@@ -1,0 +1,45 @@
+configfile: "config.yaml"
+
+localrules: finish
+
+#################################################################################
+### Finish rule
+#################################################################################
+
+rule finish:
+	input:
+		idx_transcriptome = os.path.join(config["output_dir"], "transcriptome_index_segemehl.idx"),
+		idx_genome = os.path.join(config["output_dir"], "genome_index_segemehl.idx")
+
+#################################################################################
+### Generate segemehl index for transcripts
+#################################################################################
+
+rule generate_segemehl_index_transcriptome:
+	input:
+		sequence = config["transcriptome"]
+	output:
+		idx = os.path.join(config["output_dir"], "transcriptome_index_segemehl.idx")
+	log:
+		os.path.join(config["local_log"], "generate_segemehl_index_transcriptome.log")
+	singularity:
+		"docker://zavolab/segemehl:0.2.0"
+	shell:
+		"(segemehl.x -x {output.idx} -d {input.sequence}) &> {log}"
+
+
+#################################################################################
+### Generate segemehl index for genome
+#################################################################################
+
+rule generate_segemehl_index_genome:
+	input:
+		sequence = config["genome"]
+	output:
+		idx = os.path.join(config["output_dir"], "genome_index_segemehl.idx")
+	log:
+		os.path.join(config["local_log"], "generate_segemehl_index_genome.log")
+	singularity:
+		"docker://zavolab/segemehl:0.2.0"
+	shell:
+		"(segemehl.x -x {output.idx} -d {input.sequence}) &> {log}"
