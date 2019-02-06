@@ -8,8 +8,10 @@ localrules: finish
 
 rule finish:
 	input:
-		idx_transcriptome = os.path.join(config["output_dir"], "transcriptome_index_segemehl.idx"),
-		idx_genome = os.path.join(config["output_dir"], "genome_index_segemehl.idx")
+		# idx_transcriptome = os.path.join(config["output_dir"], "transcriptome_index_segemehl.idx"),
+		idx_genome = os.path.join(config["output_dir"], "genome_index_segemehl.idx"),
+		# exons_gtf = os.path.join(config["output_dir"], "exons.gtf"),
+		# exons_bed = os.path.join(config["output_dir"], "exons.bed")
 
 #################################################################################
 ### Generate segemehl index for transcripts
@@ -43,3 +45,38 @@ rule generate_segemehl_index_genome:
 		"docker://zavolab/segemehl:0.2.0"
 	shell:
 		"(segemehl.x -x {output.idx} -d {input.sequence}) &> {log}"
+
+
+#################################################################################
+### GTF file of exons (genomic coordinates)
+#################################################################################
+
+rule get_exons_gtf:
+	input:
+		gtf = config["gtf"]
+	output:
+		exons = os.path.join(config["output_dir"], "exons.gtf")
+	log:
+		os.path.join(config["local_log"], "get_exons_gtf.log")
+	singularity:
+		"docker://ubuntu:18.04"
+	shell:
+		"(awk '$3 == \"exon\"' {input.gtf} > {output.exons} ) &> {log}"
+
+
+#################################################################################
+### Convert GTF file of exons to BED file
+#################################################################################
+
+rule gtftobed:
+	input:
+		exons = os.path.join(config["output_dir"], "exons.gtf")
+	output:
+		exons = os.path.join(config["output_dir"], "exons.bed")
+	log:
+		os.path.join(config["local_log"], "gtftobed.log")
+	singularity:
+		"docker://zavolab/bedops:2.4.35"
+	shell:
+		"(convert2bed --input=gtf --output=bed < {input.exons} > {output.exons}) &> {log}"
+
