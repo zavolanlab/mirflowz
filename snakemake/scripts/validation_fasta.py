@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 import sys
 import re
-import argparse
 import gzip
+from argparse import ArgumentParser, RawTextHelpFormatter
+
 
 ### Created: Feb 12, 2019
 ### Author: Paula Iborra 
@@ -20,22 +21,44 @@ i.e usage:
 python ~devagy74/projects/mir-prepare-annotation/snakemake/scripts/validation_fasta.py --trim="." --idlist $idlist -f $filter -i $fasta -o $out
 '''
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description="Script to filter FASTA files"
+### ARGUMENTS ###
+
+parser = ArgumentParser(
+    description="Script to filter FASTA files"
     )
-    parser.add_argument('-v','--version', action='version', version='%(prog)s 1.0',
-        help="Show program's version number and exit")
-    parser.add_argument('--trim', 
-        help="Character/s used to trim the ID. Remove anything that follows the character/s. \
-        Default: first white space",
-        type=str, nargs='?', default="")
-    parser.add_argument('--idlist', help="Generate text file with one ID per line")
-    parser.add_argument('-f','--filter', help="Remove IDs from FASTA file missing in filter file.\
-        Filter file must contain ONE ID per line")
-    parser.add_argument('-i','--infile', required=True, help="input FASTA file", type=str)
-    parser.add_argument('-o','--output', help="Output FASTA file")
-    args = parser.parse_args()
+parser.add_argument(
+    '-v','--version', 
+    action='version', 
+    version='%(prog)s 1.0',
+    help="Show program's version number and exit"
+    )
+parser.add_argument(
+    '--trim', 
+    help="Character/s used to trim the ID. Remove anything that follows the character/s. Default: first white space",
+    type=str, 
+    nargs='?', 
+    default=""
+    )
+parser.add_argument(
+    '--idlist', 
+    help="Generate text file with one ID per line"
+    )
+parser.add_argument(
+    '-f','--filter',
+    help="Remove IDs from FASTA file missing in filter file. Filter file must contain ONE ID per line"
+    )
+parser.add_argument(
+    '-i','--input', 
+    required=True, 
+    help="Input FASTA file", 
+    type=str
+    )
+parser.add_argument(
+    '-o','--output', 
+    help="Output FASTA file"
+    )
+    
+args = parser.parse_args()
 
 ### PARSE FASTA FILE ###
 
@@ -46,20 +69,27 @@ class Seq:
         self.seq=""
     def __init__(self):
         self.features=""
-      
-record=[]
+
+     
+record=[] #list of records 
 nrec=-1
 inseq=0
 
+
+# open files 
 if args.infile.endswith('.gz'):
     f = gzip.open(args.infile, 'rt')
 else:
     f = open(args.infile)
 
+# parse fasta file
+sys.stdout.write("Parsing and FASTA file...")
 for line in f:
     if re.match(r'^>' , line):
         nrec+=1
         record.append(Seq())
+
+        # define id of the record
         if args.trim == None:
             mobj=re.match ( r'^>(\S*)(.*)', line)
         elif args.trim == ".":
@@ -67,6 +97,7 @@ for line in f:
         else:
             mobj=re.match(r'^>([^%s]*)(.*)'%args.trim , line)
 
+        # add id and features
         if (mobj):
             record[nrec].id=mobj.group(1)
             record[nrec].features=mobj.group(2)
@@ -78,16 +109,20 @@ for line in f:
         else:
             cstring=record[nrec].seq+line
             record[nrec].seq = cstring
-
+sys.stdout.write("DONE")
 
 ## ID FILTER LIST ##
 
 if (args.filter):
+    sys.stdout.write("Filtering FASTA file...")
     id_filter=[line.rstrip('\n') for line in open(args.filter)]
+    sys.stdout.write("DONE\n")
+
 
 ## OUTPUT FASTA FILE ##
 
 if (args.output):
+    sys.stdout.write("Writing FASTA file...")
     with open(args.output, 'w') as output:
         if (args.filter):
             for x in range(0,nrec+1):
@@ -99,11 +134,13 @@ if (args.output):
             for x in range(0,nrec+1):
                 output.write(">%s\n%s\n"%(re.sub(r'\n', "",record[x].id), re.sub(r'\n', "", record[x].seq)))
     output.close()
+    sys.stdout.write("DONE\n")
 
 ## OUPUT LIST IDs ##    
 
 idlist=[]
 if (args.idlist):
+    sys.stdout.write("Creating IDs list from FASTA file...")
     with open(args.idlist, 'w') as id_list:
         if (args.filter):
             for x in range(0,nrec+1):
@@ -117,4 +154,5 @@ if (args.idlist):
         idlist.sort()
         id_list.write('\n'.join(idlist))
     id_list.close()
+    sys.stdout.write("DONE\n")
 
