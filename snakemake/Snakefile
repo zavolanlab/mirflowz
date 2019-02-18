@@ -9,9 +9,11 @@ localrules: finish
 rule finish:
 	input:
 		# idx_transcriptome = os.path.join(config["output_dir"], "transcriptome_index_segemehl.idx"),
-		idx_genome = os.path.join(config["output_dir"], "genome_index_segemehl.idx"),
-		# exons_gtf = os.path.join(config["output_dir"], "exons.gtf"),
-		# exons_bed = os.path.join(config["output_dir"], "exons.bed")
+		# idx_genome = os.path.join(config["output_dir"], "genome_index_segemehl.idx"),
+		exons_gtf = os.path.join(config["output_dir"], "exons.gtf"),
+		exons_bed = os.path.join(config["output_dir"], "exons.bed"),
+		fasta = os.path.join(config["output_dir"], "####"),
+
 
 #################################################################################
 ### Generate segemehl index for transcripts
@@ -76,7 +78,56 @@ rule gtftobed:
 	log:
 		os.path.join(config["local_log"], "gtftobed.log")
 	singularity:
-		"docker://zavolab/bedops:2.4.35"
+		"docker://zavolab/r-zavolab:3.5.1"
 	shell:
-		"(convert2bed --input=gtf --output=bed < {input.exons} > {output.exons}) &> {log}"
+		"(Rscript scripts/gtf_exons_bed.1.1.2.R --gtf {input.exons} -o {output.exons}) &> {log}"
+
+#################################################################################
+### Trim transcript IDs from FASTA file and get list IDs. 
+#################################################################################
+
+rule trim_fasta:
+	input:
+		fasta = config["transcriptome"]
+	output:
+		idlist = os.path.join(config["output_dir"], "idlist_fasta.txt"),
+		fasta = os.path.join(config["output_dir"], "transcriptome_idtrim.fa")
+	log:
+		os.path.join(config["local_log"], "trim_fasta.log")
+	shell:
+		"(python scripts/validation_fasta.py --trim=\".\" --idlist {output.idlist} -i {input.fasta} -o {output.fasta}) &> {log}"
+
+#################################################################################
+### Filter GTF and get ID list
+#################################################################################
+
+rule filter_gtf:
+	input:
+		idlist = os.path.join(config["output_dir"], "idlist_fasta.txt"),
+		gtf = config["gtf"]
+	output:
+		idlist = os.path.join(config["output_dir"], "idlist_gtf.txt"),
+		gtf = os.path.join(config["output_dir"], "gtf_filtered.gtf")
+	log:
+		os.path.join(config["local_log"], "filter_gtf.log")
+	shell:
+		"(ppython scripts/validation_gtf.py --idlist {output.idlist} -f ${input.idlist} -i {input.gtf} -o {output.gtf}) &> {log}"
+
+#################################################################################
+### FIlter FASTA file
+#################################################################################
+
+rule filter_fasta:
+	input:
+		fasta = os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
+		idlist = os.path.join(config["output_dir"], "idlist_gtf.txt"),
+	output:
+		idlist = os.path.join(config["output_dir"], "idlist_gtf.txt"),
+		fasta = os.path.join(config["output_dir"], "transcriptome_filtered.gtf")
+	log:
+		os.path.join(config["local_log"], "filter_fasta.log")
+	shell:
+		"(python scripts/validation_fasta.py --trim=\".\" --filter {input.idlist} -i {input.fasta} -o {output.fasta}) &> {log}"
+
+
 
