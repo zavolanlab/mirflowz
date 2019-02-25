@@ -10,9 +10,16 @@ rule finish:
 	input:
 		# idx_transcriptome = os.path.join(config["output_dir"], "transcriptome_index_segemehl.idx"),
 		# idx_genome = os.path.join(config["output_dir"], "genome_index_segemehl.idx"),
-		exons_gtf = os.path.join(config["output_dir"], "exons.gtf"),
-		exons_bed = os.path.join(config["output_dir"], "exons.bed"),
-		fasta = os.path.join(config["output_dir"], "####"),
+		# exons_gtf = os.path.join(config["output_dir"], "exons.gtf"),
+		# exons_bed = os.path.join(config["output_dir"], "exons.bed"),
+		# fasta = os.path.join(config["output_dir"], "####"),
+		header = os.path.join(config["output_dir"], "headerOfCollapsedFasta.sam")
+
+
+#################################################################################
+### DOWNLOAD DATA 
+#################################################################################
+
 
 
 #################################################################################
@@ -114,7 +121,7 @@ rule filter_gtf:
 		"(ppython scripts/validation_gtf.py --idlist {output.idlist} -f ${input.idlist} -i {input.gtf} -o {output.gtf}) &> {log}"
 
 #################################################################################
-### FIlter FASTA file
+### Filter FASTA file
 #################################################################################
 
 rule filter_fasta:
@@ -128,6 +135,29 @@ rule filter_fasta:
 		os.path.join(config["local_log"], "filter_fasta.log")
 	shell:
 		"(python scripts/validation_fasta.py --trim=\".\" --filter {input.idlist} -i {input.fasta} -o {output.fasta}) &> {log}"
+
+#################################################################################
+### Create header for SAM file
+#################################################################################
+
+rule create_header_genome:
+	input:
+		genome = config["genome"]
+	output:
+		header = os.path.join(config["output_dir"], "headerOfCollapsedFasta.sam")
+	log:
+		os.path.join(config["local_log"], "create_header_genome.log")
+	singularity:
+		"docker://zavolab/samtools:1.8"
+	shell:
+		"(samtools dict -o {output.header} {input.genome}) &> {log}"
+
+
+
+
+
+
+
 
 
 
