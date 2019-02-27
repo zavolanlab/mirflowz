@@ -67,36 +67,38 @@ if (args.filter):
     #open filter file and make it a list
     id_filter=[line.rstrip('\n') for line in open(args.filter)]
 
-    w = open('pregtf.gtf', 'w')
+    pregtf = open('pregtf.gtf', 'w')
 
     for gtf_line in gtf_file:
         if gtf_line.type in ['gene', 'transcript', 'exon']:
         ## filter by gene_id
             if args.idfield == 'gene_id':
                 if gtf_line.attr['gene_id'] in id_filter:
-                    w.write(gtf_line.get_gff_line())
+                    pregtf.write(gtf_line.get_gff_line())
 
         ## filter by anything else
             else:
                 if args.idfield not in gtf_line.attr.keys():
-                    w.write(gtf_line.get_gff_line())
+                    pregtf.write(gtf_line.get_gff_line())
                 
                 else:
                     if gtf_line.attr[args.idfield] in id_filter:
-                        w.write(gtf_line.get_gff_line())
+                        pregtf.write(gtf_line.get_gff_line())
     
+    pregtf.close()
     sys.stdout.write('DONE\n')
 
+### OUTPUT GTF FILE ### 
 # remove those lines with no childs (empty genes / transcripts)
     
-    sys.stdout.write('Filtering GTF file - Step 2...')
+    sys.stdout.write('Filtering/Writing GTF file - Step 2...')
     pregtf = open('pregtf.gtf', 'r')
-    w = open(args.output, 'w')
+    gtf_output = open(args.output, 'w')
     previous = []
 
     if args.idfield == 'gene_id':
         for line in pregtf:
-            w.write(line)
+            gtf_output.write(line)
 
     elif args.idfield == 'transcript_id':
         # store first line
@@ -109,20 +111,20 @@ if (args.filter):
 
             if line[2] == previous[-1][2]:
                 if line[2] != 'gene':
-                    w.write('\t'.join(previous[-1]))
+                    gtf_output.write('\t'.join(previous[-1]))
                     del previous[-1]
                     previous.append(line)
                 else:
                     del previous[-1]
                     previous.append(line)
             else:
-                w.write('\t'.join(previous[-1]))
+                gtf_output.write('\t'.join(previous[-1]))
                 del previous[-1]
                 previous.append(line)
 
         #for last line
         if previous[-1][2] == 'exon':
-            w.write('\t'.join(previous[-1]))
+            gtf_output.write('\t'.join(previous[-1]))
 
     elif args.idfield == 'exon_id':
         for line in reversed(open('pregtf.gtf','r').readlines()):
@@ -143,44 +145,34 @@ if (args.filter):
                         print('FILTER ERROR')
                         break
         for i in previous[::-1]:
-            w.write('\t'.join(i))
+            gtf_output.write('\t'.join(i))
 
+    gtf_output.close()
     sys.stdout.write('DONE\n')
 
 
-### OUTPUT GTF FILE ### 
-
-# sys.stdout.write('Writing GTF file...')
-# w = open(args.output, 'w')
-# for gtf_line in gtf_file:
-#     if gtf_line.type == 'gene':
-#         if (gtf_line.attr['gene_id'] in gene_trx):
-#             w.write(gtf_line.get_gff_line())
-
-#     elif gtf_line.type == 'transcript':
-#         if (gtf_line.attr['transcript_id'] in trx):
-#             w.write(gtf_line.get_gff_line())
-
-#     elif gtf_line.type == 'exon':
-#         if (
-#             gtf_line.attr['gene_id'] in gene_trx and
-#             gtf_line.attr['transcript_id'] in trx
-#             ):
-#                 w.write(gtf_line.get_gff_line())
-
-#     else:
-#         continue
-
-# w.close()
-# sys.stdout.write('DONE\n')
-
 ### OUTPUT IDs GTF FILE ###
 
-# if (args.idlist):
-#     sys.stdout.write('Creating IDs list from GTF file...')
-#     with open(args.idlist, 'w') as id_list:
-#         id_list.write('\n'.join(trx))
-#         id_list.close()
-#         sys.stdout.write('DONE\n')
+if (args.idlist):
+    sys.stdout.write('Creating IDs list from GTF file...')
+    ids_list = open(args.idlist, 'w')
+    t = (re.match(r'([^_]*)',args.idfield)).group()
+
+    # creating list of ids from gtf output filtered
+    if (args.filter):
+        gtf_output = HTSeq.GFF_Reader(args.output)
+        for line in gtf_output:
+            if line.type == t:
+                    ids_list.write(line.attr[args.idfield]+'\n')
+        ids_list.close()
+    
+    # creating list of ids from input gtf file
+    else:
+        for line in gtf_file:
+            if line.type == t:
+                ids_list.write(line.attr[args.idfield]+'\n')
+        ids_list.close()
+
+    sys.stdout.write('DONE\n')
 
 
