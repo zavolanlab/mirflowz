@@ -4,8 +4,10 @@ import sys
 import re
 import HTSeq
 from argparse import ArgumentParser
-import pandas as pd
 
+### Created: Mar 5, 2019
+### Author: Paula Iborra 
+### Company: Zavolan Group, Biozentrum, University of Basel
 
 
 ### ARGUMENTS ###
@@ -148,7 +150,7 @@ if (args.filter):
             gtf_output.write('\t'.join(i))
 
     gtf_output.close()
-    sys.stdout.write('DONE\n')
+    sys.stdout.write('DONE\n') 
 
 
 ### OUTPUT IDs GTF FILE ###

@@ -5,7 +5,7 @@ import gzip
 from argparse import ArgumentParser, RawTextHelpFormatter
 
 
-### Created: Feb 12, 2019
+### Created: Mar 5, 2019
 ### Author: Paula Iborra 
 ### Company: Zavolan Group, Biozentrum, University of Basel
 
@@ -34,7 +34,7 @@ parser.add_argument(
     )
 parser.add_argument(
     '--trim', 
-    help="Character/s used to trim the ID. Remove anything that follows the character/s. Default: first white space",
+    help="Character\'s used to trim the ID. Remove anything that follows the character/s. Write \\ infront of \'.\' and \'-\'(i.e trim=\"$\\.\\-|_\").  Default: first white space",
     type=str, 
     nargs='?', 
     default=""
@@ -77,23 +77,21 @@ inseq=0
 
 
 # open files 
-if args.infile.endswith('.gz'):
-    f = gzip.open(args.infile, 'rt')
+if args.input.endswith('.gz'):
+    f = gzip.open(args.input, 'rt')
 else:
-    f = open(args.infile)
+    f = open(args.input)
 
 # parse fasta file
-sys.stdout.write("Parsing and FASTA file...")
+sys.stdout.write("Parsing FASTA file...")
 for line in f:
     if re.match(r'^>' , line):
         nrec+=1
         record.append(Seq())
 
         # define id of the record
-        if args.trim == None:
-            mobj=re.match ( r'^>(\S*)(.*)', line)
-        elif args.trim == ".":
-            mobj=re.match(r'^>([^\.]*)(.*)' , line)  
+        if not args.trim:
+            mobj=re.match ( r'^>(\S*)(.*)', line) 
         else:
             mobj=re.match(r'^>([^%s]*)(.*)'%args.trim , line)
 
@@ -109,7 +107,7 @@ for line in f:
         else:
             cstring=record[nrec].seq+line
             record[nrec].seq = cstring
-sys.stdout.write("DONE")
+sys.stdout.write("DONE\n")
 
 ## ID FILTER LIST ##
 
@@ -127,12 +125,10 @@ if (args.output):
         if (args.filter):
             for x in range(0,nrec+1):
                 if record[x].id in id_filter:
-                    output.write(">%s\n%s\n"%(re.sub(r'\n', "",record[x].id), re.sub(r'\n', "", record[x].seq)))
-                else:
-                    continue
+                    output.write(">%s\n%s"%(record[x].id, record[x].seq))
         else:
             for x in range(0,nrec+1):
-                output.write(">%s\n%s\n"%(re.sub(r'\n', "",record[x].id), re.sub(r'\n', "", record[x].seq)))
+                output.write(">%s\n%s"%(record[x].id, record[x].seq))
     output.close()
     sys.stdout.write("DONE\n")
 
@@ -155,4 +151,5 @@ if (args.idlist):
         id_list.write('\n'.join(idlist))
     id_list.close()
     sys.stdout.write("DONE\n")
+
 

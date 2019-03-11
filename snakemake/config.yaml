@@ -5,6 +5,8 @@
   genome: "/scicore/home/zavolan/GROUP/test_datasets/annotation/Homo_sapiens.GRCh38.dna_sm.primary_assembly.clean.fa"
   transcriptome: "/scicore/home/zavolan/GROUP/test_datasets/annotation/Homo_sapiens.GRCh38.cdna.all.ncrna.clean.fa"
   gtf: "/scicore/home/zavolan/GROUP/test_datasets/annotation/Homo_sapiens.GRCh38.89.chr.gtf"
+  filtered_transcriptome: "/scicore/home/zavolan/devagy74/projects/mir-prepare-annotation/snakemake/results/transcriptome_filtered.fa"
+  filtered_gtf: "/scicore/home/zavolan/devagy74/projects/mir-prepare-annotation/snakemake/results/gtf_filtered.gtf"
   ##############################################################################
   ### Output and log directory
   ##############################################################################

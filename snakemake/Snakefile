@@ -8,11 +8,9 @@ localrules: finish
 
 rule finish:
 	input:
-		# idx_transcriptome = os.path.join(config["output_dir"], "transcriptome_index_segemehl.idx"),
-		# idx_genome = os.path.join(config["output_dir"], "genome_index_segemehl.idx"),
-		# exons_gtf = os.path.join(config["output_dir"], "exons.gtf"),
-		# exons_bed = os.path.join(config["output_dir"], "exons.bed"),
-		# fasta = os.path.join(config["output_dir"], "####"),
+		idx_transcriptome = os.path.join(config["output_dir"], "transcriptome_index_segemehl.idx"),
+		idx_genome = os.path.join(config["output_dir"], "genome_index_segemehl.idx"),
+		exons_bed = os.path.join(config["output_dir"], "exons.bed"),
 		header = os.path.join(config["output_dir"], "headerOfCollapsedFasta.sam")
 
 
@@ -22,13 +20,63 @@ rule finish:
 
 
 
+
+#################################################################################
+### Trim transcript IDs from FASTA file and get list IDs. 
+#################################################################################
+
+rule trim_fasta:
+	input:
+		fasta = config["transcriptome"]
+	output:
+		idlist = os.path.join(config["output_dir"], "idlist_fasta.txt"),
+		fasta = os.path.join(config["output_dir"], "transcriptome_idtrim.fa")
+	log:
+		os.path.join(config["local_log"], "trim_fasta.log")
+	shell:
+		"(python scripts/validation_fasta.py --trim=\"\\.\" --idlist {output.idlist} -i {input.fasta} -o {output.fasta}) &> {log}"
+
+#################################################################################
+### Filter GTF and get ID list
+#################################################################################
+
+rule filter_gtf:
+	input:
+		idlist = os.path.join(config["output_dir"], "idlist_fasta.txt"),
+		gtf = config["gtf"]
+	output:
+		idlist = os.path.join(config["output_dir"], "idlist_gtf.txt"),
+		gtf = os.path.join(config["output_dir"], "gtf_filtered.gtf")
+	singularity:
+		"docker://zavolab/python_htseq:3.6.5_0.10.0"
+	log:
+		os.path.join(config["local_log"], "filter_gtf.log")
+	shell:
+		"(python scripts/validation_gtf.py --idlist {output.idlist} -f {input.idlist} -i {input.gtf} -o {output.gtf}) &> {log}"
+
+#################################################################################
+### Filter FASTA file
+#################################################################################
+
+rule filter_fasta:
+	input:
+		fasta = os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
+		idlist = os.path.join(config["output_dir"], "idlist_gtf.txt"),
+	output:
+		fasta = os.path.join(config["output_dir"], "transcriptome_filtered.fa")
+	log:
+		os.path.join(config["local_log"], "filter_fasta.log")
+	shell:
+		"(python scripts/validation_fasta.py --filter {input.idlist} -i {input.fasta} -o {output.fasta}) &> {log}"
+
+
 #################################################################################
 ### Generate segemehl index for transcripts
 #################################################################################
 
 rule generate_segemehl_index_transcriptome:
 	input:
-		sequence = config["transcriptome"]
+		fasta = os.path.join(config["output_dir"], "transcriptome_filtered.fa")
 	output:
 		idx = os.path.join(config["output_dir"], "transcriptome_index_segemehl.idx")
 	log:
@@ -36,7 +84,7 @@ rule generate_segemehl_index_transcriptome:
 	singularity:
 		"docker://zavolab/segemehl:0.2.0"
 	shell:
-		"(segemehl.x -x {output.idx} -d {input.sequence}) &> {log}"
+		"(segemehl.x -x {output.idx} -d {input.fasta}) &> {log}"
 
 
 #################################################################################
@@ -62,7 +110,7 @@ rule generate_segemehl_index_genome:
 
 rule get_exons_gtf:
 	input:
-		gtf = config["gtf"]
+		gtf = os.path.join(config["output_dir"], "gtf_filtered.gtf")
 	output:
 		exons = os.path.join(config["output_dir"], "exons.gtf")
 	log:
@@ -89,52 +137,7 @@ rule gtftobed:
 	shell:
 		"(Rscript scripts/gtf_exons_bed.1.1.2.R --gtf {input.exons} -o {output.exons}) &> {log}"
 
-#################################################################################
-### Trim transcript IDs from FASTA file and get list IDs. 
-#################################################################################
 
-rule trim_fasta:
-	input:
-		fasta = config["transcriptome"]
-	output:
-		idlist = os.path.join(config["output_dir"], "idlist_fasta.txt"),
-		fasta = os.path.join(config["output_dir"], "transcriptome_idtrim.fa")
-	log:
-		os.path.join(config["local_log"], "trim_fasta.log")
-	shell:
-		"(python scripts/validation_fasta.py --trim=\".\" --idlist {output.idlist} -i {input.fasta} -o {output.fasta}) &> {log}"
-
-#################################################################################
-### Filter GTF and get ID list
-#################################################################################
-
-rule filter_gtf:
-	input:
-		idlist = os.path.join(config["output_dir"], "idlist_fasta.txt"),
-		gtf = config["gtf"]
-	output:
-		idlist = os.path.join(config["output_dir"], "idlist_gtf.txt"),
-		gtf = os.path.join(config["output_dir"], "gtf_filtered.gtf")
-	log:
-		os.path.join(config["local_log"], "filter_gtf.log")
-	shell:
-		"(ppython scripts/validation_gtf.py --idlist {output.idlist} -f ${input.idlist} -i {input.gtf} -o {output.gtf}) &> {log}"
-
-#################################################################################
-### Filter FASTA file
-#################################################################################
-
-rule filter_fasta:
-	input:
-		fasta = os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
-		idlist = os.path.join(config["output_dir"], "idlist_gtf.txt"),
-	output:
-		idlist = os.path.join(config["output_dir"], "idlist_gtf.txt"),
-		fasta = os.path.join(config["output_dir"], "transcriptome_filtered.gtf")
-	log:
-		os.path.join(config["local_log"], "filter_fasta.log")
-	shell:
-		"(python scripts/validation_fasta.py --trim=\".\" --filter {input.idlist} -i {input.fasta} -o {output.fasta}) &> {log}"
 
 #################################################################################
 ### Create header for SAM file
