@@ -9,17 +9,6 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 ### Author: Paula Iborra 
 ### Company: Zavolan Group, Biozentrum, University of Basel
 
-### TEST FILES ###
-'''
-out="/scicore/home/zavolan/devagy74/projects/mir-prepare-annotation/snakemake/results/fasta_out.fa"
-fasta="/scicore/home/zavolan/devagy74/projects/mir-prepare-annotation/snakemake/fastatest.fa"
-filter="/scicore/home/zavolan/devagy74/projects/mir-prepare-annotation/snakemake/filterlist.txt"
-idlist="/scicore/home/zavolan/devagy74/projects/mir-prepare-annotation/snakemake/results/idlist.txt"
-fastagz="/scicore/home/zavolan/devagy74/projects/mir-prepare-annotation/snakemake/fastatest.fa.gz"
-
-i.e usage:
-python ~devagy74/projects/mir-prepare-annotation/snakemake/scripts/validation_fasta.py --trim="." --idlist $idlist -f $filter -i $fasta -o $out
-'''
 
 ### ARGUMENTS ###
 
