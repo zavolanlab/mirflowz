@@ -1,6 +1,6 @@
 configfile: "config.yaml"
 
-localrules: finish
+localrules: finish, create_header_genome, trim_fasta, get_exons_gtf, gtftobed
 
 #################################################################################
 ### Finish rule
@@ -18,7 +18,17 @@ rule finish:
 ### DOWNLOAD DATA 
 #################################################################################
 
-
+# rule download_files:
+# 	input:
+# 		files = config["input_files"]
+# 	output:
+# 		files = config["download_directory"]
+# 	params:
+# 		type = config["download_type"]
+# 	log:
+# 		os.path.join(config["local_log"], "download_files.log")
+# 	shell:
+# 		"(python scripts/download_files.py {}) &> {log}"
 
 
 #################################################################################
@@ -27,14 +37,17 @@ rule finish:
 
 rule trim_fasta:
 	input:
-		fasta = config["transcriptome"]
+		fasta = config["transcriptome"],
+		script =  os.path.join(config["scripts_dir"], "validation_fasta.py")
 	output:
 		idlist = os.path.join(config["output_dir"], "idlist_fasta.txt"),
 		fasta = os.path.join(config["output_dir"], "transcriptome_idtrim.fa")
+	params:
+		cluster_log = os.path.join(config["cluster_log"], "trim_fasta.log")
 	log:
 		os.path.join(config["local_log"], "trim_fasta.log")
 	shell:
-		"(python scripts/validation_fasta.py --trim=\"\\.\" --idlist {output.idlist} -i {input.fasta} -o {output.fasta}) &> {log}"
+		"(python {input.script} --trim=\"\\.\" --idlist {output.idlist} -i {input.fasta} -o {output.fasta}) &> {log}"
 
 #################################################################################
 ### Filter GTF and get ID list
@@ -43,16 +56,19 @@ rule trim_fasta:
 rule filter_gtf:
 	input:
 		idlist = os.path.join(config["output_dir"], "idlist_fasta.txt"),
-		gtf = config["gtf"]
+		gtf = config["gtf"],
+		script =  os.path.join(config["scripts_dir"], "validation_gtf.py")
 	output:
 		idlist = os.path.join(config["output_dir"], "idlist_gtf.txt"),
 		gtf = os.path.join(config["output_dir"], "gtf_filtered.gtf")
+	params:
+		cluster_log = os.path.join(config["cluster_log"], "filter_gtf.log")
 	singularity:
 		"docker://zavolab/python_htseq:3.6.5_0.10.0"
 	log:
 		os.path.join(config["local_log"], "filter_gtf.log")
 	shell:
-		"(python scripts/validation_gtf.py --idlist {output.idlist} -f {input.idlist} -i {input.gtf} -o {output.gtf}) &> {log}"
+		"(python {input.script} --idlist {output.idlist} -f {input.idlist} -i {input.gtf} -o {output.gtf}) &> {log}"
 
 #################################################################################
 ### Filter FASTA file
@@ -62,12 +78,15 @@ rule filter_fasta:
 	input:
 		fasta = os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
 		idlist = os.path.join(config["output_dir"], "idlist_gtf.txt"),
+		script =  os.path.join(config["scripts_dir"], "validation_fasta.py")
 	output:
 		fasta = os.path.join(config["output_dir"], "transcriptome_filtered.fa")
+	params:
+		cluster_log = os.path.join(config["cluster_log"], "filter_fasta.log")
 	log:
 		os.path.join(config["local_log"], "filter_fasta.log")
 	shell:
-		"(python scripts/validation_fasta.py --filter {input.idlist} -i {input.fasta} -o {output.fasta}) &> {log}"
+		"(python {input.script} --filter {input.idlist} -i {input.fasta} -o {output.fasta}) &> {log}"
 
 
 #################################################################################
@@ -79,8 +98,14 @@ rule generate_segemehl_index_transcriptome:
 		fasta = os.path.join(config["output_dir"], "transcriptome_filtered.fa")
 	output:
 		idx = os.path.join(config["output_dir"], "transcriptome_index_segemehl.idx")
+	params:
+		cluster_log = os.path.join(config["cluster_log"], "generate_segemehl_index_transcriptome.log"),
 	log:
 		os.path.join(config["local_log"], "generate_segemehl_index_transcriptome.log")
+	resources:
+		mem = 75,
+		threads = 8,
+		time = "06:00:00"
 	singularity:
 		"docker://zavolab/segemehl:0.2.0"
 	shell:
@@ -96,8 +121,14 @@ rule generate_segemehl_index_genome:
 		sequence = config["genome"]
 	output:
 		idx = os.path.join(config["output_dir"], "genome_index_segemehl.idx")
+	params:
+		cluster_log = os.path.join(config["cluster_log"], "generate_segemehl_index_genome.log"),
 	log:
 		os.path.join(config["local_log"], "generate_segemehl_index_genome.log")
+	resources:
+		mem = 75,
+		threads = 8,
+		time = "06:00:00"
 	singularity:
 		"docker://zavolab/segemehl:0.2.0"
 	shell:
@@ -110,15 +141,18 @@ rule generate_segemehl_index_genome:
 
 rule get_exons_gtf:
 	input:
-		gtf = os.path.join(config["output_dir"], "gtf_filtered.gtf")
+		gtf = os.path.join(config["output_dir"], "gtf_filtered.gtf"),
+		script = os.path.join(config["scripts_dir"], "get_lines_w_pattern.sh")
 	output:
 		exons = os.path.join(config["output_dir"], "exons.gtf")
+	params:
+		cluster_log = os.path.join(config["cluster_log"], "get_exons_gtf.log")
 	log:
 		os.path.join(config["local_log"], "get_exons_gtf.log")
 	singularity:
 		"docker://ubuntu:18.04"
 	shell:
-		"(awk '$3 == \"exon\"' {input.gtf} > {output.exons} ) &> {log}"
+		"(bash {input.script} -f {input.gtf} -c 3 -p exon -o {output.exons} ) &> {log}"
 
 
 #################################################################################
@@ -127,15 +161,18 @@ rule get_exons_gtf:
 
 rule gtftobed:
 	input:
-		exons = os.path.join(config["output_dir"], "exons.gtf")
+		exons = os.path.join(config["output_dir"], "exons.gtf"),
+		script = os.path.join(config["scripts_dir"], "gtf_exons_bed.1.1.2.R")
 	output:
 		exons = os.path.join(config["output_dir"], "exons.bed")
+	params:
+		cluster_log = os.path.join(config["cluster_log"], "gtftobed.log")
 	log:
 		os.path.join(config["local_log"], "gtftobed.log")
 	singularity:
 		"docker://zavolab/r-zavolab:3.5.1"
 	shell:
-		"(Rscript scripts/gtf_exons_bed.1.1.2.R --gtf {input.exons} -o {output.exons}) &> {log}"
+		"(Rscript {input.script} --gtf {input.exons} -o {output.exons}) &> {log}"
 
 
 
@@ -148,6 +185,8 @@ rule create_header_genome:
 		genome = config["genome"]
 	output:
 		header = os.path.join(config["output_dir"], "headerOfCollapsedFasta.sam")
+	params:
+		cluster_log = os.path.join(config["cluster_log"], "create_header_genome.log")
 	log:
 		os.path.join(config["local_log"], "create_header_genome.log")
 	singularity:
