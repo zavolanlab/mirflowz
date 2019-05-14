@@ -1,6 +1,6 @@
 configfile: "config.yaml"
 
-localrules: finish, create_header_genome, trim_fasta, get_exons_gtf, gtftobed
+localrules: finish, create_header_genome, get_exons_gtf, gtftobed, trim_fasta
 
 #################################################################################
 ### Finish rule
@@ -8,6 +8,7 @@ localrules: finish, create_header_genome, trim_fasta, get_exons_gtf, gtftobed
 
 rule finish:
 	input:
+		trx = os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
 		idx_transcriptome = os.path.join(config["output_dir"], "transcriptome_index_segemehl.idx"),
 		idx_genome = os.path.join(config["output_dir"], "genome_index_segemehl.idx"),
 		exons_bed = os.path.join(config["output_dir"], "exons.bed"),
@@ -32,61 +33,80 @@ rule finish:
 
 
 #################################################################################
-### Trim transcript IDs from FASTA file and get list IDs. 
+### Extract transcriptome sequences in FASTA from genome.
 #################################################################################
+
+rule extract_transcriptome_seqs:
+	input:
+		fasta = config["genome"],
+		gtf = config["gtf"]
+	output:
+		fasta = os.path.join(config["output_dir"], "transcriptome.fa")
+	params:
+		cluster_log = os.path.join(config["cluster_log"], "extract_transcriptome_seqs.log")
+	log:
+		os.path.join(config["local_log"], "extract_transcriptome_seqs.log")
+	singularity:
+		"docker://zavolab/cufflinks:2.2.1"
+	shell:
+		"(gffread -w {output.fasta} -g {input.fasta} {input.gtf}> {output.fasta}) &> {log}"
+
+
+################################################################################
+## Trim transcript IDs from FASTA file
+################################################################################
 
 rule trim_fasta:
 	input:
-		fasta = config["transcriptome"],
+		fasta = os.path.join(config["output_dir"], "transcriptome.fa"),
 		script =  os.path.join(config["scripts_dir"], "validation_fasta.py")
 	output:
-		idlist = os.path.join(config["output_dir"], "idlist_fasta.txt"),
 		fasta = os.path.join(config["output_dir"], "transcriptome_idtrim.fa")
 	params:
 		cluster_log = os.path.join(config["cluster_log"], "trim_fasta.log")
 	log:
 		os.path.join(config["local_log"], "trim_fasta.log")
 	shell:
-		"(python {input.script} --trim=\"\\.\" --idlist {output.idlist} -i {input.fasta} -o {output.fasta}) &> {log}"
+		"(python {input.script} --trim -i {input.fasta} -o {output.fasta}) &> {log}"
 
 #################################################################################
 ### Filter GTF and get ID list
 #################################################################################
 
-rule filter_gtf:
-	input:
-		idlist = os.path.join(config["output_dir"], "idlist_fasta.txt"),
-		gtf = config["gtf"],
-		script =  os.path.join(config["scripts_dir"], "validation_gtf.py")
-	output:
-		idlist = os.path.join(config["output_dir"], "idlist_gtf.txt"),
-		gtf = os.path.join(config["output_dir"], "gtf_filtered.gtf")
-	params:
-		cluster_log = os.path.join(config["cluster_log"], "filter_gtf.log")
-	singularity:
-		"docker://zavolab/python_htseq:3.6.5_0.10.0"
-	log:
-		os.path.join(config["local_log"], "filter_gtf.log")
-	shell:
-		"(python {input.script} --idlist {output.idlist} -f {input.idlist} -i {input.gtf} -o {output.gtf}) &> {log}"
+# rule filter_gtf:
+# 	input:
+# 		idlist = os.path.join(config["output_dir"], "idlist_fasta.txt"),
+# 		gtf = config["gtf"],
+# 		script =  os.path.join(config["scripts_dir"], "validation_gtf.py")
+# 	output:
+# 		idlist = os.path.join(config["output_dir"], "idlist_gtf.txt"),
+# 		gtf = os.path.join(config["output_dir"], "gtf_filtered.gtf")
+# 	params:
+# 		cluster_log = os.path.join(config["cluster_log"], "filter_gtf.log")
+# 	singularity:
+# 		"docker://zavolab/python_htseq:3.6.5_0.10.0"
+# 	log:
+# 		os.path.join(config["local_log"], "filter_gtf.log")
+# 	shell:
+# 		"(python {input.script} --idlist {output.idlist} -f {input.idlist} -i {input.gtf} -o {output.gtf}) &> {log}"
 
 #################################################################################
 ### Filter FASTA file
 #################################################################################
 
-rule filter_fasta:
-	input:
-		fasta = os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
-		idlist = os.path.join(config["output_dir"], "idlist_gtf.txt"),
-		script =  os.path.join(config["scripts_dir"], "validation_fasta.py")
-	output:
-		fasta = os.path.join(config["output_dir"], "transcriptome_filtered.fa")
-	params:
-		cluster_log = os.path.join(config["cluster_log"], "filter_fasta.log")
-	log:
-		os.path.join(config["local_log"], "filter_fasta.log")
-	shell:
-		"(python {input.script} --filter {input.idlist} -i {input.fasta} -o {output.fasta}) &> {log}"
+# rule filter_fasta:
+# 	input:
+# 		fasta = os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
+# 		idlist = os.path.join(config["output_dir"], "idlist_gtf.txt"),
+# 		script =  os.path.join(config["scripts_dir"], "validation_fasta.py")
+# 	output:
+# 		fasta = os.path.join(config["output_dir"], "transcriptome_filtered.fa")
+# 	params:
+# 		cluster_log = os.path.join(config["cluster_log"], "filter_fasta.log")
+# 	log:
+# 		os.path.join(config["local_log"], "filter_fasta.log")
+# 	shell:
+# 		"(python {input.script} --filter {input.idlist} -i {input.fasta} -o {output.fasta}) &> {log}"
 
 
 #################################################################################
@@ -95,7 +115,7 @@ rule filter_fasta:
 
 rule generate_segemehl_index_transcriptome:
 	input:
-		fasta = os.path.join(config["output_dir"], "transcriptome_filtered.fa")
+		fasta = os.path.join(config["output_dir"], "transcriptome_idtrim.fa")
 	output:
 		idx = os.path.join(config["output_dir"], "transcriptome_index_segemehl.idx")
 	params:
@@ -105,7 +125,7 @@ rule generate_segemehl_index_transcriptome:
 	resources:
 		mem = 75,
 		threads = 8,
-		time = "06:00:00"
+		time = 6
 	singularity:
 		"docker://zavolab/segemehl:0.2.0"
 	shell:
@@ -128,7 +148,7 @@ rule generate_segemehl_index_genome:
 	resources:
 		mem = 75,
 		threads = 8,
-		time = "06:00:00"
+		time = 6
 	singularity:
 		"docker://zavolab/segemehl:0.2.0"
 	shell:
@@ -141,7 +161,7 @@ rule generate_segemehl_index_genome:
 
 rule get_exons_gtf:
 	input:
-		gtf = os.path.join(config["output_dir"], "gtf_filtered.gtf"),
+		gtf = config["gtf"],
 		script = os.path.join(config["scripts_dir"], "get_lines_w_pattern.sh")
 	output:
 		exons = os.path.join(config["output_dir"], "exons.gtf")
@@ -193,10 +213,6 @@ rule create_header_genome:
 		"docker://zavolab/samtools:1.8"
 	shell:
 		"(samtools dict -o {output.header} {input.genome}) &> {log}"
-
-
-
-
 
 
 

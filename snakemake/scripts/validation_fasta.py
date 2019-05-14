@@ -23,18 +23,28 @@ parser.add_argument(
     )
 parser.add_argument(
     '--trim', 
-    help="Character\'s used to trim the ID. Remove anything that follows the character/s. Write \\ infront of \'.\' and \'-\'(i.e trim=\"$\\.\\-|_\").  Default: first white space",
+    help="Character's used to trim the ID. Remove anything that follows the character's. Write \\ infront of \'.\' and \'-\'(i.e trim=\"$\\.\\-|_\").  Default: first white space",
     type=str, 
     nargs='?', 
     default=""
     )
 parser.add_argument(
     '--idlist', 
-    help="Generate text file with one ID per line"
+    help="Generate text file with the sequences IDs. One ID per line."
     )
 parser.add_argument(
     '-f','--filter',
-    help="Remove IDs from FASTA file missing in filter file. Filter file must contain ONE ID per line"
+    help="Input ID list. Filter IDs and sequences from FASTA file with the mode selected. Filter file must contain ONE ID per line",
+    )
+parser.add_argument(
+    '-m', '--mode',
+    help="Type of filtering fasta file: keep (k) or discard (d) IDs contained in the ID list file.",
+    choices=('k', 'd')
+    )
+parser.add_argument(
+    '-r','--remove',
+    help="Remove sequences from FASTA file longer than specified length.",
+    type=int
     )
 parser.add_argument(
     '-i','--input', 
@@ -49,6 +59,9 @@ parser.add_argument(
     
 args = parser.parse_args()
 
+if args.filter and not args.mode:
+    sys.exit("ERROR! Mode argument required when using filter option. (--mode, -m). See --help option.")
+
 ### PARSE FASTA FILE ###
 
 class Seq:
@@ -59,17 +72,15 @@ class Seq:
     def __init__(self):
         self.features=""
 
-     
-record=[] #list of records 
-nrec=-1
-inseq=0
-
-
 # open files 
 if args.input.endswith('.gz'):
     f = gzip.open(args.input, 'rt')
 else:
     f = open(args.input)
+
+record=[] #list of records 
+nrec=-1
+inseq=0
 
 # parse fasta file
 sys.stdout.write("Parsing FASTA file...")
@@ -80,7 +91,7 @@ for line in f:
 
         # define id of the record
         if not args.trim:
-            mobj=re.match ( r'^>(\S*)(.*)', line) 
+            mobj=re.match(r'^>(\S*)(.*)', line) 
         else:
             mobj=re.match(r'^>([^%s]*)(.*)'%args.trim , line)
 
@@ -111,34 +122,49 @@ if (args.filter):
 if (args.output):
     sys.stdout.write("Writing FASTA file...")
     with open(args.output, 'w') as output:
-        if (args.filter):
-            for x in range(0,nrec+1):
-                if record[x].id in id_filter:
-                    output.write(">%s\n%s"%(record[x].id, record[x].seq))
+        if (args.filter) and args.mode == 'k':
+            if (args.remove):
+                for x in range(0,nrec+1):
+                    if record[x].id in id_filter and (len(record[x].seq)-1 <= args.remove):
+                        output.write(">%s\n%s"%(record[x].id, record[x].seq))
+            else:
+                for x in range(0,nrec+1):
+                    if record[x].id in id_filter:
+                        output.write(">%s\n%s"%(record[x].id, record[x].seq))
+        elif (args.filter) and args.mode == 'd':
+            if (args.remove):
+                for x in range(0,nrec+1):
+                    if record[x].id not in id_filter and (len(record[x].seq)-1 <= args.remove):
+                        output.write(">%s\n%s"%(record[x].id, record[x].seq))
+            else:
+                for x in range(0,nrec+1):
+                    if record[x].id not in id_filter: 
+                        output.write(">%s\n%s"%(record[x].id, record[x].seq))
         else:
-            for x in range(0,nrec+1):
-                output.write(">%s\n%s"%(record[x].id, record[x].seq))
+            if (args.remove):
+                for x in range(0,nrec+1):
+                    if (len(record[x].seq)-1 <= args.remove):
+                        output.write(">%s\n%s"%(record[x].id, record[x].seq))
+            else:
+                for x in range(0,nrec+1):
+                    output.write(">%s\n%s"%(record[x].id, record[x].seq))
     output.close()
     sys.stdout.write("DONE\n")
 
-## OUPUT LIST IDs ##    
+
+## OUTPUT LIST IDs ##    
 
 idlist=[]
 if (args.idlist):
     sys.stdout.write("Creating IDs list from FASTA file...")
+    fasta = open(args.output, 'r')
     with open(args.idlist, 'w') as id_list:
-        if (args.filter):
-            for x in range(0,nrec+1):
-                if record[x].id in id_filter:
-                    idlist.append(record[x].id)
-                else:
-                    continue
-        else:
-            for x in range(0,nrec+1):
-                idlist.append(re.sub(r'\n', "",record[x].id))
+        for line in fasta:
+            if line.startswith('>'):
+                idlist.append(line[1:])
         idlist.sort()
-        id_list.write('\n'.join(idlist))
-    id_list.close()
-    sys.stdout.write("DONE\n")
+        id_list.write(''.join(idlist))
+        id_list.close()
+        sys.stdout.write("DONE\n")
 
 

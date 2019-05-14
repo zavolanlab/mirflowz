@@ -9,14 +9,14 @@
   
   "generate_segemehl_index_transcriptome":
   {
-    "time": "{resources.time}",
+    "time": "{resources.time}:00:00",
     "threads":"{resources.threads}",
     "mem":"{resources.mem}G"
   },
   
   "generate_segemehl_index_genome":
   {
-    "time": "{resources.time}",
+    "time": "{resources.time}:00:00",
     "threads":"{resources.threads}",
     "mem":"{resources.mem}G"
   }
