@@ -49,7 +49,7 @@ rule extract_transcriptome_seqs:
 	singularity:
 		"docker://zavolab/cufflinks:2.2.1"
 	shell:
-		"(gffread -w {output.fasta} -g {input.fasta} {input.gtf}> {output.fasta}) &> {log}"
+		"(gffread -w {output.fasta} -g {input.fasta} {input.gtf}) &> {log}"
 
 
 ################################################################################
