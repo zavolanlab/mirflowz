@@ -1,0 +1,56 @@
+#################################################################################
+### DOWNLOAD DATA 
+#################################################################################
+
+# rule download_files:
+# 	input:
+# 		files = config["input_files"]
+# 	output:
+# 		files = config["download_directory"]
+# 	params:
+# 		type = config["download_type"]
+# 	log:
+# 		os.path.join(config["local_log"], "download_files.log")
+# 	shell:
+# 		"(python scripts/download_files.py {}) &> {log}"
+
+
+#################################################################################
+### Filter GTF and get ID list
+#################################################################################
+
+# rule filter_gtf:
+# 	input:
+# 		idlist = os.path.join(config["output_dir"], "idlist_fasta.txt"),
+# 		gtf = config["gtf"],
+# 		script =  os.path.join(config["scripts_dir"], "validation_gtf.py")
+# 	output:
+# 		idlist = os.path.join(config["output_dir"], "idlist_gtf.txt"),
+# 		gtf = os.path.join(config["output_dir"], "gtf_filtered.gtf")
+# 	params:
+# 		cluster_log = os.path.join(config["cluster_log"], "filter_gtf.log")
+# 	singularity:
+# 		"docker://zavolab/python_htseq:3.6.5_0.10.0"
+# 	log:
+# 		os.path.join(config["local_log"], "filter_gtf.log")
+# 	shell:
+# 		"(python {input.script} --idlist {output.idlist} -f {input.idlist} -i {input.gtf} -o {output.gtf}) &> {log}"
+
+
+#################################################################################
+### Filter FASTA file
+#################################################################################
+
+# rule filter_fasta:
+# 	input:
+# 		fasta = os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
+# 		idlist = os.path.join(config["output_dir"], "idlist_gtf.txt"),
+# 		script =  os.path.join(config["scripts_dir"], "validation_fasta.py")
+# 	output:
+# 		fasta = os.path.join(config["output_dir"], "transcriptome_filtered.fa")
+# 	params:
+# 		cluster_log = os.path.join(config["cluster_log"], "filter_fasta.log")
+# 	log:
+# 		os.path.join(config["local_log"], "filter_fasta.log")
+# 	shell:
+# 		"(python {input.script} --filter {input.idlist} -i {input.fasta} -o {output.fasta}) &> {log}"
