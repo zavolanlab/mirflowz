@@ -1,6 +1,6 @@
 configfile: "config.yaml"
 
-localrules: finish, create_header_genome, get_exons_gtf, gtftobed, trim_fasta
+# localrules: finish, create_header_genome, get_exons_gtf, gtftobed, trim_fasta
 
 
 #################################################################################
@@ -15,6 +15,23 @@ rule finish:
 		exons_bed = os.path.join(config["output_dir"], "exons.bed"),
 		header = os.path.join(config["output_dir"], "headerOfCollapsedFasta.sam")
 
+#################################################################################
+### Filter gtf by transcript_level
+#################################################################################
+
+rule filter_gtf:
+	input:
+		gtf = config["gtf"]
+	output:
+		gtf = os.path.join(config["output_dir"], "filtered.gtf")
+	params:
+		cluster_log = os.path.join(config["cluster_log"], "filter_gtf.log")
+	log:
+		os.path.join(config["local_log"], "filter_gtf.log")
+	singularity:
+		"docker://zavolab/cufflinks:2.2.1"
+	shell:
+		"( ####### ) &> {log}"
 
 #################################################################################
 ### Extract transcriptome sequences in FASTA from genome.
@@ -68,7 +85,7 @@ rule generate_segemehl_index_transcriptome:
 	log:
 		os.path.join(config["local_log"], "generate_segemehl_index_transcriptome.log")
 	resources:
-		mem = 75,
+		mem = 10,
 		threads = 8,
 		time = 6
 	singularity:
@@ -91,7 +108,7 @@ rule generate_segemehl_index_genome:
 	log:
 		os.path.join(config["local_log"], "generate_segemehl_index_genome.log")
 	resources:
-		mem = 75,
+		mem = 60,
 		threads = 8,
 		time = 6
 	singularity:

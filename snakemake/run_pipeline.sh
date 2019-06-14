@@ -7,7 +7,7 @@ snakemake \
 -p \
 -s Snakefile \
 --use-singularity \
---singularity-args "--no-home --bind ${PWD},/scicore/home/zavolan/GROUP/test_datasets/annotation/" \
+--singularity-args "--no-home --bind ${PWD},/scicore/home/zavolan/devagy74/projects/filter-anno/" \
 --cores 256 \
 --local-cores 10 \
 --rerun-incomplete \
