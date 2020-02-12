@@ -1,0 +1,23 @@
+{
+  "__default__" :
+  {
+    "queue": "6hours",
+    "time": "05:00:00",
+    "threads": "1",
+    "mem": "4G",
+  },
+  
+  "generate_segemehl_index_transcriptome":
+  {
+    "time": "{resources.time}:00:00",
+    "threads":"{resources.threads}",
+    "mem":"{resources.mem}G"
+  },
+  
+  "generate_segemehl_index_genome":
+  {
+    "time": "{resources.time}:00:00",
+    "threads":"{resources.threads}",
+    "mem":"{resources.mem}G"
+  }
+}

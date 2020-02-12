@@ -1,7 +1,6 @@
 configfile: "config.yaml"
 
-# localrules: finish, create_header_genome, get_exons_gtf, gtftobed, trim_fasta
-
+localrules: finish, download_filter_gtf
 
 #################################################################################
 ### Finish rule
@@ -9,6 +8,7 @@ configfile: "config.yaml"
 
 rule finish:
 	input:
+		#trx = os.path.join(config["output_dir"], "GRCh38_96.gene_annotations.filtered.gtf"),
 		trx = os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
 		idx_transcriptome = os.path.join(config["output_dir"], "transcriptome_index_segemehl.idx"),
 		idx_genome = os.path.join(config["output_dir"], "genome_index_segemehl.idx"),
@@ -16,22 +16,24 @@ rule finish:
 		header = os.path.join(config["output_dir"], "headerOfCollapsedFasta.sam")
 
 #################################################################################
-### Filter gtf by transcript_level
+### Download and filter gtf by transcript_level
 #################################################################################
 
-rule filter_gtf:
+rule download_filter_gtf:
 	input:
-		gtf = config["gtf"]
+		script = os.path.join(config["scripts_dir"], "filter_anno_gtf.sh"),
 	output:
-		gtf = os.path.join(config["output_dir"], "filtered.gtf")
+		gtf = os.path.join(config["output_dir"], "GRCh38_96.gene_annotations.filtered.gtf")
 	params:
-		cluster_log = os.path.join(config["cluster_log"], "filter_gtf.log")
+		cluster_log = os.path.join(config["cluster_log"], "download_filter_gtf.log"),
+		prefixname = config["gtf_prefix_name"],
+		gtf_url = config["gtf_url"]
 	log:
-		os.path.join(config["local_log"], "filter_gtf.log")
+		os.path.join(config["local_log"], "download_filter_gtf.log")
 	singularity:
-		"docker://zavolab/cufflinks:2.2.1"
+		"docker://zavolab/ubuntu:18.04"
 	shell:
-		"( ####### ) &> {log}"
+		"(bash {input.script} {params.prefixname} {params.gtf_url}) &> {log}"
 
 #################################################################################
 ### Extract transcriptome sequences in FASTA from genome.
@@ -40,7 +42,7 @@ rule filter_gtf:
 rule extract_transcriptome_seqs:
 	input:
 		fasta = config["genome"],
-		gtf = config["gtf"]
+		gtf = os.path.join(config["output_dir"], "GRCh38_96.gene_annotations.filtered.gtf")
 	output:
 		fasta = os.path.join(config["output_dir"], "transcriptome.fa")
 	params:
@@ -123,7 +125,7 @@ rule generate_segemehl_index_genome:
 
 rule get_exons_gtf:
 	input:
-		gtf = config["gtf"],
+		gtf = os.path.join(config["output_dir"], "GRCh38_96.gene_annotations.filtered.gtf"),
 		script = os.path.join(config["scripts_dir"], "get_lines_w_pattern.sh")
 	output:
 		exons = os.path.join(config["output_dir"], "exons.gtf")
@@ -132,7 +134,7 @@ rule get_exons_gtf:
 	log:
 		os.path.join(config["local_log"], "get_exons_gtf.log")
 	singularity:
-		"docker://ubuntu:18.04"
+		"docker://zavolab/ubuntu:18.04"
 	shell:
 		"(bash {input.script} -f {input.gtf} -c 3 -p exon -o {output.exons} ) &> {log}"
 
