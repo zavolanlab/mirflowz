@@ -18,18 +18,16 @@ move into it with:
 git clone ssh://git@git.scicore.unibas.ch:2222/zavolan_group/pipelines/mir-prepare-annotation.git
 cd mir-map
 ```
-### Setting up a Snakemake virtual environment
+### Setting up a virtual environment
 
 Workflow dependencies can be conveniently installed with the [Conda][conda]
 package manager. We recommend that you install [Miniconda][miniconda-installation] for your system.
 
-To create and activate the environment, run:
+Create and activate the environment with necessary dependencies with conda:
 
 ```bash
-############### 
+conda env create -f environment.yml
 ```
-
-### Installing Singularity
 
 For improved reproducibility and reusability of the workflow, as well as an
 easy means to run it on a high performance computing (HPC) cluster managed,
@@ -37,13 +35,7 @@ e.g., by [Slurm][slurm], each individual step of the workflow runs in its own co
 Specifically, containers are created out of [Singularity][singularity] images
 built for each software used within the workflow. As a consequence, running
 this workflow has very few individual dependencies. It does, however, require
-that [Singularity][singularity] be installed. See the links below for installation
-instructions for the most up-to-date (as of writing) as well as for the tested
-version (2.6.1) of Singularity:
-
-- [Singularity v3.5](https://sylabs.io/guides/3.5/user-guide/quick_start.html)
-- [Singularity v2.6](https://sylabs.io/guides/2.6/user-guide/installation.html)
-
+that [Singularity][singularity] to be installed. 
 
 ## Testing
 Several tests are prepared to check the integrity of the workflow. 
