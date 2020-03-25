@@ -32,12 +32,11 @@ snakemake \
 
 # Check md5 sum of some output files
 find results/ -type f -name \*\.gz -exec gunzip '{}' \;
+find results/ -type f -name \*\.zip -exec sh -c 'unzip -o {} -d $(dirname {})' \;
 md5sum --check "expected_output.md5"
 
 # Checksum file generated with
 # find results/ \
 #     -type f \
-#     -name \*\.gz \
-#     -exec gunzip '{}' \;
-#     > expected_output.files
+#     > expected_output.files;
 # md5sum $(cat expected_output.files) > expected_output.md5

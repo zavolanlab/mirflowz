@@ -3,9 +3,9 @@
 # Tear down test environment
 cleanup () {
     rc=$?
-    #rm -rf .snakemake/
-    #rm -rf logs/
-    #rm -rf results/
+    rm -rf .snakemake/
+    rm -rf logs/
+    rm -rf results/
     cd $user_dir
     echo "Exit status: $rc"
 }
@@ -52,7 +52,5 @@ md5sum --check "expected_output.md5"
 # Checksum file generated with
 # find results/ \
 #     -type f \
-#     -name \*\.gz \
-#     -exec gunzip '{}' \;
-#     > expected_output.files
+#     > expected_output.files;
 # md5sum $(cat expected_output.files) > expected_output.md5
