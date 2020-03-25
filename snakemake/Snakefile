@@ -8,10 +8,6 @@ localrules: finish, genome_process, filter_anno_gtf
 
 rule finish:
 	input:
-		#gft = expand(os.path.join(config["output_dir"], "{organism}", "{prefix_name}","gene_annotations.filtered.gtf"),
-		#	organism=config["organism"], prefix_name=config["prefix_name"]),
-		#genome = expand(os.path.join(config["output_dir"], "{organism}", "{prefix_name}","genome.processed.fa"),
-		#	organism=config["organism"], prefix_name=config["prefix_name"]),
 		idx_transcriptome = expand(os.path.join(config["output_dir"], "{organism}", "{prefix_name}","transcriptome_index_segemehl.idx"),
 			organism=config["organism"], prefix_name=config["prefix_name"]),
 		idx_genome = expand(os.path.join(config["output_dir"],"{organism}", "{prefix_name}", "genome_index_segemehl.idx"),
