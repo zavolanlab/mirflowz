@@ -1,7 +1,10 @@
-9161071fdb39a1376c11307fb724b122  results/transcriptome_index_segemehl.idx
-f90eb515017dc586af7944cc971333c4  results/transcriptome_idtrim.fa
-cf57bc82642990336aa0a30404c71761  results/exons.gtf
-999c2944d153632f54a1f9456f84fbf6  results/transcriptome.fa
-e24fdf58ea83750f0d1dfdf3fbde292e  results/exons.bed
-46d25b79e5005b4387bcfb15e5e7d97e  results/headerOfCollapsedFasta.sam
-f854fbbe370d3d942c3e56996ba40f42  results/genome_index_segemehl.idx
+583f395125f769102ff08ff84b60e0d3  results/homo_sapiens/GRCh38.98_chrY/genome.processed.fa
+a5a6fd2cab7d7919b80761fc25f2777a  results/homo_sapiens/GRCh38.98_chrY/transcriptome_index_segemehl.idx
+bf1e37165b908729327599801ff5147b  results/homo_sapiens/GRCh38.98_chrY/transcriptome_idtrim.fa
+f37a213f94d11bf2260f50f2c9f199d2  results/homo_sapiens/GRCh38.98_chrY/genome.processed.fa.fai
+0b3dfe8cf4d644637671572fca629f69  results/homo_sapiens/GRCh38.98_chrY/gene_annotations.filtered.gtf
+6fe52e2e126ef2e0c368fb1bf267f453  results/homo_sapiens/GRCh38.98_chrY/exons.gtf
+5ab1c2f39ab35fabc6673c73beb3097b  results/homo_sapiens/GRCh38.98_chrY/transcriptome.fa
+51ac61c61825929f8f05c4b4f821f04d  results/homo_sapiens/GRCh38.98_chrY/exons.bed
+7027e0b45c8e46ef79f1cb234fa3b839  results/homo_sapiens/GRCh38.98_chrY/headerOfCollapsedFasta.sam
+11b0b7c50160aa8837dd92eda516c124  results/homo_sapiens/GRCh38.98_chrY/genome_index_segemehl.idx

@@ -22,8 +22,8 @@ cd $script_dir
 snakemake \
     --snakefile="../snakemake/Snakefile" \
     --configfile="config.yaml" \
-    --dag \
+    --rulegraph \
     --printshellcmds \
     --dryrun \
     --verbose \
-    | dot -Tsvg > "../images/workflow_dag.svg"
+    | dot -Tsvg > "../images/rule_graph.svg"
