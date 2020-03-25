@@ -18,7 +18,7 @@ user_dir=$PWD
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 cd $script_dir
 
-# Run tests
+# Run tests 
 snakemake \
     --snakefile="../snakemake/Snakefile" \
     --configfile="config.yaml" \
