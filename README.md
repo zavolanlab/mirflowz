@@ -64,6 +64,8 @@ Execute the following command to run the test workflow on a Slurm-managed high-p
 
 ## Usage
 
+Assuming that you are currently inside the repository's root directory...
+
 * To run the pipeline with your own samples:
 ```bash
 cd RUN_JOB
