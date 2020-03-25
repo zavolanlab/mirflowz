@@ -20,14 +20,14 @@
 
 # Prefix for filenames
 fileNamePrefix="$1"  # Modified by Iborra P
-
+organism="$2"
 # Paths (DO NOT CHANGE!)  #Modified by Iborra P
 root="$PWD"
 #root="$(cd "$(dirname "$0" )" && pwd)"
-resDir="${root}/results"
+resDir="${root}/results/${organism}/${fileNamePrefix}"
 rawDir="${resDir}/raw"
 tmpDir="${root}/.tmp"
-logDir=${root}/logs/local_log 
+logDir="${root}/logs/local/${organism}/${fileNamePrefix}"
 
 # URLs
 # ----
@@ -35,7 +35,7 @@ logDir=${root}/logs/local_log
 # files are concatenated after download
 # - It is assumed that the specified transcriptome files contain sequences for all transcripts in 
 # the (filtered) gene annotations
-geneAnnoURLs="$2"   #Modified by Iborra P
+geneAnnoURLs="$3"   #Modified by Iborra P
 
 # Filters
 # -------
@@ -89,15 +89,15 @@ done
 
 # Concatenate gene annotation files
 echo "Concatenating gene annotation files..." >> "$logFile"
-geneAnno="${resDir}/${fileNamePrefix}.gene_annotations.gtf.gz"
+geneAnno="${resDir}/gene_annotations.gtf.gz"
 for url in "${geneAnnoURLs[@]}"; do
     cat "${rawDir}/$(basename "$url")" >> "$geneAnno"
 done
 
 # Filter gene annotations
-geneAnnoFilt="${resDir}/${fileNamePrefix}.gene_annotations.filtered.gtf.gz"
-geneAnnoOut="${resDir}/${fileNamePrefix}.gene_annotations.filtered.gtf"
-geneAnnoFiltTmp="${tmpDir}/${fileNamePrefix}.gene_annotations.filtered.gtf.gz.tmp"
+geneAnnoFilt="${resDir}/gene_annotations.filtered.gtf.gz"
+geneAnnoOut="${resDir}/gene_annotations.filtered.gtf"
+geneAnnoFiltTmp="${tmpDir}/gene_annotations.filtered.gtf.gz.tmp"
 cp "$geneAnno" "$geneAnnoFiltTmp"
 
     # Filter requested chromosomes
@@ -141,6 +141,8 @@ cp "$geneAnno" "$geneAnnoFiltTmp"
     perl -ane 'if ($F[2] eq "gene"){$prev=$_}else{print $prev,$_; $prev=""}' <(zcat $geneAnnoFiltTmp) > "$geneAnnoOut"
     rm "$geneAnnoFiltTmp"
 
+rm "${resDir}/gene_annotations.filtered.gtf.gz"
+rm "${resDir}/gene_annotations.gtf.gz"
 #############
 ###  END  ###
 #############
