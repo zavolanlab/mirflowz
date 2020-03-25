@@ -5,7 +5,7 @@
 The scheme below is a visual representation of an example run of the
 workflow:  
 
-> ![workflow_dag](images/workflow_dag.svg)
+> ![workflow_dag](images/rule_graph.svg)
 
 ## Installation
 
