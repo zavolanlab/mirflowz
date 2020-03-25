@@ -99,11 +99,3 @@ After succesfully execution of the workflow results and logs outputs will be fou
 [singularity]: <https://sylabs.io/singularity/>
 [slurm]: <https://slurm.schedmd.com/documentation.html>
 
-
-
-[Snakemake]: <https://snakemake.readthedocs.io/en/stable/>
-[Singularity]: <https://sylabs.io/singularity/>
-[Miniconda]: <https://docs.conda.io/en/latest/miniconda.html>
-[cluster execution]: <https://snakemake.readthedocs.io/en/stable/executing/cluster-cloud.html#cluster-execution>
-[Slurm]: <https://slurm.schedmd.com/documentation.html>
-
