@@ -59,4 +59,3 @@ md5sum --check "expected_output.md5"
 #     -exec gunzip '{}' \;
 #     > expected_output.files
 # md5sum $(cat expected_output.files) > expected_output.md5
-

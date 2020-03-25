@@ -3,9 +3,7 @@
   ### Necessary inputs
   ##############################################################################
   organism: " "
-  #genome: "/scicore/home/zavolan/devagy74/projects/filter-anno/GRCh38.genome.processed.fa"
   genome_url: "ftp:// ..... "
-  #gtf: "/scicore/home/zavolan/devagy74/projects/filter-anno/GRCh38_96.gene_annotations.filtered.gtf"
   gtf_url: "ftp:// ..... "
   prefix_name: " "
   
@@ -16,6 +14,4 @@
   scripts_dir: "../scripts"
   local_log: "logs/local"
   cluster_log: "logs/cluster"
-
-
 ...
