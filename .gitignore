@@ -208,7 +208,7 @@ tags
 # End of https://www.gitignore.io/api/vim,linux,macos,python,sublimetext
 
 ### User additions
-!images/workflow_dag.svg
+!images/
 .snakemake
 results
 logs
