@@ -1,0 +1,9 @@
+name: mir_pipelines
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.7.4
+  - singularity=3.5.2
+  - wget==1.20.1
+  - snakemake==5.10.0
