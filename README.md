@@ -47,23 +47,27 @@ version (2.6.1) of Singularity:
 
 ## Testing
 Several tests are prepared to check the integrity of the workflow. 
-Assuming that you are currently inside the repository's root directory...
+Move into `test/` directory:
+```bash
+cd test/
+```
+
 ## DAG and rule graph
 Execute the following commands to generete DAG and rule graph images. Outputs will be found in `images/` folder. 
 ```bash
-./test/test_dag.sh
-./test/test_rule_graph.sh
+./test_dag.sh
+./test_rule_graph.sh
 ```
 ### Run workflow on local machine
 Execute the following command to run the test workflow on your local machine:
 ```bash
-./test/test_workflow_local.sh
+./test_workflow_local.sh
 ```
 
 ### Run workflow via Slurm
 Execute the following command to run the test workflow on a Slurm-managed high-performance computing (HPC) cluster::
 ```bash
-./test/test_workflow_slurm.sh
+./test_workflow_slurm.sh
 ```
 
 ## Usage
