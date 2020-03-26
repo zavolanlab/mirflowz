@@ -1,0 +1,13 @@
+image: continuumio/miniconda3:4.7.12
+
+before_script:
+  - apt update && apt install -y gcc
+  - conda init bash && source ~/.bashrc && echo $CONDA_DEFAULT_ENV
+  - conda env create -f environment.yml
+  - conda activate mir-pipelines && echo $CONDA_DEFAULT_ENV
+
+test:
+  script:
+    - bash tests/test_workflow_local.sh
+    - bash tests/test_dag.sh
+    - bash tests/test_rule_graph.sh
