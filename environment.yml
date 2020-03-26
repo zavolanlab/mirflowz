@@ -6,4 +6,6 @@ dependencies:
   - python=3.7.4
   - singularity=3.5.2
   - wget==1.20.1
-  - snakemake==5.10.0
+  - pip=20.0.2
+  - pip:
+    - snakemake==5.10.0
