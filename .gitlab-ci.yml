@@ -5,9 +5,8 @@ before_script:
   - conda init bash && source ~/.bashrc && echo $CONDA_DEFAULT_ENV
   - conda env create -f environment.yml
   - conda activate mir_pipelines && echo $CONDA_DEFAULT_ENV
-  - cd test/
 test:
   script:
-    - bash test_workflow_local.sh
-    - bash test_dag.sh
-    - bash test_rule_graph.sh
+    - bash test/test_workflow_local.sh
+    - bash test/test_dag.sh
+    - bash test/test_rule_graph.sh
