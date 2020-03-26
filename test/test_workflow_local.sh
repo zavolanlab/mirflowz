@@ -3,7 +3,7 @@
 # Tear down test environment
 cleanup () {
     rc=$?
-    #rm -rf .snakemake/
+    rm -rf .snakemake/
     rm -rf logs/
     rm -rf results/
     cd $user_dir
