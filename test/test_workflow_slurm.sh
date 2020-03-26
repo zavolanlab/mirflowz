@@ -15,12 +15,13 @@ trap cleanup EXIT
 set -eo pipefail  # ensures that script exits at first command that exits with non-zero status
 set -u  # ensures that script exits when unset variables are used
 set -x  # facilitates debugging by printing out executed commands
-mkdir -p logs/cluster/homo_sapiens/GRCh38.98_chrY
-mkdir -p logs/local/homo_sapiens/GRCh38.98_chrY
-mkdir -p results/homo_sapiens/GRCh38.98_chrY
 user_dir=$PWD
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 cd $script_dir
+mkdir -p logs/cluster/homo_sapiens/GRCh38.98_chrY
+mkdir -p logs/local/homo_sapiens/GRCh38.98_chrY
+mkdir -p results/homo_sapiens/GRCh38.98_chrY
+
 
 # Run tests
 snakemake \
