@@ -24,7 +24,7 @@ snakemake \
 --printshellcmds \
 --snakefile="../snakemake/Snakefile" \
 --use-singularity \
---singularity-args "--bind ${PWD}/../images" \
+--singularity-args "--bind ${PWD}/../" \
 --cores=4 \
 --rerun-incomplete \
 --configfile config.yaml \
