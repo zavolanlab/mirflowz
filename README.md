@@ -16,7 +16,7 @@ move into it with:
 
 ```bash
 git clone ssh://git@git.scicore.unibas.ch:2222/zavolan_group/pipelines/mir-prepare-annotation.git
-cd mir-map
+cd mir-prepare-annotation
 ```
 ### Setting up a virtual environment
 
@@ -35,7 +35,9 @@ e.g., by [Slurm][slurm], each individual step of the workflow runs in its own co
 Specifically, containers are created out of [Singularity][singularity] images
 built for each software used within the workflow. As a consequence, running
 this workflow has very few individual dependencies. It does, however, require
-that [Singularity][singularity] to be installed. 
+that [Singularity][singularity] to be installed.
+
+> **NOTE:** that `Singularity` is automatically loaded on the sciCORE system. To avoid conflicts, comment out or delete `singularity` in the file `environment.yml` before you create the virtual environment.
 
 ## Testing
 Several tests are prepared to check the integrity of the workflow. 
