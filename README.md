@@ -1,6 +1,6 @@
 # mir-prepare-annotation
 
-[Snakemake] workflow for download and prepare the necessary files for smallRNA-seq related pipelines.
+[Snakemake] workflow to download and prepare the necessary files for smallRNA-seq related pipelines, currently [mir-map](https://git.scicore.unibas.ch/zavolan_group/pipelines/mir-map) and [mir-quant](https://git.scicore.unibas.ch/zavolan_group/pipelines/mir-quant).
 
 The scheme below is a visual representation of an example run of the
 workflow:  
