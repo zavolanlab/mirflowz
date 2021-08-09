@@ -27,6 +27,7 @@ Create and activate the environment with necessary dependencies with conda:
 
 ```bash
 conda env create -f environment.yml
+conda activate mir_pipelines
 ```
 
 For improved reproducibility and reusability of the workflow, as well as an
