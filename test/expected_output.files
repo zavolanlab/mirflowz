@@ -6,5 +6,4 @@ results/homo_sapiens/GRCh38.98_chrY/gene_annotations.filtered.gtf
 results/homo_sapiens/GRCh38.98_chrY/exons.gtf
 results/homo_sapiens/GRCh38.98_chrY/transcriptome.fa
 results/homo_sapiens/GRCh38.98_chrY/exons.bed
-results/homo_sapiens/GRCh38.98_chrY/headerOfCollapsedFasta.sam
 results/homo_sapiens/GRCh38.98_chrY/genome_index_segemehl.idx
