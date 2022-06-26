@@ -40,13 +40,13 @@ Create and activate the environment with necessary dependencies with conda:
 
 ```bash
 conda env create -f environment.yml
-conda activate mir_pipelines
+conda activate mir-pipelines
 ```
 
-> **NOTE:** If `singularity` is already installed on your system, which is,
-> e.g., frequently the case in HPC environments, make sure to comment out or
-> delete the corresponding line from `environment.yml` prior to the creation
-> of the Conda environment. This will avoid conflicts.
+> **NOTE:** If you have root permissions for your system and you do not have
+> `singularity` installed globally on your system, you can use Conda to install
+> it. In that case, replace `environment.yml` with `environment.root.yml` in
+> the first command above.
 
 ### Testing your installation
 

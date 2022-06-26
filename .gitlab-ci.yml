@@ -1,12 +1,16 @@
-image: continuumio/miniconda3:4.9.2
+default:
+  tags:
+    - shell
 
 before_script:
-  - apt update && apt install -y gcc
-  - conda init bash && source ~/.bashrc && echo $CONDA_DEFAULT_ENV
-  - conda env create -f environment.yml
-  - conda activate mir_pipelines && echo $CONDA_DEFAULT_ENV
+  - mamba env create --force -f environment.yml
+  - conda activate mir-pipelines
+  - echo $CONDA_DEFAULT_ENV
+  - snakemake --version
+
 test:
   script:
-   # - bash test/test_workflow_local.sh
     - bash test/test_dag.sh
     - bash test/test_rule_graph.sh
+    - bash test/test_workflow_local.sh
+

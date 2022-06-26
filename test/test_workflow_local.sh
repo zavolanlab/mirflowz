@@ -4,6 +4,7 @@
 cleanup () {
     rc=$?
     rm -rf .snakemake/
+    rm -rf .tmp/
     rm -rf logs/
     rm -rf results/
     cd $user_dir
