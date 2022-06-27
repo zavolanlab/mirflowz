@@ -94,8 +94,32 @@ to the execution directory:
 cd RUN_JOB
 ```
 
-Before running the pipeline adjust the parameters in file `config.yaml`. We
-recommend that you create a copy of it for each run.
+Before running the pipeline adjust the parameters in file `config.yaml`:
+
+```yaml
+---
+  ##############################################################################
+  ### Necessary inputs
+  ##############################################################################
+  organism: " "  # name of the organism, e.g., "homo_sapiens"
+  genome_url: "ftp:// ..... "  # FTP/HTTP URL to genome file in FASTA format
+  gtf_url: "ftp:// ..... "  # FTP/HTTP URL to gene annotation file in GTF format
+  prefix_name: " "  # name of the assembly/annotation version, e.g., "GRCh38.100"
+
+  ##############################################################################
+  ### Directories
+  ##############################################################################
+  output_dir: "results"
+  scripts_dir: "../scripts"
+  local_log: "logs/local"
+  cluster_log: "logs/cluster"
+...
+```
+
+> **Note:** We expect the genome and gene annotations to be formatted according
+> the style used by Ensembl. Other formats are very likely to lead to problems,
+> if not in this pipeline, then further down the road in the mapping or
+> annotation pipelines.
 
 To start pipeline execution locally:
 
@@ -114,7 +138,7 @@ To start pipeline execution via Slurm:
 After succesful execution of the workflow, results and logs will be found in
 `results/` and `logs/` directories, respectively.
 
-> **NOTE:** Depending on the configuration of your Slurm installation or if
+> **Note:** Depending on the configuration of your Slurm installation or if
 > using a different batch scheduling system, you may need to adapt file
 > `cluster.json` (located in root directory) and the arguments to options
 > `--config` and `--cores` in file `run_workflow_slurm.sh`, located in the
