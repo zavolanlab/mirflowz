@@ -7,6 +7,7 @@ cleanup () {
     rm -rf .tmp/
     rm -rf logs/
     rm -rf results/
+    rm -rf snakemake_report.html/
     cd $user_dir
     echo "Exit status: $rc"
 }
@@ -23,7 +24,6 @@ mkdir -p logs/cluster/homo_sapiens/GRCh38.98_chrY
 mkdir -p logs/local/homo_sapiens/GRCh38.98_chrY
 mkdir -p results/homo_sapiens/GRCh38.98_chrY
 
-
 # Run tests
 snakemake \
     --snakefile="../snakemake/Snakefile" \
@@ -34,7 +34,7 @@ snakemake \
     --printshellcmds \
     --rerun-incomplete \
     --use-singularity \
-    --singularity-args="--no-home --bind ${PWD},/scicore/home/zavolan/devagy74/projects" \
+    --singularity-args="--no-home --bind ${PWD}/../" \
     --cluster "sbatch \
         --cpus-per-task={cluster.threads} \
         --mem={cluster.mem} \
@@ -45,6 +45,12 @@ snakemake \
         -p scicore \
         --open-mode=append" \
     --verbose
+
+# Snakemake report
+snakemake \
+    --snakefile="../snakemake/Snakefile" \
+    --configfile="config.yaml" \
+    --report="snakemake_report.html"
 
 # Check md5 sum of some output files
 find results/ -type f -name \*\.gz -exec gunzip '{}' \;

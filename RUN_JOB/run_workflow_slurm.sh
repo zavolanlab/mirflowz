@@ -1,11 +1,8 @@
 #!/bin/bash
 
-# Tear down test environment
+# Tear down environment
 cleanup () {
     rc=$?
-    #rm -rf .snakemake/
-    #rm -rf logs/
-    #rm -rf results/
     cd $user_dir
     echo "Exit status: $rc"
 }
@@ -17,7 +14,7 @@ set -u  # ensures that script exits when unset variables are used
 set -x  # facilitates debugging by printing out executed commands
 
 #### CHANGE PATHS WITH YOUR ORGANISM AND PREFIX_NAME ####
-mkdir -p logs/cluster/ORGANISM/PREFIX_NAME 
+mkdir -p logs/cluster/ORGANISM/PREFIX_NAME
 mkdir -p logs/local/ORGANISM/PREFIX_NAME
 mkdir -p results/ORGANISM/PREFIX_NAME
 #########################################################
@@ -26,7 +23,7 @@ user_dir=$PWD
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 cd $script_dir
 
-# Run tests
+# Run workflow
 snakemake \
     --snakefile="../snakemake/Snakefile" \
     --configfile="config.yaml" \
@@ -36,7 +33,7 @@ snakemake \
     --printshellcmds \
     --rerun-incomplete \
     --use-singularity \
-    --singularity-args="--no-home --bind ${PWD},/scicore/home/zavolan/devagy74/projects" \
+    --singularity-args="--no-home --bind ${PWD}/../" \
     --cluster "sbatch \
         --cpus-per-task={cluster.threads} \
         --mem={cluster.mem} \
@@ -48,3 +45,8 @@ snakemake \
         --open-mode=append" \
     --verbose
 
+# Snakemake report
+snakemake \
+    --snakefile="../snakemake/Snakefile" \
+    --configfile="config.yaml" \
+    --report="snakemake_report.html"
