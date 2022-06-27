@@ -1,5 +1,3 @@
-configfile: "config.yaml"
-
 localrules: finish, genome_process, filter_anno_gtf
 
 #################################################################################

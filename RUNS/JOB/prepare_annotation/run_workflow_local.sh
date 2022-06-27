@@ -18,17 +18,17 @@ cd $script_dir
 
 # Run workflow
 snakemake \
-    --printshellcmds \
-    --snakefile="../snakemake/Snakefile" \
-    --use-singularity \
-    --singularity-args "--bind ${PWD}/../" \
-    --cores=4 \
-    --rerun-incomplete \
+    --snakefile="../../../workflow/prepare_annotation/Snakefile" \
     --configfile="config.yaml" \
+    --use-singularity \
+    --singularity-args "--bind ${PWD}/../../../" \
+    --cores=4 \
+    --printshellcmds \
+    --rerun-incomplete \
     --verbose
 
 # Snakemake report
 snakemake \
-    --snakefile="../snakemake/Snakefile" \
+    --snakefile="../../../workflow/prepare_annotation/Snakefile" \
     --configfile="config.yaml" \
     --report="snakemake_report.html"

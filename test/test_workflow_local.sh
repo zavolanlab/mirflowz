@@ -3,11 +3,11 @@
 # Tear down test environment
 cleanup () {
     rc=$?
-#    rm -rf .snakemake/
-#    rm -rf .tmp/
-#    rm -rf logs/
-#    rm -rf results/
-#    rm -rf snakemake_report.html
+    rm -rf .snakemake/
+    rm -rf .tmp/
+    rm -rf logs/
+    rm -rf results/
+    rm -rf snakemake_report_*.html
     cd $user_dir
     echo "Exit status: $rc"
 }
@@ -23,20 +23,20 @@ cd $script_dir
 
 # Run tests
 snakemake \
-    --printshellcmds \
-    --snakefile="../snakemake/Snakefile" \
+    --snakefile="../workflow/prepare_annotation/Snakefile" \
+    --configfile="config_prepare_annotation.yaml" \
     --use-singularity \
     --singularity-args "--bind ${PWD}/../" \
     --cores=4 \
+    --printshellcmds \
     --rerun-incomplete \
-    --configfile="config.yaml" \
     --verbose
 
 # Snakemake report
 snakemake \
-    --snakefile="../snakemake/Snakefile" \
-    --configfile="config.yaml" \
-    --report="snakemake_report.html"
+    --snakefile="../workflow/prepare_annotation/Snakefile" \
+    --configfile="config_prepare_annotation.yaml" \
+    --report="snakemake_report_prepare_annotation.html"
 
 # Check md5 sum of some output files
 find results/ -type f -name \*\.gz -exec gunzip '{}' \;

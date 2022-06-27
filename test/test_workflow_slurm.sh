@@ -7,7 +7,7 @@ cleanup () {
     rm -rf .tmp/
     rm -rf logs/
     rm -rf results/
-    rm -rf snakemake_report.html/
+    rm -rf snakemake_report_*.html/
     cd $user_dir
     echo "Exit status: $rc"
 }
@@ -26,15 +26,9 @@ mkdir -p results/homo_sapiens/GRCh38.98_chrY
 
 # Run tests
 snakemake \
-    --snakefile="../snakemake/Snakefile" \
-    --configfile="config.yaml" \
-    --cluster-config="../cluster.json" \
-    --cores=256 \
-    --jobscript="../jobscript.sh" \
-    --printshellcmds \
-    --rerun-incomplete \
-    --use-singularity \
-    --singularity-args="--no-home --bind ${PWD}/../" \
+    --snakefile="../workflow/prepare_annotation/Snakefile" \
+    --configfile="config_prepare_annotation.yaml" \
+    --cluster-config="../workflow/prepare_annotation/cluster.json" \
     --cluster "sbatch \
         --cpus-per-task={cluster.threads} \
         --mem={cluster.mem} \
@@ -44,13 +38,19 @@ snakemake \
         -o {params.cluster_log} \
         -p scicore \
         --open-mode=append" \
+    --jobscript="../jobscript.sh" \
+    --use-singularity \
+    --singularity-args="--no-home --bind ${PWD}/../" \
+    --cores=256 \
+    --printshellcmds \
+    --rerun-incomplete \
     --verbose
 
 # Snakemake report
 snakemake \
-    --snakefile="../snakemake/Snakefile" \
-    --configfile="config.yaml" \
-    --report="snakemake_report.html"
+    --snakefile="../workflow/prepare_annotation/Snakefile" \
+    --configfile="config_prepare_annotation.yaml" \
+    --report="snakemake_report_prepare_annotation.html"
 
 # Check md5 sum of some output files
 find results/ -type f -name \*\.gz -exec gunzip '{}' \;

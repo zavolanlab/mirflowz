@@ -20,10 +20,10 @@ cd $script_dir
 
 # Run tests
 snakemake \
-    --snakefile="../snakemake/Snakefile" \
-    --configfile="config.yaml" \
+    --snakefile="../workflow/prepare_annotation/Snakefile" \
+    --configfile="config_prepare_annotation.yaml" \
     --rulegraph \
     --printshellcmds \
     --dryrun \
     --verbose \
-    | dot -Tsvg > "../images/rule_graph.svg"
+    | dot -Tsvg > "../images/rule_graph_prepare_annotation.svg"
