@@ -7,36 +7,36 @@ localrules: finish, genome_process, filter_anno_gtf
 #################################################################################
 
 rule finish:
-	input:
-		idx_transcriptome = expand(os.path.join(config["output_dir"], "{organism}", "{prefix_name}","transcriptome_index_segemehl.idx"),
-			organism=config["organism"], prefix_name=config["prefix_name"]),
-		idx_genome = expand(os.path.join(config["output_dir"],"{organism}", "{prefix_name}", "genome_index_segemehl.idx"),
-			organism=config["organism"], prefix_name=config["prefix_name"]),
-		exons = expand(os.path.join(config["output_dir"],"{organism}", "{prefix_name}", "exons.bed"),
-			organism=config["organism"], prefix_name=config["prefix_name"]),
-		header = expand(os.path.join(config["output_dir"],"{organism}", "{prefix_name}","headerOfCollapsedFasta.sam"),
-			organism=config["organism"], prefix_name=config["prefix_name"]),
+    input:
+        idx_transcriptome = expand(os.path.join(config["output_dir"], "{organism}", "{prefix_name}","transcriptome_index_segemehl.idx"),
+            organism=config["organism"], prefix_name=config["prefix_name"]),
+        idx_genome = expand(os.path.join(config["output_dir"],"{organism}", "{prefix_name}", "genome_index_segemehl.idx"),
+            organism=config["organism"], prefix_name=config["prefix_name"]),
+        exons = expand(os.path.join(config["output_dir"],"{organism}", "{prefix_name}", "exons.bed"),
+            organism=config["organism"], prefix_name=config["prefix_name"]),
+        header = expand(os.path.join(config["output_dir"],"{organism}", "{prefix_name}","headerOfCollapsedFasta.sam"),
+            organism=config["organism"], prefix_name=config["prefix_name"]),
 
 #################################################################################
 ### Download and process genome IDs
 #################################################################################
 
 rule genome_process:
-	input:
-		script = os.path.join(config["scripts_dir"],"genome_process.sh"),
-	output:
-		genome = os.path.join(config["output_dir"],"{organism}","{prefix_name}", "genome.processed.fa")
-	params:
-		cluster_log = os.path.join(config["cluster_log"],"{organism}","{prefix_name}","genome_process.log"),
-		prefix = config["prefix_name"],
-		url = config["genome_url"],
-		organism=config["organism"]
-	log:
-		os.path.join(config["local_log"],"{organism}","{prefix_name}","genome_process.log")
-	singularity:
-		"docker://zavolab/ubuntu:18.04"
-	shell:
-		"(bash {input.script} {params.prefix} {params.organism} {params.url}) &> {log}"
+    input:
+        script = os.path.join(config["scripts_dir"],"genome_process.sh"),
+    output:
+        genome = os.path.join(config["output_dir"],"{organism}","{prefix_name}", "genome.processed.fa")
+    params:
+        cluster_log = os.path.join(config["cluster_log"],"{organism}","{prefix_name}","genome_process.log"),
+        prefix = config["prefix_name"],
+        url = config["genome_url"],
+        organism=config["organism"]
+    log:
+        os.path.join(config["local_log"],"{organism}","{prefix_name}","genome_process.log")
+    singularity:
+        "docker://zavolab/ubuntu:18.04"
+    shell:
+        "(bash {input.script} {params.prefix} {params.organism} {params.url}) &> {log}"
 
 
 #################################################################################
@@ -44,40 +44,40 @@ rule genome_process:
 #################################################################################
 
 rule filter_anno_gtf:
-	input:
-		script = os.path.join(config["scripts_dir"],"filter_anno_gtf.sh"),
-	output:
-		gtf = os.path.join(config["output_dir"],"{organism}","{prefix_name}","gene_annotations.filtered.gtf")
-	params:
-		cluster_log = os.path.join(config["cluster_log"],"{organism}","{prefix_name}","download_filter_gtf.log"),
-		prefix = config["prefix_name"],
-		url = config["gtf_url"],
-		organism=config["organism"]
-	log:
-		os.path.join(config["local_log"],"{organism}","{prefix_name}","filter_anno_gtf.log")
-	singularity:
-		"docker://zavolab/ubuntu:18.04"
-	shell:
-		"(bash {input.script} {params.prefix} {params.organism} {params.url}) &> {log}"
+    input:
+        script = os.path.join(config["scripts_dir"],"filter_anno_gtf.sh"),
+    output:
+        gtf = os.path.join(config["output_dir"],"{organism}","{prefix_name}","gene_annotations.filtered.gtf")
+    params:
+        cluster_log = os.path.join(config["cluster_log"],"{organism}","{prefix_name}","download_filter_gtf.log"),
+        prefix = config["prefix_name"],
+        url = config["gtf_url"],
+        organism=config["organism"]
+    log:
+        os.path.join(config["local_log"],"{organism}","{prefix_name}","filter_anno_gtf.log")
+    singularity:
+        "docker://zavolab/ubuntu:18.04"
+    shell:
+        "(bash {input.script} {params.prefix} {params.organism} {params.url}) &> {log}"
 
 #################################################################################
 ### Extract transcriptome sequences in FASTA from genome.
 #################################################################################
 
 rule extract_transcriptome_seqs:
-	input:
-		genome = os.path.join(config["output_dir"],"{organism}","{prefix_name}", "genome.processed.fa"),
-		gtf = os.path.join(config["output_dir"],"{organism}","{prefix_name}","gene_annotations.filtered.gtf")
-	output:
-		fasta = os.path.join(config["output_dir"],"{organism}","{prefix_name}","transcriptome.fa")
-	params:
-		cluster_log = os.path.join(config["cluster_log"],"{organism}","{prefix_name}","extract_transcriptome_seqs.log")
-	log:
-		os.path.join(config["local_log"],"{organism}","{prefix_name}","extract_transcriptome_seqs.log")
-	singularity:
-		"docker://zavolab/cufflinks:2.2.1"
-	shell:
-		"(gffread -w {output.fasta} -g {input.genome} {input.gtf}) &> {log}"
+    input:
+        genome = os.path.join(config["output_dir"],"{organism}","{prefix_name}", "genome.processed.fa"),
+        gtf = os.path.join(config["output_dir"],"{organism}","{prefix_name}","gene_annotations.filtered.gtf")
+    output:
+        fasta = os.path.join(config["output_dir"],"{organism}","{prefix_name}","transcriptome.fa")
+    params:
+        cluster_log = os.path.join(config["cluster_log"],"{organism}","{prefix_name}","extract_transcriptome_seqs.log")
+    log:
+        os.path.join(config["local_log"],"{organism}","{prefix_name}","extract_transcriptome_seqs.log")
+    singularity:
+        "docker://zavolab/cufflinks:2.2.1"
+    shell:
+        "(gffread -w {output.fasta} -g {input.genome} {input.gtf}) &> {log}"
 
 
 ################################################################################
@@ -85,17 +85,18 @@ rule extract_transcriptome_seqs:
 ################################################################################
 
 rule trim_fasta:
-	input:
-		fasta = os.path.join(config["output_dir"], "{organism}","{prefix_name}","transcriptome.fa"),
-		script =  os.path.join(config["scripts_dir"], "validation_fasta.py")
-	output:
-		fasta = os.path.join(config["output_dir"],"{organism}","{prefix_name}","transcriptome_idtrim.fa")
-	params:
-		cluster_log = os.path.join(config["cluster_log"],"{organism}","{prefix_name}","trim_fasta.log")
-	log:
-		os.path.join(config["local_log"],"{organism}","{prefix_name}","trim_fasta.log")
-	shell:
-		"(python {input.script} --trim -i {input.fasta} -o {output.fasta}) &> {log}"
+    input:
+        fasta = os.path.join(config["output_dir"], "{organism}","{prefix_name}","transcriptome.fa"),
+    output:
+        fasta = os.path.join(config["output_dir"],"{organism}","{prefix_name}","transcriptome_idtrim.fa")
+    params:
+        cluster_log = os.path.join(config["cluster_log"],"{organism}","{prefix_name}","trim_fasta.log")
+    log:
+        os.path.join(config["local_log"],"{organism}","{prefix_name}","trim_fasta.log")
+    singularity:
+        "docker://zavolab/ubuntu:18.04"
+    shell:
+        """(awk -F" " "/^>/ {{print \$1; next}} 1" {input.fasta} > {output.fasta}) &> {log}"""
 
 
 #################################################################################
@@ -103,22 +104,22 @@ rule trim_fasta:
 #################################################################################
 
 rule generate_segemehl_index_transcriptome:
-	input:
-		fasta = os.path.join(config["output_dir"],"{organism}","{prefix_name}","transcriptome_idtrim.fa")
-	output:
-		idx = os.path.join(config["output_dir"],"{organism}","{prefix_name}","transcriptome_index_segemehl.idx")
-	params:
-		cluster_log = os.path.join(config["cluster_log"],"{organism}","{prefix_name}","generate_segemehl_index_transcriptome.log"),
-	log:
-		os.path.join(config["local_log"],"{organism}","{prefix_name}","generate_segemehl_index_transcriptome.log")
-	resources:
-		mem = 10,
-		threads = 8,
-		time = 6
-	singularity:
-		"docker://zavolab/segemehl:0.2.0"
-	shell:
-		"(segemehl.x -x {output.idx} -d {input.fasta}) &> {log}"
+    input:
+        fasta = os.path.join(config["output_dir"],"{organism}","{prefix_name}","transcriptome_idtrim.fa")
+    output:
+        idx = os.path.join(config["output_dir"],"{organism}","{prefix_name}","transcriptome_index_segemehl.idx")
+    params:
+        cluster_log = os.path.join(config["cluster_log"],"{organism}","{prefix_name}","generate_segemehl_index_transcriptome.log"),
+    log:
+        os.path.join(config["local_log"],"{organism}","{prefix_name}","generate_segemehl_index_transcriptome.log")
+    resources:
+        mem = 10,
+        threads = 8,
+        time = 6
+    singularity:
+        "docker://zavolab/segemehl:0.2.0"
+    shell:
+        "(segemehl.x -x {output.idx} -d {input.fasta}) &> {log}"
 
 
 #################################################################################
@@ -126,24 +127,24 @@ rule generate_segemehl_index_transcriptome:
 #################################################################################
 
 rule generate_segemehl_index_genome:
-	input:
-		#genome = config["genome"]
-		genome = os.path.join(config["output_dir"],"{organism}","{prefix_name}", "genome.processed.fa")
+    input:
+        #genome = config["genome"]
+        genome = os.path.join(config["output_dir"],"{organism}","{prefix_name}", "genome.processed.fa")
 
-	output:
-		idx = os.path.join(config["output_dir"],"{organism}","{prefix_name}","genome_index_segemehl.idx")
-	params:
-		cluster_log = os.path.join(config["cluster_log"],"{organism}","{prefix_name}","generate_segemehl_index_genome.log"),
-	log:
-		os.path.join(config["local_log"],"{organism}","{prefix_name}","generate_segemehl_index_genome.log")
-	resources:
-		mem = 60,
-		threads = 8,
-		time = 6
-	singularity:
-		"docker://zavolab/segemehl:0.2.0"
-	shell:
-		"(segemehl.x -x {output.idx} -d {input.genome}) &> {log}"
+    output:
+        idx = os.path.join(config["output_dir"],"{organism}","{prefix_name}","genome_index_segemehl.idx")
+    params:
+        cluster_log = os.path.join(config["cluster_log"],"{organism}","{prefix_name}","generate_segemehl_index_genome.log"),
+    log:
+        os.path.join(config["local_log"],"{organism}","{prefix_name}","generate_segemehl_index_genome.log")
+    resources:
+        mem = 60,
+        threads = 8,
+        time = 6
+    singularity:
+        "docker://zavolab/segemehl:0.2.0"
+    shell:
+        "(segemehl.x -x {output.idx} -d {input.genome}) &> {log}"
 
 
 #################################################################################
@@ -151,19 +152,19 @@ rule generate_segemehl_index_genome:
 #################################################################################
 
 rule get_exons_gtf:
-	input:
-		gtf = os.path.join(config["output_dir"],"{organism}","{prefix_name}","gene_annotations.filtered.gtf"),
-		script = os.path.join(config["scripts_dir"], "get_lines_w_pattern.sh")
-	output:
-		exons = os.path.join(config["output_dir"],"{organism}","{prefix_name}","exons.gtf")
-	params:
-		cluster_log = os.path.join(config["cluster_log"],"{organism}","{prefix_name}","get_exons_gtf.log")
-	log:
-		os.path.join(config["local_log"],"{organism}","{prefix_name}", "get_exons_gtf.log")
-	singularity:
-		"docker://zavolab/ubuntu:18.04"
-	shell:
-		"(bash {input.script} -f {input.gtf} -c 3 -p exon -o {output.exons} ) &> {log}"
+    input:
+        gtf = os.path.join(config["output_dir"],"{organism}","{prefix_name}","gene_annotations.filtered.gtf"),
+        script = os.path.join(config["scripts_dir"], "get_lines_w_pattern.sh")
+    output:
+        exons = os.path.join(config["output_dir"],"{organism}","{prefix_name}","exons.gtf")
+    params:
+        cluster_log = os.path.join(config["cluster_log"],"{organism}","{prefix_name}","get_exons_gtf.log")
+    log:
+        os.path.join(config["local_log"],"{organism}","{prefix_name}", "get_exons_gtf.log")
+    singularity:
+        "docker://zavolab/ubuntu:18.04"
+    shell:
+        "(bash {input.script} -f {input.gtf} -c 3 -p exon -o {output.exons} ) &> {log}"
 
 
 #################################################################################
@@ -171,19 +172,19 @@ rule get_exons_gtf:
 #################################################################################
 
 rule gtftobed:
-	input:
-		exons = os.path.join(config["output_dir"],"{organism}","{prefix_name}","exons.gtf"),
-		script = os.path.join(config["scripts_dir"], "gtf_exons_bed.1.1.2.R")
-	output:
-		exons = os.path.join(config["output_dir"],"{organism}","{prefix_name}","exons.bed")
-	params:
-		cluster_log = os.path.join(config["cluster_log"],"{organism}","{prefix_name}","gtftobed.log")
-	log:
-		os.path.join(config["local_log"],"{organism}","{prefix_name}","gtftobed.log")
-	singularity:
-		"docker://zavolab/r-zavolab:3.5.1"
-	shell:
-		"(Rscript {input.script} --gtf {input.exons} -o {output.exons}) &> {log}"
+    input:
+        exons = os.path.join(config["output_dir"],"{organism}","{prefix_name}","exons.gtf"),
+        script = os.path.join(config["scripts_dir"], "gtf_exons_bed.1.1.2.R")
+    output:
+        exons = os.path.join(config["output_dir"],"{organism}","{prefix_name}","exons.bed")
+    params:
+        cluster_log = os.path.join(config["cluster_log"],"{organism}","{prefix_name}","gtftobed.log")
+    log:
+        os.path.join(config["local_log"],"{organism}","{prefix_name}","gtftobed.log")
+    singularity:
+        "docker://zavolab/r-zavolab:3.5.1"
+    shell:
+        "(Rscript {input.script} --gtf {input.exons} -o {output.exons}) &> {log}"
 
 
 #################################################################################
@@ -191,16 +192,16 @@ rule gtftobed:
 #################################################################################
 
 rule create_header_genome:
-	input:
-		#genome = config["genome"]
-		genome = os.path.join(config["output_dir"],"{organism}","{prefix_name}", "genome.processed.fa")
-	output:
-		header = os.path.join(config["output_dir"],"{organism}","{prefix_name}","headerOfCollapsedFasta.sam")
-	params:
-		cluster_log = os.path.join(config["cluster_log"],"{organism}","{prefix_name}","create_header_genome.log")
-	log:
-		os.path.join(config["local_log"],"{organism}","{prefix_name}","create_header_genome.log")
-	singularity:
-		"docker://zavolab/samtools:1.8"
-	shell:
-		"(samtools dict -o {output.header} {input.genome}) &> {log}"
+    input:
+        #genome = config["genome"]
+        genome = os.path.join(config["output_dir"],"{organism}","{prefix_name}", "genome.processed.fa")
+    output:
+        header = os.path.join(config["output_dir"],"{organism}","{prefix_name}","headerOfCollapsedFasta.sam")
+    params:
+        cluster_log = os.path.join(config["cluster_log"],"{organism}","{prefix_name}","create_header_genome.log")
+    log:
+        os.path.join(config["local_log"],"{organism}","{prefix_name}","create_header_genome.log")
+    singularity:
+        "docker://zavolab/samtools:1.8"
+    shell:
+        "(samtools dict -o {output.header} {input.genome}) &> {log}"

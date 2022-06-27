@@ -31,10 +31,10 @@ package manager. We recommend that you install
 
 For improved reproducibility and reusability of the workflow, as well as an
 easy means to run it on a high performance computing (HPC) cluster managed,
-e.g., by [Slurm][slurm], almost all steps of the workflow run in their own
-container. As a consequence, running this workflow has very few individual
-dependencies. It does, however, require that the container engine
-[Singularity][singularity] is installed.
+e.g., by [Slurm][slurm], all steps of the workflow run in their own container.
+As a consequence, running this workflow has very few individual dependencies. It
+does, however, require that the container engine [Singularity][singularity] is
+installed.
 
 Create and activate the environment with necessary dependencies with conda:
 
