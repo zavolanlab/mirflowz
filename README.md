@@ -118,6 +118,41 @@ Before running the pipeline adjust the parameters in file
 `config_prepare_annotation.yaml`:
 
 ```yaml
+---
+
+############################## GLOBAL PARAMETERS ##############################
+
+## Isomirs annotation file
+## Number of base pairs to add/substract from 5' (start) and 3' (end) coordinates.
+bp_5p: [0]  # array of numbers, e.g., [-2,-1,0,+1], to include 2 upstream and 1 downstream nts
+bp_3p: [0]  # array of numbers, e.g., [-2,-1,0,+1], to include 2 upstream and 1 downstream nts
+
+## Directories
+output_dir: "results"
+scripts_dir: "../../../scripts"
+local_log: "logs/local"
+cluster_log: "logs/cluster"
+
+# List of "organism/prefix" identifiers
+organism: ["org/pre"]  # e.g., ["homo_sapiens/GRCh38.100", "mus_musculus/GRCm37.98"]
+
+################### PARAMETERS SPECIFIC TO ORGANISM VERSION ###################
+
+org/pre:  # One section for each list item in "organism"; names have to match precisely
+
+  # URLs to genome, gene & miRNA annotations
+  genome_url:  # FTP/HTTP URL to gzipped genome in FASTA format, Ensembl style
+  gtf_url:  # FTP/HTTP URL to gzipped gene annotations in GTF format, Ensembl style
+  mirna_url:  # FTP/HTTP URL to unzipped microRNA annotations in GFF format, miRBase style
+
+  # Chromosome name mappings between UCSC <-> Ensembl
+  # Available at: https://github.com/dpryan79/ChromosomeMappings; e.g., `GRCh38_UCSC2ensembl.txt`
+  map_chr_url:  # FTP/HTTP URL to mapping table
+  # Chromosome name mapping parameters:
+  column: 1  # Column number from input file where to change chromosome name
+  delimiter: "TAB"  # Delimiter of the input file
+
+...
 ```
 
 > **Note:** We expect the genome and gene annotations to be formatted according
