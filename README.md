@@ -3,8 +3,7 @@
 [Snakemake][snakemake] workflow to download and prepare the necessary files for
 smallRNA-seq related pipelines [mir-map][mir-map] and [mir-quant][mir-quant].
 
-The scheme below is a visual representation of an example run of the
-workflow:
+The scheme below is a visual representation of an example run of the workflow:
 
 > ![rule-graph-prep-anno][rule-graph-prep-anno]
 
@@ -108,39 +107,24 @@ Now make a clean copy of the `JOB` directory and name it what you want, e.g.,
 cp -r JOB MY_ANALYSIS
 ```
 
-Now traverse to the directory from where you will actually executw the pipeline
+Now traverse to the directory from where you will actually execute the pipeline
 with:
 
 ```bash
 cd MY_ANALYSIS/prepare_annotation
 ```
 
-Before running the pipeline adjust the parameters in file `config.yaml`:
+Before running the pipeline adjust the parameters in file
+`config_prepare_annotation.yaml`:
 
 ```yaml
----
-  ##############################################################################
-  ### Necessary inputs
-  ##############################################################################
-  organism: " "  # name of the organism, e.g., "homo_sapiens"
-  genome_url: "ftp:// ..... "  # FTP/HTTP URL to genome file in FASTA format
-  gtf_url: "ftp:// ..... "  # FTP/HTTP URL to gene annotation file in GTF format
-  prefix_name: " "  # name of the assembly/annotation version, e.g., "GRCh38.100"
-
-  ##############################################################################
-  ### Directories
-  ##############################################################################
-  output_dir: "results"
-  scripts_dir: "../scripts"
-  local_log: "logs/local"
-  cluster_log: "logs/cluster"
-...
 ```
 
 > **Note:** We expect the genome and gene annotations to be formatted according
 > the style used by Ensembl. Other formats are very likely to lead to problems,
 > if not in this pipeline, then further down the road in the mapping or
-> annotation pipelines.
+> annotation pipelines. The miRNA annotation file is expected to originate from
+> miRBase, or follow their exact layout.
 
 To start pipeline execution locally:
 

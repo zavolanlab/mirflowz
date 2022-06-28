@@ -28,7 +28,7 @@ mkdir -p results/homo_sapiens/GRCh38.98_chrY
 snakemake \
     --snakefile="../workflow/prepare_annotation/Snakefile" \
     --configfile="config_prepare_annotation.yaml" \
-    --cluster-config="../workflow/prepare_annotation/cluster.json" \
+    --cluster-config="cluster_prepare_annotation.json" \
     --cluster "sbatch \
         --cpus-per-task={cluster.threads} \
         --mem={cluster.mem} \

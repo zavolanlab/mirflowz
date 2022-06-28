@@ -17,15 +17,16 @@
 ####################
 
 # Prefix for filenames
-fileNamePrefix="$1"
-organism="$2"   
+output_dir="$1"
+log_dir="$2"   
 
-# Paths (DO NOT CHANGE!)
+# # Paths (DO NOT CHANGE!)
 root="$PWD"
 #root="$(cd "$(dirname "$0" )" && pwd)"
-resDir="${root}/results/${organism}/${fileNamePrefix}/"
+
+resDir="${root}/${output_dir}"
 rawDir="${resDir}/raw"
-logDir="${root}/logs/local/${organism}/${fileNamePrefix}/"
+logDir="${root}/${log_dir}"
 
 # URLs
 # ------
@@ -48,8 +49,8 @@ mkdir --parents "$rawDir"
 mkdir --parents "$logDir"
 
 # Create log file
-logFile="${logDir}/$(basename $0 ".sh").log"
-rm -f "$logFile"; touch "$logFile"
+logFile="${logDir}"
+rm -fr "$logFile"; touch "$logFile"
 >&2 echo "Log written to '$logFile'..."
 
 ##############

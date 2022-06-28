@@ -5,8 +5,6 @@ channels:
   - conda-forge
 dependencies:
   - graphviz=2.40.1
-  - pip=20.0.2
   - python=3.7.4
-  - snakemake==6.10.0
+  - snakemake=6.10.0
   - unzip=6.0
-  - wget==1.20.1

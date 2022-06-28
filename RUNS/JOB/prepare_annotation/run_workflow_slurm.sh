@@ -27,7 +27,7 @@ cd $script_dir
 snakemake \
     --snakefile="../../../workflow/prepare_annotation/Snakefile" \
     --configfile="config.yaml" \
-    --cluster-config="../../../workflow/prepare_annotation/cluster.json" \
+    --cluster-config="cluster.json" \
     --cluster "sbatch \
         --cpus-per-task={cluster.threads} \
         --mem={cluster.mem} \
