@@ -1,36 +1,45 @@
-# mir-prepare-annotation
+# _MIRFLOWZ_
 
-[Snakemake][snakemake] workflow to download and prepare the necessary files for
-smallRNA-seq related pipelines [mir-map][mir-map] and [mir-quant][mir-quant].
-
-The scheme below is a visual representation of an example run of the workflow:
-
-> ![rule-graph-prep-anno][rule-graph-prep-anno]
+Suite of [Snakemake][snakemake] workflows for the mapping and quantification
+of smallRNA-seq libraries, including miRNA and isomiR quantification.
 
 ## Installation
+
+All workflows live inside this repository and will be available for you to run
+after following the installation instructions layed out in this section.
 
 ### Cloning the repository
 
 Traverse to the desired path on your file system, then clone the repository and
-move into it with:
+change into it with:
 
 ```bash
-git clone ssh://git@git.scicore.unibas.ch:2222/zavolan_group/pipelines/mir-prepare-annotation.git
-cd mir-prepare-annotation
+git clone ssh://git@git.scicore.unibas.ch:2222/zavolan_group/pipelines/mirflowz.git
+cd mirflowz
 ```
+
+### Dependencies
+
+For improved reproducibility and reusability of the workflows, as well as an
+easy means to run them on a high performance computing (HPC) cluster managed,
+e.g., by [Slurm][slurm], all steps of the workflows run inside their own
+containers. As a consequence, running this workflow has very few individual
+dependencies. It does, however, require the package manager [Conda][conda] and
+the container engine [Singularity][singularity] to be installed before you
+proceed.
+
+> **NOTE:** If you have root permissions for your system and you do not already
+> have `singularity` installed globally on your system, you can conveniently
+> use Conda to install it. In that case, replace `environment.yml` with
+> `environment.root.yml` in the first command below.
 
 ### Setting up a virtual environment
 
-Workflow dependencies can be conveniently installed with the [Conda][conda]
-package manager. We recommend that you install [Miniconda][miniconda] for your
-system.
-
-For improved reproducibility and reusability of the workflow, as well as an
-easy means to run it on a high performance computing (HPC) cluster managed,
-e.g., by [Slurm][slurm], all steps of the workflow run in their own container.
-As a consequence, running this workflow has very few individual dependencies.
-It does, however, require that the container engine [Singularity][singularity]
-is installed.
+It you do not already have [Conda][conda] installed globally on your system,
+we recommend that you install [Miniconda][miniconda]. For faster creation of
+the environment (and Conda environments in general), you can also install
+[Mamba][mamba] on top of Conda. In that case, replace `conda` with `mamba` in
+the commands below (particularly in `conda env create`).
 
 Create and activate the environment with necessary dependencies with Conda:
 
@@ -39,59 +48,112 @@ conda env create -f environment.yml
 conda activate mir-pipelines
 ```
 
-> **NOTE:** For faster creation of the environment (and Conda environments in
-> general), you can also install [Mamba][mamba] on top of Conda.
->  
-> **NOTE:** If you have root permissions for your system and you do not have
-> `singularity` installed globally on your system, you can use Conda to install
-> it. In that case, replace `environment.yml` with `environment.root.yml` in
-> the first command above.
-
 ### Testing your installation
 
-Several tests are prepared to check the integrity of the workflow.
+Several tests are provided to check the integrity of the installation. Follow
+the instructions in this section to make sure the workflows are ready to use.
 
-Change into the test directory:
+#### Run test workflows on local machine
 
-```bash
-cd test/
-```
-
-#### DAG and rule graph
-
-Execute the following commands to generate DAG and rule graph images. Outputs
-will be found in the `images/` directory.
+Execute the following command to run the test workflows on your local machine:
 
 ```bash
-./test_dag.sh
-./test_rule_graph.sh
+bash test/test_workflow_local.sh
 ```
 
-#### Run workflow on local machine
+#### Run test workflows via Slurm
 
-Execute the following command to run the test workflow on your local machine:
-
-```bash
-./test_workflow_local.sh
-```
-
-#### Run workflow via Slurm
-
-Execute the following command to run the test workflow on a Slurm-managed
+Execute the following command to run the test workflows on a Slurm-managed
 high-performance computing (HPC) cluster:
 
 ```bash
-./test_workflow_slurm.sh
+bash test/test_workflow_slurm.sh
 ```
 
-> **NOTE:** This was set up to run on the developer's Slurm cluster. Several
-> files may need to be modified on other systems, including `jobscript.sh`,
-> `workflow/prepare_annotation/cluster.json` and `test/test_workflow_slurm.sh`
-> itself (all relative to the repository's root directory). Consult the manual
-> of your batch scheduling system, as well as the section of the Snakemake
-> manual dealing with [cluster execution].
+> **NOTE:** The Slurm tests were configured to run on the developer's cluster.
+> Several files may need to be modified if you would like to run tests (and
+> the actual workflows) on other systems. These may possibly include the
+> following (relative to the repository root directory), but potentially others
+> as well:
+>  
+> * `jobscript.sh`
+> * `RUNS/JOB/{prepare,map,quantify}/cluster.json`
+> * `test/test_workflow_slurm.sh`
+>  
+> Consult the manual of
+> your batch scheduling system, as well as the section of the Snakemake manual
+> dealing with [cluster execution].
+
+#### DAG and rule graph
+
+Execute the following commands to generate DAG and rule graph images for each
+workflow. Outputs will be found in the `images/` directory in the repository
+root.
+
+> **NOTE:** It is essential that you run the DAG and rule graph tests only
+> _after_ running the test workflow. This is because they require files to be
+> available that will only be created when running that workflows.
+
+```bash
+bash test/test_dag.sh
+bash test/test_rule_graph.sh
+```
+
+#### Clean up test results
+
+After successfully running the tests above, you can run the following command
+to remove all artifacts generated by the test runs:
+
+```bash
+bash test/test_cleanup.sh
+```
 
 ## Usage
+
+Now that your virtual environment is set up and the workflows are deployed and
+tested, you can go ahead and run the workflows on your samples.
+
+But first, here is a brief description of what each of the three workflows
+does:
+
+### Workflow description
+
+The repository contains the following workflows, all implemented in Snakemake
+and fully containerized:
+
+#### _PREPARE_
+
+The first workflow, **_PREPARE_** downloads and processes "genome resources"
+from the publicly available repositories [Ensembl][ensembl] and
+[miRBase][mirbase] according to your instructions. Resources are then processed
+to prepare indexes and other contingent resources that will be used in later
+steps.
+
+The scheme below is a visual representation of an example run of the
+**_PREPARE_** workflow:
+
+> ![rule-graph-prepare][rule-graph-prepare]
+
+#### _MAP_
+
+The second workflow, **_MAP_** aligns the user-provided short read smallRNA-seq
+libraries against the references generated with the **_PREPARE_** workflow. For
+increased fidelity it uses two separate aligning tools, [Segemehl][segemehl]
+and our in-house tool [Oligomap][oligomap]. In both cases, reads are aligned
+separately to the genome and the transcriptome. Afterwards, alignments are
+merged in a way that only the best alignment (or alignments) of each read are
+kept.
+
+The scheme below is a visual representation of an example run of the **_MAP_**
+workflow:
+
+> ![rule-graph-map][rule-graph-map]
+
+#### _QUANTIFY_
+
+Coming soon...
+
+### Running the workflows
 
 Assuming that you are currently inside the repository's root directory, change
 to the run root directory:
@@ -100,38 +162,67 @@ to the run root directory:
 cd RUNS
 ```
 
-Now make a clean copy of the `JOB` directory and name it what you want, e.g.,
-`MY_ANALYSIS`:
+Now make a clean copy of the `JOB` directory and name it whatever you want,
+e.g., `MY_ANALYSIS`:
 
 ```bash
 cp -r JOB MY_ANALYSIS
 ```
 
-Now traverse to the directory from where you will actually execute the pipeline
-with:
+Now traverse to the new directory. You will see that there are three
+subdirectories, one for each workflow, change into the one you would like to
+run (probably `prepare`).
 
 ```bash
-cd MY_ANALYSIS/prepare_annotation
+cd MY_ANALYSIS
+cd {prepare,map,quantify}
 ```
 
-Before running the pipeline adjust the parameters in file
-`config_prepare_annotation.yaml`:
+Before running the workflow adjust the parameters in file `config.yaml`. The
+file explains what each of the parameters means and how you can meaningfully
+fill them in.
+
+To start workflow execution, run:
+
+```bash
+./run_workflow_slurm.sh
+```
+
+> **NOTE:** Check back in the installation section to find more information on
+> how to run the workflows on your HPC system. Although we do provide a
+> workflow runner to execute the workflows locally (`run_workflow_local.sh`) on
+> your laptop or desktop machine, we recommend against that for real-world
+> data, as the resources requirements for running the workflows are very high
+> (can be >50 Gigs of memory!).
+
+After successful execution of the workflow, results and logs will be found in
+`results/` and `logs/` directories, respectively.
+
+### Appendix: Configuration files
+
+_MIRFLOWZ_ comes with template configuration files for each individual
+workflow. These contain notes on how to fill in each parameter.
+
+#### _PREPARE_
+
+**File location:** `RUNS/JOB/prepare/config.yaml`
 
 ```yaml
 ---
 
 ############################## GLOBAL PARAMETERS ##############################
 
-## Isomirs annotation file
-## Number of base pairs to add/substract from 5' (start) and 3' (end) coordinates.
-bp_5p: [0]  # array of numbers, e.g., [-2,-1,0,+1], to include 2 upstream and 1 downstream nts
-bp_3p: [0]  # array of numbers, e.g., [-2,-1,0,+1], to include 2 upstream and 1 downstream nts
-
-## Directories
-output_dir: "results"
+# Directories
+# Usually there is no need to change these
 scripts_dir: "../../../scripts"
+output_dir: "results"
 local_log: "logs/local"
 cluster_log: "logs/cluster"
+
+# Isomirs annotation file
+# Number of base pairs to add/substract from 5' (start) and 3' (end) coordinates.
+bp_5p: [0]  # array of numbers, e.g., [-2,-1,0,+1], to include 2 upstream and 1 downstream nts
+bp_3p: [0]  # array of numbers, e.g., [-2,-1,0,+1], to include 2 upstream and 1 downstream nts
 
 # List of "organism/prefix" identifiers
 organism: ["org/pre"]  # e.g., ["homo_sapiens/GRCh38.100", "mus_musculus/GRCm37.98"]
@@ -161,33 +252,74 @@ org/pre:  # One section for each list item in "organism"; names have to match pr
 > annotation pipelines. The miRNA annotation file is expected to originate from
 > miRBase, or follow their exact layout.
 
-To start pipeline execution locally:
+#### _MAP_
 
-```bash
-./run_workflow_local.sh
+**File location:** `RUNS/JOB/map/config.yaml`
+
+```yaml
+---
+
+############################## GLOBAL PARAMETERS ##############################
+
+# Directories
+# Usually there is no need to change these
+scripts_dir: "../../../scripts"
+output_dir: "results"
+local_log: "logs/local"
+cluster_log: "logs/cluster"
+
+# Resources: genome, transcriptome, genes, miRs
+# All of these are produced by the "prepare" workflow
+genome: "path/to/genome.processed.fa"
+gtf: "path/to/gene_annotations.filtered.gtf"
+transcriptome: "path/to/transcriptome_idtrim.fa"
+transcriptome_index_segemehl: "path/to/transcriptome_index_segemehl.idx"
+genome_index_segemehl: "path/to/genome_index_segemehl.idx"
+exons: "path/to/exons.bed"
+header_of_collapsed_fasta: "path/to/headerOfCollapsedFasta.sam"
+
+# Tool parameters: quality filter
+q_value: 10  # Q (Phred) score; minimum quality score to keep
+p_value: 50  # minimum % of bases that must have Q quality
+
+# Tool parameters: adapter removal
+error_rate: 0.1  # fraction of allowed errors
+minimum_length: 15  # discard processed reads shorter than the indicated length
+overlap: 3  # minimum overlap length of adapter and read to trim the bases
+max_n: 0  # discard reads containing more than the indicated number of N bases
+
+# Tool parameters: mapping
+max_length_reads: 30  # maximum length of processed reads to map with oligomap
+nh: 100  # discard reads with more mappings than the indicated number
+
+# Sample information
+input_dir: "path/to/input_directory"
+sample: ["sample_1"]  # put all samples, separated by comma & without file extension
+                      # (e.g., "sample_1" instead of "sample_1.fa.gz")
+
+######################## PARAMETERS SPECIFIC TO SAMPLE ########################
+
+sample_1:  # One section for each list item in "sample"; names have to match precisely
+    adapter: "XXXXXXXXXXXXXXXXXXXX"  # 3' adapter sequence to trim
+    format: "fa"  # file format; currently supported: "fa"
+
+...
 ```
 
-To start pipeline execution via Slurm:
+#### _QUANTIFY_
 
-```bash
-./run_workflow_slurm.sh
-```
-
-> *This is strongly recommended due to excessive resource needs of some tools!*
-
-After successful execution of the workflow, results and logs will be found in
-`results/` and `logs/` directories, respectively.
-
-> **Note:** See the note in the installation section for configuring workflow
-> runs on your individual batch scheduling system, Slurm or otherwise.
+Coming soon...
 
 [conda]: <https://docs.conda.io/projects/conda/en/latest/index.html>
 [cluster execution]: <https://snakemake.readthedocs.io/en/stable/executing/cluster-cloud.html#cluster-execution>
+[ensembl]: <https://ensembl.org/>
 [mamba]: <https://github.com/mamba-org/mamba>
 [miniconda-installation]: <https://docs.conda.io/en/latest/miniconda.html>
-[mir-map]: <https://git.scicore.unibas.ch/zavolan_group/pipelines/mir-map>
-[mir-quant]: <https://git.scicore.unibas.ch/zavolan_group/pipelines/mir-quant>
-[rule-graph-prep-anno]: images/rule_graph_prepare_annotation.svg
-[snakemake]: <https://snakemake.readthedocs.io/en/stable/>
+[mirbase]: <https://mirbase.org/>
+[oligomap]: <https://bio.tools/oligomap>
+[rule-graph-prepare]: images/rule_graph_prepare.svg
+[rule-graph-map]: images/rule_graph_map.svg
+[segemehl]: <https://www.bioinf.uni-leipzig.de/Software/segemehl/>
 [singularity]: <https://sylabs.io/singularity/>
 [slurm]: <https://slurm.schedmd.com/documentation.html>
+[snakemake]: <https://snakemake.readthedocs.io/en/stable/>

@@ -3,11 +3,6 @@
 # Tear down test environment
 cleanup () {
     rc=$?
-    rm -rf .snakemake/
-    rm -rf .tmp/
-    rm -rf logs/
-    rm -rf results/
-    rm -rf snakemake_report_*.html
     cd $user_dir
     echo "Exit status: $rc"
 }
@@ -21,10 +16,10 @@ user_dir=$PWD
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 cd $script_dir
 
-# Run tests
+# Run test: prepare workflow
 snakemake \
-    --snakefile="../workflow/prepare_annotation/Snakefile" \
-    --configfile="config_prepare_annotation.yaml" \
+    --snakefile="../workflow/prepare/Snakefile" \
+    --configfile="config_prepare.yaml" \
     --use-singularity \
     --singularity-args "--bind ${PWD}/../" \
     --cores=4 \
@@ -32,19 +27,35 @@ snakemake \
     --rerun-incomplete \
     --verbose
 
-# Snakemake report
+# Run test: map workflow
 snakemake \
-    --snakefile="../workflow/prepare_annotation/Snakefile" \
-    --configfile="config_prepare_annotation.yaml" \
-    --report="snakemake_report_prepare_annotation.html"
+    --snakefile="../workflow/map/Snakefile" \
+    --configfile="config_map.yaml" \
+    --use-singularity \
+    --singularity-args "--bind ${PWD}/../" \
+    --cores=4 \
+    --printshellcmds \
+    --rerun-incomplete \
+    --verbose
+
+# Snakemake report: prepare workflow
+snakemake \
+    --snakefile="../workflow/prepare/Snakefile" \
+    --configfile="config_prepare.yaml" \
+    --report="snakemake_report_prepare.html"
+
+# Snakemake report: map workflow
+snakemake \
+    --snakefile="../workflow/map/Snakefile" \
+    --configfile="config_map.yaml" \
+    --report="snakemake_report_map.html"
 
 # Check md5 sum of some output files
 find results/ -type f -name \*\.gz -exec gunzip '{}' \;
 find results/ -type f -name \*\.zip -exec sh -c 'unzip -o {} -d $(dirname {})' \;
 md5sum --check "expected_output.md5"
 
-# Checksum file generated with
-# find results/ \
-#     -type f \
-#     > expected_output.files;
+# Generate checksum files
+# (run only when using new test data and after verifying results!)
+# find results/ -type f > expected_output.files;
 # md5sum $(cat expected_output.files) > expected_output.md5

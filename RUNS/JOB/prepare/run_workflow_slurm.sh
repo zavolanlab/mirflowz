@@ -25,7 +25,7 @@ cd $script_dir
 
 # Run workflow
 snakemake \
-    --snakefile="../../../workflow/prepare_annotation/Snakefile" \
+    --snakefile="../../../workflow/prepare/Snakefile" \
     --configfile="config.yaml" \
     --cluster-config="cluster.json" \
     --cluster "sbatch \
@@ -47,6 +47,6 @@ snakemake \
 
 # Snakemake report
 snakemake \
-    --snakefile="../../../workflow/prepare_annotation/Snakefile" \
+    --snakefile="../../../workflow/prepare/Snakefile" \
     --configfile="config.yaml" \
     --report="snakemake_report.html"

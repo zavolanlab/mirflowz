@@ -2,16 +2,16 @@
 
 ############################## GLOBAL PARAMETERS ##############################
 
-## Isomirs annotation file
-## Number of base pairs to add/substract from 5' (start) and 3' (end) coordinates.
-bp_5p: [-1,0,+1]
-bp_3p: [-1,0,+1]
-
-## Directories
+# Directories
 output_dir: "results"
 scripts_dir: "../scripts"
 local_log: "logs/local"
 cluster_log: "logs/cluster"
+
+# Isomirs annotation file
+# Number of base pairs to add/substract from 5' (start) and 3' (end) coordinates.
+bp_5p: [-1,0,+1]
+bp_3p: [-1,0,+1]
 
 # List of "organism/prefix"
 organism: ["homo_sapiens/chrY"]
@@ -29,7 +29,7 @@ homo_sapiens/chrY:
   # Other organisms available at: https://github.com/dpryan79/ChromosomeMappings
   map_chr_url: "https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_UCSC2ensembl.txt"
   # Chromosome name mapping parameters:
-  column: 1  # Column number from input file where to change chromosome name
-  delimiter: "TAB"  # Delimiter of the input file
+  column: 1
+  delimiter: "TAB"
 
 ...

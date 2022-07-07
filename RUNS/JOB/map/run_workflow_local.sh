@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# Tear down test environment
+# Tear down environment
 cleanup () {
     rc=$?
+    rm $(cat intermediate_files.txt) 
     cd $user_dir
     echo "Exit status: $rc"
 }
@@ -16,22 +17,19 @@ user_dir=$PWD
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 cd $script_dir
 
-# Run test: prepare workflow
+# Run workflow
 snakemake \
-    --snakefile="../workflow/prepare/Snakefile" \
-    --configfile="config_prepare.yaml" \
-    --dag \
     --printshellcmds \
-    --dryrun \
-    --verbose \
-    | dot -Tsvg > "../images/workflow_dag_prepare.svg"
+    --snakefile="../snakemake/Snakefile" \
+    --use-singularity \
+    --singularity-args "--bind ${PWD}/../" \
+    --cores=4 \
+    --rerun-incomplete \
+    --configfile="config.yaml" \
+    --verbose
 
-# Run test: map workflow
+# Snakemake report
 snakemake \
-    --snakefile="../workflow/map/Snakefile" \
-    --configfile="config_map.yaml" \
-    --dag \
-    --printshellcmds \
-    --dryrun \
-    --verbose \
-    | dot -Tsvg > "../images/workflow_dag_map.svg"
+    --snakefile="../snakemake/Snakefile" \
+    --configfile="config.yaml" \
+    --report="snakemake_report.html"

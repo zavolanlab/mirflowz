@@ -18,7 +18,7 @@ cd $script_dir
 
 # Run workflow
 snakemake \
-    --snakefile="../../../workflow/prepare_annotation/Snakefile" \
+    --snakefile="../../../workflow/prepare/Snakefile" \
     --configfile="config.yaml" \
     --use-singularity \
     --singularity-args "--bind ${PWD}/../../../" \
@@ -29,6 +29,6 @@ snakemake \
 
 # Snakemake report
 snakemake \
-    --snakefile="../../../workflow/prepare_annotation/Snakefile" \
+    --snakefile="../../../workflow/prepare/Snakefile" \
     --configfile="config.yaml" \
     --report="snakemake_report.html"

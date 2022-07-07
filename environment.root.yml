@@ -1,4 +1,4 @@
-name: mir-pipelines
+name: mirflowz
 channels:
   - bioconda
   - defaults

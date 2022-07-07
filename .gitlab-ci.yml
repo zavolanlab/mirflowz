@@ -10,7 +10,9 @@ before_script:
 
 test:
   script:
+    - bash test/test_workflow_local.sh
     - bash test/test_dag.sh
     - bash test/test_rule_graph.sh
-    - bash test/test_workflow_local.sh
 
+after_script:
+  - bash test/test_cleanup.sh

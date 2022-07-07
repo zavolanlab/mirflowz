@@ -1,0 +1,47 @@
+---
+
+############################## GLOBAL PARAMETERS ##############################
+
+# Directories
+# Usually there is no need to change these
+scripts_dir: "../../../scripts"
+output_dir: "results"
+local_log: "logs/local"
+cluster_log: "logs/cluster"
+
+# Resources: genome, transcriptome, genes, miRs
+# All of these are produced by the "prepare" workflow
+genome: "path/to/genome.processed.fa"
+gtf: "path/to/gene_annotations.filtered.gtf"
+transcriptome: "path/to/transcriptome_idtrim.fa"
+transcriptome_index_segemehl: "path/to/transcriptome_index_segemehl.idx"
+genome_index_segemehl: "path/to/genome_index_segemehl.idx"
+exons: "path/to/exons.bed"
+header_of_collapsed_fasta: "path/to/headerOfCollapsedFasta.sam"
+
+# Tool parameters: quality filter
+q_value: 10  # Q (Phred) score; minimum quality score to keep
+p_value: 50  # minimum % of bases that must have Q quality
+
+# Tool parameters: adapter removal
+error_rate: 0.1  # fraction of allowed errors
+minimum_length: 15  # discard processed reads shorter than the indicated length
+overlap: 3  # minimum overlap length of adapter and read to trim the bases
+max_n: 0  # discard reads containing more than the indicated number of N bases
+
+# Tool parameters: mapping
+max_length_reads: 30  # maximum length of processed reads to map with oligomap
+nh: 100  # discard reads with more mappings than the indicated number
+
+# Sample information
+input_dir: "path/to/input_directory"
+sample: ["sample_1"]  # put all samples, separated by comma & without file extension
+                      # (e.g., "sample_1" instead of "sample_1.fa.gz")
+
+######################## PARAMETERS SPECIFIC TO SAMPLE ########################
+
+sample_1:  # One section for each list item in "sample"; names have to match precisely
+    adapter: "XXXXXXXXXXXXXXXXXXXX"  # 3' adapter sequence to trim
+    format: "fa"  # file format; currently supported: "fa"
+
+...

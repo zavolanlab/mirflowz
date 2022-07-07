@@ -214,3 +214,5 @@ results
 logs
 nohup.out
 .wget-hsts
+wget-log*
+snakemake_report_*.html
