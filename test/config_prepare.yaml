@@ -1,8 +1,8 @@
 ---
-
-############################## GLOBAL PARAMETERS ##############################
+#### GLOBAL PARAMETERS #####
 
 # Directories
+# Usually there is no need to change these
 output_dir: "results"
 scripts_dir: "../scripts"
 local_log: "logs/local"
@@ -10,16 +10,15 @@ cluster_log: "logs/cluster"
 
 # Isomirs annotation file
 # Number of base pairs to add/substract from 5' (start) and 3' (end) coordinates.
-bp_5p: [-1,0,+1]
-bp_3p: [-1,0,+1]
+bp_5p: [-1, 0, +1]
+bp_3p: [-1, 0, +1]
 
-# List of "organism/prefix"
+# List of inputs
 organism: ["homo_sapiens/chrY"]
 
-################### PARAMETERS SPECIFIC TO ORGANISM VERSION ###################
+#### PARAMETERS SPECIFIC TO INPUTS #####
 
 homo_sapiens/chrY:
-
   # URLs to genome, gene & miRNA annotations
   genome_url: "ftp://ftp.ensembl.org/pub/release-98/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna_sm.chromosome.Y.fa.gz"
   gtf_url: "ftp://ftp.ensembl.org/pub/release-98/gtf/homo_sapiens/Homo_sapiens.GRCh38.98.gtf.gz"
@@ -31,5 +30,4 @@ homo_sapiens/chrY:
   # Chromosome name mapping parameters:
   column: 1
   delimiter: "TAB"
-
 ...

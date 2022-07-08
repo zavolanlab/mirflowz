@@ -12,16 +12,14 @@ trap cleanup EXIT
 set -eo pipefail  # ensures that script exits at first command that exits with non-zero status
 set -u  # ensures that script exits when unset variables are used
 set -x  # facilitates debugging by printing out executed commands
-
-#### CHANGE PATHS WITH YOUR ORGANISM AND PREFIX_NAME ####
-mkdir -p logs/cluster/ORGANISM/PREFIX_NAME
-mkdir -p logs/local/ORGANISM/PREFIX_NAME
-mkdir -p results/ORGANISM/PREFIX_NAME
-#########################################################
-
 user_dir=$PWD
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 cd $script_dir
+
+# Have to match directories indicated in config.yaml
+mkdir -p logs/cluster
+mkdir -p logs/local
+mkdir -p results
 
 # Run workflow
 snakemake \

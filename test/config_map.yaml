@@ -1,8 +1,8 @@
 ---
-
-############################## GLOBAL PARAMETERS ##############################
+#### GLOBAL PARAMETERS ####
 
 # Directories
+# Usually there is no need to change these
 output_dir: "results/"
 local_log:  "logs/local"
 cluster_log: "logs/cluster"
@@ -32,14 +32,13 @@ max_n: 0
 max_length_reads: 30
 nh: 100
 
-# Sample information
+# Inputs information
 input_dir: "test_files"
 sample: ["test_lib"]
 
-######################## PARAMETERS SPECIFIC TO SAMPLE ########################
+#### PARAMETERS SPECIFIC TO INPUTS ####
 
 test_lib:
     adapter: "AACTGTAGGCACCATCAAT"
     format: "fa"
-
 ...

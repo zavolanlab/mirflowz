@@ -3,7 +3,6 @@
 # Tear down environment
 cleanup () {
     rc=$?
-    rm $(cat intermediate_files.txt) 
     cd $user_dir
     echo "Exit status: $rc"
 }
@@ -19,7 +18,7 @@ cd $script_dir
 
 # Run workflow
 snakemake \
-    --snakefile="../../../workflow/map/Snakefile" \
+    --snakefile="../../../workflow/quantify/Snakefile" \
     --configfile="config.yaml" \
     --use-singularity \
     --singularity-args "--bind ${PWD}/../../../" \
@@ -30,6 +29,6 @@ snakemake \
 
 # Snakemake report
 snakemake \
-    --snakefile="../../../workflow/map/Snakefile" \
+    --snakefile="../../../workflow/quantify/Snakefile" \
     --configfile="config.yaml" \
     --report="snakemake_report.html"

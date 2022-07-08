@@ -35,3 +35,13 @@ snakemake \
     --dryrun \
     --verbose \
     | dot -Tsvg > "../images/workflow_dag_map.svg"
+
+# Run test: quantify workflow
+snakemake \
+    --snakefile="../workflow/quantify/Snakefile" \
+    --configfile="config_quantify.yaml" \
+    --dag \
+    --printshellcmds \
+    --dryrun \
+    --verbose \
+    | dot -Tsvg > "../images/workflow_dag_quantify.svg"

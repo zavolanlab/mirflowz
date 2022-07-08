@@ -1,6 +1,5 @@
 ---
-
-############################## GLOBAL PARAMETERS ##############################
+#### GLOBAL PARAMETERS ####
 
 # Directories
 # Usually there is no need to change these
@@ -33,15 +32,13 @@ max_n: 0  # discard reads containing more than the indicated number of N bases
 max_length_reads: 30  # maximum length of processed reads to map with oligomap
 nh: 100  # discard reads with more mappings than the indicated number
 
-# Sample information
+# Inputs information
 input_dir: "path/to/input_directory"
-sample: ["sample_1"]  # put all samples, separated by comma & without file extension
-                      # (e.g., "sample_1" instead of "sample_1.fa.gz")
+sample: ["sample_1", "sample_2"]  # put all sample names, separated by comma
 
-######################## PARAMETERS SPECIFIC TO SAMPLE ########################
+#### PARAMETERS SPECIFIC TO INPUTS ####
 
-sample_1:  # One section for each list item in "sample"; names have to match precisely
+sample_1:  # one section per list item in "sample"; names have to match
     adapter: "XXXXXXXXXXXXXXXXXXXX"  # 3' adapter sequence to trim
     format: "fa"  # file format; currently supported: "fa"
-
 ...

@@ -151,7 +151,16 @@ workflow:
 
 #### _QUANTIFY_
 
-Coming soon...
+The third and final workflow, **_QUANTIFY_** quantifies miRNA expression by
+intersecting the alignments from the **_MAP_** workflow with the annotations
+generated in the **_PREPARE_** workflow. Intersections are computed with
+[`bedtools`][bedtools] for one or multiple of mature, primary transcripts and
+isomiRs. Reads consistent with each miRNA are counted and tabulated.
+
+The scheme below is a visual representation of an example run of the
+**_QUANTIFY_** workflow:
+
+> ![rule-graph-quantify][rule-graph-quantify]
 
 ### Running the workflows
 
@@ -209,8 +218,7 @@ workflow. These contain notes on how to fill in each parameter.
 
 ```yaml
 ---
-
-############################## GLOBAL PARAMETERS ##############################
+#### GLOBAL PARAMETERS #####
 
 # Directories
 # Usually there is no need to change these
@@ -221,28 +229,26 @@ cluster_log: "logs/cluster"
 
 # Isomirs annotation file
 # Number of base pairs to add/substract from 5' (start) and 3' (end) coordinates.
-bp_5p: [0]  # array of numbers, e.g., [-2,-1,0,+1], to include 2 upstream and 1 downstream nts
-bp_3p: [0]  # array of numbers, e.g., [-2,-1,0,+1], to include 2 upstream and 1 downstream nts
+bp_5p: [0] # array of numbers, e.g., [-2,-1,0,+1], to include 2 upstream and 1 downstream nts
+bp_3p: [0] # array of numbers, e.g., [-2,-1,0,+1], to include 2 upstream and 1 downstream nts
 
-# List of "organism/prefix" identifiers
-organism: ["org/pre"]  # e.g., ["homo_sapiens/GRCh38.100", "mus_musculus/GRCm37.98"]
+# List of inputs
+organism: ["org/pre"] # e.g., ["homo_sapiens/GRCh38.100", "mus_musculus/GRCm37.98"]
 
-################### PARAMETERS SPECIFIC TO ORGANISM VERSION ###################
+#### PARAMETERS SPECIFIC TO INPUTS ####
 
-org/pre:  # One section for each list item in "organism"; names have to match precisely
-
+org/pre: # One section for each list item in "organism"; names have to match precisely
   # URLs to genome, gene & miRNA annotations
-  genome_url:  # FTP/HTTP URL to gzipped genome in FASTA format, Ensembl style
-  gtf_url:  # FTP/HTTP URL to gzipped gene annotations in GTF format, Ensembl style
-  mirna_url:  # FTP/HTTP URL to unzipped microRNA annotations in GFF format, miRBase style
+  genome_url: # FTP/HTTP URL to gzipped genome in FASTA format, Ensembl style
+  gtf_url: # FTP/HTTP URL to gzipped gene annotations in GTF format, Ensembl style
+  mirna_url: # FTP/HTTP URL to unzipped microRNA annotations in GFF format, miRBase style
 
   # Chromosome name mappings between UCSC <-> Ensembl
-  # Available at: https://github.com/dpryan79/ChromosomeMappings; e.g., `GRCh38_UCSC2ensembl.txt`
-  map_chr_url:  # FTP/HTTP URL to mapping table
+  # Other organisms available at: https://github.com/dpryan79/ChromosomeMappings
+  map_chr_url: # FTP/HTTP URL to mapping table
   # Chromosome name mapping parameters:
-  column: 1  # Column number from input file where to change chromosome name
-  delimiter: "TAB"  # Delimiter of the input file
-
+  column: 1 # Column number from input file where to change chromosome name
+  delimiter: "TAB" # Delimiter of the input file
 ...
 ```
 
@@ -258,8 +264,7 @@ org/pre:  # One section for each list item in "organism"; names have to match pr
 
 ```yaml
 ---
-
-############################## GLOBAL PARAMETERS ##############################
+#### GLOBAL PARAMETERS ####
 
 # Directories
 # Usually there is no need to change these
@@ -292,24 +297,49 @@ max_n: 0  # discard reads containing more than the indicated number of N bases
 max_length_reads: 30  # maximum length of processed reads to map with oligomap
 nh: 100  # discard reads with more mappings than the indicated number
 
-# Sample information
+# Inputs information
 input_dir: "path/to/input_directory"
-sample: ["sample_1"]  # put all samples, separated by comma & without file extension
-                      # (e.g., "sample_1" instead of "sample_1.fa.gz")
+sample: ["sample_1", "sample_2"]  # put all sample names, separated by comma
 
-######################## PARAMETERS SPECIFIC TO SAMPLE ########################
+#### PARAMETERS SPECIFIC TO INPUTS ####
 
-sample_1:  # One section for each list item in "sample"; names have to match precisely
+sample_1:  # one section per list item in "sample"; names have to match
     adapter: "XXXXXXXXXXXXXXXXXXXX"  # 3' adapter sequence to trim
     format: "fa"  # file format; currently supported: "fa"
-
 ...
 ```
 
 #### _QUANTIFY_
 
-Coming soon...
+**File location:** `RUNS/JOB/quantify/config.yaml`
 
+```yaml
+---
+#### GLOBAL PARAMETERS ####
+
+# Directories
+# Usually there is no need to change these
+output_dir: "results"
+scripts_dir: "../scripts"
+local_log: "logs/local"
+cluster_log: "logs/cluster"
+
+# Types of miRNAs to quantify
+# Remove miRNA types you are not interested in
+mir_list: ["miRNA", "miRNA_primary_transcript", "isomirs"]
+
+# Resources: miR annotations, chromosome name mappings
+# All of these are produced by the "prepare" workflow
+mirnas_anno: "path/to/mirna_filtered.bed"
+isomirs_anno: "path/to/isomirs_annotation.bed"
+
+# Inputs information
+input_dir: "path/to/input_directory"
+sample: ["sample_1", "sample_2"]  # put all samples, separated by comma
+...
+```
+
+[bedtools]: <https://github.com/arq5x/bedtools2>
 [conda]: <https://docs.conda.io/projects/conda/en/latest/index.html>
 [cluster execution]: <https://snakemake.readthedocs.io/en/stable/executing/cluster-cloud.html#cluster-execution>
 [ensembl]: <https://ensembl.org/>
@@ -317,8 +347,9 @@ Coming soon...
 [miniconda-installation]: <https://docs.conda.io/en/latest/miniconda.html>
 [mirbase]: <https://mirbase.org/>
 [oligomap]: <https://bio.tools/oligomap>
-[rule-graph-prepare]: images/rule_graph_prepare.svg
 [rule-graph-map]: images/rule_graph_map.svg
+[rule-graph-prepare]: images/rule_graph_prepare.svg
+[rule-graph-quantify]: images/rule_graph_quantify.svg
 [segemehl]: <https://www.bioinf.uni-leipzig.de/Software/segemehl/>
 [singularity]: <https://sylabs.io/singularity/>
 [slurm]: <https://slurm.schedmd.com/documentation.html>

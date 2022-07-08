@@ -23,7 +23,7 @@ mkdir -p results/{homo_sapiens/chrY,results/test_lib}
 snakemake \
     --snakefile="../workflow/prepare/Snakefile" \
     --configfile="config_prepare.yaml" \
-    --cluster-config="cluster_prepare.json" \
+    --cluster-config="../RUNS/JOB/prepare/cluster.json" \
     --cluster "sbatch \
         --cpus-per-task={cluster.threads} \
         --mem={cluster.mem} \
@@ -45,7 +45,29 @@ snakemake \
 snakemake \
     --snakefile="../workflow/map/Snakefile" \
     --configfile="config_map.yaml" \
-    --cluster-config="cluster_map.json" \
+    --cluster-config="../RUNS/JOB/map/cluster.json" \
+    --cluster "sbatch \
+        --cpus-per-task={cluster.threads} \
+        --mem={cluster.mem} \
+        --qos={cluster.queue} \
+        --time={cluster.time} \
+        --export=JOB_NAME={rule} \
+        -o {params.cluster_log} \
+        -p scicore \
+        --open-mode=append" \
+    --jobscript="../jobscript.sh" \
+    --use-singularity \
+    --singularity-args="--no-home --bind ${PWD}/../" \
+    --cores=256 \
+    --printshellcmds \
+    --rerun-incomplete \
+    --verbose
+
+# Run test: quantify workflow
+snakemake \
+    --snakefile="../workflow/quantify/Snakefile" \
+    --configfile="config_quantify.yaml" \
+    --cluster-config="../RUNS/JOB/quantify/cluster.json" \
     --cluster "sbatch \
         --cpus-per-task={cluster.threads} \
         --mem={cluster.mem} \
@@ -75,6 +97,12 @@ snakemake \
     --configfile="config_map.yaml" \
     --report="snakemake_report_map.html"
 
+# Snakemake report: quantify workflow
+snakemake \
+    --snakefile="../workflow/quantify/Snakefile" \
+    --configfile="config_quantify.yaml" \
+    --report="snakemake_report_quantify.html"
+
 # Check md5 sum of some output files
 find results/ -type f -name \*\.gz -exec gunzip '{}' \;
 find results/ -type f -name \*\.zip -exec sh -c 'unzip -o {} -d $(dirname {})' \;
@@ -82,5 +110,4 @@ md5sum --check "expected_output.md5"
 
 # Generate checksum files
 # (run only when using new test data and after verifying results!)
-# find results/ -type f > expected_output.files;
-# md5sum $(cat expected_output.files) > expected_output.md5
+# md5sum $(find results/ -type f) > expected_output.md5
