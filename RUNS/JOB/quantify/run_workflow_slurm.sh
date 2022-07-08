@@ -38,6 +38,7 @@ snakemake \
     --use-singularity \
     --singularity-args="--no-home --bind ${PWD}/../../../" \
     --jobscript="../../../jobscript.sh" \
+    --jobs=20 \
     --cores=256 \
     --printshellcmds \
     --rerun-incomplete \

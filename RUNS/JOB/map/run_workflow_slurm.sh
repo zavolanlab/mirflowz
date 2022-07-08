@@ -18,10 +18,9 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 cd $script_dir
 
 # Have to match directories indicated in config.yaml
-mkdir -p logs/cluster
-mkdir -p logs/local
-mkdir -p results
-
+mkdir -p logs/cluster/{sample_1,sample_2}
+mkdir -p logs/local/{sample_1,sample_2}
+mkdir -p results/{sample_1,sample_2}
 
 # Run workflow
 snakemake \
@@ -40,6 +39,7 @@ snakemake \
     --use-singularity \
     --singularity-args="--no-home --bind ${PWD}/../../../" \
     --jobscript="../../../jobscript.sh" \
+    --jobs=20 \
     --cores=256 \
     --printshellcmds \
     --rerun-incomplete \

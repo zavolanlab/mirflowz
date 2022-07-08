@@ -15,15 +15,17 @@ set -x  # facilitates debugging by printing out executed commands
 user_dir=$PWD
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 cd $script_dir
-mkdir -p logs/cluster/{homo_sapiens/chrY,results/test_lib}
-mkdir -p logs/local/{homo_sapiens/chrY,results/test_lib}
-mkdir -p results/{homo_sapiens/chrY,results/test_lib}
+
+# Have to match directories indicated in config.yaml files
+mkdir -p logs/cluster/{homo_sapiens/chrY,test_lib}
+mkdir -p logs/local/{homo_sapiens/chrY,test_lib}
+mkdir -p results/{homo_sapiens/chrY,test_lib}
 
 # Run test: prepare workflow
 snakemake \
     --snakefile="../workflow/prepare/Snakefile" \
     --configfile="config_prepare.yaml" \
-    --cluster-config="../RUNS/JOB/prepare/cluster.json" \
+    --cluster-config="cluster.json" \
     --cluster "sbatch \
         --cpus-per-task={cluster.threads} \
         --mem={cluster.mem} \
@@ -34,6 +36,7 @@ snakemake \
         -p scicore \
         --open-mode=append" \
     --jobscript="../jobscript.sh" \
+    --jobs=20 \
     --use-singularity \
     --singularity-args="--no-home --bind ${PWD}/../" \
     --cores=256 \
@@ -45,7 +48,7 @@ snakemake \
 snakemake \
     --snakefile="../workflow/map/Snakefile" \
     --configfile="config_map.yaml" \
-    --cluster-config="../RUNS/JOB/map/cluster.json" \
+    --cluster-config="cluster.json" \
     --cluster "sbatch \
         --cpus-per-task={cluster.threads} \
         --mem={cluster.mem} \
@@ -56,6 +59,7 @@ snakemake \
         -p scicore \
         --open-mode=append" \
     --jobscript="../jobscript.sh" \
+    --jobs=20 \
     --use-singularity \
     --singularity-args="--no-home --bind ${PWD}/../" \
     --cores=256 \
@@ -67,7 +71,7 @@ snakemake \
 snakemake \
     --snakefile="../workflow/quantify/Snakefile" \
     --configfile="config_quantify.yaml" \
-    --cluster-config="../RUNS/JOB/quantify/cluster.json" \
+    --cluster-config="cluster.json" \
     --cluster "sbatch \
         --cpus-per-task={cluster.threads} \
         --mem={cluster.mem} \
@@ -78,6 +82,7 @@ snakemake \
         -p scicore \
         --open-mode=append" \
     --jobscript="../jobscript.sh" \
+    --jobs=20 \
     --use-singularity \
     --singularity-args="--no-home --bind ${PWD}/../" \
     --cores=256 \

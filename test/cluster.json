@@ -1,8 +1,8 @@
 {
   "__default__" :
   {
-    "queue": "6hours",
-    "time": "05:00:00",
+    "queue": "30min",
+    "time": "00:05:00",
     "threads": "1",
     "mem": "4G"
   },
@@ -14,31 +14,21 @@
 
   "mapping_genome_segemehl":
   {
-    "queue": "1day",
-    "time": "{resources.time}:00:00",
-    "threads":"{resources.threads}",
     "mem":"{resources.mem}G"
   },
 
   "mapping_transcriptome_segemehl":
   {
-    "queue": "1day",
-    "time": "{resources.time}:00:00",
-    "threads":"{resources.threads}",
     "mem":"{resources.mem}G"
   },
 
   "mapping_genome_oligomap":
   {
-    "time": "{resources.time}:00:00",
-    "threads":"{resources.threads}",
     "mem":"{resources.mem}G"
   },
 
   "mapping_transcriptome_oligomap":
   {
-    "time": "{resources.time}:00:00",
-    "threads":"{resources.threads}",
     "mem":"{resources.mem}G"
   },
 
@@ -49,19 +39,30 @@
 
   "sort_genome_oligomap":
   {
-    "time": "{resources.time}:00:00",
     "threads":"{resources.threads}"
-  },
-
-  "oligomap_genome_toSAM":
-  {
-    "time": "{resources.time}-00:00:00",
-    "queue": "{resources.queue}day"
   },
 
   "remove_inferiors":
   {
     "threads":"{resources.threads}",
     "mem":"{resources.mem}G"
+  },
+
+  "generate_segemehl_index_transcriptome":
+  {
+    "threads":"{resources.threads}",
+    "mem":"{resources.mem}G"
+  },
+
+  "generate_segemehl_index_genome":
+  {
+    "threads":"{resources.threads}",
+    "mem":"{resources.mem}G"
+  },
+
+  "sort_alignment":
+  {
+    "mem":"{resources.mem}G",
+    "threads":"{resources.threads}"
   }
 }

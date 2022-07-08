@@ -7,7 +7,7 @@
     "mem": "4G"
   },
 
-    "sortaligment":
+  "sort_alignment":
   {
     "mem":"{resources.mem}G",
     "threads":"{resources.threads}"
