@@ -45,7 +45,7 @@ Create and activate the environment with necessary dependencies with Conda:
 
 ```bash
 conda env create -f environment.yml
-conda activate mir-pipelines
+conda activate mirflowz
 ```
 
 ### Testing your installation
