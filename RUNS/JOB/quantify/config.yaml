@@ -4,7 +4,7 @@
 # Directories
 # Usually there is no need to change these
 output_dir: "results"
-scripts_dir: "../scripts"
+scripts_dir: "../../../scripts"
 local_log: "logs/local"
 cluster_log: "logs/cluster"
 
