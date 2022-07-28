@@ -15,18 +15,25 @@ bp_3p: [0] # array of numbers, e.g., [-2,-1,0,+1], to include 2 upstream and 1 d
 
 # List of inputs
 organism: ["org/pre"] # e.g., ["homo_sapiens/GRCh38.100", "mus_musculus/GRCm37.98"]
+# this string specifies a path, and the "/" is important for this
+# "pre" specifies the assembly version
 
 #### PARAMETERS SPECIFIC TO INPUTS ####
 
-org/pre: # One section for each list item in "organism"; names have to match precisely
+org/pre: # One section for each list item in "organism"; entry should match precisely what
+# is in the "organism" section above, one entry per list item above, omitting the ""
   # URLs to genome, gene & miRNA annotations
   genome_url: # FTP/HTTP URL to gzipped genome in FASTA format, Ensembl style
+  # e.g. "ftp://ftp.ensembl.org/pub/release-106/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz"
   gtf_url: # FTP/HTTP URL to gzipped gene annotations in GTF format, Ensembl style
+  # e.g. "ftp://ftp.ensembl.org/pub/release-106/gtf/homo_sapiens/Homo_sapiens.GRCh38.106.chr.gtf.gz"
   mirna_url: # FTP/HTTP URL to unzipped microRNA annotations in GFF format, miRBase style
+  # e.g. "https://www.mirbase.org/ftp/CURRENT/genomes/hsa.gff3"
 
   # Chromosome name mappings between UCSC <-> Ensembl
   # Other organisms available at: https://github.com/dpryan79/ChromosomeMappings
   map_chr_url: # FTP/HTTP URL to mapping table
+  # e.g. "https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_UCSC2ensembl.txt"
   # Chromosome name mapping parameters:
   column: 1 # Column number from input file where to change chromosome name
   delimiter: "TAB" # Delimiter of the input file
