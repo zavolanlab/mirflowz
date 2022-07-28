@@ -250,7 +250,7 @@ rule generate_segemehl_index_genome:
             "generate_segemehl_index_genome.log",
         ),
     resources:
-        mem=50,
+        mem=60,
         threads=8,
         time=6,
     singularity:
