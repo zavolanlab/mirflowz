@@ -4,7 +4,7 @@ default:
 
 before_script:
   - mamba env create --force -f environment.yml
-  - conda activate mir-pipelines
+  - conda activate mirflowz
   - echo $CONDA_DEFAULT_ENV
   - snakemake --version
 
