@@ -16,32 +16,12 @@ user_dir=$PWD
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 cd $script_dir
 
-# Run test: prepare workflow
+# Run test
 snakemake \
-    --snakefile="../workflow/prepare/Snakefile" \
-    --configfile="config_prepare.yaml" \
+    --snakefile="../workflow/Snakefile" \
+    --configfile="config.yaml" \
     --dag \
     --printshellcmds \
     --dryrun \
     --verbose \
-    | dot -Tsvg > "../images/workflow_dag_prepare.svg"
-
-# Run test: map workflow
-snakemake \
-    --snakefile="../workflow/map/Snakefile" \
-    --configfile="config_map.yaml" \
-    --dag \
-    --printshellcmds \
-    --dryrun \
-    --verbose \
-    | dot -Tsvg > "../images/workflow_dag_map.svg"
-
-# Run test: quantify workflow
-snakemake \
-    --snakefile="../workflow/quantify/Snakefile" \
-    --configfile="config_quantify.yaml" \
-    --dag \
-    --printshellcmds \
-    --dryrun \
-    --verbose \
-    | dot -Tsvg > "../images/workflow_dag_quantify.svg"
+    | dot -Tsvg > "../images/workflow_dag.svg"

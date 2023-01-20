@@ -4,14 +4,27 @@
 #
 # Pipeline to quantify miRNAs, including isomiRs, from miRNA-seq alignments.
 ###############################################################################
+#
+# USAGE:
+# snakemake \
+#    --snakefile="quanitfy.smk" \
+#    --cores 4 \
+#    --use-singularity \
+#    --singularity-args "--bind $PWD/../" \ 
+#    --printshellcmds \
+#    --rerun-incomplete \
+#    --verbose
+#
+################################################################################
 
 import os
 
+configfile: "config.yaml"
 
 # Rules that require internet connection for downloading files are included
 # in the localrules
 localrules:
-    finish,
+    finish_quantify,
 
 
 ###############################################################################
@@ -19,16 +32,21 @@ localrules:
 ###############################################################################
 
 
-rule finish:
+rule finish_quantify:
     input:
         table1=expand(
-            os.path.join(config["output_dir"], "TABLES", "counts.{mir}.tab"),
+            os.path.join(
+                config["output_dir"], 
+                "TABLES", 
+                "counts.{mir}.tab",
+            ),
             mir=config["mir_list"],
         ),
         table2=os.path.join(
-            config["output_dir"], "TABLES", "counts.isomirs.tab"
+            config["output_dir"], 
+            "TABLES", 
+            "counts.isomirs.tab",
         ),
-
 
 ###############################################################################
 ### BAM to BED
@@ -38,7 +56,7 @@ rule finish:
 rule bamtobed:
     input:
         alignment=os.path.join(
-            config["input_dir"],
+            config["quantify_input_dir"],
             "{sample}",
             "convertedSortedMappings_{sample}.bam",
         ),

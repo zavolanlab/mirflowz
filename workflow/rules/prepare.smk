@@ -2,17 +2,30 @@
 # (c) 2020 Paula Iborra, Zavolan Lab, Biozentrum, University of Basel
 # (@) paula.iborradetoledo@unibas.ch / paula.iborra@alumni.esci.upf.edu
 #
-# Snakemake workflow to download and prepare the necessary files for
-# smallRNA-seq related workflows.
+# Snakemake workflow to download and prepare the necessary files 
+# for smallRNA-seq related workflows.
+#
 ###############################################################################
-
+#
+# USAGE:
+# snakemake \
+#    --snakefile="prepare.smk" \
+#    --cores 4 \
+#    --use-singularity \
+#    --singularity-args "--bind $PWD/../" \
+#    --printshellcmds \
+#    --rerun-incomplete \
+#    --verbose
+#
+################################################################################
 import os
 
+configfile: "config.yaml" 
 
 # Rules that require internet connection for downloading files are included
 # in the localrules
 localrules:
-    finish,
+    finish_prepare,
     genome_process,
     filter_anno_gtf,
     mirna_anno,
@@ -24,7 +37,7 @@ localrules:
 ###############################################################################
 
 
-rule finish:
+rule finish_prepare:
     input:
         idx_transcriptome=expand(
             os.path.join(
@@ -43,7 +56,11 @@ rule finish:
             organism=config["organism"],
         ),
         exons=expand(
-            os.path.join(config["output_dir"], "{organism}", "exons.bed"),
+            os.path.join(
+                config["output_dir"], 
+                "{organism}", 
+                "exons.bed",
+            ),
             organism=config["organism"],
         ),
         header=expand(
@@ -56,23 +73,26 @@ rule finish:
         ),
         mirnafilt=expand(
             os.path.join(
-                config["output_dir"], "{organism}", "mirna_filtered.bed"
+                config["output_dir"], 
+                "{organism}", 
+                "mirna_filtered.bed",
             ),
             organism=config["organism"],
         ),
         isomirs=expand(
             os.path.join(
-                config["output_dir"], "{organism}", "isomirs_annotation.bed"
+                config["output_dir"], 
+                "{organism}", 
+                "isomirs_annotation.bed",
             ),
             organism=config["organism"],
         ),
 
 
+
 ###############################################################################
 ### Download and process genome IDs
 ###############################################################################
-
-
 rule genome_process:
     input:
         script=os.path.join(config["scripts_dir"], "genome_process.sh"),
@@ -582,7 +602,7 @@ rule filter_mature_mirs:
 
 
 ###############################################################################
-### Create isomirs annotation file from mature miRNA
+### Create isomirs annotation file from mature miRNA 
 ###############################################################################
 
 

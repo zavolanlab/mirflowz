@@ -1,0 +1,108 @@
+###############################################################################
+# (c) 2020 Paula Iborra, Zavolan Lab, Biozentrum, University of Basel
+# (@) paula.iborradetoledo@unibas.ch / paula.iborra@alumni.esci.upf.edu
+#
+# Snakemake workflow to:
+#   - download and prepare the necessary files for smallRNA-seq related workflows.
+#   - map small RNA-seq reads (e.g. from miRNA sequencing libraries)
+#   - quantify miRNAs, including isomiRs, from miRNA-seq alignments.
+#
+###############################################################################
+#
+# USAGE:
+# snakemake \
+#    --use-singularity \
+#    --singularity-args "--bind $PWD/../" \
+#    --cores 4 \
+#    --printshellcmds \
+#    --rerun-incomplete \
+#    --verbose
+#
+################################################################################
+
+import os
+
+###############################################################################
+### Including subworkflows
+###############################################################################
+
+include: os.path.join("rules" , "prepare.smk")
+include: os.path.join("rules" , "map.smk")
+include: os.path.join("rules" , "quantify.smk")
+
+###############################################################################
+### Finish rule
+###############################################################################
+
+
+rule finish:
+    input:
+        idx_transcriptome=expand(
+            os.path.join(
+                config["output_dir"],
+                "{organism}",
+                "transcriptome_index_segemehl.idx",
+            ),
+            organism=config["organism"],
+        ),
+        idx_genome=expand(
+            os.path.join(
+                config["output_dir"],
+                "{organism}",
+                "genome_index_segemehl.idx",
+            ),
+            organism=config["organism"],
+        ),
+        exons=expand(
+            os.path.join(
+                config["output_dir"], 
+                "{organism}", 
+                "exons.bed",
+            ),
+            organism=config["organism"],
+        ),
+        header=expand(
+            os.path.join(
+                config["output_dir"],
+                "{organism}",
+                "headerOfCollapsedFasta.sam",
+            ),
+            organism=config["organism"],
+        ),
+        mirnafilt=expand(
+            os.path.join(
+                config["output_dir"], 
+                "{organism}", 
+                "mirna_filtered.bed",
+            ),
+            organism=config["organism"],
+        ),
+        isomirs=expand(
+            os.path.join(
+                config["output_dir"], 
+                "{organism}", 
+                "isomirs_annotation.bed",
+            ),
+            organism=config["organism"],
+        ),
+        maps=expand(
+            os.path.join(
+                config["output_dir"],
+                "{sample}",
+                "convertedSortedMappings_{sample}.bam.bai",
+            ),
+            sample=config["sample"],
+        ),
+        table1=expand(
+            os.path.join(
+                config["output_dir"], 
+                "TABLES", 
+                "counts.{mir}.tab"
+            ),
+            mir=config["mir_list"],
+        ),
+        table2=os.path.join(
+            config["output_dir"], 
+            "TABLES", 
+            "counts.isomirs.tab"
+        ),

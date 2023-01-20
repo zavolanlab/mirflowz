@@ -4,22 +4,33 @@
 #
 # Workflow to map small RNA-seq reads (e.g. from miRNA sequencing libraries).
 ###############################################################################
-
+#
+# USAGE:
+# snakemake \
+#    --snakefile="map.smk" \
+#    -- cores 4 \
+#    --use-singularity \
+#    --singularity-args "--bind $PWD/../" \
+#    --printshellcmds \
+#    --rerun-incomplete \
+#    --verbose
+#
+################################################################################
 import os
 
+configfile: "config.yaml"
 
 # Rules that require internet connection for downloading files are included
 # in the localrules
 localrules:
-    finish,
-
+    finish_map,
 
 ###############################################################################
 ### Finish rule
 ###############################################################################
 
 
-rule finish:
+rule finish_map:
     input:
         maps=expand(
             os.path.join(
@@ -30,7 +41,6 @@ rule finish:
             sample=config["sample"],
         ),
 
-
 ###############################################################################
 ### Uncompress fastq files
 ###############################################################################
@@ -38,7 +48,7 @@ rule finish:
 
 rule uncompress_zipped_files:
     input:
-        reads=os.path.join(config["input_dir"], "{sample}.{format}.gz"),
+        reads=os.path.join(config["map_input_dir"], "{sample}.{format}.gz"),
     output:
         reads=os.path.join(
             config["output_dir"], "{sample}", "{format}", "reads.{format}"

@@ -21,10 +21,10 @@ mkdir -p logs/cluster/{homo_sapiens/chrY,test_lib}
 mkdir -p logs/local/{homo_sapiens/chrY,test_lib}
 mkdir -p results/{homo_sapiens/chrY,test_lib}
 
-# Run test: prepare workflow
+# Run test
 snakemake \
-    --snakefile="../workflow/prepare/Snakefile" \
-    --configfile="config_prepare.yaml" \
+    --snakefile="../workflow/Snakefile" \
+    --cores=256 \
     --cluster-config="cluster.json" \
     --cluster "sbatch \
         --cpus-per-task={cluster.threads} \
@@ -38,75 +38,15 @@ snakemake \
     --jobscript="../jobscript.sh" \
     --jobs=20 \
     --use-singularity \
-    --singularity-args="--no-home --bind ${PWD}/../" \
-    --cores=256 \
+    --singularity-args="--bind ${PWD}/../" \
     --printshellcmds \
     --rerun-incomplete \
     --verbose
 
-# Run test: map workflow
+# Snakemake report
 snakemake \
-    --snakefile="../workflow/map/Snakefile" \
-    --configfile="config_map.yaml" \
-    --cluster-config="cluster.json" \
-    --cluster "sbatch \
-        --cpus-per-task={cluster.threads} \
-        --mem={cluster.mem} \
-        --qos={cluster.queue} \
-        --time={cluster.time} \
-        --export=JOB_NAME={rule} \
-        -o {params.cluster_log} \
-        -p scicore \
-        --open-mode=append" \
-    --jobscript="../jobscript.sh" \
-    --jobs=20 \
-    --use-singularity \
-    --singularity-args="--no-home --bind ${PWD}/../" \
-    --cores=256 \
-    --printshellcmds \
-    --rerun-incomplete \
-    --verbose
-
-# Run test: quantify workflow
-snakemake \
-    --snakefile="../workflow/quantify/Snakefile" \
-    --configfile="config_quantify.yaml" \
-    --cluster-config="cluster.json" \
-    --cluster "sbatch \
-        --cpus-per-task={cluster.threads} \
-        --mem={cluster.mem} \
-        --qos={cluster.queue} \
-        --time={cluster.time} \
-        --export=JOB_NAME={rule} \
-        -o {params.cluster_log} \
-        -p scicore \
-        --open-mode=append" \
-    --jobscript="../jobscript.sh" \
-    --jobs=20 \
-    --use-singularity \
-    --singularity-args="--no-home --bind ${PWD}/../" \
-    --cores=256 \
-    --printshellcmds \
-    --rerun-incomplete \
-    --verbose
-
-# Snakemake report: prepare workflow
-snakemake \
-    --snakefile="../workflow/prepare/Snakefile" \
-    --configfile="config_prepare.yaml" \
-    --report="snakemake_report_prepare.html"
-
-# Snakemake report: map workflow
-snakemake \
-    --snakefile="../workflow/map/Snakefile" \
-    --configfile="config_map.yaml" \
-    --report="snakemake_report_map.html"
-
-# Snakemake report: quantify workflow
-snakemake \
-    --snakefile="../workflow/quantify/Snakefile" \
-    --configfile="config_quantify.yaml" \
-    --report="snakemake_report_quantify.html"
+    --snakefile="../workflow/Snakefile" \
+    --report="snakemake_report.html"
 
 # Check md5 sum of some output files
 find results/ -type f -name \*\.gz -exec gunzip '{}' \;

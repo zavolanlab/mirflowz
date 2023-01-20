@@ -5,6 +5,7 @@ cleanup () {
     rc=$?
     cd $user_dir
     echo "Exit status: $rc"
+    rm -rf .snakemake
 }
 trap cleanup EXIT
 
@@ -16,56 +17,21 @@ user_dir=$PWD
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 cd $script_dir
 
-# Run test: prepare workflow
+# Run test
 snakemake \
-    --snakefile="../workflow/prepare/Snakefile" \
-    --configfile="config_prepare.yaml" \
+    --snakefile="../workflow/Snakefile" \
+    --cores 4  \
     --use-singularity \
     --singularity-args "--bind ${PWD}/../" \
-    --cores=4 \
     --printshellcmds \
     --rerun-incomplete \
     --verbose
 
-# Run test: map workflow
-snakemake \
-    --snakefile="../workflow/map/Snakefile" \
-    --configfile="config_map.yaml" \
-    --use-singularity \
-    --singularity-args "--bind ${PWD}/../" \
-    --cores=4 \
-    --printshellcmds \
-    --rerun-incomplete \
-    --verbose
 
-# Run test: quantify workflow
+# Snakemake report
 snakemake \
-    --snakefile="../workflow/quantify/Snakefile" \
-    --configfile="config_quantify.yaml" \
-    --use-singularity \
-    --singularity-args "--bind ${PWD}/../" \
-    --cores=4 \
-    --printshellcmds \
-    --rerun-incomplete \
-    --verbose 
-
-# Snakemake report: prepare workflow
-snakemake \
-    --snakefile="../workflow/prepare/Snakefile" \
-    --configfile="config_prepare.yaml" \
-    --report="snakemake_report_prepare.html"
-
-# Snakemake report: map workflow
-snakemake \
-    --snakefile="../workflow/map/Snakefile" \
-    --configfile="config_map.yaml" \
-    --report="snakemake_report_map.html"
-
-# Snakemake report: quantify workflow
-snakemake \
-    --snakefile="../workflow/quantify/Snakefile" \
-    --configfile="config_quantify.yaml" \
-    --report="snakemake_report_quantify.html"
+    --snakefile="../workflow/Snakefile" \
+    --report="snakemake_report.html"
 
 # Check md5 sum of some output files
 find results/ -type f -name \*\.gz -exec gunzip '{}' \;
