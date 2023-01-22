@@ -7,20 +7,24 @@
 #
 ###############################################################################
 #
-# USAGE:
+# USAGE (from the file's directory):
+#
 # snakemake \
 #    --snakefile="prepare.smk" \
 #    --cores 4 \
 #    --use-singularity \
-#    --singularity-args "--bind $PWD/../" \
+#    --singularity-args "--bind $PWD/../" \ 
 #    --printshellcmds \
 #    --rerun-incomplete \
 #    --verbose
 #
+# IMPORTANT when executing this file alone:
+## * You must modify the config.yaml.
+## * Uncomment the configfile line.
 ################################################################################
 import os
 
-configfile: "config.yaml" 
+#configfile: "../../config/config.yaml" 
 
 # Rules that require internet connection for downloading files are included
 # in the localrules
@@ -35,8 +39,6 @@ localrules:
 ###############################################################################
 ### Finish rule
 ###############################################################################
-
-
 rule finish_prepare:
     input:
         idx_transcriptome=expand(

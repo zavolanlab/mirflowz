@@ -5,7 +5,8 @@
 # Pipeline to quantify miRNAs, including isomiRs, from miRNA-seq alignments.
 ###############################################################################
 #
-# USAGE:
+# USAGE (from the file's directory):
+#
 # snakemake \
 #    --snakefile="quanitfy.smk" \
 #    --cores 4 \
@@ -15,11 +16,28 @@
 #    --rerun-incomplete \
 #    --verbose
 #
+# IMPORTANT when executing this file alone:
+## * You must modify the config.yaml.
+## * Uncomment the configfile line.
 ################################################################################
 
 import os
+import pandas as pd
 
-configfile: "config.yaml"
+#configfile: "../../config/config.yaml"
+
+###############################################################################
+### Reading samples' table
+###############################################################################
+
+samples_table = pd.read_csv(
+    config["samples"],
+    header = 0,
+    index_col = 0,
+    comment = "#",
+    engine = "python",
+    sep = "\t",
+)
 
 # Rules that require internet connection for downloading files are included
 # in the localrules
@@ -309,7 +327,7 @@ rule merge_tables:
             os.path.join(
                 config["output_dir"], "TABLES", "{mir}_counts_{sample}"
             ),
-            sample=config["sample"],
+            sample=pd.unique(samples_table.index.values),
             mir=config["mir_list"],
         ),
         script=os.path.join(config["scripts_dir"], "merge_tables.R"),

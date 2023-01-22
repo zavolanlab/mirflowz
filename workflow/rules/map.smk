@@ -5,24 +5,62 @@
 # Workflow to map small RNA-seq reads (e.g. from miRNA sequencing libraries).
 ###############################################################################
 #
-# USAGE:
+# USAGE (from the file's directory):
+#
 # snakemake \
 #    --snakefile="map.smk" \
-#    -- cores 4 \
+#    --cores 4 \
 #    --use-singularity \
-#    --singularity-args "--bind $PWD/../" \
+#    --singularity-args "--bind $PWD/../" \ 
 #    --printshellcmds \
 #    --rerun-incomplete \
 #    --verbose
 #
+# IMPORTANT when executing this file alone:
+## * You must modify the config.yaml.
+## * Uncomment the configfile line.
 ################################################################################
+
 import os
+import pandas as pd
 
-configfile: "config.yaml"
+#configfile: "../../config/config.yaml"
 
+###############################################################################
+### Reading sample and resources tables
+###############################################################################
+
+samples_table = pd.read_csv(
+    config["samples"],
+    header = 0,
+    index_col = 0,
+    comment = "#",
+    engine = "python",
+    sep = "\t",
+)
+
+###############################################################################
+### Funcitons get_sample and get_resource
+###############################################################################
+# Function to get relevant per sample information from samples and resources table
+
+def get_sample(column_id, sample_id = None):
+    if sample_id:
+        return str(
+            samples_table[column_id][samples_table.index == sample_id][0]
+        )
+    else:
+        return str(
+            samples_table[column_id][0]
+        )
+
+###############################################################################
+### Global configuration
+###############################################################################
 # Rules that require internet connection for downloading files are included
 # in the localrules
 localrules:
+    start,
     finish_map,
 
 ###############################################################################
@@ -38,21 +76,28 @@ rule finish_map:
                 "{sample}",
                 "convertedSortedMappings_{sample}.bam.bai",
             ),
-            sample=config["sample"],
+            sample=pd.unique(samples_table.index.values),
         ),
 
-###############################################################################
-### Uncompress fastq files
-###############################################################################
 
 
-rule uncompress_zipped_files:
+###############################################################################
+### Start rule (get samples)
+###############################################################################
+
+rule start:
     input:
-        reads=os.path.join(config["map_input_dir"], "{sample}.{format}.gz"),
+        reads=lambda wildcards: expand(
+            pd.Series(samples_table.loc[wildcards.sample, "sample_file"]).values,
+            format=get_sample("format"),
+        ),
     output:
         reads=os.path.join(
-            config["output_dir"], "{sample}", "{format}", "reads.{format}"
-        ),
+            config["output_dir"],
+            "{sample}",
+            "{format}",
+            "reads.{format}",
+        )
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
@@ -139,7 +184,7 @@ rule fasta_formatter:
         reads=lambda wildcards: os.path.join(
             config["output_dir"],
             wildcards.sample,
-            config[wildcards.sample]["format"],
+            get_sample("format", wildcards.sample),
             "reads.fa",
         ),
     output:
@@ -170,7 +215,7 @@ rule cutadapt:
         cluster_log=os.path.join(
             config["cluster_log"], "cutadapt_{sample}.log"
         ),
-        adapter=lambda wildcards: config[wildcards.sample]["adapter"],
+        adapter=lambda wildcards: get_sample("adapter", wildcards.sample),
         error_rate=config["error_rate"],
         minimum_length=config["minimum_length"],
         overlap=config["overlap"],

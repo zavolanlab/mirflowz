@@ -47,6 +47,7 @@ homo_sapiens/chrY:
 
 #### PARAMETERS SPECIFIC TO INPUTS #####
 
+# All of these are produced by the "prepare" workflow
 genome: "results/homo_sapiens/chrY/genome.processed.fa"
 gtf: "results/homo_sapiens/chrY/gene_annotations.filtered.gtf"
 transcriptome: "results/homo_sapiens/chrY/transcriptome_idtrim.fa"
