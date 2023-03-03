@@ -14,7 +14,7 @@ samples: path/to/samples_table.csv
 
 genome_file: path/to/gzipped/ensembl/genome.fa.gz
 gtf_file: path/to/gzipped/ensembl/gene_annotations.gtf.gz
-mirna_file: path/to/unzipped/mirbase/mirna_annotations.gff
+mirna_file: path/to/unzipped/mirbase/mirna_annotations.gff3
 
 # Tab-separated mappings table between UCSC (column 1)
 # and Ensembl (coulm 2) chromosome names 
