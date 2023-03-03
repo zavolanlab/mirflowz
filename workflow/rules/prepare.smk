@@ -353,6 +353,8 @@ rule map_chr_names:
         cluster_log=os.path.join(
             config["cluster_log"], "map_chr_names.log"
         ),
+        column=1,
+        delimiter="TAB",
     log:
         os.path.join(config["local_log"], "map_chr_names.log"),
     singularity:
@@ -360,8 +362,8 @@ rule map_chr_names:
     shell:
         "(perl {input.script} \
         {input.anno} \
-        1 \
-        "TAB" \
+        {params.column} \
+        {params.delimiter} \
         {input.map_chr} \
         {output.gff} \
         ) &> {log}"
