@@ -12,19 +12,14 @@ samples: path/to/samples_table.csv
 # All genome resources have to match the source/organism
 # of all samples in the sample table
 
-# FTP/HTTP URL to gzipped genome in FASTA format, Ensembl style
-genome_url: # e.g. "ftp://ftp.ensembl.org/pub/release-106/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz"
-
-# FTP/HTTP URL to gzipped gene annotations in GTF format, Ensembl style
-gtf_url: # e.g. "ftp://ftp.ensembl.org/pub/release-106/gtf/homo_sapiens/Homo_sapiens.GRCh38.106.chr.gtf.gz"
-
-# FTP/HTTP URL to unzipped microRNA annotations in GFF format, miRBase style
-mirna_url: # e.g. "https://www.mirbase.org/ftp/CURRENT/genomes/hsa.gff3"
+genome_file: path/to/gzipped/ensembl/genome.fa.gz
+gtf_file: path/to/gzipped/ensembl/gene_annotations.gtf.gz
+mirna_file: path/to/unzipped/mirbase/mirna_annotations.gff
 
 # Tab-separated mappings table between UCSC (column 1)
 # and Ensembl (coulm 2) chromosome names 
 # Available at: https://github.com/dpryan79/ChromosomeMappings
-map_chr_url: # e.g. "https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_UCSC2ensembl.txt"
+map_chr_file: path/to/ucsc_ensembl_mappings.txt
 
 
 ###############################
