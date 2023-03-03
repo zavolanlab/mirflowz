@@ -1,98 +1,84 @@
 ---
-#### GLOBAL PARAMETERS #####
+#############################
+#### REQUIRED PARAMETERS ####
+#############################
 
-# Directories
-# Usually there is no need to change these
-samples: "test_files/samples_table.csv" # For the mapping worflow
-quantify_input_dir: "results" # For the quantify worflow
-output_dir: "results"
-scripts_dir: "../scripts"
-local_log: "logs/local"
-cluster_log: "logs/cluster"
-#######################################################################################################
-####
-#### PREPARE PARAMETERS
-####
-#######################################################################################################
+# All paths are relative to the current working directory unless noted otherwise
 
-# Isomirs annotation file
-# Number of base pairs to add/substract from 5' (start) and 3' (end) coordinates.
-bp_5p: [0] # array of numbers, e.g., [-2,-1,0,+1], to include 2 upstream and 1 downstream nts
-bp_3p: [0] # array of numbers, e.g., [-2,-1,0,+1], to include 2 upstream and 1 downstream nts
+samples: path/to/samples_table.csv 
 
+#### GENOME RESOURCES #####
 
-#### PARAMETERS SPECIFIC TO INPUTS #####
+# All genome resources have to match the source/organism
+# of all samples in the sample table
 
-organism: "org/pre" # e.g., "homo_sapiens/GRCh38.100" or "mus_musculus/GRCm37.98"
-# this string specifies a path, and the "/" is important for this
-# "pre" specifies the assembly version
+# FTP/HTTP URL to gzipped genome in FASTA format, Ensembl style
+genome_url: # e.g. "ftp://ftp.ensembl.org/pub/release-106/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz"
+
+# FTP/HTTP URL to gzipped gene annotations in GTF format, Ensembl style
+gtf_url: # e.g. "ftp://ftp.ensembl.org/pub/release-106/gtf/homo_sapiens/Homo_sapiens.GRCh38.106.chr.gtf.gz"
+
+# FTP/HTTP URL to unzipped microRNA annotations in GFF format, miRBase style
+mirna_url: # e.g. "https://www.mirbase.org/ftp/CURRENT/genomes/hsa.gff3"
+
+# Tab-separated mappings table between UCSC (column 1)
+# and Ensembl (coulm 2) chromosome names 
+# Available at: https://github.com/dpryan79/ChromosomeMappings
+map_chr_url: # e.g. "https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_UCSC2ensembl.txt"
 
 
-org/pre: # One section for each list item in "organism"; entry should match precisely what
-# is in the "organism" section above, one entry per list item above, omitting the ""
-  # URLs to genome, gene & miRNA annotations
-  genome_url: # FTP/HTTP URL to gzipped genome in FASTA format, Ensembl style
-  # e.g. "ftp://ftp.ensembl.org/pub/release-106/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz"
-  gtf_url: # FTP/HTTP URL to gzipped gene annotations in GTF format, Ensembl style
-  # e.g. "ftp://ftp.ensembl.org/pub/release-106/gtf/homo_sapiens/Homo_sapiens.GRCh38.106.chr.gtf.gz"
-  mirna_url: # FTP/HTTP URL to unzipped microRNA annotations in GFF format, miRBase style
-  # e.g. "https://www.mirbase.org/ftp/CURRENT/genomes/hsa.gff3"
+###############################
+#### "OPTIONAL" PARAMETERS ####
+###############################
 
-  # Chromosome name mappings between UCSC <-> Ensembl
-  # Other organisms available at: https://github.com/dpryan79/ChromosomeMappings
-  map_chr_url: # FTP/HTTP URL to mapping table
-  # e.g. "https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_UCSC2ensembl.txt"
-  # Chromosome name mapping parameters:
-  column: 1 # Column number from input file where to change chromosome name
-  delimiter: "TAB" # Delimiter of the input file
+# The below parameters only need to be changed if the default behavior of
+# MIRFLOWZ is to be changed; however, they still need to be present!
 
-#######################################################################################################
-####
-#### MAP PARAMETERS
-####
-#######################################################################################################
+#### DIRECTORIES ####
 
-#### PARAMETERS SPECIFIC TO INPUTS #####
+output_dir: results/
+local_log: logs/local/
+cluster_log: logs/cluster/
+scripts_dir: ../scripts/
 
-# Resources: genome, transcriptome, genes, miRs
-# All of these are produced by the "prepare" workflow
-genome: "path/to/genome.processed.fa"
-gtf: "path/to/gene_annotations.filtered.gtf"
-transcriptome: "path/to/transcriptome_idtrim.fa"
-transcriptome_index_segemehl: "path/to/transcriptome_index_segemehl.idx"
-genome_index_segemehl: "path/to/genome_index_segemehl.idx"
-exons: "path/to/exons.bed"
-header_of_collapsed_fasta: "path/to/headerOfCollapsedFasta.sam"
 
-#### TOOL PARAMETERS #### 
+#### ISOMIR GENERATION PARAMETERS ####
+
+# Generate isomiR annotations with the indicated number of shifts relative to
+# the start and end position of each annotated mature miRNA, as an array of
+# relative positions
+# Examples:
+# - `bp_5p: [-2,0,+1]` and `bp_3p: [+1]` generates 3 isomiRs for each mature
+#   miRNA: one that starts two nucleotides before, one that starts exactly at
+#   and one that starts one nucleotide after the annotated mature miRNA; all
+#   isomiRs will stop one nucleotide after the end of the annotated mature
+#   miRNA; note that because `0` is not included in the `bp_3p` array, the
+#   annotated mature miRNAs will not be included in this example
+# - Use `bp_5p: [0]` and `bp_3p: [0]` to only include the mature annotated
+#   miRNAs and no isomiRs
+
+bp_5p: [-2, -1, 0, +1, +2]
+bp_3p: [-2, -1, 0, +1, +2]
+
+#### PROCESSING PARAMETERS #### 
 
 # quality filter
 q_value: 10  # Q (Phred) score; minimum quality score to keep
 p_value: 50  # minimum % of bases that must have Q quality
 
 # adapter removal
-error_rate: 0.1  # fraction of allowed errors
+error_rate: 0.1     # fraction of allowed errors
 minimum_length: 15  # discard processed reads shorter than the indicated length
-overlap: 3  # minimum overlap length of adapter and read to trim the bases
-max_n: 0  # discard reads containing more than the indicated number of N bases
+overlap: 3          # minimum overlap length of adapter and read to trim the bases
+max_n: 0            # discard reads containing more than the indicated number of N bases
 
 # mapping
 max_length_reads: 30  # maximum length of processed reads to map with oligomap
-nh: 100  # discard reads with more mappings than the indicated number
+nh: 100               # discard reads with more mappings than the indicated number
 
-#######################################################################################################
-####
-#### QUANTIFY PARAMETERS
-####
-#######################################################################################################
-
+#### QUANTIFICATION PARAMETERS ####
 
 # Types of miRNAs to quantify
 # Remove miRNA types you are not interested in
 mir_list: ["miRNA", "miRNA_primary_transcript", "isomirs"]
-
-# Resources: miR annotations, chromosome name mappings
-# All of these are produced by the "prepare" workflow
-mirnas_anno: "path/to/mirna_filtered.bed"
-isomirs_anno: "path/to/isomirs_annotation.bed"
 ...

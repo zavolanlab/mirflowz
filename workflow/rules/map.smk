@@ -268,8 +268,8 @@ rule fastx_collapser:
 rule mapping_genome_segemehl:
     input:
         reads=os.path.join(config["output_dir"], "{sample}", "collapsed.fasta"),
-        genome=config["genome"],
-        genome_index_segemehl=config["genome_index_segemehl"],
+        genome=os.path.join(config["output_dir"], "genome.processed.fa"),
+        genome_index_segemehl=os.path.join(config["output_dir"], "genome_index_segemehl.idx"),
     output:
         gmap=os.path.join(
             config["output_dir"], "{sample}", "segemehlGenome_map.sam"
@@ -306,8 +306,8 @@ rule mapping_genome_segemehl:
 rule mapping_transcriptome_segemehl:
     input:
         reads=os.path.join(config["output_dir"], "{sample}", "collapsed.fasta"),
-        transcriptome=config["transcriptome"],
-        transcriptome_index_segemehl=config["transcriptome_index_segemehl"],
+        transcriptome=os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
+        transcriptome_index_segemehl=os.path.join(config["output_dir"], "transcriptome_index_segemehl.idx"),
     output:
         tmap=os.path.join(
             config["output_dir"], "{sample}", "segemehlTranscriptome_map.sam"
@@ -379,7 +379,7 @@ rule mapping_genome_oligomap:
         reads=os.path.join(
             config["output_dir"], "{sample}", "filtered_for_oligomap.fasta"
         ),
-        target=config["genome"],
+        target=os.path.join(config["output_dir"], "genome.processed.fa"),
     output:
         gmap=os.path.join(
             config["output_dir"], "{sample}", "oligoGenome_map.fa"
@@ -496,7 +496,7 @@ rule mapping_transcriptome_oligomap:
         reads=os.path.join(
             config["output_dir"], "{sample}", "filtered_for_oligomap.fasta"
         ),
-        target=config["transcriptome"],
+        target=os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
     output:
         tmap=os.path.join(
             config["output_dir"], "{sample}", "oligoTranscriptome_map.fa"
@@ -808,7 +808,7 @@ rule trans_to_gen:
             "noheader_TranscriptomeMappings.sam",
         ),
         script=os.path.join(config["scripts_dir"], "sam_trx_to_sam_gen.pl"),
-        exons=config["exons"],
+        exons=os.path.join(config["output_dir"], "exons.bed"),
     output:
         genout=os.path.join(config["output_dir"], "{sample}", "TransToGen.sam"),
     params:
@@ -861,7 +861,7 @@ rule cat_mapping:
 
 rule add_header:
     input:
-        header=config["header_of_collapsed_fasta"],
+        header=os.path.join(config["output_dir"], "headerOfCollapsedFasta.sam"),
         catmaps=os.path.join(
             config["output_dir"], "{sample}", "catMappings.sam"
         ),

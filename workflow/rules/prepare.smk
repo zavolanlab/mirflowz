@@ -41,53 +41,30 @@ localrules:
 ###############################################################################
 rule finish_prepare:
     input:
-        idx_transcriptome=expand(
-            os.path.join(
+        idx_transcriptome=os.path.join(
                 config["output_dir"],
-                "{organism}",
                 "transcriptome_index_segemehl.idx",
-            ),
-            organism=config["organism"],
+
         ),
-        idx_genome=expand(
-            os.path.join(
+        idx_genome=os.path.join(
                 config["output_dir"],
-                "{organism}",
                 "genome_index_segemehl.idx",
-            ),
-            organism=config["organism"],
         ),
-        exons=expand(
-            os.path.join(
+        exons=os.path.join(
                 config["output_dir"], 
-                "{organism}", 
                 "exons.bed",
-            ),
-            organism=config["organism"],
         ),
-        header=expand(
-            os.path.join(
+        header=os.path.join(
                 config["output_dir"],
-                "{organism}",
                 "headerOfCollapsedFasta.sam",
-            ),
-            organism=config["organism"],
         ),
-        mirnafilt=expand(
-            os.path.join(
+        mirnafilt=os.path.join(
                 config["output_dir"], 
-                "{organism}", 
                 "mirna_filtered.bed",
-            ),
-            organism=config["organism"],
         ),
-        isomirs=expand(
-            os.path.join(
+        isomirs=os.path.join(
                 config["output_dir"], 
-                "{organism}", 
                 "isomirs_annotation.bed",
-            ),
-            organism=config["organism"],
         ),
 
 
@@ -100,13 +77,13 @@ rule genome_process:
         script=os.path.join(config["scripts_dir"], "genome_process.sh"),
     output:
         genome=os.path.join(
-            config["output_dir"], "{organism}", "genome.processed.fa"
+            config["output_dir"], "genome.processed.fa"
         ),
     params:
-        url=lambda wildcards: config[wildcards.organism]["genome_url"],
-        dir_out=os.path.join(config["output_dir"], "{organism}"),
+        url=config["genome_url"],
+        dir_out=config["output_dir"],
     log:
-        os.path.join(config["local_log"], "{organism}", "genome_process.log"),
+        os.path.join(config["local_log"], "genome_process.log"),
     singularity:
         "docker://zavolab/ubuntu:18.04"
     shell:
@@ -124,14 +101,13 @@ rule filter_anno_gtf:
     output:
         gtf=os.path.join(
             config["output_dir"],
-            "{organism}",
             "gene_annotations.filtered.gtf",
         ),
     params:
-        url=lambda wildcards: config[wildcards.organism]["gtf_url"],
-        dir_out=os.path.join(config["output_dir"], "{organism}"),
+        url=config["gtf_url"],
+        dir_out=config["output_dir"],
     log:
-        os.path.join(config["local_log"], "{organism}", "filter_anno_gtf.log"),
+        os.path.join(config["local_log"], "filter_anno_gtf.log"),
     singularity:
         "docker://zavolab/ubuntu:18.04"
     shell:
@@ -146,27 +122,25 @@ rule filter_anno_gtf:
 rule extract_transcriptome_seqs:
     input:
         genome=os.path.join(
-            config["output_dir"], "{organism}", "genome.processed.fa"
+            config["output_dir"], "genome.processed.fa"
         ),
         gtf=os.path.join(
             config["output_dir"],
-            "{organism}",
             "gene_annotations.filtered.gtf",
         ),
     output:
         fasta=os.path.join(
-            config["output_dir"], "{organism}", "transcriptome.fa"
+            config["output_dir"], "transcriptome.fa"
         ),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
-            "{organism}",
             "extract_transcriptome_seqs.log",
         ),
     log:
         os.path.join(
             config["local_log"],
-            "{organism}",
+            
             "extract_transcriptome_seqs.log",
         ),
     singularity:
@@ -183,19 +157,19 @@ rule extract_transcriptome_seqs:
 rule trim_fasta:
     input:
         fasta=os.path.join(
-            config["output_dir"], "{organism}", "transcriptome.fa"
+            config["output_dir"], "transcriptome.fa"
         ),
         script=os.path.join(config["scripts_dir"], "validation_fasta.py"),
     output:
         fasta=os.path.join(
-            config["output_dir"], "{organism}", "transcriptome_idtrim.fa"
+            config["output_dir"], "transcriptome_idtrim.fa"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "{organism}", "trim_fasta.log"
+            config["cluster_log"], "trim_fasta.log"
         ),
     log:
-        os.path.join(config["local_log"], "{organism}", "trim_fasta.log"),
+        os.path.join(config["local_log"], "trim_fasta.log"),
     singularity:
         "docker://zavolab/ubuntu:18.04"
     shell:
@@ -215,24 +189,21 @@ rule trim_fasta:
 rule generate_segemehl_index_transcriptome:
     input:
         fasta=os.path.join(
-            config["output_dir"], "{organism}", "transcriptome_idtrim.fa"
+            config["output_dir"], "transcriptome_idtrim.fa"
         ),
     output:
         idx=os.path.join(
             config["output_dir"],
-            "{organism}",
             "transcriptome_index_segemehl.idx",
         ),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
-            "{organism}",
             "generate_segemehl_index_transcriptome.log",
         ),
     log:
         os.path.join(
             config["local_log"],
-            "{organism}",
             "generate_segemehl_index_transcriptome.log",
         ),
     resources:
@@ -253,22 +224,20 @@ rule generate_segemehl_index_transcriptome:
 rule generate_segemehl_index_genome:
     input:
         genome=os.path.join(
-            config["output_dir"], "{organism}", "genome.processed.fa"
+            config["output_dir"], "genome.processed.fa"
         ),
     output:
         idx=os.path.join(
-            config["output_dir"], "{organism}", "genome_index_segemehl.idx"
+            config["output_dir"], "genome_index_segemehl.idx"
         ),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
-            "{organism}",
             "generate_segemehl_index_genome.log",
         ),
     log:
         os.path.join(
             config["local_log"],
-            "{organism}",
             "generate_segemehl_index_genome.log",
         ),
     resources:
@@ -290,18 +259,17 @@ rule get_exons_gtf:
     input:
         gtf=os.path.join(
             config["output_dir"],
-            "{organism}",
             "gene_annotations.filtered.gtf",
         ),
         script=os.path.join(config["scripts_dir"], "get_lines_w_pattern.sh"),
     output:
-        exons=os.path.join(config["output_dir"], "{organism}", "exons.gtf"),
+        exons=os.path.join(config["output_dir"], "exons.gtf"),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "{organism}", "get_exons_gtf.log"
+            config["cluster_log"], "get_exons_gtf.log"
         ),
     log:
-        os.path.join(config["local_log"], "{organism}", "get_exons_gtf.log"),
+        os.path.join(config["local_log"], "get_exons_gtf.log"),
     singularity:
         "docker://zavolab/ubuntu:18.04"
     shell:
@@ -321,16 +289,16 @@ rule get_exons_gtf:
 
 rule gtftobed:
     input:
-        exons=os.path.join(config["output_dir"], "{organism}", "exons.gtf"),
+        exons=os.path.join(config["output_dir"], "exons.gtf"),
         script=os.path.join(config["scripts_dir"], "gtf_exons_bed.1.1.2.R"),
     output:
-        exons=os.path.join(config["output_dir"], "{organism}", "exons.bed"),
+        exons=os.path.join(config["output_dir"], "exons.bed"),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "{organism}", "gtftobed.log"
+            config["cluster_log"], "gtftobed.log"
         ),
     log:
-        os.path.join(config["local_log"], "{organism}", "gtftobed.log"),
+        os.path.join(config["local_log"], "gtftobed.log"),
     singularity:
         "docker://zavolab/r-zavolab:3.5.1"
     shell:
@@ -349,19 +317,19 @@ rule gtftobed:
 rule create_header_genome:
     input:
         genome=os.path.join(
-            config["output_dir"], "{organism}", "genome.processed.fa"
+            config["output_dir"], "genome.processed.fa"
         ),
     output:
         header=os.path.join(
-            config["output_dir"], "{organism}", "headerOfCollapsedFasta.sam"
+            config["output_dir"], "headerOfCollapsedFasta.sam"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "{organism}", "create_header_genome.log"
+            config["cluster_log"], "create_header_genome.log"
         ),
     log:
         os.path.join(
-            config["local_log"], "{organism}", "create_header_genome.log"
+            config["local_log"], "create_header_genome.log"
         ),
     singularity:
         "docker://zavolab/samtools:1.8"
@@ -377,19 +345,19 @@ rule create_header_genome:
 rule mirna_anno:
     input:
         genome=os.path.join(
-            config["output_dir"], "{organism}", "genome.processed.fa"
+            config["output_dir"], "genome.processed.fa"
         ),
     output:
         anno=os.path.join(
-            config["output_dir"], "{organism}", "raw", "mirna.gff3"
+            config["output_dir"], "mirna.gff3"
         ),
     params:
-        anno=lambda wildcards: config[wildcards.organism]["mirna_url"],
+        anno=config["mirna_url"],
         cluster_log=os.path.join(
-            config["cluster_log"], "{organism}", "mirna_anno.log"
+            config["cluster_log"], "mirna_anno.log"
         ),
     log:
-        os.path.join(config["local_log"], "{organism}", "mirna_anno.log"),
+        os.path.join(config["local_log"], "mirna_anno.log"),
     singularity:
         "docker://zavolab/ubuntu:18.04"
     shell:
@@ -404,19 +372,19 @@ rule mirna_anno:
 rule dict_chr:
     input:
         genome=os.path.join(
-            config["output_dir"], "{organism}", "genome.processed.fa"
+            config["output_dir"], "genome.processed.fa"
         ),
     output:
         map_chr=os.path.join(
-            config["output_dir"], "{organism}", "UCSC2ensembl.txt"
+            config["output_dir"], "UCSC2ensembl.txt"
         ),
     params:
-        map_chr=lambda wildcards: config[wildcards.organism]["map_chr_url"],
+        map_chr=config["map_chr_url"],
         cluster_log=os.path.join(
-            config["cluster_log"], "{organism}", "dict_chr.log"
+            config["cluster_log"], "dict_chr.log"
         ),
     log:
-        os.path.join(config["local_log"], "{organism}", "dict_chr.log"),
+        os.path.join(config["local_log"], "dict_chr.log"),
     singularity:
         "docker://zavolab/ubuntu:18.04"
     shell:
@@ -431,24 +399,24 @@ rule dict_chr:
 rule map_chr_names:
     input:
         anno=os.path.join(
-            config["output_dir"], "{organism}", "raw", "mirna.gff3"
+            config["output_dir"], "mirna.gff3"
         ),
         script=os.path.join(config["scripts_dir"], "map_chromosomes.pl"),
         map_chr=os.path.join(
-            config["output_dir"], "{organism}", "UCSC2ensembl.txt"
+            config["output_dir"], "UCSC2ensembl.txt"
         ),
     output:
         gff=os.path.join(
-            config["output_dir"], "{organism}", "mirna_chr_mapped.gff3"
+            config["output_dir"], "mirna_chr_mapped.gff3"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "{organism}", "map_chr_names.log"
+            config["cluster_log"], "map_chr_names.log"
         ),
-        column=lambda wildcards: config[wildcards.organism]["column"],
-        delimiter=lambda wildcards: config[wildcards.organism]["delimiter"],
+        column=1,
+        delimiter="TAB",
     log:
-        os.path.join(config["local_log"], "{organism}", "map_chr_names.log"),
+        os.path.join(config["local_log"], "map_chr_names.log"),
     singularity:
         "docker://zavolab/perl:5.28"
     shell:
@@ -469,20 +437,20 @@ rule map_chr_names:
 rule filter_mir_1_anno:
     input:
         gff=os.path.join(
-            config["output_dir"], "{organism}", "mirna_chr_mapped.gff3"
+            config["output_dir"], "mirna_chr_mapped.gff3"
         ),
     output:
         gff=os.path.join(
-            config["output_dir"], "{organism}", "mirna_filtered.gff3"
+            config["output_dir"], "mirna_filtered.gff3"
         ),
     params:
         script=os.path.join(config["scripts_dir"], "filter_mir_1_anno.sh"),
         cluster_log=os.path.join(
-            config["cluster_log"], "{organism}", "filter_mir_1_anno.log"
+            config["cluster_log"], "filter_mir_1_anno.log"
         ),
     log:
         os.path.join(
-            config["local_log"], "{organism}", "filter_mir_1_anno.log"
+            config["local_log"], "filter_mir_1_anno.log"
         ),
     singularity:
         "docker://zavolab/ubuntu:18.04"
@@ -498,19 +466,19 @@ rule filter_mir_1_anno:
 rule gfftobed:
     input:
         gff=os.path.join(
-            config["output_dir"], "{organism}", "mirna_filtered.gff3"
+            config["output_dir"], "mirna_filtered.gff3"
         ),
     output:
         bed=os.path.join(
-            config["output_dir"], "{organism}", "mirna_filtered.bed"
+            config["output_dir"], "mirna_filtered.bed"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "{organism}", "gfftobed.log"
+            config["cluster_log"], "gfftobed.log"
         ),
-        out_dir=os.path.join(config["output_dir"]),
+        out_dir=config["output_dir"]
     log:
-        os.path.join(config["local_log"], "{organism}", "gfftobed.log"),
+        os.path.join(config["local_log"], "gfftobed.log"),
     singularity:
         "docker://zavolab/bedops:2.4.35"
     shell:
@@ -528,19 +496,19 @@ rule gfftobed:
 rule create_index_fasta:
     input:
         genome=os.path.join(
-            config["output_dir"], "{organism}", "genome.processed.fa"
+            config["output_dir"], "genome.processed.fa"
         ),
     output:
         genome=os.path.join(
-            config["output_dir"], "{organism}", "genome.processed.fa.fai"
+            config["output_dir"], "genome.processed.fa.fai"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "{organism}", "create_index_fasta.log"
+            config["cluster_log"], "create_index_fasta.log"
         ),
     log:
         os.path.join(
-            config["local_log"], "{organism}", "create_index_fasta.log"
+            config["local_log"], "create_index_fasta.log"
         ),
     singularity:
         "docker://zavolab/samtools:1.8"
@@ -556,18 +524,18 @@ rule create_index_fasta:
 rule extract_chr_len:
     input:
         genome=os.path.join(
-            config["output_dir"], "{organism}", "genome.processed.fa.fai"
+            config["output_dir"], "genome.processed.fa.fai"
         ),
     output:
         chrsize=os.path.join(
-            config["output_dir"], "{organism}", "chr_size.txt"
+            config["output_dir"], "chr_size.txt"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "{organism}", "extract_chr_len.log"
+            config["cluster_log"], "extract_chr_len.log"
         ),
     log:
-        os.path.join(config["local_log"], "{organism}", "extract_chr_len.log"),
+        os.path.join(config["local_log"], "extract_chr_len.log"),
     singularity:
         "docker://zavolab/ubuntu:18.04"
     shell:
@@ -582,20 +550,20 @@ rule extract_chr_len:
 rule filter_mature_mirs:
     input:
         bed=os.path.join(
-            config["output_dir"], "{organism}", "mirna_filtered.bed"
+            config["output_dir"], "mirna_filtered.bed"
         ),
     output:
         bed=os.path.join(
-            config["output_dir"], "{organism}", "mirna_mature_filtered.bed"
+            config["output_dir"], "mirna_mature_filtered.bed"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "{organism}", "filter_mature_mirs.log"
+            config["cluster_log"], "filter_mature_mirs.log"
         ),
         precursor="miRNA_primary_transcript",
     log:
         os.path.join(
-            config["local_log"], "{organism}", "filter_mature_mirs.log"
+            config["local_log"], "filter_mature_mirs.log"
         ),
     singularity:
         "docker://zavolab/ubuntu:18.04"
@@ -611,21 +579,19 @@ rule filter_mature_mirs:
 rule iso_anno:
     input:
         bed=os.path.join(
-            config["output_dir"], "{organism}", "mirna_mature_filtered.bed"
+            config["output_dir"], "mirna_mature_filtered.bed"
         ),
         chrsize=os.path.join(
-            config["output_dir"], "{organism}", "chr_size.txt"
+            config["output_dir"], "chr_size.txt"
         ),
     output:
         bed=os.path.join(
             config["output_dir"],
-            "{organism}",
             "iso_anno_5p{bp_5p}_3p{bp_3p}.bed",
         ),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
-            "{organism}",
             "iso_anno_5p{bp_5p}_3p{bp_3p}.log",
         ),
         bp_5p=lambda wildcards: wildcards.bp_5p,
@@ -633,7 +599,6 @@ rule iso_anno:
     log:
         os.path.join(
             config["local_log"],
-            "{organism}",
             "iso_anno_5p{bp_5p}_3p{bp_3p}.log",
         ),
     singularity:
@@ -657,19 +622,16 @@ rule iso_anno_rename:
     input:
         bed=os.path.join(
             config["output_dir"],
-            "{organism}",
             "iso_anno_5p{bp_5p}_3p{bp_3p}.bed",
         ),
     output:
         bed=os.path.join(
             config["output_dir"],
-            "{organism}",
             "iso_anno_rename_5p{bp_5p}_3p{bp_3p}.bed",
         ),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
-            "{organism}",
             "iso_anno_rename_5p{bp_5p}_3p{bp_3p}.log",
         ),
         bp_5p=lambda wildcards: wildcards.bp_5p,
@@ -677,7 +639,6 @@ rule iso_anno_rename:
     log:
         os.path.join(
             config["local_log"],
-            "{organism}",
             "iso_anno_rename_5p{bp_5p}_3p{bp_3p}.log",
         ),
     singularity:
@@ -700,26 +661,24 @@ rule iso_anno_concat:
         bed=lambda wildcards: expand(
             os.path.join(
                 config["output_dir"],
-                "{organism}",
                 "iso_anno_rename_5p{bp_5p}_3p{bp_3p}.bed",
             ),
-            organism=config["organism"],
             bp_3p=config["bp_3p"],
             bp_5p=config["bp_5p"],
         ),
     output:
         bed=os.path.join(
-            config["output_dir"], "{organism}", "iso_anno_concat.bed"
+            config["output_dir"], "iso_anno_concat.bed"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "{organism}", "iso_anno_concat.log"
+            config["cluster_log"], "iso_anno_concat.log"
         ),
         prefix=os.path.join(
-            config["output_dir"], "{organism}", "iso_anno_rename"
+            config["output_dir"], "iso_anno_rename"
         ),
     log:
-        os.path.join(config["local_log"], "{organism}", "iso_anno_concat.log"),
+        os.path.join(config["local_log"], "iso_anno_concat.log"),
     singularity:
         "docker://zavolab/ubuntu:18.04"
     shell:
@@ -734,19 +693,19 @@ rule iso_anno_concat:
 rule iso_anno_final:
     input:
         bed=os.path.join(
-            config["output_dir"], "{organism}", "iso_anno_concat.bed"
+            config["output_dir"], "iso_anno_concat.bed"
         ),
     output:
         bed=os.path.join(
-            config["output_dir"], "{organism}", "isomirs_annotation.bed"
+            config["output_dir"], "isomirs_annotation.bed"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "{organism}", "iso_anno_final.log"
+            config["cluster_log"], "iso_anno_final.log"
         ),
         pattern="5p0_3p0",
     log:
-        os.path.join(config["local_log"], "{organism}", "iso_anno_final.log"),
+        os.path.join(config["local_log"], "iso_anno_final.log"),
     singularity:
         "docker://zavolab/ubuntu:18.04"
     shell:

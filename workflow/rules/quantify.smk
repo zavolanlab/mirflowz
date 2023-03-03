@@ -74,7 +74,7 @@ rule finish_quantify:
 rule bamtobed:
     input:
         alignment=os.path.join(
-            config["quantify_input_dir"],
+            config["output_dir"],
             "{sample}",
             "convertedSortedMappings_{sample}.bam",
         ),
@@ -143,7 +143,9 @@ rule intersect_mirna:
         alignment=os.path.join(
             config["output_dir"], "{sample}", "sorted.alignments.bed12"
         ),
-        mirna=config["mirnas_anno"],
+        mirna=os.path.join(
+            config["output_dir"], "mirna_filtered.bed"
+        ),
     output:
         intersect=os.path.join(
             config["output_dir"], "{sample}", "intersect_mirna.bed"
@@ -178,7 +180,9 @@ rule intersect_mirna:
 #         alignment=os.path.join(
 #             config["output_dir"], "{sample}", "sorted.alignments.bed12"
 #         ),
-#         isomirs=config["isomirs_anno"],
+#         isomirs=os.path.join(
+#            config["output_dir"], "isomirs_annotation.bed",
+#         ),
 #     output:
 #         intersect=os.path.join(
 #             config["output_dir"], "{sample}", "intersect_isomirs.bed"

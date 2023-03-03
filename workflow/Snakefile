@@ -23,7 +23,7 @@
 import os
 import pandas as pd
 
-configfile: "../config/config.yaml"
+configfile: "config.yaml"
 
 ###############################################################################
 ### Global configuration
@@ -45,53 +45,29 @@ include: os.path.join("rules" , "quantify.smk")
 ###############################################################################
 rule finish:
     input:
-        idx_transcriptome=expand(
-            os.path.join(
+        idx_transcriptome=os.path.join(
                 config["output_dir"],
-                "{organism}",
                 "transcriptome_index_segemehl.idx",
-            ),
-            organism=config["organism"],
         ),
-        idx_genome=expand(
-            os.path.join(
+        idx_genome=os.path.join(
                 config["output_dir"],
-                "{organism}",
                 "genome_index_segemehl.idx",
-            ),
-            organism=config["organism"],
         ),
-        exons=expand(
-            os.path.join(
+        exons=os.path.join(
                 config["output_dir"], 
-                "{organism}", 
                 "exons.bed",
-            ),
-            organism=config["organism"],
         ),
-        header=expand(
-            os.path.join(
+        header=os.path.join(
                 config["output_dir"],
-                "{organism}",
                 "headerOfCollapsedFasta.sam",
-            ),
-            organism=config["organism"],
         ),
-        mirnafilt=expand(
-            os.path.join(
+        mirnafilt=os.path.join(
                 config["output_dir"], 
-                "{organism}", 
                 "mirna_filtered.bed",
-            ),
-            organism=config["organism"],
         ),
-        isomirs=expand(
-            os.path.join(
+        isomirs=os.path.join(
                 config["output_dir"], 
-                "{organism}", 
                 "isomirs_annotation.bed",
-            ),
-            organism=config["organism"],
         ),
         maps=expand(
             os.path.join(

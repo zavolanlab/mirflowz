@@ -1,90 +1,53 @@
 ---
-#### GLOBAL PARAMETERS #####
+#############################
+#### REQUIRED PARAMETERS ####
+#############################
 
-# Directories
-# Usually there is no need to change these
-samples: "test_files/samples_table.csv" # For the mapping worflow
-quantify_input_dir: "results" # For the quantify worflow
-output_dir: "results"
-scripts_dir: "../scripts"
-local_log: "logs/local"
-cluster_log: "logs/cluster"
+samples: test_files/samples_table.csv 
 
-#######################################################################################################
-####
-#### PREPARE PARAMETERS
-####
-#######################################################################################################
+#### GENOME RESOURCES ####
 
-# Isomirs annotation 
-# Number of base pairs to add/substract from 5' (start) and 3' (end) coordinates.
-bp_5p: [-1, 0, +1]
-bp_3p: [-1, 0, +1]
+genome_url: "ftp://ftp.ensembl.org/pub/release-98/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna_sm.chromosome.Y.fa.gz"
+gtf_url: "ftp://ftp.ensembl.org/pub/release-98/gtf/homo_sapiens/Homo_sapiens.GRCh38.98.gtf.gz"
+mirna_url: "https://www.mirbase.org/ftp/CURRENT/genomes/hsa.gff3"
 
+map_chr_url: "https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_UCSC2ensembl.txt"
 
-#### PARAMETERS SPECIFIC TO INPUTS #####
+###############################
+#### "OPTIONAL" PARAMETERS ####
+###############################
 
-organism: "homo_sapiens/chrY"
+#### DIRECTORIES #####
 
-homo_sapiens/chrY:
-  # URLs to genome, gene & miRNA annotations
-  genome_url: "ftp://ftp.ensembl.org/pub/release-98/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna_sm.chromosome.Y.fa.gz"
-  gtf_url: "ftp://ftp.ensembl.org/pub/release-98/gtf/homo_sapiens/Homo_sapiens.GRCh38.98.gtf.gz"
-  mirna_url: "https://www.mirbase.org/ftp/CURRENT/genomes/hsa.gff3"
-
-  # Chromosome name mappings between UCSC <-> Ensembl
-  # Other organisms available at: https://github.com/dpryan79/ChromosomeMappings
-  map_chr_url: "https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_UCSC2ensembl.txt"
-  # Chromosome name mapping parameters:
-  column: 1
-  delimiter: "TAB"
-
-#######################################################################################################
-####
-#### MAP PARAMETERS
-####
-#######################################################################################################
-
-#### PARAMETERS SPECIFIC TO INPUTS #####
-
-genome: "results/homo_sapiens/chrY/genome.processed.fa"
-gtf: "results/homo_sapiens/chrY/gene_annotations.filtered.gtf"
-transcriptome: "results/homo_sapiens/chrY/transcriptome_idtrim.fa"
-transcriptome_index_segemehl: "results/homo_sapiens/chrY/transcriptome_index_segemehl.idx"
-genome_index_segemehl: "results/homo_sapiens/chrY/genome_index_segemehl.idx"
-exons: "results/homo_sapiens/chrY/exons.bed"
-header_of_collapsed_fasta: "results/homo_sapiens/chrY/headerOfCollapsedFasta.sam"
+output_dir: results/
+local_log: logs/local/
+cluster_log: logs/cluster/
+scripts_dir: ../scripts/
 
 
-#### TOOL PARAMETERS #### 
+#### ISOMIR GENERATION PARAMETERS ####
+
+bp_5p: [-2, -1, 0, +1, +2]
+bp_3p: [-2, -1, 0, +1, +2]
+
+
+#### PROCESSING PARAMETERS #### 
 
 # quality filter
-q_value: 10
-p_value: 50
+q_value: 10 
+p_value: 50 
 
 # adapter removal
-error_rate: 0.1
-minimum_length: 15
-overlap: 3
-max_n: 0
+error_rate: 0.1    
+minimum_length: 15 
+overlap: 3         
+max_n: 0           
 
 # mapping
-max_length_reads: 30
-nh: 100
+max_length_reads: 30 
+nh: 100              
 
-#######################################################################################################
-####
-#### QUANTIFY PARAMETERS
-####
-#######################################################################################################
+#### QUANTIFICATION PARAMETERS ####
 
-
-# Types of miRNAs to quantify
-#mir_list: ["miRNA", "miRNA_primary_transcript", "isomirs"]
 mir_list: ["miRNA", "miRNA_primary_transcript"]
-
-# Resources: miR annotations, chromosome name mappings
-# All of these are produced by the "prepare" workflow
-mirnas_anno: "results/homo_sapiens/chrY/mirna_filtered.bed"
-isomirs_anno: "results/homo_sapiens/chrY/isomirs_annotation.bed"
 ...
