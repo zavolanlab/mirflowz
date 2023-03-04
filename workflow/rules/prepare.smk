@@ -26,15 +26,8 @@ import os
 
 #configfile: "../../config/config.yaml" 
 
-# Rules that require internet connection for downloading files are included
-# in the localrules
 localrules:
     finish_prepare,
-    genome_process,
-    filter_anno_gtf,
-    mirna_anno,
-    dict_chr,
-
 
 ###############################################################################
 ### Finish rule
