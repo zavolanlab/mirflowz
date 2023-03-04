@@ -10,7 +10,7 @@
 ###  DESCRIPTION  ###
 #####################
 
-# Download and process genome sequences fasta files.
+# Process genome sequences fasta file.
 
 ####################
 ###  PARAMETERS  ###
@@ -20,19 +20,14 @@
 output_dir="$1"
 log_dir="$2"   
 
-# # Paths (DO NOT CHANGE!)
+# Paths (DO NOT CHANGE!)
 root="$PWD"
-#root="$(cd "$(dirname "$0" )" && pwd)"
-
+fileDir="${root}/test_files"
 resDir="${root}/${output_dir}"
-rawDir="${resDir}/raw"
 logDir="${root}/${log_dir}"
 
-# URLs
-# ------
-# All URLs variables represent Bash arrays, so that multiple URLs can be provided; in that case, 
-# files are concatenated after download
-genomeSeqURLs="$3"   #Modified by Iborra P
+# Genome File
+genomeSeqFile="$3"  
 
 ########################
 ###  PRE-REQUISITES  ###
@@ -45,7 +40,6 @@ set -o pipefail
 
 # Create directories
 mkdir --parents "$resDir"
-mkdir --parents "$rawDir"
 mkdir --parents "$logDir"
 
 # Create log file
@@ -57,37 +51,22 @@ rm -fr "$logFile"; touch "$logFile"
 ###  MAIN  ###
 ##############
 
-## GET & FILTER GENE ANNOTATIONS
-
-# Get genome sequences fasta files
-echo "Downloading genome sequences files..." >> "$logFile"
-# wget -i "${genomeSeqURLs}" --output-document "${rawDir}/${fileNamePrefix}.genome.fa.gz"
-# genomeSeq="${resDir}/${fileNamePrefix}.genome.fa.gz"
-
-for url in "${genomeSeqURLs[@]}"; do
-    wget "$url" --output-document "${rawDir}/$(basename "$url")" &> /dev/null
-done
-
-# Concatenate genome sequences fasta files
-echo "Concatenating genome sequences files..." >> "$logFile"
-genomeSeq="${resDir}/genome.fa.gz"
-for url in "${genomeSeqURLs[@]}"; do
-    cat "${rawDir}/$(basename "$url")" >> "$genomeSeq"
-done
-
-# Trim genome sequences IDs
+## TRIM GENOME SEQUENCES IDs
 echo "Triming genome sequenes IDs..." >> "$logFile"
+
 genomeSeqTrim="${resDir}/genome.processed.fa"
+cp "${genomeSeqFile}" "${output_dir}/genome.fa.gz"
+genomeSeq="${output_dir}/genome.fa.gz"
 gunzip "$genomeSeq"
-genomeSeq="${resDir}/genome.fa"
+genomeSeq="${output_dir}/genome.fa"
 awk '{if ($1 ~ /^>/) {print $1} else {print $0}}' "$genomeSeq" > "$genomeSeqTrim"
-rm "${resDir}/genome.fa"
+rm "${output_dir}/genome.fa"
 
 #############
 ###  END  ###
 #############
 
-echo "Original data in: $rawDir" >> "$logFile"
+echo "Original data in: $fileDir" >> "$logFile"
 echo "Processed data in: $resDir" >> "$logFile"
 echo "Done. No errors." >> "$logFile"
 >&2 echo "Done. No errors."
