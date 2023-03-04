@@ -24,18 +24,16 @@ log_dir="$2"
 # Paths (DO NOT CHANGE!)  #Modified by Iborra P
 root="$PWD"
 resDir="${root}/${output_dir}"
-rawDir="${resDir}/raw"
+fileDir="${root}/test_files"
 tmpDir="${root}/.tmp"
 logDir="${root}/${log_dir}"
 
 
-# URLs
+# Annotation file 
 # ----
-# - All URLs variables represent Bash arrays, so that multiple URLs can be provided; in that case, 
-# files are concatenated after download
 # - It is assumed that the specified transcriptome files contain sequences for all transcripts in 
 # the (filtered) gene annotations
-geneAnnoURLs="$3"   #Modified by Iborra P
+geneAnnoFile="$3"  
 
 # Filters
 # -------
@@ -65,7 +63,6 @@ set -o pipefail
 
 # Create directories
 mkdir --parents "$resDir"
-mkdir --parents "$rawDir"
 mkdir --parents "$tmpDir"
 
 # Create log file
@@ -78,25 +75,14 @@ rm -fr "$logFile"; touch "$logFile"
 ###  MAIN  ###
 ##############
 
-## GET & FILTER GENE ANNOTATIONS
-
-# Get gene annotation files
-echo "Downloading gene annotations..." >> "$logFile"
-for url in "${geneAnnoURLs[@]}"; do
-    wget "$url" --output-document "${rawDir}/$(basename "$url")" &> /dev/null
-done
-
-# Concatenate gene annotation files
-echo "Concatenating gene annotation files..." >> "$logFile"
-geneAnno="${resDir}/gene_annotations.gtf.gz"
-for url in "${geneAnnoURLs[@]}"; do
-    cat "${rawDir}/$(basename "$url")" >> "$geneAnno"
-done
+## FILTER GENE ANNOTATIONS
 
 # Filter gene annotations
 geneAnnoFilt="${resDir}/gene_annotations.filtered.gtf.gz"
 geneAnnoOut="${resDir}/gene_annotations.filtered.gtf"
 geneAnnoFiltTmp="${tmpDir}/gene_annotations.filtered.gtf.gz.tmp"
+geneAnno="${resDir}/gene_annotations.gtf.gz"
+cp "$geneAnnoFile" "$geneAnno"
 cp "$geneAnno" "$geneAnnoFiltTmp"
 
     # Filter requested chromosomes
@@ -142,11 +128,12 @@ cp "$geneAnno" "$geneAnnoFiltTmp"
 
 rm "${resDir}/gene_annotations.filtered.gtf.gz"
 rm "${resDir}/gene_annotations.gtf.gz"
+
 #############
 ###  END  ###
 #############
 
-echo "Original data in: $rawDir" >> "$logFile"
+echo "Original data in: $fileDir" >> "$logFile"
 echo "Processed data in: $resDir" >> "$logFile"
 echo "Done. No errors." >> "$logFile"
 >&2 echo "Done. No errors."
