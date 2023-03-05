@@ -1,11 +1,11 @@
 # _MIRFLOWZ_
 
-Suite of [Snakemake][snakemake] workflows for the mapping and quantification
+[Snakemake][snakemake] workflow for the mapping and quantification
 of smallRNA-seq libraries, including miRNA and isomiR quantification.
 
 ## Installation
 
-All workflows live inside this repository and will be available for you to run
+The whole workflow live inside this repository and will be available for you to run
 after following the installation instructions layed out in this section.
 
 ### Cloning the repository
@@ -20,9 +20,9 @@ cd mirflowz
 
 ### Dependencies
 
-For improved reproducibility and reusability of the workflows, as well as an
+For improved reproducibility and reusability of the workflow, as well as an
 easy means to run them on a high performance computing (HPC) cluster managed,
-e.g., by [Slurm][slurm], all steps of the workflows run inside their own
+e.g., by [Slurm][slurm], all steps of the workflow run inside their own
 containers. As a consequence, running this workflow has very few individual
 dependencies. It does, however, require the package manager [Conda][conda] and
 the container engine [Singularity][singularity] to be installed before you
@@ -36,7 +36,7 @@ proceed.
 ### Setting up a virtual environment
 
 It you do not already have [Conda][conda] installed globally on your system,
-we recommend that you install [Miniconda][miniconda]. For faster creation of
+we recommend that you install [Miniconda][miniconda-installation]. For faster creation of
 the environment (and Conda environments in general), you can also install
 [Mamba][mamba] on top of Conda. In that case, replace `conda` with `mamba` in
 the commands below (particularly in `conda env create`).
@@ -55,7 +55,7 @@ the instructions in this section to make sure the workflows are ready to use.
 
 #### Run test workflows on local machine
 
-Execute the following command to run the test workflows on your local machine:
+Execute the following command to run the test workflow on your local machine:
 
 ```bash
 bash test/test_workflow_local.sh
@@ -63,7 +63,7 @@ bash test/test_workflow_local.sh
 
 #### Run test workflows via Slurm
 
-Execute the following command to run the test workflows on a Slurm-managed
+Execute the following command to run the test workflow on a Slurm-managed
 high-performance computing (HPC) cluster:
 
 ```bash
@@ -72,12 +72,12 @@ bash test/test_workflow_slurm.sh
 
 > **NOTE:** The Slurm tests were configured to run on the developer's cluster.
 > Several files may need to be modified if you would like to run tests (and
-> the actual workflows) on other systems. These may possibly include the
+> the actual workflow) on other systems. These may possibly include the
 > following (relative to the repository root directory), but potentially others
 > as well:
 >  
 > * `jobscript.sh`
-> * `RUNS/JOB/{prepare,map,quantify}/cluster.json`
+> * `test/cluster.json`
 > * `test/test_workflow_slurm.sh`
 >  
 > Consult the manual of
@@ -86,8 +86,8 @@ bash test/test_workflow_slurm.sh
 
 #### DAG and rule graph
 
-Execute the following commands to generate DAG and rule graph images for each
-workflow. Outputs will be found in the `images/` directory in the repository
+Execute the following commands to generate DAG and rule graph images for the
+workflow. The output will be found in the `images/` directory in the repository
 root.
 
 > **NOTE:** It is essential that you run the DAG and rule graph tests only
@@ -110,86 +110,122 @@ bash test/test_cleanup.sh
 
 ## Usage
 
-Now that your virtual environment is set up and the workflows are deployed and
-tested, you can go ahead and run the workflows on your samples.
+Now that your virtual environment is set up and the workflow is deployed and
+tested, you can go ahead and run the workflow on your samples.
 
-But first, here is a brief description of what each of the three workflows
-does:
+But first, here is a brief description of what the workflow does:
 
 ### Workflow description
 
-The repository contains the following workflows, all implemented in Snakemake
-and fully containerized:
+The workflow consist on one main `Snakefile` 
+gathering three different subworkflows,
+**_PREPARE_**, **_MAP_** and **_QUANTIFY_**. 
+Each one of them is implemented in an individual Snakemake file
+and fully containerized.    
+
 
 #### _PREPARE_
 
-The first workflow, **_PREPARE_** downloads and processes "genome resources"
+The first subworkflow, **_PREPARE_**, downloads and processes "genome resources"
 from the publicly available repositories [Ensembl][ensembl] and
 [miRBase][mirbase] according to your instructions. Resources are then processed
 to prepare indexes and other contingent resources that will be used in later
 steps.
 
-The scheme below is a visual representation of an example run of the
-**_PREPARE_** workflow:
-
-> ![rule-graph-prepare][rule-graph-prepare]
-
 #### _MAP_
 
-The second workflow, **_MAP_** aligns the user-provided short read smallRNA-seq
-libraries against the references generated with the **_PREPARE_** workflow. For
+The second subworkflow, **_MAP_**, aligns the user-provided short read smallRNA-seq
+libraries against the references generated with the **_PREPARE_** subworkflow. For
 increased fidelity it uses two separate aligning tools, [Segemehl][segemehl]
 and our in-house tool [Oligomap][oligomap]. In both cases, reads are aligned
 separately to the genome and the transcriptome. Afterwards, alignments are
 merged in a way that only the best alignment (or alignments) of each read are
 kept.
 
-The scheme below is a visual representation of an example run of the **_MAP_**
-workflow:
-
-> ![rule-graph-map][rule-graph-map]
-
 #### _QUANTIFY_
 
-The third and final workflow, **_QUANTIFY_** quantifies miRNA expression by
-intersecting the alignments from the **_MAP_** workflow with the annotations
-generated in the **_PREPARE_** workflow. Intersections are computed with
+The third and final subworkflow, **_QUANTIFY_**, quantifies miRNA expression by
+intersecting the alignments from the **_MAP_** subworkflow with the annotations
+generated in the **_PREPARE_** subworkflow. Intersections are computed with
 [`bedtools`][bedtools] for one or multiple of mature, primary transcripts and
 isomiRs. Reads consistent with each miRNA are counted and tabulated.
 
-The scheme below is a visual representation of an example run of the
-**_QUANTIFY_** workflow:
 
-> ![rule-graph-quantify][rule-graph-quantify]
+The schema below is a visual representation of
+an example run of the whole workflow:
 
-### Running the workflows
+> ![rule-graph][rule-graph]
 
-Assuming that you are currently inside the repository's root directory, change
-to the run root directory:
 
-```bash
-cd RUNS
-```
+### Running the workflow
 
-Now make a clean copy of the `JOB` directory and name it whatever you want,
-e.g., `MY_ANALYSIS`:
+Assuming that you are currently inside the repository's root directory, 
+create a directory from which you will run your workflow and
+name it whatever you want e.g., `MY_ANALYSIS` and 
+head to it.
 
 ```bash
-cp -r JOB MY_ANALYSIS
-```
-
-Now traverse to the new directory. You will see that there are three
-subdirectories, one for each workflow, change into the one you would like to
-run (probably `prepare`).
-
-```bash
+mkdir MY_ANALYSIS
 cd MY_ANALYSIS
-cd {prepare,map,quantify}
+```
+Now within the `MY_ANALYSIS/` directory, 
+create a new directory to store you library; 
+name it as you like, e.g. `my_lib` and move there.    
+
+```bash
+mkdir my_lib
+cd my_lib
+```
+Place your library file here. 
+In addition, create a sample table. 
+Fill it with the correct entries. 
+You can look at the `test/test_files/sample_table.csv` 
+to get an idea of what this file must contain.
+
+```bash
+touch sample_table.csv
 ```
 
-Before running the workflow adjust the parameters in file `config.yaml`. The
-file explains what each of the parameters means and how you can meaningfully
-fill them in.
+Now traverse back to the previous directory.
+Here, a coupleof things must be done:  
+
+First of all, copy the `config_template.yaml` to this directory.
+
+```bash
+cp ..config/config_template.yaml ./config.yaml
+```
+Then, using your editor of choice, adjust the parameters of the `config.yaml`.
+The file explains what each of the parameters means and how you can meaningfully
+fill them in.  
+
+
+Accordingly to how you want
+to run the workflow you can either 
+copy the script to run it **locally** with
+
+```bash
+cp ../test/test_workflow_local.sh ./run_workflow_local.sh
+```
+or copy the script to run the workflow 
+on a **cluster via Slurm** 
+along with the `cluster.json` file with
+
+```bash
+cp ../test/test_workflow_slurm.sh ./run_workflow_slurm.sh
+cp ../test/cluster.json ./cluster.json
+```
+
+In both cases, the final 9 lines must be removed; this can be done with:
+
+```bash
+head -n 9 run_workflow_*.sh
+```
+Finally, you can optionally copy the script 
+to remove all artifacts generated by the run:
+
+```bash
+cp ../test/test_cleanup.sh ./run_cleanup.sh
+```
 
 To start workflow execution, run:
 
@@ -207,149 +243,116 @@ To start workflow execution, run:
 After successful execution of the workflow, results and logs will be found in
 `results/` and `logs/` directories, respectively.
 
-### Appendix: Configuration files
+### Appendix: Configuration file
 
-_MIRFLOWZ_ comes with template configuration files for each individual
-workflow. These contain notes on how to fill in each parameter.
+_MIRFLOWZ_ comes with a template configuration file 
+for the whole workflow. 
+This template contains notes on how to fill in each parameter.
 
-#### _PREPARE_
-
-**File location:** `RUNS/JOB/prepare/config.yaml`
-
-```yaml
----
-#### GLOBAL PARAMETERS #####
-
-# Directories
-# Usually there is no need to change these
-scripts_dir: "../../../scripts"
-output_dir: "results"
-local_log: "logs/local"
-cluster_log: "logs/cluster"
-
-# Isomirs annotation file
-# Number of base pairs to add/substract from 5' (start) and 3' (end) coordinates.
-bp_5p: [0] # array of numbers, e.g., [-2,-1,0,+1], to include 2 upstream and 1 downstream nts
-bp_3p: [0] # array of numbers, e.g., [-2,-1,0,+1], to include 2 upstream and 1 downstream nts
-
-# List of inputs
-organism: ["org/pre"] # e.g., ["homo_sapiens/GRCh38.100", "mus_musculus/GRCm37.98"]
-
-#### PARAMETERS SPECIFIC TO INPUTS ####
-
-org/pre: # One section for each list item in "organism"; names have to match precisely
-  # URLs to genome, gene & miRNA annotations
-  genome_url: # FTP/HTTP URL to gzipped genome in FASTA format, Ensembl style
-  gtf_url: # FTP/HTTP URL to gzipped gene annotations in GTF format, Ensembl style
-  mirna_url: # FTP/HTTP URL to unzipped microRNA annotations in GFF format, miRBase style
-
-  # Chromosome name mappings between UCSC <-> Ensembl
-  # Other organisms available at: https://github.com/dpryan79/ChromosomeMappings
-  map_chr_url: # FTP/HTTP URL to mapping table
-  # Chromosome name mapping parameters:
-  column: 1 # Column number from input file where to change chromosome name
-  delimiter: "TAB" # Delimiter of the input file
-...
-```
-
-> **Note:** We expect the genome and gene annotations to be formatted according
-> the style used by Ensembl. Other formats are very likely to lead to problems,
-> if not in this pipeline, then further down the road in the mapping or
-> annotation pipelines. The miRNA annotation file is expected to originate from
-> miRBase, or follow their exact layout.
-
-#### _MAP_
-
-**File location:** `RUNS/JOB/map/config.yaml`
+**File location:** `config/config_template.yaml`
 
 ```yaml
 ---
-#### GLOBAL PARAMETERS ####
+#############################
+#### REQUIRED PARAMETERS ####
+#############################
 
-# Directories
-# Usually there is no need to change these
-scripts_dir: "../../../scripts"
-output_dir: "results"
-local_log: "logs/local"
-cluster_log: "logs/cluster"
+# All paths are relative to the current working directory unless noted otherwise
 
-# Resources: genome, transcriptome, genes, miRs
-# All of these are produced by the "prepare" workflow
-genome: "path/to/genome.processed.fa"
-gtf: "path/to/gene_annotations.filtered.gtf"
-transcriptome: "path/to/transcriptome_idtrim.fa"
-transcriptome_index_segemehl: "path/to/transcriptome_index_segemehl.idx"
-genome_index_segemehl: "path/to/genome_index_segemehl.idx"
-exons: "path/to/exons.bed"
-header_of_collapsed_fasta: "path/to/headerOfCollapsedFasta.sam"
+samples: path/to/samples_table.csv 
 
-# Tool parameters: quality filter
+#### GENOME RESOURCES #####
+
+# All genome resources have to match the source/organism
+# of all samples in the sample table
+
+# FTP/HTTP URL to gzipped genome in FASTA format, Ensembl style
+genome_url: # e.g. "ftp://ftp.ensembl.org/pub/release-106/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz"
+
+# FTP/HTTP URL to gzipped gene annotations in GTF format, Ensembl style
+gtf_url: # e.g. "ftp://ftp.ensembl.org/pub/release-106/gtf/homo_sapiens/Homo_sapiens.GRCh38.106.chr.gtf.gz"
+
+# FTP/HTTP URL to unzipped microRNA annotations in GFF format, miRBase style
+mirna_url: # e.g. "https://www.mirbase.org/ftp/CURRENT/genomes/hsa.gff3"
+
+# Tab-separated mappings table between UCSC (column 1)
+# and Ensembl (coulm 2) chromosome names 
+# Available at: https://github.com/dpryan79/ChromosomeMappings
+map_chr_url: # e.g. "https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_UCSC2ensembl.txt"
+
+
+###############################
+#### "OPTIONAL" PARAMETERS ####
+###############################
+
+# The below parameters only need to be changed if the default behavior of
+# MIRFLOWZ is to be changed; however, they still need to be present!
+
+#### DIRECTORIES ####
+
+output_dir: results/
+local_log: logs/local/
+cluster_log: logs/cluster/
+scripts_dir: ../scripts/
+
+
+#### ISOMIR GENERATION PARAMETERS ####
+
+# Generate isomiR annotations with the indicated number of shifts relative to
+# the start and end position of each annotated mature miRNA, as an array of
+# relative positions
+# Examples:
+# - `bp_5p: [-2,0,+1]` and `bp_3p: [+1]` generates 3 isomiRs for each mature
+#   miRNA: one that starts two nucleotides before, one that starts exactly at
+#   and one that starts one nucleotide after the annotated mature miRNA; all
+#   isomiRs will stop one nucleotide after the end of the annotated mature
+#   miRNA; note that because `0` is not included in the `bp_3p` array, the
+#   annotated mature miRNAs will not be included in this example
+# - Use `bp_5p: [0]` and `bp_3p: [0]` to only include the mature annotated
+#   miRNAs and no isomiRs
+
+bp_5p: [-2, -1, 0, +1, +2]
+bp_3p: [-2, -1, 0, +1, +2]
+
+#### PROCESSING PARAMETERS #### 
+
+# quality filter
 q_value: 10  # Q (Phred) score; minimum quality score to keep
 p_value: 50  # minimum % of bases that must have Q quality
 
-# Tool parameters: adapter removal
-error_rate: 0.1  # fraction of allowed errors
+# adapter removal
+error_rate: 0.1     # fraction of allowed errors
 minimum_length: 15  # discard processed reads shorter than the indicated length
-overlap: 3  # minimum overlap length of adapter and read to trim the bases
-max_n: 0  # discard reads containing more than the indicated number of N bases
+overlap: 3          # minimum overlap length of adapter and read to trim the bases
+max_n: 0            # discard reads containing more than the indicated number of N bases
 
-# Tool parameters: mapping
+# mapping
 max_length_reads: 30  # maximum length of processed reads to map with oligomap
-nh: 100  # discard reads with more mappings than the indicated number
+nh: 100               # discard reads with more mappings than the indicated number
 
-# Inputs information
-input_dir: "path/to/input_directory"
-sample: ["sample_1", "sample_2"]  # put all sample names, separated by comma
-
-#### PARAMETERS SPECIFIC TO INPUTS ####
-
-sample_1:  # one section per list item in "sample"; names have to match
-    adapter: "XXXXXXXXXXXXXXXXXXXX"  # 3' adapter sequence to trim
-    format: "fa"  # file format; currently supported: "fa"
-...
-```
-
-#### _QUANTIFY_
-
-**File location:** `RUNS/JOB/quantify/config.yaml`
-
-```yaml
----
-#### GLOBAL PARAMETERS ####
-
-# Directories
-# Usually there is no need to change these
-output_dir: "results"
-scripts_dir: "../scripts"
-local_log: "logs/local"
-cluster_log: "logs/cluster"
+#### QUANTIFICATION PARAMETERS ####
 
 # Types of miRNAs to quantify
 # Remove miRNA types you are not interested in
 mir_list: ["miRNA", "miRNA_primary_transcript", "isomirs"]
-
-# Resources: miR annotations, chromosome name mappings
-# All of these are produced by the "prepare" workflow
-mirnas_anno: "path/to/mirna_filtered.bed"
-isomirs_anno: "path/to/isomirs_annotation.bed"
-
-# Inputs information
-input_dir: "path/to/input_directory"
-sample: ["sample_1", "sample_2"]  # put all samples, separated by comma
 ...
 ```
 
+> **Note:** We expect the genome and gene annotations to be formatted according
+> the style used by Ensembl. Other formats are very likely to lead to problems.
+> The miRNA annotation file is expected to originate from
+> miRBase, or follow their exact layout.
+
+
 [bedtools]: <https://github.com/arq5x/bedtools2>
 [conda]: <https://docs.conda.io/projects/conda/en/latest/index.html>
-[cluster execution]: <https://snakemake.readthedocs.io/en/stable/executing/cluster-cloud.html#cluster-execution>
+[cluster execution]: <https://snakemake.readthedocs.io/en/stable/executing/cluster.html>
 [ensembl]: <https://ensembl.org/>
 [mamba]: <https://github.com/mamba-org/mamba>
 [miniconda-installation]: <https://docs.conda.io/en/latest/miniconda.html>
 [mirbase]: <https://mirbase.org/>
 [oligomap]: <https://bio.tools/oligomap>
-[rule-graph-map]: images/rule_graph_map.svg
-[rule-graph-prepare]: images/rule_graph_prepare.svg
-[rule-graph-quantify]: images/rule_graph_quantify.svg
+[rule-graph]: images/rule_graph.svg
 [segemehl]: <https://www.bioinf.uni-leipzig.de/Software/segemehl/>
 [singularity]: <https://sylabs.io/singularity/>
 [slurm]: <https://slurm.schedmd.com/documentation.html>
