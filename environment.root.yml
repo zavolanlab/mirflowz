@@ -5,11 +5,11 @@ channels:
   - defaults
 dependencies:
   - graphviz=2.40.1
-  - jinja2=2.11.2
+  - jinja2=3.0
   - networkx=2.5
   - pygments=2.6.1
   - python=3.7.4
   - singularity=3.5.2
-  - snakemake=6.10.0
+  - snakemake=7.24.0
+  - snakemake-minimal=7.24.0
   - unzip=6.0
-  - wget==1.20.1
