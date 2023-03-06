@@ -26,15 +26,8 @@ import os
 
 #configfile: "../../config/config.yaml" 
 
-# Rules that require internet connection for downloading files are included
-# in the localrules
 localrules:
     finish_prepare,
-    genome_process,
-    filter_anno_gtf,
-    mirna_anno,
-    dict_chr,
-
 
 ###############################################################################
 ### Finish rule
@@ -74,20 +67,20 @@ rule finish_prepare:
 ###############################################################################
 rule genome_process:
     input:
+        genome=config["genome_file"],
         script=os.path.join(config["scripts_dir"], "genome_process.sh"),
     output:
         genome=os.path.join(
             config["output_dir"], "genome.processed.fa"
         ),
     params:
-        url=config["genome_url"],
         dir_out=config["output_dir"],
     log:
         os.path.join(config["local_log"], "genome_process.log"),
     singularity:
         "docker://zavolab/ubuntu:18.04"
     shell:
-        "(bash {input.script} {params.dir_out} {log} {params.url})"
+        "(bash {input.script} {params.dir_out} {log} {input.genome})"
 
 
 ###############################################################################
@@ -97,6 +90,7 @@ rule genome_process:
 
 rule filter_anno_gtf:
     input:
+        gtf=config["gtf_file"],
         script=os.path.join(config["scripts_dir"], "filter_anno_gtf.sh"),
     output:
         gtf=os.path.join(
@@ -104,14 +98,13 @@ rule filter_anno_gtf:
             "gene_annotations.filtered.gtf",
         ),
     params:
-        url=config["gtf_url"],
         dir_out=config["output_dir"],
     log:
         os.path.join(config["local_log"], "filter_anno_gtf.log"),
     singularity:
         "docker://zavolab/ubuntu:18.04"
     shell:
-        "(bash {input.script} {params.dir_out} {log} {params.url}) &> {log}"
+        "(bash {input.script} {params.dir_out} {log} {input.gtf}) &> {log}"
 
 
 ###############################################################################
@@ -140,7 +133,6 @@ rule extract_transcriptome_seqs:
     log:
         os.path.join(
             config["local_log"],
-            
             "extract_transcriptome_seqs.log",
         ),
     singularity:
@@ -336,61 +328,6 @@ rule create_header_genome:
     shell:
         "(samtools dict -o {output.header} --uri=NA {input.genome}) &> {log}"
 
-
-###############################################################################
-### Download miRNA annotation
-###############################################################################
-
-
-rule mirna_anno:
-    input:
-        genome=os.path.join(
-            config["output_dir"], "genome.processed.fa"
-        ),
-    output:
-        anno=os.path.join(
-            config["output_dir"], "mirna.gff3"
-        ),
-    params:
-        anno=config["mirna_url"],
-        cluster_log=os.path.join(
-            config["cluster_log"], "mirna_anno.log"
-        ),
-    log:
-        os.path.join(config["local_log"], "mirna_anno.log"),
-    singularity:
-        "docker://zavolab/ubuntu:18.04"
-    shell:
-        "(wget {params.anno} -O {output.anno}) &> {log}"
-
-
-###############################################################################
-### Download dictionary mapping chr
-###############################################################################
-
-
-rule dict_chr:
-    input:
-        genome=os.path.join(
-            config["output_dir"], "genome.processed.fa"
-        ),
-    output:
-        map_chr=os.path.join(
-            config["output_dir"], "UCSC2ensembl.txt"
-        ),
-    params:
-        map_chr=config["map_chr_url"],
-        cluster_log=os.path.join(
-            config["cluster_log"], "dict_chr.log"
-        ),
-    log:
-        os.path.join(config["local_log"], "dict_chr.log"),
-    singularity:
-        "docker://zavolab/ubuntu:18.04"
-    shell:
-        "(wget {params.map_chr} -O {output.map_chr}) &> {log}"
-
-
 ###############################################################################
 ### Mapping chromosomes names, UCSC <-> ENSEMBL
 ###############################################################################
@@ -398,13 +335,9 @@ rule dict_chr:
 
 rule map_chr_names:
     input:
-        anno=os.path.join(
-            config["output_dir"], "mirna.gff3"
-        ),
+        anno=config["mirna_file"],
         script=os.path.join(config["scripts_dir"], "map_chromosomes.pl"),
-        map_chr=os.path.join(
-            config["output_dir"], "UCSC2ensembl.txt"
-        ),
+        map_chr=config["map_chr_file"],
     output:
         gff=os.path.join(
             config["output_dir"], "mirna_chr_mapped.gff3"

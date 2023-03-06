@@ -7,11 +7,10 @@ samples: test_files/samples_table.csv
 
 #### GENOME RESOURCES ####
 
-genome_url: "ftp://ftp.ensembl.org/pub/release-98/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna_sm.chromosome.Y.fa.gz"
-gtf_url: "ftp://ftp.ensembl.org/pub/release-98/gtf/homo_sapiens/Homo_sapiens.GRCh38.98.gtf.gz"
-mirna_url: "https://www.mirbase.org/ftp/CURRENT/genomes/hsa.gff3"
-
-map_chr_url: "https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_UCSC2ensembl.txt"
+genome_file: test_files/Homo_sapiens.GRCh38.dna_sm.chromosome.Y.fa.gz
+gtf_file: test_files/Homo_sapiens.GRCh38.98.gtf.gz 
+mirna_file: test_files/hsa.gff3
+map_chr_file: test_files/GRCh38_UCSC2ensembl.txt
 
 ###############################
 #### "OPTIONAL" PARAMETERS ####
