@@ -14,7 +14,7 @@ Traverse to the desired path on your file system, then clone the repository and
 change into it with:
 
 ```bash
-git clone ssh://git@git.scicore.unibas.ch:2222/zavolan_group/pipelines/mirflowz.git
+git clone git@github.com:zavolanlab/mirflowz.git
 cd mirflowz
 ```
 
