@@ -1,11 +1,11 @@
 # _MIRFLOWZ_
 
-[Snakemake][snakemake] workflow for the mapping and quantification
+_MIRFLOW_ is a [Snakemake][snakemake] workflow for the mapping and quantification
 of smallRNA-seq libraries, including miRNA and isomiR quantification.
 
 ## Installation
 
-The whole workflow live inside this repository and will be available for you to run
+The whole workflow lives inside this repository and will be available for you to run
 after following the installation instructions layed out in this section.
 
 ### Cloning the repository
@@ -21,7 +21,7 @@ cd mirflowz
 ### Dependencies
 
 For improved reproducibility and reusability of the workflow, as well as an
-easy means to run them on a high performance computing (HPC) cluster managed,
+easy means to run it on a high performance computing (HPC) cluster managed,
 e.g., by [Slurm][slurm], all steps of the workflow run inside their own
 containers. As a consequence, running this workflow has very few individual
 dependencies. It does, however, require the package manager [Conda][conda] and
@@ -35,7 +35,7 @@ proceed.
 
 ### Setting up a virtual environment
 
-It you do not already have [Conda][conda] installed globally on your system,
+If you do not already have [Conda][conda] installed globally on your system,
 we recommend that you install [Miniconda][miniconda-installation]. For faster creation of
 the environment (and Conda environments in general), you can also install
 [Mamba][mamba] on top of Conda. In that case, replace `conda` with `mamba` in
@@ -51,7 +51,7 @@ conda activate mirflowz
 ### Testing your installation
 
 Several tests are provided to check the integrity of the installation. Follow
-the instructions in this section to make sure the workflows are ready to use.
+the instructions in this section to make sure the workflow is ready to use.
 
 #### Run test workflows on local machine
 
@@ -176,18 +176,18 @@ name it as you like, e.g. `my_lib` and move there.
 mkdir my_lib
 cd my_lib
 ```
-Place your library file here. 
+Place your library file(s) here. 
 In addition, create a sample table. 
 Fill it with the correct entries. 
 You can look at the `test/test_files/sample_table.csv` 
-to get an idea of what this file must contain.
+to get an idea of what this file must look like.
 
 ```bash
 touch sample_table.csv
 ```
 
 Now traverse back to the previous directory.
-Here, a coupleof things must be done:  
+Here, a couple of things must be done:  
 
 First of all, copy the `config_template.yaml` to this directory.
 
@@ -234,10 +234,10 @@ To start workflow execution, run:
 ```
 
 > **NOTE:** Check back in the installation section to find more information on
-> how to run the workflows on your HPC system. Although we do provide a
-> workflow runner to execute the workflows locally (`run_workflow_local.sh`) on
+> how to run the workflow on your HPC system. Although we do provide a
+> workflow runner to execute the workflow locally (`run_workflow_local.sh`) on
 > your laptop or desktop machine, we recommend against that for real-world
-> data, as the resources requirements for running the workflows are very high
+> data, as the resources requirements for running the workflow are very high
 > (can be >50 Gigs of memory!).
 
 After successful execution of the workflow, results and logs will be found in
