@@ -63,12 +63,11 @@ rule finish_prepare:
 
 
 ###############################################################################
-### Download and process genome IDs
+### Trimm genome IDs
 ###############################################################################
-rule genome_process:
+rule trim_genome_seq_id:
     input:
         genome=config["genome_file"],
-        script=os.path.join(config["scripts_dir"], "genome_process.sh"),
     output:
         genome=os.path.join(
             config["output_dir"], "genome.processed.fa"
@@ -80,31 +79,12 @@ rule genome_process:
     singularity:
         "docker://zavolab/ubuntu:18.04"
     shell:
-        "(bash {input.script} {params.dir_out} {log} {input.genome})"
-
-
-###############################################################################
-### Download and filter gtf by transcript_level
-###############################################################################
-
-
-rule filter_anno_gtf:
-    input:
-        gtf=config["gtf_file"],
-        script=os.path.join(config["scripts_dir"], "filter_anno_gtf.sh"),
-    output:
-        gtf=os.path.join(
-            config["output_dir"],
-            "gene_annotations.filtered.gtf",
-        ),
-    params:
-        dir_out=config["output_dir"],
-    log:
-        os.path.join(config["local_log"], "filter_anno_gtf.log"),
-    singularity:
-        "docker://zavolab/ubuntu:18.04"
-    shell:
-        "(bash {input.script} {params.dir_out} {log} {input.gtf}) &> {log}"
+        """(zcat {input.genome} | 
+        awk \
+        -F" " \
+        "/^>/ {{print \$1; next}} 1" \
+        > {output.genome} \
+        ) &> {log}"""
 
 
 ###############################################################################
@@ -117,10 +97,7 @@ rule extract_transcriptome_seqs:
         genome=os.path.join(
             config["output_dir"], "genome.processed.fa"
         ),
-        gtf=os.path.join(
-            config["output_dir"],
-            "gene_annotations.filtered.gtf",
-        ),
+        gtf=config["gtf_file"],
     output:
         fasta=os.path.join(
             config["output_dir"], "transcriptome.fa"
@@ -138,7 +115,7 @@ rule extract_transcriptome_seqs:
     singularity:
         "docker://zavolab/cufflinks:2.2.1"
     shell:
-        "(gffread -w {output.fasta} -g {input.genome} {input.gtf}) &> {log}"
+        "(zcat {input.gtf} | gffread -w {output.fasta} -g {input.genome}) &> {log}"
 
 
 ###############################################################################
@@ -249,10 +226,7 @@ rule generate_segemehl_index_genome:
 
 rule get_exons_gtf:
     input:
-        gtf=os.path.join(
-            config["output_dir"],
-            "gene_annotations.filtered.gtf",
-        ),
+        gtf=config["gtf_file"],
         script=os.path.join(config["scripts_dir"], "get_lines_w_pattern.sh"),
     output:
         exons=os.path.join(config["output_dir"], "exons.gtf"),
