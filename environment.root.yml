@@ -1,8 +1,5 @@
 name: mirflowz
 channels:
   - conda-forge
-  - bioconda
 dependencies:
-  - python=3.9.16
   - singularity=3.5.2
-  - snakemake=7.24.0
