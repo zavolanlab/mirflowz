@@ -1,15 +1,8 @@
 name: mirflowz
 channels:
-  - bioconda
   - conda-forge
-  - defaults
+  - bioconda
 dependencies:
-  - graphviz=2.40.1
-  - jinja2=3.0
-  - networkx=2.5
-  - pygments=2.6.1
-  - python=3.7.4
+  - python=3.9.16
   - singularity=3.5.2
   - snakemake=7.24.0
-  - snakemake-minimal=7.24.0
-  - unzip=6.0
