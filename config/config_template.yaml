@@ -5,7 +5,7 @@
 
 # All paths are relative to the current working directory unless noted otherwise
 
-samples: path/to/samples_table.csv 
+samples: path/to/samples_table.csv
 
 #### GENOME RESOURCES #####
 
@@ -58,18 +58,18 @@ bp_3p: [-2, -1, 0, +1, +2]
 #### PROCESSING PARAMETERS #### 
 
 # quality filter
-q_value: 10  # Q (Phred) score; minimum quality score to keep
-p_value: 50  # minimum % of bases that must have Q quality
+q_value: 10 # Q (Phred) score; minimum quality score to keep
+p_value: 50 # minimum % of bases that must have Q quality
 
 # adapter removal
-error_rate: 0.1     # fraction of allowed errors
-minimum_length: 15  # discard processed reads shorter than the indicated length
-overlap: 3          # minimum overlap length of adapter and read to trim the bases
-max_n: 0            # discard reads containing more than the indicated number of N bases
+error_rate: 0.1 # fraction of allowed errors
+minimum_length: 15 # discard processed reads shorter than the indicated length
+overlap: 3 # minimum overlap length of adapter and read to trim the bases
+max_n: 0 # discard reads containing more than the indicated number of N bases
 
 # mapping
-max_length_reads: 30  # maximum length of processed reads to map with oligomap
-nh: 100               # discard reads with more mappings than the indicated number
+max_length_reads: 30 # maximum length of processed reads to map with oligomap
+nh: 100 # discard reads with more mappings than the indicated number
 
 #### QUANTIFICATION PARAMETERS ####
 
