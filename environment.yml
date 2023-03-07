@@ -1,7 +1,7 @@
 name: mirflowz
 channels:
-  - conda-forge
   - bioconda
+  - conda-forge
 dependencies:
   - python=3.9.16
   - snakemake=7.24.0
