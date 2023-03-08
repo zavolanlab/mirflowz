@@ -52,6 +52,6 @@ printf "\nAll lines with pattern \"%s\" in column %i are retrieved from %s and w
 	${outname}
 
 # Get lines with matching pattern in requested column
-awk -v col="${column}" -v pat="${pattern}" '$col == pat' ${filename} > ${outname}
+zcat ${filename} | awk -v col="${column}" -v pat="${pattern}" '$col == pat' > ${outname}
 
 printf "\nDONE!\n"
