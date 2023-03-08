@@ -5,26 +5,21 @@
 
 # All paths are relative to the current working directory unless noted otherwise
 
-samples: path/to/samples_table.csv 
+samples: path/to/samples_table.csv
 
 #### GENOME RESOURCES #####
 
 # All genome resources have to match the source/organism
 # of all samples in the sample table
 
-# FTP/HTTP URL to gzipped genome in FASTA format, Ensembl style
-genome_url: # e.g. "ftp://ftp.ensembl.org/pub/release-106/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz"
-
-# FTP/HTTP URL to gzipped gene annotations in GTF format, Ensembl style
-gtf_url: # e.g. "ftp://ftp.ensembl.org/pub/release-106/gtf/homo_sapiens/Homo_sapiens.GRCh38.106.chr.gtf.gz"
-
-# FTP/HTTP URL to unzipped microRNA annotations in GFF format, miRBase style
-mirna_url: # e.g. "https://www.mirbase.org/ftp/CURRENT/genomes/hsa.gff3"
+genome_file: path/to/gzipped/ensembl/genome.fa.gz
+gtf_file: path/to/gzipped/ensembl/gene_annotations.gtf.gz
+mirna_file: path/to/unzipped/mirbase/mirna_annotations.gff3
 
 # Tab-separated mappings table between UCSC (column 1)
 # and Ensembl (coulm 2) chromosome names 
 # Available at: https://github.com/dpryan79/ChromosomeMappings
-map_chr_url: # e.g. "https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_UCSC2ensembl.txt"
+map_chr_file: path/to/ucsc_ensembl_mappings.txt
 
 
 ###############################
@@ -63,18 +58,18 @@ bp_3p: [-2, -1, 0, +1, +2]
 #### PROCESSING PARAMETERS #### 
 
 # quality filter
-q_value: 10  # Q (Phred) score; minimum quality score to keep
-p_value: 50  # minimum % of bases that must have Q quality
+q_value: 10 # Q (Phred) score; minimum quality score to keep
+p_value: 50 # minimum % of bases that must have Q quality
 
 # adapter removal
-error_rate: 0.1     # fraction of allowed errors
-minimum_length: 15  # discard processed reads shorter than the indicated length
-overlap: 3          # minimum overlap length of adapter and read to trim the bases
-max_n: 0            # discard reads containing more than the indicated number of N bases
+error_rate: 0.1 # fraction of allowed errors
+minimum_length: 15 # discard processed reads shorter than the indicated length
+overlap: 3 # minimum overlap length of adapter and read to trim the bases
+max_n: 0 # discard reads containing more than the indicated number of N bases
 
 # mapping
-max_length_reads: 30  # maximum length of processed reads to map with oligomap
-nh: 100               # discard reads with more mappings than the indicated number
+max_length_reads: 30 # maximum length of processed reads to map with oligomap
+nh: 100 # discard reads with more mappings than the indicated number
 
 #### QUANTIFICATION PARAMETERS ####
 
