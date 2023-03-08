@@ -97,10 +97,6 @@ bash test/test_workflow_slurm.sh
 Execute the following command to generate a rule graph image for the workflow.
 The output will be found in the `images/` directory in the repository root.
 
-> **NOTE:** It is essential that you run the rule graph test only _after_ 
-> running the test workflow. This is because it requires files to be available
-> that will only be created when running the workflow.
-
 ```bash
 bash test/test_rule_graph.sh
 ```
@@ -120,7 +116,8 @@ bash test/test_cleanup.sh
 Now that your virtual environment is set up and the workflow is deployed and
 tested, you can go ahead and run the workflow on your samples.
 
-### Running the workflow
+
+### Running the workflow locally
 
 Assuming that you are currently inside the repository's root directory, 
 create a directory from which you will run your workflow and name it whatever 
@@ -130,8 +127,9 @@ you want e.g., `MY_ANALYSIS` and head to it.
 mkdir MY_ANALYSIS
 cd MY_ANALYSIS
 ```
-Place your library file(s) here. In addition, create a sample table. Fill it 
-with the correct entries. The `sample_table.csv` is a tab-separated  file that must have hte following columns:  
+Place your library file(s) here. In addition, create the sample table 
+`sample_table.csv` and fill it up. The `sample_table.csv` is a tab-separated  
+file, with one row per library, that must have the following columns:  
 
 - `sample`. This column contains the library name.  
 - `sample_file`. In this column, you must provide the path to the library file.
@@ -141,18 +139,24 @@ The path must be relative to the worflow's directory.
 `fa` if providing a FASTA file or `fastq` if the library is a FASTQ file.  
 
 You can look at the `test/test_files/sample_table.csv` to know what this file 
-must look like, or tu use it as a template.
+must look like, or use it as a template.
 
 ```bash
 touch sample_table.csv
 ```
+In this same directory, add the following required input files:  
+
+- The gzipped reference genome in FASTA format.  
+- The gzipped gene annotation file in GTF format.  
+- The unzipped microRNA annotation file in GTF format.  
+- A tab-separated mappings table between UCSC and Ensembl.
 
 > **Note:** We expect the genome and gene annotations to be formatted according
 > the style used by Ensembl. Other formats are very likely to lead to problems.
 > The miRNA annotation file is expected to originate from miRBase, or follow 
 > their exact layout.
 
-Copy the `config_template.yaml` to this directory.
+Finally, copy the `config_template.yaml` to this directory.
 
 ```bash
 cp ..config/config_template.yaml ./config.yaml
@@ -161,37 +165,14 @@ Then, using your editor of choice, adjust the parameters of the `config.yaml`.
 The file explains what each of the parameters means and how you can meaningfully
 fill them in. 
 
-Accordingly to how you want to run the workflow you can either copy the script 
-to run it **locally** with
+With all the require files on this directory you can run the workflow [...]
 
 ```bash
 cp ../test/test_workflow_local.sh ./run_workflow_local.sh
 ```
-or copy the script to run the workflow on a **cluster via Slurm** along with 
-the `cluster.json` file with
 
-```bash
-cp ../test/test_workflow_slurm.sh ./run_workflow_slurm.sh
-cp ../test/cluster.json ./cluster.json
-```
+### Running the workflow in an HPC with SLURM
 
-In both cases, the final 9 lines must be removed; this can be done with:
-
-```bash
-head -n 9 run_workflow_*.sh
-```
-Finally, you can optionally copy the script to remove all artifacts generated
-by the run:
-
-```bash
-cp ../test/test_cleanup.sh ./run_cleanup.sh
-```
-
-To start workflow execution, run:
-
-```bash
-./run_workflow_slurm.sh
-```
 
 > **NOTE:** Check back in the installation section to find more information on
 > how to run the workflow on your HPC system. Although we do provide a workflow
