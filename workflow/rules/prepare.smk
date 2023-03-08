@@ -63,15 +63,14 @@ rule finish_prepare:
 
 
 ###############################################################################
-### Trimm genome IDs
+### Trim genome IDs
 ###############################################################################
+
 rule trim_genome_seq_id:
     input:
         genome=config["genome_file"],
     output:
-        genome=os.path.join(
-            config["output_dir"], "genome.processed.fa"
-        ),
+        genome=os.path.join(config["output_dir"], "genome.processed.fa"),
     params:
         dir_out=config["output_dir"],
     log:
