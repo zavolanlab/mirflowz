@@ -24,8 +24,6 @@
 ################################################################################
 import os
 
-#configfile: "../../config/config.yaml" 
-
 localrules:
     finish_prepare,
 
@@ -73,6 +71,9 @@ rule trim_genome_seq_id:
         genome=os.path.join(config["output_dir"], "genome.processed.fa"),
     params:
         dir_out=config["output_dir"],
+        cluster_log=os.path.join(
+            config["cluster_log"], "genome_process.log",
+        ),
     log:
         os.path.join(config["local_log"], "genome_process.log"),
     singularity:
