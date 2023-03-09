@@ -1,7 +1,23 @@
 # _MIRFLOWZ_
 
-_MIRFLOWZ_ is a [Snakemake][snakemake] workflow for mapping and 
-quantifying of miRNA and isomiR quantification.
+_MIRFLOWZ_ is a [Snakemake][snakemake] workflow for mapping miRNAs and isomiRs.
+
+## Table of Contents
+
+1. [Installation](#installation)
+    - [Cloning the repository](#cloning-the-repository)
+    - [Dependencies](#dependencies)
+    - [Setting up the virtual environment](#setting-up-the-virtual-environment)
+    - [Testing your installation](#testing-your-installation)
+2. [Usage](#usage)
+    - [Prepare inputs](#prepare-inputs)
+    - [Running the workflow locally](#running-the-workflow-locally)
+    - [Running the workflow in an HPC with SLURM](#running-the-workflow-in-an-hpc-with-slurm) 
+    - [Creating a snakemake report](#creating-a-snakemake-report)
+3. [Workflow description](#workflow-description)
+4. [Contributing](#contributing)
+5. [License](#license)
+6. [Contact](#contact)
 
 ## Installation
 
@@ -24,12 +40,11 @@ For improved reproducibility and reusability of the workflow, as well as an
 easy means to run it on a high performance computing (HPC) cluster managed,
 e.g., by [Slurm][slurm], all steps of the workflow run inside their own
 containers. As a consequence, running this workflow has very few individual
-dependencies. It does, however, require the package manager [Conda][conda] and
-the container engine [Singularity][singularity] to be installed before you
-proceed.
+dependencies. It does, however, require the package manager [Conda][conda] to 
+be installed before you proceed.
 
 
-### Setting up a virtual environment
+### Setting up the virtual environment
 
 If you do not already have [Conda][conda] installed globally on your system,
 we recommend that you install [Miniconda][miniconda-installation]. For faster creation of
@@ -44,14 +59,14 @@ conda env create -f environment.yml
 conda activate mirflowz
 ```
 
-If you have root permissions for your system and you do not already have
-`singularity` installed globally on your system, you must update the Conda
-environment using the `environment.root.yml` with command below. Mind that the
-you must have the environment activated to updated it.
-
-```bash
-conda env update -f environment.root.yml
-```
+> If you have root permissions for your system and you do not already have
+> `singularity` installed globally on your system, you must update the Conda
+> environment using the `environment.root.yml` with the command below. Mind that
+> you must have the environment activated to update it.
+>
+> ```bash
+> conda env update -f environment.root.yml
+> ```
 
 ### Testing your installation
 
@@ -92,11 +107,14 @@ bash test/test_workflow_slurm.sh
 #### Rule graph
 
 Execute the following command to generate a rule graph image for the workflow.
-The output will be found in the `images/` directory in the repository root.
+The output will be found in the `images/` directory in the repository root. 
 
 ```bash
 bash test/test_rule_graph.sh
 ```
+
+You can see the rule graph below in the 
+[workflow description](#workflow-description) section.
 
 #### Clean up test results
 
@@ -112,62 +130,85 @@ bash test/test_cleanup.sh
 Now that your virtual environment is set up and the workflow is deployed and
 tested, you can go ahead and run the workflow on your samples.
 
-Assuming that you are currently inside the repository's root directory, 
-create a directory from which you will run your workflow and name it whatever 
-you want e.g., `MY_ANALYSIS` and head to it.
+### Prepare inputs 
+
+It is suggested to have all the input files for a given run (or hard links 
+pointing to them) inside a dedicated directory, for instance under the 
+_MIRFLOWZ_ root directory. This way it is easier to keep the data together, 
+reproduce an analysis and set up `Singularity` access to them.  
+
+#### 1. Prepare sample table
 
 ```bash
-mkdir MY_ANALYSIS
-cd MY_ANALYSIS
+touch path/to/your/sample/table.csv
 ```
-Place your library file(s) here. In addition, create the sample table 
-`sample_table.csv` and fill it up. The `sample_table.csv` is a tab-separated  
-file, with one row per library, that must have the following columns:  
+> Fill the sample table according to the following requirements:  
+>
+> - `sample`. This column contains the library name.  
+> - `sample_file`. In this column, you must provide the path to the library file.
+> The path must be relative to the working directory.  
+> - `adapter`.  This field must contain the adapter sequence in capital letters.  
+> - `format`. In this field you mast state the library format. It can either be 
+> `fa` if providing a FASTA file or `fastq` if the library is a FASTQ file.  
+> 
+> You can look at the `test/test_files/sample_table.csv` to know what this file 
+> must look like, or use it as a template.
 
-- `sample`. This column contains the library name.  
-- `sample_file`. In this column, you must provide the path to the library file.
-The path must be relative to the working directory.  
-- `adapter`.  This field must contain the adapter sequence in capital letters.  
-- `format`. In this field you mast state the library format. It can either be 
-`fa` if providing a FASTA file or `fastq` if the library is a FASTQ file.  
+#### 2. Prepare genome resources
 
-You can look at the `test/test_files/sample_table.csv` to know what this file 
-must look like, or use it as a template.
+There are 4 files you must provide: 
+
+1. A **`gzip`ped FASTA** file containing **reference sequences**, typically the
+   genome of the source/organism from which the library was extracted.
+
+2. A **`gzip`ped GTF** file with matching **gene annotations** for the
+   reference sequences above.
+
+> _MIRFLOWZ_ expects both the reference sequence and gene annotation files to
+> follow [Ensembl][ensembl] style/formatting. If you obtained these files from
+> a source other than Ensembl, you may first need to convert them to the
+> expected style to avoid issues!
+
+3. An **uncompressed GTF** file with **microRNA annotations** for the reference
+   sequences above.
+
+> _MIRFLOWZ_ expects the miRNA annotations to follow [miRBase][mirbase]
+> style/formatting. If you obtained this file from a source other than miRBase,
+> you may first need to convert it to the expected style to avoid issues!
+
+4. An **uncompressed tab-separated file** with a **mapping between the
+   reference names** used in the miRNA annotation file (column 1; "UCSC style")
+   and in the gene annotations and reference sequence files (column 2; "Ensembl
+   style"). Values in column 1 are expected to be unique, no header is
+   expected, and any additional columns will be ignored. [This
+   resource][chrMap] provides such files for various organisms, and in the
+   expected format.
+
+> General note: If you want to process the genome resources before use (e.g.,
+> filtering), you can do that, but make sure the formats of any modified
+> resource files meet the formatting expectations outlined above!
+
+
+#### 3. Prepare configuration file
 
 ```bash
-touch sample_table.csv
+cp  path/to/config_template.yaml  path/to/config.yaml
 ```
-In this same directory, add the following required input files:  
 
-- The gzipped reference genome in FASTA format.  
-- The gzipped gene annotation file in GTF format.  
-- The unzipped microRNA annotation file in GTF format.  
-- A tab-separated mappings table between UCSC and Ensembl.
-
-> **Note:** We expect the genome and gene annotations to be formatted according
-> the style used by Ensembl. Other formats are very likely to lead to problems.
-> The miRNA annotation file is expected to originate from miRBase, or follow 
-> their exact layout.
-
-Finally, copy the `config_template.yaml` to this directory.
-
-```bash
-cp ..config/config_template.yaml ./config.yaml
-```
-Then, using your editor of choice, adjust the parameters of the `config.yaml`.
-The file explains what each of the parameters means and how you can meaningfully
+> Copy the `config_template.yaml`, and using your editor of choice, adjust the parameters of the `config.yaml`.
+> The file explains what each of the parameters means and how you can meaningfully
 fill them in. 
 
 ### Running the workflow locally
 
-
-With all the require files on the directory you can run the workflow with the
+With all the require files you can now run the workflow locally with the 
 following command:  
 
 ```bash
 snakemake \
-    --snakefile="../workflow/Snakefile" \
+    --snakefile="path/to/Snakefile" \
     --cores 4  \
+    --configfile="path/to/config.yaml" \
     --use-singularity \
     --singularity-args "--bind ${PWD}/../" \
     --printshellcmds \
@@ -175,10 +216,16 @@ snakemake \
     --verbose
 ```
 
+> **NOTE:** Depending on your working directory, you do not need to use the 
+> parameters  `--snakefile` and `--configfile`. For instance, if the snakefile
+> is in the same directory or the `workflow/` directory is beneath the current
+> working directory there's no need for the `--snakefile` directory. Reger to 
+> the [snakemake documentation][snakemakeDocu] for more information.
+
 ### Running the workflow in an HPC with SLURM
 
 
-TO BE FILLED
+Coming soon...
 
 > **NOTE:** Check back in the installation section to find more information on
 > how to run the workflow on your HPC system. Although we do provide a workflow
@@ -209,19 +256,16 @@ snakemake \
 
 ## Workflow description
 
-The _MIRFLOWZ_ workflow starts by processing the user-provided "genome 
-resources" while preparing indexes and other contigent resources that will be
-used in later steps. Afterwards, the user-provided short read smallRNA-seq
-library(ies) will be aligned against the references previously generated. For
-increased fidelity, it uses two separate aligning tools, [Segemehl][segemehl] 
-and our in-house tool [Oligomap][oligomap]. In both cases, reads are aligned
-separately to the genome and the transcriptome. Thereafter, alignments are
-merged in a way that only the best alignment (or alignments) of each read is 
-(are) kept. Finally, the quantification of miRNA expression is done by
-intersecting the alignments with the generated annotation files. Intersections 
-are computed with [`bedtools`][bedtools] for one or multiple of mature, primary
-transcripts and isomiRs. Reads consistent with each miRNA are counted and 
-tabulated.
+The _MIRFLOWZ_ workflow first processes and indexes the user-provided genome 
+resources. Afterwards, the user-provided short read smallRNA-seq libraries will
+be aligned seperately against the genome and transcriptome. For increased 
+fidelity, two seperated aligners, [Segemehl][segemehl] and our in-house tool 
+[Oligomap][oligomap], are used. All the resulting alignments are merged such 
+that only the best alignments of each read are kept (smallest edit disntance).
+ Finally, alignments are intersected with the user-provided, pre-processed
+ miRNA annotation file using [`bedtools`][bedtools]. Countes are tabulated 
+ seperately for reads consistent with either miRNA precursors, mature miRNA
+ and/or isomiRs.
 
 
 The schema below is a visual representation of the rules building up the 
@@ -229,14 +273,39 @@ workflow and how they are related:
 
 > ![rule-graph][rule-graph]
 
+
+## Contributing
+
+_MIRFLOWZ_ is an open-source project which relies on the community 
+contributions. You are welcome to participate in the form of bug reports, 
+feature requests, discussions, or fixes and other code changes.
+
+## License
+
+This project is covered by the [MIT License](LICENSE).
+
+## Contact
+
+This project is a collaborative effort, so do not hesitate on contacting us via
+[email][email] Please mention the name of this tool for
+any inquiry, proposal, question, etc.
+
+
+
+
 [bedtools]: <https://github.com/arq5x/bedtools2>
+[chrMap]: <https://github.com/dpryan79/ChromosomeMapping>
 [conda]: <https://docs.conda.io/projects/conda/en/latest/index.html>
 [cluster execution]: <https://snakemake.readthedocs.io/en/stable/executing/cluster.html>
+[email]: <zavolab-biozentrum@unibas.ch>
+[ensembl]: <https://ensembl.org/>
 [mamba]: <https://github.com/mamba-org/mamba>
 [miniconda-installation]: <https://docs.conda.io/en/latest/miniconda.html>
+[mirbase]: <https://mirbase.org/>
 [oligomap]: <https://bio.tools/oligomap>
 [rule-graph]: images/rule_graph.svg
 [segemehl]: <https://www.bioinf.uni-leipzig.de/Software/segemehl/>
 [singularity]: <https://sylabs.io/singularity/>
 [slurm]: <https://slurm.schedmd.com/documentation.html>
 [snakemake]: <https://snakemake.readthedocs.io/en/stable/>
+[snakemakeDocu]: <https://snakemake.readthedocs.io/en/stable/executing/cli.html>
