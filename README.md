@@ -10,8 +10,8 @@ _MIRFLOWZ_ is a [Snakemake][snakemake] workflow for mapping miRNAs and isomiRs.
     - [Setting up the virtual environment](#setting-up-the-virtual-environment)
     - [Testing your installation](#testing-your-installation)
 2. [Usage](#usage)
-    - [Prepare inputs](#prepare-inputs)
-    - [Running the workflow locally](#running-the-workflow-locally)
+    - [Preparing inputs](#preparing-inputs)
+    - [Running the workflow](#running-the-workflow)
     - [Creating a snakemake report](#creating-a-snakemake-report)
 3. [Workflow description](#workflow-description)
 4. [Contributing](#contributing)
@@ -38,9 +38,9 @@ cd mirflowz
 For improved reproducibility and reusability of the workflow, as well as an
 easy means to run it on a high performance computing (HPC) cluster managed,
 e.g., by [Slurm][slurm], all steps of the workflow run inside their own
-containers. As a consequence, running this workflow has very few individual
-dependencies. It does, however, require the package manager [Conda][conda] to 
-be installed before you proceed.
+containers. As a consequence, running this workflow has only a few individual
+dependencies. These are managed by the package manager [Conda][conda], which 
+needs to be installed on your system before proceeding.
 
 If you do not already have [Conda][conda] installed globally on your system,
 we recommend that you install [Miniconda][miniconda-installation]. For faster
@@ -57,14 +57,19 @@ conda env create -f environment.yml
 conda activate mirflowz
 ```
 
-> If you have root permissions for your system and you do not already have
-> `singularity` installed globally on your system, you must update the Conda
-> environment using the `environment.root.yml` with the command below. Mind that
-> you must have the environment activated to update it.
->
-> ```bash
-> conda env update -f environment.root.yml
-> ```
+If you do not already have Singularity installed globally on your system,
+you must further update the Conda environment using the
+`environment.root.yml` with the command below. Mind that you must have the
+environment activated to update it.
+
+```bash
+conda env update -f environment.root.yml
+```
+
+> Note that you will need to have root permissions on your system to be able
+> to install Singularity. If you want to run _MIRFLOWZ_ on an HPC cluster
+> (recommended in almost all cases), ask your systems administrator about
+> Singularity.
 
 ### Testing your installation
 
@@ -105,14 +110,14 @@ bash test/test_cleanup.sh
 Now that your virtual environment is set up and the workflow is deployed and
 tested, you can go ahead and run the workflow on your samples.
 
-### Prepare inputs 
+### Preparing inputs 
 
 It is suggested to have all the input files for a given run (or hard links 
 pointing to them) inside a dedicated directory, for instance under the 
 _MIRFLOWZ_ root directory. This way it is easier to keep the data together, 
 reproduce an analysis and set up `Singularity` access to them.  
 
-#### 1. Prepare sample table
+#### 1. Prepare a sample table
 
 ```bash
 touch path/to/your/sample/table.csv
@@ -163,7 +168,7 @@ There are 4 files you must provide:
 > filtering), you can do that, but make sure the formats of any modified
 > resource files meet the formatting expectations outlined above!
 
-#### 3. Prepare configuration file
+#### 3. Prepare a configuration file
 
 We recommend creating a copy of the configuration file template:
 
@@ -175,7 +180,7 @@ Open the new copy in your editor of choice and adjust the configuration
 parameters to your liking. The template explains what each of the
 parameters means and how you can meaningfully adjust them. 
 
-### Running the workflow locally
+### Running the workflow
 
 With all the required files in place, you can now run the workflow locally
 with the following command:  
