@@ -12,7 +12,7 @@ _MIRFLOWZ_ is a [Snakemake][snakemake] workflow for mapping miRNAs and isomiRs.
 2. [Usage](#usage)
     - [Preparing inputs](#preparing-inputs)
     - [Running the workflow](#running-the-workflow)
-    - [Creating a snakemake report](#creating-a-snakemake-report)
+    - [Creating a Snakemake report](#creating-a-snakemake-report)
 3. [Workflow description](#workflow-description)
 4. [Contributing](#contributing)
 5. [License](#license)
