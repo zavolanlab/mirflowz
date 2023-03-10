@@ -24,4 +24,4 @@ snakemake \
     --printshellcmds \
     --dryrun \
     --verbose \
-    | dot -Tsvg > "../images/rule_graph_.svg"
+    | dot -Tsvg > "../images/rule_graph.svg"

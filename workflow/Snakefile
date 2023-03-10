@@ -23,7 +23,6 @@
 import os
 import pandas as pd
 
-configfile: "config.yaml"
 
 ###############################################################################
 ### Global configuration
