@@ -12,7 +12,6 @@ _MIRFLOWZ_ is a [Snakemake][snakemake] workflow for mapping miRNAs and isomiRs.
 2. [Usage](#usage)
     - [Prepare inputs](#prepare-inputs)
     - [Running the workflow locally](#running-the-workflow-locally)
-    - [Running the workflow in an HPC with SLURM](#running-the-workflow-in-an-hpc-with-slurm) 
     - [Creating a snakemake report](#creating-a-snakemake-report)
 3. [Workflow description](#workflow-description)
 4. [Contributing](#contributing)
@@ -43,14 +42,13 @@ containers. As a consequence, running this workflow has very few individual
 dependencies. It does, however, require the package manager [Conda][conda] to 
 be installed before you proceed.
 
+If you do not already have [Conda][conda] installed globally on your system,
+we recommend that you install [Miniconda][miniconda-installation]. For faster
+creation of the environment (and Conda environments in general), you can also
+install [Mamba][mamba] on top of Conda. In that case, replace `conda` with
+`mamba` in the commands below (particularly in `conda env create`).
 
 ### Setting up the virtual environment
-
-If you do not already have [Conda][conda] installed globally on your system,
-we recommend that you install [Miniconda][miniconda-installation]. For faster creation of
-the environment (and Conda environments in general), you can also install
-[Mamba][mamba] on top of Conda. In that case, replace `conda` with `mamba` in
-the commands below (particularly in `conda env create`).
 
 Create and activate the environment with necessary dependencies with Conda:
 
@@ -81,29 +79,6 @@ Execute the following command to run the test workflow on your local machine:
 bash test/test_workflow_local.sh
 ```
 
-#### Run test workflow via Slurm
-
-Execute the following command to run the test workflow on a Slurm-managed
-high-performance computing (HPC) cluster:
-
-```bash
-bash test/test_workflow_slurm.sh
-```
-
-> **NOTE:** The Slurm tests were configured to run on the developer's cluster.
-> Several files may need to be modified if you would like to run tests (and
-> the actual workflow) on other systems. These may possibly include the
-> following (relative to the repository root directory), but potentially others
-> as well:
->  
-> * `jobscript.sh`
-> * `test/cluster.json`
-> * `test/test_workflow_slurm.sh`
->  
-> Consult the manual of
-> your batch scheduling system, as well as the section of the Snakemake manual
-> dealing with [cluster execution].
-
 #### Rule graph
 
 Execute the following command to generate a rule graph image for the workflow.
@@ -113,7 +88,7 @@ The output will be found in the `images/` directory in the repository root.
 bash test/test_rule_graph.sh
 ```
 
-You can see the rule graph below in the 
+You can see the rule graph below in the
 [workflow description](#workflow-description) section.
 
 #### Clean up test results
@@ -188,21 +163,22 @@ There are 4 files you must provide:
 > filtering), you can do that, but make sure the formats of any modified
 > resource files meet the formatting expectations outlined above!
 
-
 #### 3. Prepare configuration file
+
+We recommend creating a copy of the configuration file template:
 
 ```bash
 cp  path/to/config_template.yaml  path/to/config.yaml
 ```
 
-> Copy the `config_template.yaml`, and using your editor of choice, adjust the parameters of the `config.yaml`.
-> The file explains what each of the parameters means and how you can meaningfully
-fill them in. 
+Open the new copy in your editor of choice and adjust the configuration
+parameters to your liking. The template explains what each of the
+parameters means and how you can meaningfully adjust them. 
 
 ### Running the workflow locally
 
-With all the require files you can now run the workflow locally with the 
-following command:  
+With all the required files in place, you can now run the workflow locally
+with the following command:  
 
 ```bash
 snakemake \
@@ -217,37 +193,23 @@ snakemake \
 ```
 
 > **NOTE:** Depending on your working directory, you do not need to use the 
-> parameters  `--snakefile` and `--configfile`. For instance, if the snakefile
+> parameters  `--snakefile` and `--configfile`. For instance, if the `Snakefile`
 > is in the same directory or the `workflow/` directory is beneath the current
-> working directory there's no need for the `--snakefile` directory. Reger to 
-> the [snakemake documentation][snakemakeDocu] for more information.
-
-### Running the workflow in an HPC with SLURM
-
-
-Coming soon...
-
-> **NOTE:** Check back in the installation section to find more information on
-> how to run the workflow on your HPC system. Although we do provide a workflow
-> runner to execute the workflow locally (`run_workflow_local.sh`) on your 
-> laptop or desktop machine, we recommend against that for real-world data, as 
-> the resources requirements for running the workflow are very high(can be >50 
-Gigs of memory!).
+> working directory, there's no need for the `--snakefile` directory. Refer to 
+> the [Snakemake documentation][snakemakeDocu] for more information.
 
 After successful execution of the workflow, results and logs will be found in
-`results/` and `logs/` directories, respectively.
-
+the `results/` and `logs/` directories, respectively.
 
 ### Creating a Snakemake report
 
-`Snakemake` provides the option to generate a detailed HTML reports; in them 
-you will find runtime statistics, the workflow topology and results. If you 
-want to create a `snakemake` report, you must run from your working directory 
-the following command line:
+Snakemake provides the option to generate a detailed HTML report on runtime
+statistics, workflow topology and results. If you want to create a Snakemake
+report, you must run the following command:
 
 ```bash
 snakemake \
-    --snakefile="../workflow/Snakefile" \
+    --snakefile="path/to/Snakefile" \
     --report="snakemake_report.html"
 ```
 
@@ -261,24 +223,22 @@ resources. Afterwards, the user-provided short read smallRNA-seq libraries will
 be aligned seperately against the genome and transcriptome. For increased 
 fidelity, two seperated aligners, [Segemehl][segemehl] and our in-house tool 
 [Oligomap][oligomap], are used. All the resulting alignments are merged such 
-that only the best alignments of each read are kept (smallest edit disntance).
- Finally, alignments are intersected with the user-provided, pre-processed
- miRNA annotation file using [`bedtools`][bedtools]. Countes are tabulated 
- seperately for reads consistent with either miRNA precursors, mature miRNA
- and/or isomiRs.
+that only the best alignments of each read are kept (smallest edit distance).
+Finally, alignments are intersected with the user-provided, pre-processed
+miRNA annotation file using [`bedtools`][bedtools]. Counts are tabulated 
+seperately for reads consistent with either miRNA precursors, mature miRNA
+and/or isomiRs.
 
-
-The schema below is a visual representation of the rules building up the 
-workflow and how they are related:
+The schema below is a visual representation of the individual workflow steps
+and how they are related:
 
 > ![rule-graph][rule-graph]
 
-
 ## Contributing
 
-_MIRFLOWZ_ is an open-source project which relies on the community 
-contributions. You are welcome to participate in the form of bug reports, 
-feature requests, discussions, or fixes and other code changes.
+_MIRFLOWZ_ is an open-source project which relies on community contributions.
+You are welcome to participate by submitting bug reports or feature requests,
+taking part in discussions, or proposing fixes and other code changes.
 
 ## License
 
@@ -286,12 +246,8 @@ This project is covered by the [MIT License](LICENSE).
 
 ## Contact
 
-This project is a collaborative effort, so do not hesitate on contacting us via
-[email][email] Please mention the name of this tool for
-any inquiry, proposal, question, etc.
-
-
-
+Do not hesitate on contacting us via [email][email] for any inquiries on
+_MIRFLOWZ_. Please mention the name of the tool.
 
 [bedtools]: <https://github.com/arq5x/bedtools2>
 [chrMap]: <https://github.com/dpryan79/ChromosomeMapping>
