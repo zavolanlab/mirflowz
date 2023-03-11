@@ -1,0 +1,6 @@
+name: jupyter
+channels:
+  - defaults
+dependencies:
+  - jupyter
+  - python=3.10
