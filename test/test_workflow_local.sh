@@ -21,6 +21,7 @@ cd $script_dir
 snakemake \
     --snakefile="../workflow/Snakefile" \
     --cores 4  \
+    --configfile="config.yaml" \
     --use-singularity \
     --singularity-args "--bind ${PWD}/../" \
     --printshellcmds \
@@ -31,6 +32,7 @@ snakemake \
 # Snakemake report
 snakemake \
     --snakefile="../workflow/Snakefile" \
+    --configfile="config.yaml" \
     --report="snakemake_report.html"
 
 # Check md5 sum of some output files
