@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  pull_request:
+    types:
+      - opened
+      - closed
+    branches:
+     - dev
+  push:
+    branches:
+      - '*'
+ 
+jobs:
+
+  snakemake-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+    
+      -  name: Checkout Repository
+         uses: actions/checkout@v3
+         
+      - name: Setup environment
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: "3.9.16"
+          mamba-version: "*"
+          channels: conda-forge
+          channel-priority: true
+          activate-environment: mirflowz
+          environment-file: environment.yml
+          auto-activate-base: false
+      
+      - name: Update mirflowz env with root packages
+        run: mamba env update -n mirflowz -f environment.root.yml
+        
+      - name: Run local test
+        run: bash test/test_workflow_local.sh
+      
+      - name: Run test for rule graph
+        run: bash test/test_rule_graph.sh
