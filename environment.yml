@@ -5,3 +5,4 @@ channels:
 dependencies:
   - python=3.9.16
   - snakemake=7.24.0
+  - graphviz=7.1.0
