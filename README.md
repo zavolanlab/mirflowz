@@ -215,6 +215,7 @@ report, you must run the following command:
 ```bash
 snakemake \
     --snakefile="path/to/Snakefile" \
+    --configfile="path/to/config.yaml" \
     --report="snakemake_report.html"
 ```
 

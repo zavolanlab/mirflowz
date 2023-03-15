@@ -1,8 +1,8 @@
 samples: test_files/samples_table.csv  
-genome_file: test_files/Homo_sapiens.GRCh38.dna_sm.chromosome.Y.fa.gz
-gtf_file: test_files/Homo_sapiens.GRCh38.98.gtf.gz
-mirna_file: test_files/hsa.gff3
-map_chr_file: test_files/GRCh38_UCSC2ensembl.txt
+genome_file: test_files/genome.fa.gz
+gtf_file: test_files/gene_annotations.gtf.gz
+mirna_file: test_files/mirna_annotations.gff3
+map_chr_file: test_files/ucsc_to_ensembl.txt
 output_dir: results/
 local_log: logs/local/
 cluster_log: logs/cluster/
