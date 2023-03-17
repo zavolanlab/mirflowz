@@ -188,6 +188,9 @@ sub filter_sam {
 			if ( defined $last_id && $fields{"QNAME"} ne $last_id ) {
 				die "[ERROR] SAM file appears to be corrupt!" unless scalar @AoH > 0;							# Assert integrity of SAM records
 				@AoH = @{&sam_AoH_filter_records_w_ident_QNAME(\@AoH)} if scalar @AoH > 1;
+				
+				@AoH = sort {$a->{"POS"} <=> $b->{"POS"} || $a->{'CIGAR'} cmp $b->{'CIGAR'}} @AoH; 				# Sort records in @AoH (First by POS and then by CIGAR String)
+
 				my @out_lines = @{&sam_AoH_join_records(\@AoH)};
 				if ( $multi < 0 ) {
 					print OUT $out_lines[0] if scalar @out_lines == 1;											# Print unique mapper entries
