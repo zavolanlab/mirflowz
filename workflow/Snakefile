@@ -22,6 +22,14 @@
 
 import os
 import pandas as pd
+from snakemake.utils import validate
+
+###############################################################################
+### Configuration validation
+###############################################################################
+
+configfile: "config.yaml"
+validate(config, os.path.join("..", "config", "config_schema.json"))
 
 
 ###############################################################################
