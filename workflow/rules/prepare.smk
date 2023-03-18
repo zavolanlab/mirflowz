@@ -77,7 +77,7 @@ rule trim_genome_seq_id:
     log:
         os.path.join(config["local_log"], "genome_process.log"),
     singularity:
-        "docker://zavolab/ubuntu:18.04"
+        "docker://ubuntu:focal-20210416"
     shell:
         """(zcat {input.genome} | 
         awk \
@@ -113,7 +113,7 @@ rule extract_transcriptome_seqs:
             "extract_transcriptome_seqs.log",
         ),
     singularity:
-        "docker://zavolab/cufflinks:2.2.1"
+        "docker://quay.io/biocontainers/cufflinks:2.2.1--py27_2"
     shell:
         "(zcat {input.gtf} | gffread -w {output.fasta} -g {input.genome}) &> {log}"
 
@@ -140,7 +140,7 @@ rule trim_fasta:
     log:
         os.path.join(config["local_log"], "trim_fasta.log"),
     singularity:
-        "docker://zavolab/ubuntu:18.04"
+        "docker://ubuntu:focal-20210416"
     shell:
         """(awk \
         -F" " \
@@ -180,7 +180,7 @@ rule generate_segemehl_index_transcriptome:
         threads=8,
         time=6,
     singularity:
-        "docker://zavolab/segemehl:0.2.0"
+        "docker://quay.io/biocontainers/segemehl:0.2.0--hfb9b9cc_7"
     shell:
         "(segemehl.x -x {output.idx} -d {input.fasta}) &> {log}"
 
@@ -214,7 +214,7 @@ rule generate_segemehl_index_genome:
         threads=8,
         time=6,
     singularity:
-        "docker://zavolab/segemehl:0.2.0"
+        "docker://quay.io/biocontainers/segemehl:0.2.0--hfb9b9cc_7"
     shell:
         "(segemehl.x -x {output.idx} -d {input.genome}) &> {log}"
 
@@ -237,7 +237,7 @@ rule get_exons_gtf:
     log:
         os.path.join(config["local_log"], "get_exons_gtf.log"),
     singularity:
-        "docker://zavolab/ubuntu:18.04"
+        "docker://ubuntu:focal-20210416"
     shell:
         "(bash \
         {input.script} \
@@ -298,7 +298,7 @@ rule create_header_genome:
             config["local_log"], "create_header_genome.log"
         ),
     singularity:
-        "docker://zavolab/samtools:1.8"
+        "docker://biocontainers/samtools:v1.9-4-deb_cv1"
     shell:
         "(samtools dict -o {output.header} --uri=NA {input.genome}) &> {log}"
 
@@ -320,12 +320,12 @@ rule map_chr_names:
         cluster_log=os.path.join(
             config["cluster_log"], "map_chr_names.log"
         ),
-        column=1,
+        column="1",
         delimiter="TAB",
     log:
         os.path.join(config["local_log"], "map_chr_names.log"),
     singularity:
-        "docker://zavolab/perl:5.28"
+        "docker://quay.io/biocontainers/perl:5.26.2"
     shell:
         "(perl {input.script} \
         {input.anno} \
@@ -360,7 +360,7 @@ rule filter_mir_1_anno:
             config["local_log"], "filter_mir_1_anno.log"
         ),
     singularity:
-        "docker://zavolab/ubuntu:18.04"
+        "docker://ubuntu:focal-20210416"
     shell:
         "(bash {params.script} -f {input.gff} -o {output.gff}) &> {log}"
 
@@ -387,7 +387,7 @@ rule gfftobed:
     log:
         os.path.join(config["local_log"], "gfftobed.log"),
     singularity:
-        "docker://zavolab/bedops:2.4.35"
+        "docker://quay.io/biocontainers/bedops:2.4.35--h6bb024c_2"
     shell:
         "(convert2bed -i gff < {input.gff} \
         --sort-tmpdir={params.out_dir} \
@@ -418,7 +418,7 @@ rule create_index_fasta:
             config["local_log"], "create_index_fasta.log"
         ),
     singularity:
-        "docker://zavolab/samtools:1.8"
+        "docker://biocontainers/samtools:v1.9-4-deb_cv1"
     shell:
         "(samtools faidx {input.genome}) &> {log}"
 
@@ -444,7 +444,7 @@ rule extract_chr_len:
     log:
         os.path.join(config["local_log"], "extract_chr_len.log"),
     singularity:
-        "docker://zavolab/ubuntu:18.04"
+        "docker://ubuntu:focal-20210416"
     shell:
         "(cut -f1,2 {input.genome} > {output.chrsize}) &> {log}"
 
@@ -473,7 +473,7 @@ rule filter_mature_mirs:
             config["local_log"], "filter_mature_mirs.log"
         ),
     singularity:
-        "docker://zavolab/ubuntu:18.04"
+        "docker://ubuntu:focal-20210416"
     shell:
         "(grep -v {params.precursor} {input.bed} > {output.bed}) &> {log}"
 
@@ -509,7 +509,7 @@ rule iso_anno:
             "iso_anno_5p{bp_5p}_3p{bp_3p}.log",
         ),
     singularity:
-        "docker://zavolab/bedtools:2.28.0"
+        "docker://biocontainers/bedtools:v2.28.0_cv2"
     shell:
         "(bedtools slop \
         -i {input.bed} \
@@ -549,7 +549,7 @@ rule iso_anno_rename:
             "iso_anno_rename_5p{bp_5p}_3p{bp_3p}.log",
         ),
     singularity:
-        "docker://zavolab/ubuntu:18.04"
+        "docker://ubuntu:focal-20210416"
     shell:
         "(sed \
         's/;Derives/_5p{params.bp_5p}_3p{params.bp_3p};Derives/' \
@@ -587,7 +587,7 @@ rule iso_anno_concat:
     log:
         os.path.join(config["local_log"], "iso_anno_concat.log"),
     singularity:
-        "docker://zavolab/ubuntu:18.04"
+        "docker://ubuntu:focal-20210416"
     shell:
         "(cat {params.prefix}* > {output.bed}) &> {log}"
 
@@ -614,6 +614,6 @@ rule iso_anno_final:
     log:
         os.path.join(config["local_log"], "iso_anno_final.log"),
     singularity:
-        "docker://zavolab/ubuntu:18.04"
+        "docker://ubuntu:focal-20210416"
     shell:
         "(grep -v '{params.pattern}' {input.bed} > {output.bed}) &> {log}"

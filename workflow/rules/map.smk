@@ -107,7 +107,7 @@ rule start:
             "uncompress_zipped_files_{sample}_{format}.log",
         ),
     singularity:
-        "docker://zavolab/ubuntu:18.04"
+        "docker://ubuntu:focal-20210416"
     shell:
         "(zcat {input.reads} > {output.reads}) &> {log}"
 
@@ -135,7 +135,7 @@ rule fastq_quality_filter:
     log:
         os.path.join(config["local_log"], "fastq_quality_filter_{sample}.log"),
     singularity:
-        "docker://zavolab/fastx:0.0.14"
+        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--2"
     shell:
         "(fastq_quality_filter \
         -v \
@@ -167,7 +167,7 @@ rule fastq_to_fasta:
     log:
         os.path.join(config["local_log"], "fastq_to_fasta_{sample}.log"),
     singularity:
-        "docker://zavolab/fastx:0.0.14"
+        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--2"
     shell:
         "(fastq_to_fasta -r -n -i {input.reads} > {output.reads}) &> {log}"
 
@@ -194,7 +194,7 @@ rule fasta_formatter:
     log:
         os.path.join(config["local_log"], "fasta_formatter_{sample}.log"),
     singularity:
-        "docker://zavolab/fastx:0.0.14"
+        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--2"
     shell:
         "(fasta_formatter -w 0 -i {input.reads} > {output.reads}) &> {log}"
 
@@ -223,7 +223,7 @@ rule cutadapt:
     resources:
         threads=8,
     singularity:
-        "docker://zavolab/cutadapt:1.16"
+        "docker://quay.io/biocontainers/cutadapt:1.16--py35_2"
     shell:
         "(cutadapt \
         -a {params.adapter} \
@@ -253,7 +253,7 @@ rule fastx_collapser:
     log:
         os.path.join(config["local_log"], "fastx_collapser_{sample}.log"),
     singularity:
-        "docker://zavolab/fastx:0.0.14"
+        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--2"
     shell:
         "(fastx_collapser -i {input.reads} > {output.reads}) &> {log}"
 
@@ -285,7 +285,7 @@ rule mapping_genome_segemehl:
         time=12,
         threads=8,
     singularity:
-        "docker://zavolab/segemehl:0.2.0"
+        "docker://quay.io/biocontainers/segemehl:0.2.0--hfb9b9cc_7"
     shell:
         "(segemehl.x \
         -i {input.genome_index_segemehl} \
@@ -324,7 +324,7 @@ rule mapping_transcriptome_segemehl:
         time=12,
         threads=8,
     singularity:
-        "docker://zavolab/segemehl:0.2.0"
+        "docker://quay.io/biocontainers/segemehl:0.2.0--hfb9b9cc_7"
     shell:
         "(segemehl.x \
         -i {input.transcriptome_index_segemehl} \
@@ -358,7 +358,7 @@ rule filter_fasta_for_oligomap:
             config["local_log"], "filter_fasta_for_oligomap_{sample}.log"
         ),
     singularity:
-        "docker://zavolab/python:3.6.5"
+        "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
     shell:
         "(python {input.script} \
         -r {params.max_length_reads} \
@@ -476,7 +476,7 @@ rule oligomap_genome_toSAM:
         time=1,
         queue=1,
     singularity:
-        "docker://zavolab/python:3.6.5"
+        "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
     shell:
         "(python {input.script} \
         -i {input.sort} \
@@ -596,7 +596,7 @@ rule oligomap_transcriptome_toSAM:
             config["local_log"], "oligomap_transcriptome_toSAM_{sample}.log"
         ),
     singularity:
-        "docker://zavolab/python:3.6.5"
+        "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
     shell:
         "(python {input.script} \
         -i {input.sort} \
@@ -629,7 +629,7 @@ rule merge_genome_maps:
     log:
         os.path.join(config["local_log"], "merge_genome_maps_{sample}.log"),
     singularity:
-        "docker://zavolab/ubuntu:18.04"
+        "docker://ubuntu:focal-20210416"
     shell:
         "(cat {input.gmap1} {input.gmap2} > {output.gmaps}) &> {log}"
 
@@ -662,7 +662,7 @@ rule merge_transcriptome_maps:
             config["local_log"], "merge_transcriptome_maps_{sample}.log"
         ),
     singularity:
-        "docker://zavolab/ubuntu:18.04"
+        "docker://ubuntu:focal-20210416"
     shell:
         "(cat {input.tmap1} {input.tmap2} > {output.tmaps}) &> {log}"
 
@@ -690,7 +690,7 @@ rule nh_filter_genome:
     log:
         os.path.join(config["local_log"], "nh_filter_genome_{sample}.log"),
     singularity:
-        "docker://zavolab/python:3.6.5"
+        "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
     shell:
         "(python {input.script} \
         {input.gmaps} \
@@ -726,7 +726,7 @@ rule filter_nh_transcriptome:
             config["local_log"], "filter_nh_transcriptome_{sample}.log"
         ),
     singularity:
-        "docker://zavolab/python:3.6.5"
+        "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
     shell:
         "(python {input.script} \
         {input.tmaps} \
@@ -756,7 +756,7 @@ rule remove_headers_genome:
     log:
         os.path.join(config["local_log"], "remove_headers_genome_{sample}.log"),
     singularity:
-        "docker://zavolab/samtools:1.8"
+        "docker://biocontainers/samtools:v1.9-4-deb_cv1"
     shell:
         "samtools view {input.gmap} > {output.gmap}"
 
@@ -788,7 +788,7 @@ rule remove_headers_transcriptome:
             config["local_log"], "remove_headers_transcriptome_{sample}.log"
         ),
     singularity:
-        "docker://zavolab/samtools:1.8"
+        "docker://biocontainers/samtools:v1.9-4-deb_cv1"
     shell:
         "samtools view {input.tmap} > {output.tmap}"
 
@@ -816,7 +816,7 @@ rule trans_to_gen:
     log:
         os.path.join(config["local_log"], "trans_to_gen_{sample}.log"),
     singularity:
-        "docker://zavolab/perl:5.28"
+        "docker://quay.io/biocontainers/perl:5.26.2"
     shell:
         "(perl {input.script} \
         --in {input.tmap} \
@@ -847,7 +847,7 @@ rule cat_mapping:
     log:
         os.path.join(config["local_log"], "cat_mapping_{sample}.log"),
     singularity:
-        "docker://zavolab/ubuntu:18.04"
+        "docker://ubuntu:focal-20210416"
     shell:
         "(cat {input.gmap1} {input.gmap2} > {output.catmaps}) &> {log}"
 
@@ -876,7 +876,7 @@ rule add_header:
     log:
         os.path.join(config["local_log"], "add_header_{sample}.log"),
     singularity:
-        "docker://zavolab/ubuntu:18.04"
+        "docker://ubuntu:focal-20210416"
     shell:
         "(cat {input.header} {input.catmaps} > {output.concatenate}) &> {log}"
 
@@ -902,7 +902,7 @@ rule sort_id:
     log:
         os.path.join(config["local_log"], "sort_id_{sample}.log"),
     singularity:
-        "docker://zavolab/samtools:1.8"
+        "docker://biocontainers/samtools:v1.9-4-deb_cv1"
     shell:
         "(samtools sort -n -o {output.sort} {input.concatenate}) &> {log}"
 
@@ -935,7 +935,7 @@ rule remove_inferiors:
         mem=15,
         threads=4,
     singularity:
-        "docker://zavolab/perl:5.28"
+        "docker://quay.io/biocontainers/perl:5.26.2"
     shell:
         "(perl {input.script} \
         --print-header \
@@ -967,7 +967,7 @@ rule uncollapse_reads:
     log:
         os.path.join(config["local_log"], "uncollapse_reads_{sample}.log"),
     singularity:
-        "docker://zavolab/perl:5.28"
+        "docker://quay.io/biocontainers/perl:5.26.2"
     shell:
         "(perl {input.script} \
         --suffix \
@@ -997,7 +997,7 @@ rule convert_to_bam:
     log:
         os.path.join(config["local_log"], "convert_to_bam_{sample}.log"),
     singularity:
-        "docker://zavolab/samtools:1.8"
+        "docker://biocontainers/samtools:v1.9-4-deb_cv1"
     shell:
         "(samtools view -b {input.maps} > {output.maps}) &> {log}"
 
@@ -1025,7 +1025,7 @@ rule sort_by_position:
     log:
         os.path.join(config["local_log"], "sort_by_position_{sample}.log"),
     singularity:
-        "docker://zavolab/samtools:1.8"
+        "docker://biocontainers/samtools:v1.9-4-deb_cv1"
     shell:
         "(samtools sort {input.maps} > {output.maps}) &> {log}"
 
@@ -1055,6 +1055,6 @@ rule index_bam:
     log:
         os.path.join(config["local_log"], "index_bam_{sample}.log"),
     singularity:
-        "docker://zavolab/samtools:1.8"
+        "docker://biocontainers/samtools:v1.9-4-deb_cv1"
     shell:
         "(samtools index -b {input.maps} > {output.maps}) &> {log}"
