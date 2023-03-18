@@ -28,7 +28,6 @@ from snakemake.utils import validate
 ### Configuration validation
 ###############################################################################
 
-configfile: "config.yaml"
 validate(config, os.path.join("..", "config", "config_schema.json"))
 
 
@@ -84,7 +83,7 @@ rule finish:
             ),
             sample=pd.unique(samples_table.index.values),
         ),
-        table1=expand(
+        table1=lambda wildcard:expand(
             os.path.join(
                 config["output_dir"], 
                 "TABLES", 
