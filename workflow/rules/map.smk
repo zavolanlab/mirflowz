@@ -358,7 +358,7 @@ rule filter_fasta_for_oligomap:
             config["local_log"], "filter_fasta_for_oligomap_{sample}.log"
         ),
     singularity:
-        "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
+        "docker://python:3.6.5"
     shell:
         "(python {input.script} \
         -r {params.max_length_reads} \
@@ -476,7 +476,7 @@ rule oligomap_genome_toSAM:
         time=1,
         queue=1,
     singularity:
-        "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
+        "docker://python:3.6.5"
     shell:
         "(python {input.script} \
         -i {input.sort} \
@@ -596,7 +596,7 @@ rule oligomap_transcriptome_toSAM:
             config["local_log"], "oligomap_transcriptome_toSAM_{sample}.log"
         ),
     singularity:
-        "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
+        "docker://python:3.6.5"
     shell:
         "(python {input.script} \
         -i {input.sort} \
@@ -756,7 +756,7 @@ rule remove_headers_genome:
     log:
         os.path.join(config["local_log"], "remove_headers_genome_{sample}.log"),
     singularity:
-        "docker://biocontainers/samtools:v1.9-4-deb_cv1"
+        "docker://quay.io/biocontainers/samtools:1.8--h46bd0b3_5"
     shell:
         "samtools view {input.gmap} > {output.gmap}"
 
@@ -788,7 +788,7 @@ rule remove_headers_transcriptome:
             config["local_log"], "remove_headers_transcriptome_{sample}.log"
         ),
     singularity:
-        "docker://biocontainers/samtools:v1.9-4-deb_cv1"
+        "docker://quay.io/biocontainers/samtools:1.8--h46bd0b3_5"
     shell:
         "samtools view {input.tmap} > {output.tmap}"
 
@@ -816,7 +816,7 @@ rule trans_to_gen:
     log:
         os.path.join(config["local_log"], "trans_to_gen_{sample}.log"),
     singularity:
-        "docker://quay.io/biocontainers/perl:5.26.2"
+        "docker://perl:5.28"
     shell:
         "(perl {input.script} \
         --in {input.tmap} \
@@ -902,7 +902,7 @@ rule sort_id:
     log:
         os.path.join(config["local_log"], "sort_id_{sample}.log"),
     singularity:
-        "docker://biocontainers/samtools:v1.9-4-deb_cv1"
+        "docker://quay.io/biocontainers/samtools:1.8--h46bd0b3_5"
     shell:
         "(samtools sort -n -o {output.sort} {input.concatenate}) &> {log}"
 
@@ -935,7 +935,7 @@ rule remove_inferiors:
         mem=15,
         threads=4,
     singularity:
-        "docker://quay.io/biocontainers/perl:5.26.2"
+        "docker://perl:5.28"
     shell:
         "(perl {input.script} \
         --print-header \
@@ -967,7 +967,7 @@ rule uncollapse_reads:
     log:
         os.path.join(config["local_log"], "uncollapse_reads_{sample}.log"),
     singularity:
-        "docker://quay.io/biocontainers/perl:5.26.2"
+        "docker://perl:5.28"
     shell:
         "(perl {input.script} \
         --suffix \
@@ -997,7 +997,7 @@ rule convert_to_bam:
     log:
         os.path.join(config["local_log"], "convert_to_bam_{sample}.log"),
     singularity:
-        "docker://biocontainers/samtools:v1.9-4-deb_cv1"
+        "docker://quay.io/biocontainers/samtools:1.8--h46bd0b3_5"
     shell:
         "(samtools view -b {input.maps} > {output.maps}) &> {log}"
 
@@ -1025,7 +1025,7 @@ rule sort_by_position:
     log:
         os.path.join(config["local_log"], "sort_by_position_{sample}.log"),
     singularity:
-        "docker://biocontainers/samtools:v1.9-4-deb_cv1"
+        "docker://quay.io/biocontainers/samtools:1.8--h46bd0b3_5"
     shell:
         "(samtools sort {input.maps} > {output.maps}) &> {log}"
 
@@ -1055,6 +1055,6 @@ rule index_bam:
     log:
         os.path.join(config["local_log"], "index_bam_{sample}.log"),
     singularity:
-        "docker://biocontainers/samtools:v1.9-4-deb_cv1"
+        "docker://quay.io/biocontainers/samtools:1.8--h46bd0b3_5"
     shell:
         "(samtools index -b {input.maps} > {output.maps}) &> {log}"

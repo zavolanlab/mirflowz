@@ -298,7 +298,7 @@ rule create_header_genome:
             config["local_log"], "create_header_genome.log"
         ),
     singularity:
-        "docker://biocontainers/samtools:v1.9-4-deb_cv1"
+        "docker://quay.io/biocontainers/samtools:1.8--2"
     shell:
         "(samtools dict -o {output.header} --uri=NA {input.genome}) &> {log}"
 
@@ -325,7 +325,7 @@ rule map_chr_names:
     log:
         os.path.join(config["local_log"], "map_chr_names.log"),
     singularity:
-        "docker://quay.io/biocontainers/perl:5.26.2"
+        "docker://perl:5.28"
     shell:
         "(perl {input.script} \
         {input.anno} \
@@ -418,7 +418,7 @@ rule create_index_fasta:
             config["local_log"], "create_index_fasta.log"
         ),
     singularity:
-        "docker://biocontainers/samtools:v1.9-4-deb_cv1"
+        "docker://quay.io/biocontainers/samtools:1.8--2"
     shell:
         "(samtools faidx {input.genome}) &> {log}"
 

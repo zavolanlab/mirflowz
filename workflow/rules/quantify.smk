@@ -87,7 +87,7 @@ rule bamtobed:
     log:
         os.path.join(config["local_log"], "bamtobed_{sample}.log"),
     singularity:
-        "docker://biocontainers/bedtools:v2.27.0_cv3"
+        "docker://quay.io/biocontainers/bedtools:2.27.1--hd03093a_6"
     shell:
         "(bedtools bamtobed \
         -bed12 \
@@ -155,7 +155,7 @@ rule intersect_mirna:
     log:
         os.path.join(config["local_log"], "intersection_mirna_{sample}.log"),
     singularity:
-        "docker://biocontainers/bedtools:v2.27.0_cv3"
+        "docker://quay.io/biocontainers/bedtools:2.27.1--hd03093a_6"
     shell:
         "(bedtools intersect \
         -wao \
@@ -192,7 +192,7 @@ rule intersect_mirna:
 #     log:
 #         os.path.join(config["local_log"], "intersection_isomirs_{sample}.log"),
 #     singularity:
-#         "docker://biocontainers/bedtools:v2.27.0_cv3"
+#         "docker://quay.io/biocontainers/bedtools:2.27.1--hd03093a_6"
 #     shell:
 #         "(bedtools intersect \
 #         -wao \
