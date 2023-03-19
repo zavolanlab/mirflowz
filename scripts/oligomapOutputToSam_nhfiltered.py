@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-import sys
-sys.path.append("/scicore/home/zavolan/clipz/newClipz6/lib/python")
 
 #################################################
 # Transforms oligomap output to SAM format and	
