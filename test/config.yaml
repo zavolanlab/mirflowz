@@ -3,18 +3,4 @@ genome_file: test_files/genome.fa.gz
 gtf_file: test_files/gene_annotations.gtf.gz
 mirna_file: test_files/mirna_annotations.gff3
 map_chr_file: test_files/ucsc_to_ensembl.txt
-output_dir: results/
-local_log: logs/local/
-cluster_log: logs/cluster/
-scripts_dir: ../scripts/
-bp_5p: [-2, -1, 0, +1, +2]
-bp_3p: [-2, -1, 0, +1, +2]
-q_value: 10
-p_value: 50
-error_rate: 0.1
-minimum_length: 15
-overlap: 3
-max_n: 0
-max_length_reads: 30
-nh: 100
 mir_list: ["miRNA", "miRNA_primary_transcript"]

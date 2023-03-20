@@ -919,7 +919,7 @@ rule remove_inferiors:
         ),
         script=os.path.join(
             config["scripts_dir"],
-            "sam_remove_duplicates_inferior_alignments_multimappers.1_5.pl",
+            "sam_remove_duplicates_inferior_alignments_multimappers.1_6.pl",
         ),
     output:
         remove_inf=os.path.join(
