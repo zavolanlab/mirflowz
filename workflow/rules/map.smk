@@ -107,7 +107,7 @@ rule start:
             "uncompress_zipped_files_{sample}_{format}.log",
         ),
     singularity:
-        "docker://ubuntu:focal-20210416"
+        "docker://ubuntu:bionic-20221215"
     shell:
         "(zcat {input.reads} > {output.reads}) &> {log}"
 
@@ -629,7 +629,7 @@ rule merge_genome_maps:
     log:
         os.path.join(config["local_log"], "merge_genome_maps_{sample}.log"),
     singularity:
-        "docker://ubuntu:focal-20210416"
+        "docker://ubuntu:bionic-20221215"
     shell:
         "(cat {input.gmap1} {input.gmap2} > {output.gmaps}) &> {log}"
 
@@ -662,7 +662,7 @@ rule merge_transcriptome_maps:
             config["local_log"], "merge_transcriptome_maps_{sample}.log"
         ),
     singularity:
-        "docker://ubuntu:focal-20210416"
+        "docker://ubuntu:bionic-20221215"
     shell:
         "(cat {input.tmap1} {input.tmap2} > {output.tmaps}) &> {log}"
 
@@ -847,7 +847,7 @@ rule cat_mapping:
     log:
         os.path.join(config["local_log"], "cat_mapping_{sample}.log"),
     singularity:
-        "docker://ubuntu:focal-20210416"
+        "docker://ubuntu:bionic-20221215"
     shell:
         "(cat {input.gmap1} {input.gmap2} > {output.catmaps}) &> {log}"
 
@@ -876,7 +876,7 @@ rule add_header:
     log:
         os.path.join(config["local_log"], "add_header_{sample}.log"),
     singularity:
-        "docker://ubuntu:focal-20210416"
+        "docker://ubuntu:bionic-20221215"
     shell:
         "(cat {input.header} {input.catmaps} > {output.concatenate}) &> {log}"
 

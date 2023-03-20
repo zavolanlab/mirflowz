@@ -77,7 +77,7 @@ rule trim_genome_seq_id:
     log:
         os.path.join(config["local_log"], "genome_process.log"),
     singularity:
-        "docker://ubuntu:focal-20210416"
+        "docker://ubuntu:bionic-20221215"
     shell:
         """(zcat {input.genome} | 
         awk \
@@ -140,7 +140,7 @@ rule trim_fasta:
     log:
         os.path.join(config["local_log"], "trim_fasta.log"),
     singularity:
-        "docker://ubuntu:focal-20210416"
+        "docker://ubuntu:bionic-20221215"
     shell:
         """(awk \
         -F" " \
@@ -237,7 +237,7 @@ rule get_exons_gtf:
     log:
         os.path.join(config["local_log"], "get_exons_gtf.log"),
     singularity:
-        "docker://ubuntu:focal-20210416"
+        "docker://ubuntu:bionic-20221215"
     shell:
         "(bash \
         {input.script} \
@@ -360,7 +360,7 @@ rule filter_mir_1_anno:
             config["local_log"], "filter_mir_1_anno.log"
         ),
     singularity:
-        "docker://ubuntu:focal-20210416"
+        "docker://ubuntu:bionic-20221215"
     shell:
         "(bash {params.script} -f {input.gff} -o {output.gff}) &> {log}"
 
@@ -444,7 +444,7 @@ rule extract_chr_len:
     log:
         os.path.join(config["local_log"], "extract_chr_len.log"),
     singularity:
-        "docker://ubuntu:focal-20210416"
+        "docker://ubuntu:bionic-20221215"
     shell:
         "(cut -f1,2 {input.genome} > {output.chrsize}) &> {log}"
 
@@ -473,7 +473,7 @@ rule filter_mature_mirs:
             config["local_log"], "filter_mature_mirs.log"
         ),
     singularity:
-        "docker://ubuntu:focal-20210416"
+        "docker://ubuntu:bionic-20221215"
     shell:
         "(grep -v {params.precursor} {input.bed} > {output.bed}) &> {log}"
 
@@ -549,7 +549,7 @@ rule iso_anno_rename:
             "iso_anno_rename_5p{bp_5p}_3p{bp_3p}.log",
         ),
     singularity:
-        "docker://ubuntu:focal-20210416"
+        "docker://ubuntu:bionic-20221215"
     shell:
         "(sed \
         's/;Derives/_5p{params.bp_5p}_3p{params.bp_3p};Derives/' \
@@ -587,7 +587,7 @@ rule iso_anno_concat:
     log:
         os.path.join(config["local_log"], "iso_anno_concat.log"),
     singularity:
-        "docker://ubuntu:focal-20210416"
+        "docker://ubuntu:bionic-20221215"
     shell:
         "(cat {params.prefix}* > {output.bed}) &> {log}"
 
@@ -614,6 +614,6 @@ rule iso_anno_final:
     log:
         os.path.join(config["local_log"], "iso_anno_final.log"),
     singularity:
-        "docker://ubuntu:focal-20210416"
+        "docker://ubuntu:bionic-20221215"
     shell:
         "(grep -v '{params.pattern}' {input.bed} > {output.bed}) &> {log}"
