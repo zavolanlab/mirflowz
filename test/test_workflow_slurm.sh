@@ -25,6 +25,7 @@ mkdir -p results/{homo_sapiens/chrY,test_lib}
 snakemake \
     --snakefile="../workflow/Snakefile" \
     --cores=256 \
+    --configfile="config.yaml" \
     --cluster-config="cluster.json" \
     --cluster "sbatch \
         --cpus-per-task={cluster.threads} \
@@ -46,6 +47,7 @@ snakemake \
 # Snakemake report
 snakemake \
     --snakefile="../workflow/Snakefile" \
+    --configfile="config.yaml" \
     --report="snakemake_report.html"
 
 # Check md5 sum of some output files
