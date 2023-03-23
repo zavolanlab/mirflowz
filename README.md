@@ -91,6 +91,7 @@ Execute the following command to run the test workflow on a cluster via SLURM:
 ```bash
 bash test/test_workflow_slurm.sh
 ```
+
 #### Rule graph
 
 Execute the following command to generate a rule graph image for the workflow.
