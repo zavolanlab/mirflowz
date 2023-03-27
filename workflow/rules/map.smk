@@ -135,7 +135,7 @@ rule fastq_quality_filter:
     log:
         os.path.join(config["local_log"], "fastq_quality_filter_{sample}.log"),
     singularity:
-        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--2"
+        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--H87F3376_10"
     shell:
         "(fastq_quality_filter \
         -v \
@@ -167,7 +167,7 @@ rule fastq_to_fasta:
     log:
         os.path.join(config["local_log"], "fastq_to_fasta_{sample}.log"),
     singularity:
-        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--2"
+        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--H87F3376_10"
     shell:
         "(fastq_to_fasta -r -n -i {input.reads} > {output.reads}) &> {log}"
 
@@ -194,7 +194,7 @@ rule fasta_formatter:
     log:
         os.path.join(config["local_log"], "fasta_formatter_{sample}.log"),
     singularity:
-        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--2"
+        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--H87F3376_10"
     shell:
         "(fasta_formatter -w 0 -i {input.reads} > {output.reads}) &> {log}"
 
@@ -223,7 +223,7 @@ rule cutadapt:
     resources:
         threads=8,
     singularity:
-        "docker://quay.io/biocontainers/cutadapt:1.16--py35_2"
+        "docker://quay.io/biocontainers/cutadapt:4.3--py310h1425a21_0"
     shell:
         "(cutadapt \
         -a {params.adapter} \
@@ -253,7 +253,7 @@ rule fastx_collapser:
     log:
         os.path.join(config["local_log"], "fastx_collapser_{sample}.log"),
     singularity:
-        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--2"
+        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--H87F3376_10"
     shell:
         "(fastx_collapser -i {input.reads} > {output.reads}) &> {log}"
 
@@ -285,7 +285,7 @@ rule mapping_genome_segemehl:
         time=12,
         threads=8,
     singularity:
-        "docker://quay.io/biocontainers/segemehl:0.2.0--hfb9b9cc_7"
+        "docker://quay.io/biocontainers/segemehl:0.2.0--h20b1175_9"
     shell:
         "(segemehl.x \
         -i {input.genome_index_segemehl} \
@@ -324,7 +324,7 @@ rule mapping_transcriptome_segemehl:
         time=12,
         threads=8,
     singularity:
-        "docker://quay.io/biocontainers/segemehl:0.2.0--hfb9b9cc_7"
+        "docker://quay.io/biocontainers/segemehl:0.2.0--h20b1175_9"
     shell:
         "(segemehl.x \
         -i {input.transcriptome_index_segemehl} \
@@ -358,7 +358,7 @@ rule filter_fasta_for_oligomap:
             config["local_log"], "filter_fasta_for_oligomap_{sample}.log"
         ),
     singularity:
-        "docker://python:3.6.5"
+        "docker://python:3.9.16"
     shell:
         "(python {input.script} \
         -r {params.max_length_reads} \
@@ -476,7 +476,7 @@ rule oligomap_genome_toSAM:
         time=1,
         queue=1,
     singularity:
-        "docker://python:3.6.5"
+        "docker://python:3.9.16"
     shell:
         "(python {input.script} \
         -i {input.sort} \
@@ -596,7 +596,7 @@ rule oligomap_transcriptome_toSAM:
             config["local_log"], "oligomap_transcriptome_toSAM_{sample}.log"
         ),
     singularity:
-        "docker://python:3.6.5"
+        "docker://python:3.9.16"
     shell:
         "(python {input.script} \
         -i {input.sort} \
