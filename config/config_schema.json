@@ -45,6 +45,11 @@
             "default": "../scripts/",
             "description": "Path to the scripts directory."
         },
+        "overhang":{
+            "type": "integer",
+            "default": 10,
+            "description": "Minimum length (in bp) of the pre-miRs overhang. Its value cannot exceed 10 bp."
+        },
         "q_value":{
             "type": "integer",
             "default": 10,

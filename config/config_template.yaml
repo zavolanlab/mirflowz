@@ -39,6 +39,9 @@ scripts_dir: ../scripts/
 
 #### PROCESSING PARAMETERS #### 
 
+# pre-miRs overhang extension
+overhang: 10 # minimum length (in bp) for the pre-miRs overhang. Its value cannot exceed 10 bp.
+
 # quality filter
 q_value: 10 # Q (Phred) score; minimum quality score to keep
 p_value: 50 # minimum % of bases that must have Q quality
