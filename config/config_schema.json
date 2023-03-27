@@ -45,16 +45,6 @@
             "default": "../scripts/",
             "description": "Path to the scripts directory."
         },
-        "bp_5p":{
-            "type": "array",
-            "default": [-2, -1, 0, 1, 2],
-            "description": "Number of shifts relative to the start of each annotated mature miRNA."
-        },
-        "bp_3p":{
-            "type": "array",
-            "default": [-2, -1, 0, 1, 2],
-            "description": "Number of shifts relative to the end of each annotated mature miRNA."
-        },
         "q_value":{
             "type": "integer",
             "default": 10,
