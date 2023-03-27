@@ -121,7 +121,7 @@ rule sort_alignments:
         mem=4,
         threads=8,
     singularity:
-        "docker://ubuntu:bionic-20221215"
+        "docker://ubuntu:lunar-20221207"
     shell:
         "(sort \
         -k1,1 \

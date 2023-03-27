@@ -107,7 +107,7 @@ rule start:
             "uncompress_zipped_files_{sample}_{format}.log",
         ),
     singularity:
-        "docker://ubuntu:bionic-20221215"
+        "docker://ubuntu:lunar-20221207"
     shell:
         "(zcat {input.reads} > {output.reads}) &> {log}"
 
@@ -629,7 +629,7 @@ rule merge_genome_maps:
     log:
         os.path.join(config["local_log"], "merge_genome_maps_{sample}.log"),
     singularity:
-        "docker://ubuntu:bionic-20221215"
+        "docker://ubuntu:lunar-20221207"
     shell:
         "(cat {input.gmap1} {input.gmap2} > {output.gmaps}) &> {log}"
 
@@ -662,7 +662,7 @@ rule merge_transcriptome_maps:
             config["local_log"], "merge_transcriptome_maps_{sample}.log"
         ),
     singularity:
-        "docker://ubuntu:bionic-20221215"
+        "docker://ubuntu:lunar-20221207"
     shell:
         "(cat {input.tmap1} {input.tmap2} > {output.tmaps}) &> {log}"
 
@@ -756,7 +756,7 @@ rule remove_headers_genome:
     log:
         os.path.join(config["local_log"], "remove_headers_genome_{sample}.log"),
     singularity:
-        "docker://quay.io/biocontainers/samtools:1.8--h46bd0b3_5"
+        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
         "samtools view {input.gmap} > {output.gmap}"
 
@@ -788,7 +788,7 @@ rule remove_headers_transcriptome:
             config["local_log"], "remove_headers_transcriptome_{sample}.log"
         ),
     singularity:
-        "docker://quay.io/biocontainers/samtools:1.8--h46bd0b3_5"
+        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
         "samtools view {input.tmap} > {output.tmap}"
 
@@ -816,7 +816,7 @@ rule trans_to_gen:
     log:
         os.path.join(config["local_log"], "trans_to_gen_{sample}.log"),
     singularity:
-        "docker://perl:5.28"
+        "docker://perl:5.37.10"
     shell:
         "(perl {input.script} \
         --in {input.tmap} \
@@ -847,7 +847,7 @@ rule cat_mapping:
     log:
         os.path.join(config["local_log"], "cat_mapping_{sample}.log"),
     singularity:
-        "docker://ubuntu:bionic-20221215"
+        "docker://ubuntu:lunar-20221207"
     shell:
         "(cat {input.gmap1} {input.gmap2} > {output.catmaps}) &> {log}"
 
@@ -876,7 +876,7 @@ rule add_header:
     log:
         os.path.join(config["local_log"], "add_header_{sample}.log"),
     singularity:
-        "docker://ubuntu:bionic-20221215"
+        "docker://ubuntu:lunar-20221207"
     shell:
         "(cat {input.header} {input.catmaps} > {output.concatenate}) &> {log}"
 
@@ -902,7 +902,7 @@ rule sort_id:
     log:
         os.path.join(config["local_log"], "sort_id_{sample}.log"),
     singularity:
-        "docker://quay.io/biocontainers/samtools:1.8--h46bd0b3_5"
+        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
         "(samtools sort -n -o {output.sort} {input.concatenate}) &> {log}"
 
@@ -935,7 +935,7 @@ rule remove_inferiors:
         mem=15,
         threads=4,
     singularity:
-        "docker://perl:5.28"
+        "docker://perl:5.37.10"
     shell:
         "(perl {input.script} \
         --print-header \
@@ -967,7 +967,7 @@ rule uncollapse_reads:
     log:
         os.path.join(config["local_log"], "uncollapse_reads_{sample}.log"),
     singularity:
-        "docker://perl:5.28"
+        "docker://perl:5.37.10"
     shell:
         "(perl {input.script} \
         --suffix \
@@ -997,7 +997,7 @@ rule convert_to_bam:
     log:
         os.path.join(config["local_log"], "convert_to_bam_{sample}.log"),
     singularity:
-        "docker://quay.io/biocontainers/samtools:1.8--h46bd0b3_5"
+        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
         "(samtools view -b {input.maps} > {output.maps}) &> {log}"
 
@@ -1025,7 +1025,7 @@ rule sort_by_position:
     log:
         os.path.join(config["local_log"], "sort_by_position_{sample}.log"),
     singularity:
-        "docker://quay.io/biocontainers/samtools:1.8--h46bd0b3_5"
+        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
         "(samtools sort {input.maps} > {output.maps}) &> {log}"
 
@@ -1055,6 +1055,6 @@ rule index_bam:
     log:
         os.path.join(config["local_log"], "index_bam_{sample}.log"),
     singularity:
-        "docker://quay.io/biocontainers/samtools:1.8--h46bd0b3_5"
+        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
         "(samtools index -b {input.maps} > {output.maps}) &> {log}"
