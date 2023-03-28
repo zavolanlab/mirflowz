@@ -142,7 +142,7 @@ rule intersect_mirna:
             config["output_dir"], "{sample}", "sorted.alignments.bed12"
         ),
         mirna=os.path.join(
-            config["output_dir"], "mirna_annotations.bed"
+            config["output_dir"], "extended_mirna_annotations.bed"
         ),
     output:
         intersect=os.path.join(
