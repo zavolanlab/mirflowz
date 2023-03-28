@@ -69,11 +69,7 @@ rule finish:
         ),
         mirnafilt=os.path.join(
                 config["output_dir"], 
-                "mirna_annotations.bed",
-        ),
-        isomirs=os.path.join(
-                config["output_dir"], 
-                "isomirs_annotation.bed",
+                "extended_mirna_annotations.bed",
         ),
         maps=expand(
             os.path.join(
