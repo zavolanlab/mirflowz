@@ -49,15 +49,13 @@ rule finish_prepare:
                 config["output_dir"],
                 "headerOfCollapsedFasta.sam",
         ),
+        chrsize=os.path.join(
+            config["output_dir"], "chr_size.txt"
+        ),
         mirnafilt=os.path.join(
                 config["output_dir"], 
-                "mirna_filtered.bed",
+                "extended_mirna_filtered.bed",
         ),
-        isomirs=os.path.join(
-                config["output_dir"], 
-                "isomirs_annotation.bed",
-        ),
-
 
 
 ###############################################################################
@@ -303,70 +301,6 @@ rule create_header_genome:
         "(samtools dict -o {output.header} --uri=NA {input.genome}) &> {log}"
 
 ###############################################################################
-### Mapping chromosomes names, UCSC <-> ENSEMBL
-###############################################################################
-
-
-rule map_chr_names:
-    input:
-        anno=config["mirna_file"],
-        script=os.path.join(config["scripts_dir"], "map_chromosomes.pl"),
-        map_chr=config["map_chr_file"],
-    output:
-        gff=os.path.join(
-            config["output_dir"], "mirna_annotations.gff3"
-        ),
-    params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "map_chr_names.log"
-        ),
-        column="1",
-        delimiter="TAB",
-    log:
-        os.path.join(config["local_log"], "map_chr_names.log"),
-    singularity:
-        "docker://perl:5.28"
-    shell:
-        "(perl {input.script} \
-        {input.anno} \
-        {params.column} \
-        {params.delimiter} \
-        {input.map_chr} \
-        {output.gff} \
-        ) &> {log}"
-
-
-###############################################################################
-### GFF to BED (improve intersect memory efficient allowing to use -sorted)
-###############################################################################
-
-
-rule gfftobed:
-    input:
-        gff=os.path.join(
-            config["output_dir"], "mirna_annotations.gff3"
-        ),
-    output:
-        bed=os.path.join(
-            config["output_dir"], "mirna_annotations.bed"
-        ),
-    params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "gfftobed.log"
-        ),
-        out_dir=config["output_dir"]
-    log:
-        os.path.join(config["local_log"], "gfftobed.log"),
-    singularity:
-        "docker://quay.io/biocontainers/bedops:2.4.35--h6bb024c_2"
-    shell:
-        "(convert2bed -i gff < {input.gff} \
-        --sort-tmpdir={params.out_dir} \
-        > {output.bed} \
-        ) &> {log}"
-
-
-###############################################################################
 ### Index genome fasta file
 ###############################################################################
 
@@ -421,6 +355,107 @@ rule extract_chr_len:
 
 
 ###############################################################################
+### Mapping chromosomes names, UCSC <-> ENSEMBL
+###############################################################################
+
+
+rule map_chr_names:
+    input:
+        anno=config["mirna_file"],
+        script=os.path.join(config["scripts_dir"], "map_chromosomes.pl"),
+        map_chr=config["map_chr_file"],
+    output:
+        gff=os.path.join(
+            config["output_dir"], "mirna_annotations.gff3"
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"], "map_chr_names.log"
+        ),
+        column="1",
+        delimiter="TAB",
+    log:
+        os.path.join(config["local_log"], "map_chr_names.log"),
+    singularity:
+        "docker://perl:5.28"
+    shell:
+        "(perl {input.script} \
+        {input.anno} \
+        {params.column} \
+        {params.delimiter} \
+        {input.map_chr} \
+        {output.gff} \
+        ) &> {log}"
+
+
+###############################################################################
+### Etending pre-miRNA overhang
+###############################################################################
+
+rule extend_premir:
+    input:
+        gff=os.path.join(
+            config["output_dir"], "mirna_annotations.gff3"
+        ),
+        script=os.path.join(
+            config["scripts_dir"], "extend_overhang.py"
+        ),
+        chrsize=os.path.join(
+            config["output_dir"], "chr_size.txt"
+        ),
+    output:
+        gff=os.path.join(
+            config["output_dir"], "extended_mirna_annotations.gff3"
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"], "extend_overhang.log"
+        ),
+        extension=config["overhang"],
+    log:
+        os.path.join(config["local_log"], "extend_overhang.log"),
+    singularity:
+        "docker://python:3.9.16"
+    shell:
+        "(python {input.script} \
+        -i {input.gff} \
+        -e {params.extension} \
+        --chr {input.chrsize} \
+        -o {output.gff} \
+        )&>{log}"
+
+
+###############################################################################
+### GFF to BED (improve intersect memory efficient allowing to use -sorted)
+###############################################################################
+
+
+rule gfftobed:
+    input:
+        gff=os.path.join(
+            config["output_dir"], "extended_mirna_annotations.gff3"
+        ),
+    output:
+        bed=os.path.join(
+            config["output_dir"], "extended_mirna_annotations.bed"
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"], "gfftobed2.log"
+        ),
+        out_dir=config["output_dir"]
+    log:
+        os.path.join(config["local_log"], "gfftobed2.log"),
+    singularity:
+        "docker://quay.io/biocontainers/bedops:2.4.35--h6bb024c_2"
+    shell:
+        "(convert2bed -i gff < {input.gff} \
+        --sort-tmpdir={params.out_dir} \
+        > {output.bed} \
+        ) &> {log}"
+
+
+###############################################################################
 ### Extract mature miRNA
 ###############################################################################
 
@@ -428,7 +463,7 @@ rule extract_chr_len:
 rule filter_mature_mirs:
     input:
         bed=os.path.join(
-            config["output_dir"], "mirna_annotations.bed"
+            config["output_dir"], "extended_mirna_annotations.bed"
         ),
     output:
         bed=os.path.join(
