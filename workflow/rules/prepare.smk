@@ -314,7 +314,7 @@ rule map_chr_names:
         map_chr=config["map_chr_file"],
     output:
         gff=os.path.join(
-            config["output_dir"], "mirna_chr_mapped.gff3"
+            config["output_dir"], "mirna_annotations.gff3"
         ),
     params:
         cluster_log=os.path.join(
@@ -337,35 +337,6 @@ rule map_chr_names:
 
 
 ###############################################################################
-### Filtering _1 miR IDs
-###############################################################################
-
-
-rule filter_mir_1_anno:
-    input:
-        gff=os.path.join(
-            config["output_dir"], "mirna_chr_mapped.gff3"
-        ),
-    output:
-        gff=os.path.join(
-            config["output_dir"], "mirna_filtered.gff3"
-        ),
-    params:
-        script=os.path.join(config["scripts_dir"], "filter_mir_1_anno.sh"),
-        cluster_log=os.path.join(
-            config["cluster_log"], "filter_mir_1_anno.log"
-        ),
-    log:
-        os.path.join(
-            config["local_log"], "filter_mir_1_anno.log"
-        ),
-    singularity:
-        "docker://ubuntu:lunar-20221207"
-    shell:
-        "(bash {params.script} -f {input.gff} -o {output.gff}) &> {log}"
-
-
-###############################################################################
 ### GFF to BED (improve intersect memory efficient allowing to use -sorted)
 ###############################################################################
 
@@ -373,11 +344,11 @@ rule filter_mir_1_anno:
 rule gfftobed:
     input:
         gff=os.path.join(
-            config["output_dir"], "mirna_filtered.gff3"
+            config["output_dir"], "mirna_annotations.gff3"
         ),
     output:
         bed=os.path.join(
-            config["output_dir"], "mirna_filtered.bed"
+            config["output_dir"], "mirna_annotations.bed"
         ),
     params:
         cluster_log=os.path.join(
@@ -457,7 +428,7 @@ rule extract_chr_len:
 rule filter_mature_mirs:
     input:
         bed=os.path.join(
-            config["output_dir"], "mirna_filtered.bed"
+            config["output_dir"], "mirna_annotations.bed"
         ),
     output:
         bed=os.path.join(

@@ -84,6 +84,14 @@ Execute the following command to run the test workflow on your local machine:
 bash test/test_workflow_local.sh
 ```
 
+#### Run test workflow on a cluster via SLURM
+
+Execute the following command to run the test workflow on a cluster via SLURM:
+
+```bash
+bash test/test_workflow_slurm.sh
+```
+
 #### Rule graph
 
 Execute the following command to generate a rule graph image for the workflow.
@@ -149,7 +157,7 @@ There are 4 files you must provide:
 > a source other than Ensembl, you may first need to convert them to the
 > expected style to avoid issues!
 
-3. An **uncompressed GTF** file with **microRNA annotations** for the reference
+3. An **uncompressed GFF3** file with **microRNA annotations** for the reference
    sequences above.
 
 > _MIRFLOWZ_ expects the miRNA annotations to follow [miRBase][mirbase]
@@ -256,7 +264,7 @@ Do not hesitate on contacting us via [email][email] for any inquiries on
 _MIRFLOWZ_. Please mention the name of the tool.
 
 [bedtools]: <https://github.com/arq5x/bedtools2>
-[chrMap]: <https://github.com/dpryan79/ChromosomeMapping>
+[chrMap]: <https://github.com/dpryan79/ChromosomeMappings>
 [conda]: <https://docs.conda.io/projects/conda/en/latest/index.html>
 [cluster execution]: <https://snakemake.readthedocs.io/en/stable/executing/cluster.html>
 [email]: <zavolab-biozentrum@unibas.ch>
