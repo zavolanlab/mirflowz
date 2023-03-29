@@ -87,7 +87,7 @@ rule bamtobed:
     log:
         os.path.join(config["local_log"], "bamtobed_{sample}.log"),
     singularity:
-        "docker://quay.io/biocontainers/bedtools:2.27.1--hd03093a_6"
+        "docker://quay.io/biocontainers/bedtools:2.30.0--h468198e_3"
     shell:
         "(bedtools bamtobed \
         -bed12 \
@@ -121,7 +121,7 @@ rule sort_alignments:
         mem=4,
         threads=8,
     singularity:
-        "docker://ubuntu:bionic-20221215"
+        "docker://ubuntu:lunar-20221207"
     shell:
         "(sort \
         -k1,1 \
@@ -155,7 +155,7 @@ rule intersect_mirna:
     log:
         os.path.join(config["local_log"], "intersection_mirna_{sample}.log"),
     singularity:
-        "docker://quay.io/biocontainers/bedtools:2.27.1--hd03093a_6"
+        "docker://quay.io/biocontainers/bedtools:2.30.0--h468198e_3"
     shell:
         "(bedtools intersect \
         -wao \
@@ -192,7 +192,7 @@ rule intersect_mirna:
 #     log:
 #         os.path.join(config["local_log"], "intersection_isomirs_{sample}.log"),
 #     singularity:
-#         "docker://quay.io/biocontainers/bedtools:2.27.1--hd03093a_6"
+#         "docker://quay.io/biocontainers/bedtools:2.30.0--h468198e_3"
 #     shell:
 #         "(bedtools intersect \
 #         -wao \
@@ -230,7 +230,7 @@ rule quant_mirna:
     log:
         os.path.join(config["local_log"], "quant_mirna_miRNA_{sample}.log"),
     singularity:
-        "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
+        "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
     shell:
         "(python \
         {input.script} \
@@ -273,7 +273,7 @@ rule quant_mirna_pri:
             "quant_mirna_miRNA_primary_transcript_{sample}.log",
         ),
     singularity:
-        "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
+        "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
     shell:
         "(python \
         {input.script} \
@@ -308,7 +308,7 @@ rule quant_mirna_pri:
 #     log:
 #         os.path.join(config["local_log"], "quant_isomirs_{sample}.log"),
 #     singularity:
-#         "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
+#         "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
 #     shell:
 #         "(python \
 #         {input.script} \

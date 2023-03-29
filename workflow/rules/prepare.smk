@@ -77,7 +77,7 @@ rule trim_genome_seq_id:
     log:
         os.path.join(config["local_log"], "genome_process.log"),
     singularity:
-        "docker://ubuntu:bionic-20221215"
+        "docker://ubuntu:lunar-20221207"
     shell:
         """(zcat {input.genome} | 
         awk \
@@ -140,7 +140,7 @@ rule trim_fasta:
     log:
         os.path.join(config["local_log"], "trim_fasta.log"),
     singularity:
-        "docker://ubuntu:bionic-20221215"
+        "docker://ubuntu:lunar-20221207"
     shell:
         """(awk \
         -F" " \
@@ -180,7 +180,7 @@ rule generate_segemehl_index_transcriptome:
         threads=8,
         time=6,
     singularity:
-        "docker://quay.io/biocontainers/segemehl:0.2.0--hfb9b9cc_7"
+        "docker://quay.io/biocontainers/segemehl:0.2.0--h20b1175_9"
     shell:
         "(segemehl.x -x {output.idx} -d {input.fasta}) &> {log}"
 
@@ -214,7 +214,7 @@ rule generate_segemehl_index_genome:
         threads=8,
         time=6,
     singularity:
-        "docker://quay.io/biocontainers/segemehl:0.2.0--hfb9b9cc_7"
+        "docker://quay.io/biocontainers/segemehl:0.2.0--h20b1175_9"
     shell:
         "(segemehl.x -x {output.idx} -d {input.genome}) &> {log}"
 
@@ -237,7 +237,7 @@ rule get_exons_gtf:
     log:
         os.path.join(config["local_log"], "get_exons_gtf.log"),
     singularity:
-        "docker://ubuntu:bionic-20221215"
+        "docker://ubuntu:lunar-20221207"
     shell:
         "(bash \
         {input.script} \
@@ -298,7 +298,7 @@ rule create_header_genome:
             config["local_log"], "create_header_genome.log"
         ),
     singularity:
-        "docker://quay.io/biocontainers/samtools:1.8--2"
+        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
         "(samtools dict -o {output.header} --uri=NA {input.genome}) &> {log}"
 
@@ -325,7 +325,7 @@ rule map_chr_names:
     log:
         os.path.join(config["local_log"], "map_chr_names.log"),
     singularity:
-        "docker://perl:5.28"
+        "docker://perl:5.37.10"
     shell:
         "(perl {input.script} \
         {input.anno} \
@@ -389,7 +389,7 @@ rule create_index_fasta:
             config["local_log"], "create_index_fasta.log"
         ),
     singularity:
-        "docker://quay.io/biocontainers/samtools:1.8--2"
+        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
         "(samtools faidx {input.genome}) &> {log}"
 
@@ -415,7 +415,7 @@ rule extract_chr_len:
     log:
         os.path.join(config["local_log"], "extract_chr_len.log"),
     singularity:
-        "docker://ubuntu:bionic-20221215"
+        "docker://ubuntu:lunar-20221207"
     shell:
         "(cut -f1,2 {input.genome} > {output.chrsize}) &> {log}"
 
@@ -444,7 +444,7 @@ rule filter_mature_mirs:
             config["local_log"], "filter_mature_mirs.log"
         ),
     singularity:
-        "docker://ubuntu:bionic-20221215"
+        "docker://ubuntu:lunar-20221207"
     shell:
         "(grep -v {params.precursor} {input.bed} > {output.bed}) &> {log}"
 
@@ -520,7 +520,7 @@ rule iso_anno_rename:
             "iso_anno_rename_5p{bp_5p}_3p{bp_3p}.log",
         ),
     singularity:
-        "docker://ubuntu:bionic-20221215"
+        "docker://ubuntu:lunar-20221207"
     shell:
         "(sed \
         's/;Derives/_5p{params.bp_5p}_3p{params.bp_3p};Derives/' \
@@ -558,7 +558,7 @@ rule iso_anno_concat:
     log:
         os.path.join(config["local_log"], "iso_anno_concat.log"),
     singularity:
-        "docker://ubuntu:bionic-20221215"
+        "docker://ubuntu:lunar-20221207"
     shell:
         "(cat {params.prefix}* > {output.bed}) &> {log}"
 
@@ -585,6 +585,6 @@ rule iso_anno_final:
     log:
         os.path.join(config["local_log"], "iso_anno_final.log"),
     singularity:
-        "docker://ubuntu:bionic-20221215"
+        "docker://ubuntu:lunar-20221207"
     shell:
         "(grep -v '{params.pattern}' {input.bed} > {output.bed}) &> {log}"
