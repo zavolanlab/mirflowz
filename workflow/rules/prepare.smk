@@ -415,7 +415,7 @@ rule extend_premir:
     log:
         os.path.join(config["local_log"], "extend_overhang.log"),
     singularity:
-        "docker://python:3.9.16"
+        "docker://quay.io/biocontainers/gffutils:0.11.1--pyh7cba7a3_0"
     shell:
         "(python {input.script} \
         -i {input.gff} \
