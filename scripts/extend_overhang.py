@@ -2,35 +2,26 @@
 
 from mirnaExtension_class import MirnaExtension
 import argparse
-import sys
+
 
 def parse_arguments():
-    '''
-    Command-line arguments parser
-    '''
+    """Command-line arguments parser."""
     parser = argparse.ArgumentParser(
         description="Script to extend pre-miRNs overhang."
         )
     parser.add_argument(
-        '-v','--version', 
-        action='version', 
+        '-v', '--version',
+        action='version',
         version='%(prog)s 1.0',
         help="Show program's version number and exit"
         )
     parser.add_argument(
-        '-i', '--input', 
+        '-i', '--input',
         help="Path to the gff3 input file",
-        type=str,
-        default=None,
+        type=str
         )
     parser.add_argument(
-        '-o', '--output', 
-        help="Path for the gff3 final file.",
-        type=str,
-        default=None,
-        )
-    parser.add_argument(
-        '-e','--extension',
+        '-e', '--extension',
         help="Minimum number of base pairs each overhang must be of. Maximum value = 10. Default value = 10.",
         default=10,
         type=int,
@@ -42,26 +33,27 @@ def parse_arguments():
         type=str,
         default=None
         )
-        
+
     return parser
 
-def main():
 
-    if args.chr:    
+def main():
+    """Extend pre-miRNAs overhang."""
+    # Create dictionary with the ref. sequence length
+    if args.chr:
         seq_lengths = {}
         with open(args.chr, 'r') as f:
             for line in f:
                 ref_seq, length = line.strip().split("\t")
-                seq_lengths[ref_seq] =  int(length)
-        
+                seq_lengths[ref_seq] = int(length)
+
     else:
         seq_lengths = None
 
-
-    m = MirnaExtension(args.input, args.extension, seq_lengths, args.output)
+    m = MirnaExtension(gff_file=args.input, n=args.extension, seq_lengths=seq_lengths)
     m.load_gff_file()
     m.extend_primary_mirnas()
-    m.write_gff_file()
+
 
 if __name__ == "__main__":
 
