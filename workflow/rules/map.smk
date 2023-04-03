@@ -977,7 +977,7 @@ rule filter_multimappers:
     shell:
         "(python {input.script} \
         -i {input.sam} \
-        -o {output.sam} \
+        > {output.sam} \
         ) &> {log}"
 
 
