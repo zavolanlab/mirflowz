@@ -389,7 +389,7 @@ rule map_chr_names:
 
 
 ###############################################################################
-### Etending pre-miRNA overhang
+### Extending pre-miRNA overhang
 ###############################################################################
 
 rule extend_premir:
@@ -421,7 +421,7 @@ rule extend_premir:
         -i {input.gff} \
         -e {params.extension} \
         --chr {input.chrsize} \
-        -o {output.gff} \
+        > {output.gff} \
         )&>{log}"
 
 
