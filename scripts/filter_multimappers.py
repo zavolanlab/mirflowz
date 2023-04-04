@@ -16,7 +16,7 @@ list and selects the best alignment(s) for those queries, writing them to
 standard output.
 
 Input:
-    input_sam_file (str): Path to the input SAM file, ordered by query name.
+    input_sam_file: Path to the input SAM file, ordered by query name.
 
 Output:
     standard output: Filtered SAM file
@@ -34,14 +34,15 @@ Functions:
         Filter multimappers by indels count.
 
 Usage:
-    python filter_multimappers.py -i input_sam_file
-    python filter_multimappers.py -i input_sam_file > output_sam_file
+    filter_multimappers.py SAM
+    filter_multimappers.py SAM > SAM
 """
-from pathlib import Path
-from typing import List
 import argparse
-import pysam
+from pathlib import Path
 import sys
+from typing import List
+
+import pysam
 
 
 def parse_arguments():
@@ -58,7 +59,7 @@ def parse_arguments():
         )
 
     parser.add_argument(
-        '-i', '--infile',
+        'infile',
         help="Path to the SAM input file, sorted by query name.",
         type=Path
         )
@@ -76,16 +77,13 @@ def count_indels(alignment: pysam.AlignedSegment) -> int:
     https://pysam.readthedocs.io/en/v0.15.0/api.html#pysam.AlignedSegment.cigartuples
 
     Args:
-        alignments(pysam.AlignedSegment): The read to count insertions for.
+        alignments: The read to count insertions for.
 
 
     Returns:
         int: The sum of insertions and deletions in the alignment.
     """
-    alignment_indels: list[int] = [op[1] for op in alignment.cigartuples if op[0] == 1 or op[0] == 2]
-    indels: int = sum(alignment_indels)
-
-    return indels
+    return sum([op[1] for op in alignment.cigartuples if op[0] == 1 or op[0] == 2])
 
 
 def find_best_alignments(alignments: List[pysam.AlignedSegment]) -> List[pysam.AlignedSegment]:
@@ -98,14 +96,14 @@ def find_best_alignments(alignments: List[pysam.AlignedSegment]) -> List[pysam.A
     number of alignments kept and its identifier respectively.
 
     Args:
-        alignments (list[pysam.AlignedSegment]): alignments with the same query name
+        alignments: alignments with the same query name
 
     Retrns:
-        best_alignments (list[pysam.AlignedSegment]): alignments with the less indels
+        best_alignments: alignments with the less indels
     """
     alignment_indels = [(aln, count_indels(alignment=aln)) for aln in alignments]
     min_indels = min(alignment_indels, key=lambda x: x[1])[1]
-    best_alignments = [indelCount[0] for indelCount in alignment_indels if indelCount[1] == min_indels]
+    best_alignments = [alignment for i, (alignment, indels) in enumerate(alignment_indels) if indels == min_indels]
     
     for i in range(len(best_alignments)):
         best_alignments[i].set_tag('NH', len(best_alignments))
@@ -118,12 +116,13 @@ def write_output(alignments: List[pysam.AlignedSegment]) -> None:
     """Write the output to the standard output (stdout).
 
     Args:
-        alignments (list[pysam.AlignedSegment]): alignments with the same query name
+        alignments: alignments with the same query name
     """
     if len(alignments) == 1:
         sys.stdout.write(alignments[0].to_string() + '\n')
     else:
-        for alignment in alignments:
+        best_alignments = find_best_alignments(alignments=alignments)
+        for alignment in best_alignments:
             sys.stdout.write(alignment.to_string() + '\n')
 
 
@@ -131,45 +130,33 @@ def main(sam_file: Path) -> None:
     """Filter multimappers by indels count.
 
     Args:
-        sam_file (str): Path to the input SAM file.
+        sam_file: Path to the input SAM file.
     """
     with pysam.AlignmentFile(sam_file, "r") as samfile:
 
-        # Extract header from input SAM file and write it to stdout
-        header = samfile.header
-        sys.stdout.write(str(header))
+        sys.stdout.write(str(samfile.header))
 
         current_query = None
         current_alignments: list[pysam.AlignedSegment] = []
         
         for alignment in samfile:
  
-            # Skip secondary and supplementary alignments
             if alignment.is_secondary or alignment.is_supplementary:
                 continue
 
             if current_query is None:
                 current_query = alignment.query_name
 
-            if current_query != alignment.query_name:
-                if len(current_alignments) == 1:
-                    write_output(alignments=current_alignments)
-                else:
-                    best_alignments = find_best_alignments(alignments=current_alignments)
-                    write_output(alignments=best_alignments)
-
-                # Reset variables
-                current_query = alignment.query_name
-                current_alignments = [alignment]
-            else:
+            if current_query == alignment.query_name:
                 current_alignments.append(alignment)
 
-        # Last set of alignments
-        if len(current_alignments) == 1:
-            write_output(alignments=current_alignments)
-        else:
-            best_alignments = find_best_alignments(alignments=current_alignments)
-            write_output(alignments=best_alignments)
+            else:
+                write_output(alignments=current_alignments)
+
+                current_query = alignment.query_name
+                current_alignments = [alignment]
+
+        write_output(alignments=current_alignments)
 
 
 if __name__ == "__main__":
