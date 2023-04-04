@@ -946,11 +946,11 @@ rule remove_inferiors:
 
 
 ###############################################################################
-### Filter multimappers (keep best alignment)
+### Filter multimappers by indels
 ###############################################################################
 
 
-rule filter_multimappers:
+rule filter_by_indels:
     input:
         sam=os.path.join(
             config["output_dir"], "{sample}", "removeInferiors.sam"
