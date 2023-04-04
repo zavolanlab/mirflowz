@@ -104,7 +104,7 @@ def find_best_alignments(alignments: List[pysam.AlignedSegment]) -> List[pysam.A
     alignment_indels = [(aln, count_indels(alignment=aln)) for aln in alignments]
     min_indels = min(alignment_indels, key=lambda x: x[1])[1]
     best_alignments = [alignment for i, (alignment, indels) in enumerate(alignment_indels) if indels == min_indels]
-    
+
     for i in range(len(best_alignments)):
         best_alignments[i].set_tag('NH', len(best_alignments))
         best_alignments[i].set_tag('XI', i)
@@ -138,9 +138,9 @@ def main(sam_file: Path) -> None:
 
         current_query = None
         current_alignments: list[pysam.AlignedSegment] = []
-        
+
         for alignment in samfile:
- 
+
             if alignment.is_secondary or alignment.is_supplementary:
                 continue
 
