@@ -976,7 +976,7 @@ rule filter_by_indels:
         "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
     shell:
         "(python {input.script} \
-        -i {input.sam} \
+        {input.sam} \
         > {output.sam} \
         ) &> {log}"
 
