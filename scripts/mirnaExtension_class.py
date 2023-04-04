@@ -68,7 +68,7 @@ class MirnaExtension():
             self.db = gffutils.create_db(sys.stdin, dbfn=':memory:', force=True, keep_order=True)
         else:
             self.db = gffutils.create_db(self.gff_file, dbfn=':memory:', force=True, keep_order=True)
-
+    
     def extend_primary_mirnas(self) -> None:
         """Extend primary miRNAs start/end."""
         # Set end boundary
@@ -89,7 +89,7 @@ class MirnaExtension():
             left_distance = start
             right_distance = seq_len - end
 
-            mature_miRNAs = list(self.db.children(primary_mirna, featuretype='miRNA'))
+            mature_miRNAs = list(self.db.region(seqid=primary_mirna.seqid, start=primary_mirna.start, end=primary_mirna.end, featuretype='miRNA', completely_within=True))
 
             if mature_miRNAs:
                 mature_start = min(m.start for m in mature_miRNAs)
