@@ -94,7 +94,8 @@ def find_best_alignments(alignments: List[pysam.AlignedSegment]) -> List[pysam.A
     This function creates a list of tuples with the alignment object and its
     number of indels. Then, computes the minimum number of indels and returns
     a list with the alignments that have no more than that minimum number of
-    indels.
+    indels. In addition, it updates the tag 'NH' and 'XI' to match the final
+    number of alignments kept and its identifier respectively.
 
     Args:
         alignments (list[pysam.AlignedSegment]): alignments with the same query name
@@ -105,6 +106,10 @@ def find_best_alignments(alignments: List[pysam.AlignedSegment]) -> List[pysam.A
     alignment_indels = [(aln, count_indels(alignment=aln)) for aln in alignments]
     min_indels = min(alignment_indels, key=lambda x: x[1])[1]
     best_alignments = [indelCount[0] for indelCount in alignment_indels if indelCount[1] == min_indels]
+    
+    for i in range(len(best_alignments)):
+        best_alignments[i].set_tag('NH', len(best_alignments))
+        best_alignments[i].set_tag('XI', i)
 
     return best_alignments
 
