@@ -1,7 +1,7 @@
-328ccec8ecb818487d9ecfc21f46d04d  results/TABLES/counts.miRNA_primary_transcript.tab
-0913cc78d8d93e56f532daef52e67697  results/TABLES/counts.miRNA.tab
-c319b728b89899db499b09c40f3b5c95  results/TABLES/miRNA_primary_transcript_counts_test_lib
-0d00f1c003499543004889c8022c2480  results/TABLES/miRNA_counts_test_lib
+b71a70bb8cd9d58a7a9f7e92ad43b8da  results/TABLES/counts.miRNA_primary_transcript.tab
+8b787aa28227d2ab0b2b4c135c896779  results/TABLES/counts.miRNA.tab
+5b69386237ebfbb800ad4f59caa55f7e  results/TABLES/miRNA_primary_transcript_counts_test_lib
+bf140a612d9218064d3d7b0eca68ea61  results/TABLES/miRNA_counts_test_lib
 68b329da9893e34099c7d8ad5cb9c940  results/TABLES/counts.isomirs.tab
 188d3f67c09644be64cc4e1bc05dfc77  results/test_lib/convertedSortedMappings_test_lib.bam.bai
 aedc3855e2a1820042add1e9a1b4cf09  results/test_lib/uncollapsedMappings.sam
@@ -35,7 +35,7 @@ d41d8cd98f00b204e9800998ecf8427e  results/test_lib/oligoTranscriptome_map.fa
 d41d8cd98f00b204e9800998ecf8427e  results/test_lib/TransToGen.sam
 7e708cdf835b37ffbab29313abdb6510  results/test_lib/GenomeMappings.sam
 7f85f711a7cb605135c8248068a53b92  results/test_lib/collapsed.fasta
-5c1bf0b544288a95af8c29ca3f6589cc  results/test_lib/intersect_mirna.bed
+c4c927e10a2b4ceb9491bdc8a2fccdcb  results/test_lib/intersect_mirna.bed
 d34fc868b861b1bc46db07a397dc0f10  results/genome.processed.fa.fai
 09e24a504bfec37fee3d5ff1b5c7738e  results/exons.bed
 21e102e4ebd3508bb06f46366a3d578d  results/exons.gtf
@@ -43,9 +43,9 @@ d34fc868b861b1bc46db07a397dc0f10  results/genome.processed.fa.fai
 4fba145540a2c61f29bfddfd0f5a4d4e  results/genome.processed.fa
 8148cd880602255be166beb59bbed95a  results/headerOfCollapsedFasta.sam
 44dbf7c3eae00d0bc8d5e1319123746c  results/chr_size.txt
-cd2318ca855be5a7ddc346b1aa1133aa  results/extended_mirna_annotations.bed
-1a38c9d1284356fdb095fbce879d0e24  results/mirna_annotations.gff3
+4da5e465085a6a080da1f8e807833a1d  results/extended_mirna_annotations.bed
+f28cc0143ab6659bef3de3a7afa1dccc  results/mirna_annotations.gff3
 003b92b245ac336e3d70a513033e1cee  results/transcriptome_idtrim.fa
 2d437f8681f4248d4f2075f86debb920  results/transcriptome.fa
-3b1e1a0788dfc9dcf082ee4d09346cde  results/extended_mirna_annotations.gff3
+efd691b0504709dfd3e507dd33e395a2  results/extended_mirna_annotations.gff3
 4fb453846e88593d0cac13220ec2d685  results/genome_index_segemehl.idx
