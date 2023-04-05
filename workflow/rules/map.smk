@@ -946,6 +946,42 @@ rule remove_inferiors:
 
 
 ###############################################################################
+### Filter multimappers by indels
+###############################################################################
+
+
+rule filter_by_indels:
+    input:
+        sam=os.path.join(
+            config["output_dir"], "{sample}", "removeInferiors.sam"
+        ),
+        script=os.path.join(
+            config["scripts_dir"],
+            "filter_multimappers.py",
+        ),
+    output:
+        sam=os.path.join(
+            config["output_dir"], "{sample}", "removeMultimappers.sam"
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"], "remove_multimappers_{sample}.log"
+        ),
+    log:
+        os.path.join(config["local_log"], "remove_multimappers_{sample}.log"),
+    resources:
+        mem=15,
+        threads=4,
+    singularity:
+        "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
+    shell:
+        "(python {input.script} \
+        {input.sam} \
+        > {output.sam} \
+        ) &> {log}"
+
+
+###############################################################################
 ### Uncollapse reads
 ###############################################################################
 
@@ -953,7 +989,7 @@ rule remove_inferiors:
 rule uncollapse_reads:
     input:
         maps=os.path.join(
-            config["output_dir"], "{sample}", "removeInferiors.sam"
+            config["output_dir"], "{sample}", "removeMultimappers.sam"
         ),
         script=os.path.join(config["scripts_dir"], "sam_uncollapse.pl"),
     output:
