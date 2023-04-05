@@ -141,24 +141,26 @@ if (args.uniq):
     i = (args.uniq)
     out = open(args.prefix, 'w')
     for x in counts[i].keys():
-        cnt = str(counts[i][x])
-        print(x,cnt)
-        out.write(x + '\t' + cnt + '\n') 
+        cnt = counts[i][x]
+        if cnt > 0:
+            out.write(x + '\t' + str(cnt) + '\n') 
 
 ### SPLIT. CREATE A SEPARE COUNT TABLES FILES FOR EACH MIRNA TYPE
 if (args.split):
     for i in counts.keys():
         out = open(args.prefix+i, 'w')
         for x in counts[i].keys():
-            cnt = str(counts[i][x])
-            out.write(x + '\t' + cnt + '\n')
+            cnt = counts[i][x]
+            if cnt > 0:
+                out.write(x + '\t' + str(cnt) + '\n')
 
 ### CREATE ONE TABLE WITH ALL MIRNA TYPE COUNTS
 if not (args.uniq) and not (args.split):
     out = open(args.prefix, 'w')
     for i in counts.keys():
         for x in counts[i].keys():
-            cnt = str(counts[i][x])
-            out.write(x + '\t' + cnt + '\n')
+            cnt = counts[i][x]
+            if cnt > 0:
+                out.write(x + '\t' + cnt + '\n')
 
 sys.stderr.write("##### DONE! #####\n")
