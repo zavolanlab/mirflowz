@@ -28,7 +28,7 @@ import pandas as pd
 from snakemake.utils import validate
 
 ###############################################################################
-### Configuration validation
+### Validate configuration
 ###############################################################################
 
 validate(config, os.path.join("..", "config", "config_schema.json"))
@@ -42,7 +42,7 @@ localrules:
     finish,
 
 ###############################################################################
-### Including subworkflows
+### Include subworkflows
 ###############################################################################
 
 include: os.path.join("rules" , "prepare.smk")
