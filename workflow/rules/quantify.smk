@@ -4,22 +4,6 @@
 #
 # Pipeline to quantify miRNAs, including isomiRs, from miRNA-seq alignments.
 ###############################################################################
-#
-# USAGE (from the file's directory):
-#
-# snakemake \
-#    --snakefile="quanitfy.smk" \
-#    --cores 4 \
-#    --use-singularity \
-#    --singularity-args "--bind $PWD/../" \ 
-#    --printshellcmds \
-#    --rerun-incomplete \
-#    --verbose
-#
-# IMPORTANT when executing this file alone:
-## * You must modify the config.yaml.
-## * Uncomment the configfile line.
-################################################################################
 
 import os
 import pandas as pd
