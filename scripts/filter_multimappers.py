@@ -92,7 +92,7 @@ def find_best_alignments(alns: List[pysam.AlignedSegment]) -> List[pysam.Aligned
     This function creates a list of tuples with the alignment object and its
     number of indels. Then, computes the minimum number of indels and returns
     a list with the alignments that have no more than that minimum number of
-    indels. In addition, it updates the tag 'NH' and 'XI' to match the final
+    indels. In addition, it updates the tag 'NH' and 'HI' to match the final
     number of alignments kept and its identifier respectively.
 
     Args:
