@@ -672,6 +672,31 @@ rule nh_filter_genome:
 
 
 ###############################################################################
+### Remove header genome mappings
+###############################################################################
+
+rule remove_headers_genome:
+    input:
+        gmap=os.path.join(
+            config["output_dir"], "{sample}", "nhfiltered_GenomeMappings.sam"
+        ),
+    output:
+        gmap=os.path.join(
+            config["output_dir"], "{sample}", "noheader_GenomeMappings.sam"
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"], "remove_headers_genome_{sample}.log"
+        ),
+    log:
+        os.path.join(config["local_log"], "remove_headers_genome_{sample}.log"),
+    singularity:
+        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    shell:
+        "samtools view {input.gmap} > {output.gmap}"
+
+
+###############################################################################
 ### Filter NH transcriptome
 ###############################################################################
 
@@ -704,31 +729,6 @@ rule filter_nh_transcriptome:
         {params.nh} \
         {output.tmaps} \
         ) &> {log}"
-
-
-###############################################################################
-### Remove header genome mappings
-###############################################################################
-
-rule remove_headers_genome:
-    input:
-        gmap=os.path.join(
-            config["output_dir"], "{sample}", "nhfiltered_GenomeMappings.sam"
-        ),
-    output:
-        gmap=os.path.join(
-            config["output_dir"], "{sample}", "noheader_GenomeMappings.sam"
-        ),
-    params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "remove_headers_genome_{sample}.log"
-        ),
-    log:
-        os.path.join(config["local_log"], "remove_headers_genome_{sample}.log"),
-    singularity:
-        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
-    shell:
-        "samtools view {input.gmap} > {output.gmap}"
 
 
 ###############################################################################
