@@ -67,7 +67,7 @@ def parse_arguments():
     return parser
 
 
-def count_indels(alignment: pysam.AlignedSegment) -> int:
+def count_indels(aln: pysam.AlignedSegment) -> int:
     """Count the number of indels in an alignment based on its CIGAR string.
 
     This function counts the number of indels in the alignment based on the
@@ -83,10 +83,10 @@ def count_indels(alignment: pysam.AlignedSegment) -> int:
     Returns:
         int: The sum of insertions and deletions in the alignment.
     """
-    return sum([op[1] for op in alignment.cigartuples if op[0] == 1 or op[0] == 2])
+    return sum([op[1] for op in aln.cigartuples if op[0] == 1 or op[0] == 2])
 
 
-def find_best_alignments(alignments: List[pysam.AlignedSegment]) -> List[pysam.AlignedSegment]:
+def find_best_alignments(alns: List[pysam.AlignedSegment]) -> List[pysam.AlignedSegment]:
     """Find alignments with less indels.
 
     This function creates a list of tuples with the alignment object and its
@@ -101,13 +101,13 @@ def find_best_alignments(alignments: List[pysam.AlignedSegment]) -> List[pysam.A
     Retrns:
         best_alignments: alignments with the less indels
     """
-    alignment_indels = [(aln, count_indels(alignment=aln)) for aln in alignments]
-    min_indels = min(alignment_indels, key=lambda x: x[1])[1]
-    best_alignments = [alignment for i, (alignment, indels) in enumerate(alignment_indels) if indels == min_indels]
+    aln_indels = [(aln, count_indels(alignment=aln)) for aln in alns]
+    min_indels = min(aln_indels, key=lambda x: x[1])[1]
+    best_alignments = [aln for i, (aln, indels) in enumerate(aln_indels) if indels == min_indels]
 
     for i in range(len(best_alignments)):
         best_alignments[i].set_tag('NH', len(best_alignments))
-        best_alignments[i].set_tag('XI', i)
+        best_alignments[i].set_tag('HI', i + 1)
 
     return best_alignments
 
