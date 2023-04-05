@@ -24,7 +24,7 @@ import os
 import pandas as pd
 
 ###############################################################################
-### Reading sample and resources tables
+### Reading sample's table
 ###############################################################################
 
 samples_table = pd.read_csv(
@@ -37,9 +37,9 @@ samples_table = pd.read_csv(
 )
 
 ###############################################################################
-### Funcitons get_sample and get_resource
+### Funciton get_sample
 ###############################################################################
-# Function to get relevant per sample information from samples and resources table
+# Function to get relevant per sample information from samples table
 
 def get_sample(column_id, sample_id = None):
     if sample_id:
