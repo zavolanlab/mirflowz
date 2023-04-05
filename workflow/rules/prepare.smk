@@ -7,20 +7,18 @@
 #
 ###############################################################################
 #
-# USAGE (from the file's directory):
+# USAGE:
 #
 # snakemake \
-#    --snakefile="prepare.smk" \
+#    --snakefile="path/to/repare.smk" \
 #    --cores 4 \
+#    --config="path/to/config.yaml" \
 #    --use-singularity \
 #    --singularity-args "--bind $PWD/../" \ 
 #    --printshellcmds \
 #    --rerun-incomplete \
 #    --verbose
 #
-# IMPORTANT when executing this file alone:
-## * You must modify the config.yaml.
-## * Uncomment the configfile line.
 ################################################################################
 import os
 
