@@ -51,14 +51,6 @@ def get_sample(column_id, sample_id = None):
             samples_table[column_id][0]
         )
 
-###############################################################################
-### Global configuration
-###############################################################################
-# Rules that require internet connection for downloading files are included
-# in the localrules
-localrules:
-    start,
-    finish_map,
 
 ###############################################################################
 ### Finish rule
