@@ -5,24 +5,24 @@
 # Pipeline to quantify miRNAs, including isomiRs, from miRNA-seq alignments.
 ###############################################################################
 #
-# USAGE:
+# USAGE (from the file's directory):
 #
 # snakemake \
-#    --snakefile="path/to/quanitfy.smk" \
+#    --snakefile="quanitfy.smk" \
 #    --cores 4 \
-#    --configfile="path/to/config.yaml" \
 #    --use-singularity \
 #    --singularity-args "--bind $PWD/../" \ 
 #    --printshellcmds \
 #    --rerun-incomplete \
 #    --verbose
 #
+# IMPORTANT when executing this file alone:
+## * You must modify the config.yaml.
+## * Uncomment the configfile line.
 ################################################################################
 
 import os
-
 import pandas as pd
-
 
 ###############################################################################
 ### Reading samples' table
@@ -37,14 +37,20 @@ samples_table = pd.read_csv(
     sep = "\t",
 )
 
+# Rules that require internet connection for downloading files are included
+# in the localrules
+localrules:
+    finish_quantify,
+
 
 ###############################################################################
 ### Finish rule
 ###############################################################################
 
+
 rule finish_quantify:
     input:
-        table=expand(
+        table1=expand(
             os.path.join(
                 config["output_dir"], 
                 "TABLES", 
@@ -52,11 +58,16 @@ rule finish_quantify:
             ),
             mir=config["mir_list"],
         ),
-
+        table2=os.path.join(
+            config["output_dir"], 
+            "TABLES", 
+            "counts.isomirs.tab",
+        ),
 
 ###############################################################################
 ### BAM to BED
 ###############################################################################
+
 
 rule bamtobed:
     input:
@@ -89,6 +100,7 @@ rule bamtobed:
 ###############################################################################
 ### Sort alignments
 ###############################################################################
+
 
 rule sort_alignments:
     input:
@@ -123,6 +135,7 @@ rule sort_alignments:
 ### miRNAs intersection
 ###############################################################################
 
+
 rule intersect_mirna:
     input:
         alignment=os.path.join(
@@ -156,8 +169,46 @@ rule intersect_mirna:
 
 
 ###############################################################################
+### isomiRs intersection
+###############################################################################
+
+
+# rule intersect_isomirs:
+#     input:
+#         alignment=os.path.join(
+#             config["output_dir"], "{sample}", "sorted.alignments.bed12"
+#         ),
+#         isomirs=os.path.join(
+#            config["output_dir"], "isomirs_annotation.bed",
+#         ),
+#     output:
+#         intersect=os.path.join(
+#             config["output_dir"], "{sample}", "intersect_isomirs.bed"
+#         ),
+#     params:
+#         cluster_log=os.path.join(
+#             config["cluster_log"], "intersection_isomirs_{sample}.log"
+#         ),
+#     log:
+#         os.path.join(config["local_log"], "intersection_isomirs_{sample}.log"),
+#     singularity:
+#         "docker://quay.io/biocontainers/bedtools:2.30.0--h468198e_3"
+#     shell:
+#         "(bedtools intersect \
+#         -wao \
+#         -s \
+#         -F 1 \
+#         -sorted \
+#         -b {input.alignment} \
+#         -a {input.isomirs} \
+#         > {output.intersect} \
+#         ) &> {log}"
+
+
+###############################################################################
 ### miRNAs counting table - miRNA
 ###############################################################################
+
 
 rule quant_mirna:
     input:
@@ -192,6 +243,7 @@ rule quant_mirna:
 ###############################################################################
 ### miRNAs counting table - miRNA_primary
 ###############################################################################
+
 
 rule quant_mirna_pri:
     input:
@@ -232,8 +284,44 @@ rule quant_mirna_pri:
 
 
 ###############################################################################
+### isomiRs counting table
+###############################################################################
+
+
+# rule quant_isomirs:
+#     input:
+#         intersect=os.path.join(
+#             config["output_dir"], "{sample}", "intersect_isomirs.bed"
+#         ),
+#         script=os.path.join(config["scripts_dir"], "mirna_quantification.py"),
+#     output:
+#         table=os.path.join(
+#             config["output_dir"], "TABLES", "isomirs_counts_{sample}"
+#         ),
+#     params:
+#         cluster_log=os.path.join(
+#             config["cluster_log"], "quant_isomirs_{sample}.log"
+#         ),
+#         prefix=os.path.join(
+#             config["output_dir"], "TABLES", "isomirs_counts_{sample}"
+#         ),
+#     log:
+#         os.path.join(config["local_log"], "quant_isomirs_{sample}.log"),
+#     singularity:
+#         "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
+#     shell:
+#         "(python \
+#         {input.script} \
+#         -i {input.intersect} \
+#         --uniq=miRNA \
+#         -p={params.prefix} \
+#         ) &> {log}"
+
+
+###############################################################################
 ### Merge counting tables for all samples by mature/primary/isomirs forms.
 ###############################################################################
+
 
 rule merge_tables:
     input:
