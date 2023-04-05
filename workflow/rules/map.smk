@@ -56,7 +56,6 @@ def get_sample(column_id, sample_id = None):
 ### Finish rule
 ###############################################################################
 
-
 rule finish_map:
     input:
         maps=expand(
@@ -67,7 +66,6 @@ rule finish_map:
             ),
             sample=pd.unique(samples_table.index.values),
         ),
-
 
 
 ###############################################################################
@@ -107,7 +105,6 @@ rule start:
 ### Quality filter
 ###############################################################################
 
-
 rule fastq_quality_filter:
     input:
         reads=os.path.join(
@@ -141,7 +138,6 @@ rule fastq_quality_filter:
 ### Convert fastq to fasta
 ###############################################################################
 
-
 rule fastq_to_fasta:
     input:
         reads=os.path.join(
@@ -166,7 +162,6 @@ rule fastq_to_fasta:
 ###############################################################################
 ### Format fasta file
 ###############################################################################
-
 
 rule fasta_formatter:
     input:
@@ -193,7 +188,6 @@ rule fasta_formatter:
 ###############################################################################
 ### Remove adapters
 ###############################################################################
-
 
 rule cutadapt:
     input:
@@ -231,7 +225,6 @@ rule cutadapt:
 ### Collapse identical reads
 ###############################################################################
 
-
 rule fastx_collapser:
     input:
         reads=os.path.join(config["output_dir"], "{sample}", "cut.fasta"),
@@ -252,7 +245,6 @@ rule fastx_collapser:
 ###############################################################################
 ### Segemehl genome mapping
 ###############################################################################
-
 
 rule mapping_genome_segemehl:
     input:
@@ -290,7 +282,6 @@ rule mapping_genome_segemehl:
 ###############################################################################
 ### Segemehl transcriptome mapping
 ###############################################################################
-
 
 rule mapping_transcriptome_segemehl:
     input:
@@ -330,7 +321,6 @@ rule mapping_transcriptome_segemehl:
 ### Filter fasta for oligomap mapping
 ###############################################################################
 
-
 rule filter_fasta_for_oligomap:
     input:
         reads=os.path.join(config["output_dir"], "{sample}", "collapsed.fasta"),
@@ -361,7 +351,6 @@ rule filter_fasta_for_oligomap:
 ###############################################################################
 ### Oligomap genome mapping
 ###############################################################################
-
 
 rule mapping_genome_oligomap:
     input:
@@ -403,7 +392,6 @@ rule mapping_genome_oligomap:
 ### Oligomap genome sorting
 ###############################################################################
 
-
 rule sort_genome_oligomap:
     input:
         tmap=os.path.join(
@@ -439,7 +427,6 @@ rule sort_genome_oligomap:
 ###############################################################################
 ### Oligomap genome mapping output to SAM
 ###############################################################################
-
 
 rule oligomap_genome_toSAM:
     input:
@@ -478,7 +465,6 @@ rule oligomap_genome_toSAM:
 ###############################################################################
 ### Oligomap trancriptome mapping
 ###############################################################################
-
 
 rule mapping_transcriptome_oligomap:
     input:
@@ -522,7 +508,6 @@ rule mapping_transcriptome_oligomap:
 ### Oligomap trancriptome sorting
 ###############################################################################
 
-
 rule sort_transcriptome_oligomap:
     input:
         tmap=os.path.join(
@@ -558,7 +543,6 @@ rule sort_transcriptome_oligomap:
 ###############################################################################
 ### Oligomap transcriptome mapping ouput to SAM
 ###############################################################################
-
 
 rule oligomap_transcriptome_toSAM:
     input:
@@ -600,7 +584,6 @@ rule oligomap_transcriptome_toSAM:
 ### Merge genome mappings
 ###############################################################################
 
-
 rule merge_genome_maps:
     input:
         gmap1=os.path.join(
@@ -628,7 +611,6 @@ rule merge_genome_maps:
 ###############################################################################
 ### Merge trancriptome mappings
 ###############################################################################
-
 
 rule merge_transcriptome_maps:
     input:
@@ -662,7 +644,6 @@ rule merge_transcriptome_maps:
 ### Filter NH genome
 ###############################################################################
 
-
 rule nh_filter_genome:
     input:
         gmaps=os.path.join(
@@ -693,7 +674,6 @@ rule nh_filter_genome:
 ###############################################################################
 ### Filter NH transcriptome
 ###############################################################################
-
 
 rule filter_nh_transcriptome:
     input:
@@ -730,7 +710,6 @@ rule filter_nh_transcriptome:
 ### Remove header genome mappings
 ###############################################################################
 
-
 rule remove_headers_genome:
     input:
         gmap=os.path.join(
@@ -755,7 +734,6 @@ rule remove_headers_genome:
 ###############################################################################
 ### Remove header transcriptome mappings
 ###############################################################################
-
 
 rule remove_headers_transcriptome:
     input:
@@ -788,7 +766,6 @@ rule remove_headers_transcriptome:
 ### Transcriptome to genome coordinates
 ###############################################################################
 
-
 rule trans_to_gen:
     input:
         tmap=os.path.join(
@@ -820,7 +797,6 @@ rule trans_to_gen:
 ### Concatenate genome and trancriptome mappings
 ###############################################################################
 
-
 rule cat_mapping:
     input:
         gmap1=os.path.join(config["output_dir"], "{sample}", "TransToGen.sam"),
@@ -846,7 +822,6 @@ rule cat_mapping:
 ###############################################################################
 ### Add header
 ###############################################################################
-
 
 rule add_header:
     input:
@@ -876,7 +851,6 @@ rule add_header:
 ### Sort mapped file by IDs
 ###############################################################################
 
-
 rule sort_id:
     input:
         concatenate=os.path.join(
@@ -901,7 +875,6 @@ rule sort_id:
 ###############################################################################
 ### Remove inferior mappings (keeping multimappers)
 ###############################################################################
-
 
 rule remove_inferiors:
     input:
@@ -940,7 +913,6 @@ rule remove_inferiors:
 ### Uncollapse reads
 ###############################################################################
 
-
 rule uncollapse_reads:
     input:
         maps=os.path.join(
@@ -971,7 +943,6 @@ rule uncollapse_reads:
 ### Convert SAM to BAM
 ###############################################################################
 
-
 rule convert_to_bam:
     input:
         maps=os.path.join(
@@ -996,7 +967,6 @@ rule convert_to_bam:
 ###############################################################################
 ### Sort by coordinate position
 ###############################################################################
-
 
 rule sort_by_position:
     input:
@@ -1024,7 +994,6 @@ rule sort_by_position:
 ###############################################################################
 ### Create bam index
 ###############################################################################
-
 
 rule index_bam:
     input:
