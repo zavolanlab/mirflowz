@@ -7,25 +7,29 @@
 #
 ###############################################################################
 #
-# USAGE:
+# USAGE (from the file's directory):
 #
 # snakemake \
-#    --snakefile="path/to/repare.smk" \
+#    --snakefile="prepare.smk" \
 #    --cores 4 \
-#    --configfile="path/to/config.yaml" \
 #    --use-singularity \
 #    --singularity-args "--bind $PWD/../" \ 
 #    --printshellcmds \
 #    --rerun-incomplete \
 #    --verbose
 #
+# IMPORTANT when executing this file alone:
+## * You must modify the config.yaml.
+## * Uncomment the configfile line.
 ################################################################################
 import os
+
+localrules:
+    finish_prepare,
 
 ###############################################################################
 ### Finish rule
 ###############################################################################
-
 rule finish_prepare:
     input:
         idx_transcriptome=os.path.join(
@@ -49,6 +53,11 @@ rule finish_prepare:
                 config["output_dir"], 
                 "mirna_filtered.bed",
         ),
+        isomirs=os.path.join(
+                config["output_dir"], 
+                "isomirs_annotation.bed",
+        ),
+
 
 
 ###############################################################################
@@ -82,6 +91,7 @@ rule trim_genome_seq_id:
 ### Extract transcriptome sequences in FASTA from genome.
 ###############################################################################
 
+
 rule extract_transcriptome_seqs:
     input:
         genome=os.path.join(
@@ -111,6 +121,7 @@ rule extract_transcriptome_seqs:
 ###############################################################################
 ### Trim transcript IDs from FASTA file
 ###############################################################################
+
 
 rule trim_fasta:
     input:
@@ -142,6 +153,7 @@ rule trim_fasta:
 ###############################################################################
 ### Generate segemehl index for transcripts
 ###############################################################################
+
 
 rule generate_segemehl_index_transcriptome:
     input:
@@ -177,6 +189,7 @@ rule generate_segemehl_index_transcriptome:
 ### Generate segemehl index for genome
 ###############################################################################
 
+
 rule generate_segemehl_index_genome:
     input:
         genome=os.path.join(
@@ -210,6 +223,7 @@ rule generate_segemehl_index_genome:
 ### GTF file of exons (genomic coordinates)
 ###############################################################################
 
+
 rule get_exons_gtf:
     input:
         gtf=config["gtf_file"],
@@ -238,6 +252,7 @@ rule get_exons_gtf:
 ### Convert GTF file of exons to BED file
 ###############################################################################
 
+
 rule gtftobed:
     input:
         exons=os.path.join(config["output_dir"], "exons.gtf"),
@@ -264,6 +279,7 @@ rule gtftobed:
 ### Create header for SAM file
 ###############################################################################
 
+
 rule create_header_genome:
     input:
         genome=os.path.join(
@@ -286,10 +302,10 @@ rule create_header_genome:
     shell:
         "(samtools dict -o {output.header} --uri=NA {input.genome}) &> {log}"
 
-
 ###############################################################################
 ### Mapping chromosomes names, UCSC <-> ENSEMBL
 ###############################################################################
+
 
 rule map_chr_names:
     input:
@@ -324,6 +340,7 @@ rule map_chr_names:
 ### GFF to BED (improve intersect memory efficient allowing to use -sorted)
 ###############################################################################
 
+
 rule gfftobed:
     input:
         gff=os.path.join(
@@ -353,6 +370,7 @@ rule gfftobed:
 ### Index genome fasta file
 ###############################################################################
 
+
 rule create_index_fasta:
     input:
         genome=os.path.join(
@@ -380,6 +398,7 @@ rule create_index_fasta:
 ### Extract chromosome length
 ###############################################################################
 
+
 rule extract_chr_len:
     input:
         genome=os.path.join(
@@ -405,6 +424,7 @@ rule extract_chr_len:
 ### Extract mature miRNA
 ###############################################################################
 
+
 rule filter_mature_mirs:
     input:
         bed=os.path.join(
@@ -427,3 +447,144 @@ rule filter_mature_mirs:
         "docker://ubuntu:lunar-20221207"
     shell:
         "(grep -v {params.precursor} {input.bed} > {output.bed}) &> {log}"
+
+
+###############################################################################
+### Create isomirs annotation file from mature miRNA 
+###############################################################################
+
+
+rule iso_anno:
+    input:
+        bed=os.path.join(
+            config["output_dir"], "mirna_mature_filtered.bed"
+        ),
+        chrsize=os.path.join(
+            config["output_dir"], "chr_size.txt"
+        ),
+    output:
+        bed=os.path.join(
+            config["output_dir"],
+            "iso_anno_5p{bp_5p}_3p{bp_3p}.bed",
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"],
+            "iso_anno_5p{bp_5p}_3p{bp_3p}.log",
+        ),
+        bp_5p=lambda wildcards: wildcards.bp_5p,
+        bp_3p=lambda wildcards: wildcards.bp_3p,
+    log:
+        os.path.join(
+            config["local_log"],
+            "iso_anno_5p{bp_5p}_3p{bp_3p}.log",
+        ),
+    singularity:
+        "docker://biocontainers/bedtools:v2.28.0_cv2"
+    shell:
+        "(bedtools slop \
+        -i {input.bed} \
+        -g {input.chrsize} \
+        -l {params.bp_5p} \
+        -r {params.bp_3p} \
+        > {output.bed} \
+        ) &> {log}"
+
+
+###############################################################################
+### Change miRNA names to isomirs names
+###############################################################################
+
+
+rule iso_anno_rename:
+    input:
+        bed=os.path.join(
+            config["output_dir"],
+            "iso_anno_5p{bp_5p}_3p{bp_3p}.bed",
+        ),
+    output:
+        bed=os.path.join(
+            config["output_dir"],
+            "iso_anno_rename_5p{bp_5p}_3p{bp_3p}.bed",
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"],
+            "iso_anno_rename_5p{bp_5p}_3p{bp_3p}.log",
+        ),
+        bp_5p=lambda wildcards: wildcards.bp_5p,
+        bp_3p=lambda wildcards: wildcards.bp_3p,
+    log:
+        os.path.join(
+            config["local_log"],
+            "iso_anno_rename_5p{bp_5p}_3p{bp_3p}.log",
+        ),
+    singularity:
+        "docker://ubuntu:lunar-20221207"
+    shell:
+        "(sed \
+        's/;Derives/_5p{params.bp_5p}_3p{params.bp_3p};Derives/' \
+        {input.bed} \
+        > {output.bed} \
+        ) &> {log}"
+
+
+###############################################################################
+### Concatenate all isomirs annotation files
+###############################################################################
+
+
+rule iso_anno_concat:
+    input:
+        bed=lambda wildcards: expand(
+            os.path.join(
+                config["output_dir"],
+                "iso_anno_rename_5p{bp_5p}_3p{bp_3p}.bed",
+            ),
+            bp_3p=config["bp_3p"],
+            bp_5p=config["bp_5p"],
+        ),
+    output:
+        bed=os.path.join(
+            config["output_dir"], "iso_anno_concat.bed"
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"], "iso_anno_concat.log"
+        ),
+        prefix=os.path.join(
+            config["output_dir"], "iso_anno_rename"
+        ),
+    log:
+        os.path.join(config["local_log"], "iso_anno_concat.log"),
+    singularity:
+        "docker://ubuntu:lunar-20221207"
+    shell:
+        "(cat {params.prefix}* > {output.bed}) &> {log}"
+
+
+###############################################################################
+### Remove non changing isomirs (5p0_3p0)
+###############################################################################
+
+
+rule iso_anno_final:
+    input:
+        bed=os.path.join(
+            config["output_dir"], "iso_anno_concat.bed"
+        ),
+    output:
+        bed=os.path.join(
+            config["output_dir"], "isomirs_annotation.bed"
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"], "iso_anno_final.log"
+        ),
+        pattern="5p0_3p0",
+    log:
+        os.path.join(config["local_log"], "iso_anno_final.log"),
+    singularity:
+        "docker://ubuntu:lunar-20221207"
+    shell:
+        "(grep -v '{params.pattern}' {input.bed} > {output.bed}) &> {log}"
