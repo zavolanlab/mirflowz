@@ -5,26 +5,27 @@
 # Workflow to map small RNA-seq reads (e.g. from miRNA sequencing libraries).
 ###############################################################################
 #
-# USAGE:
+# USAGE (from the file's directory):
 #
 # snakemake \
-#    --snakefile="path/to/map.smk" \
+#    --snakefile="map.smk" \
 #    --cores 4 \
-#    --configfile="path/to/config.yaml" \
 #    --use-singularity \
 #    --singularity-args "--bind $PWD/../" \ 
 #    --printshellcmds \
 #    --rerun-incomplete \
 #    --verbose
 #
+# IMPORTANT when executing this file alone:
+## * You must modify the config.yaml.
+## * Uncomment the configfile line.
 ################################################################################
 
 import os
-
 import pandas as pd
 
 ###############################################################################
-### Reading sample's table
+### Reading sample and resources tables
 ###############################################################################
 
 samples_table = pd.read_csv(
@@ -37,9 +38,9 @@ samples_table = pd.read_csv(
 )
 
 ###############################################################################
-### Funciton get_sample
+### Funcitons get_sample and get_resource
 ###############################################################################
-# Function to get relevant per sample information from samples table
+# Function to get relevant per sample information from samples and resources table
 
 def get_sample(column_id, sample_id = None):
     if sample_id:
@@ -51,10 +52,19 @@ def get_sample(column_id, sample_id = None):
             samples_table[column_id][0]
         )
 
+###############################################################################
+### Global configuration
+###############################################################################
+# Rules that require internet connection for downloading files are included
+# in the localrules
+localrules:
+    start,
+    finish_map,
 
 ###############################################################################
 ### Finish rule
 ###############################################################################
+
 
 rule finish_map:
     input:
@@ -66,6 +76,7 @@ rule finish_map:
             ),
             sample=pd.unique(samples_table.index.values),
         ),
+
 
 
 ###############################################################################
@@ -105,6 +116,7 @@ rule start:
 ### Quality filter
 ###############################################################################
 
+
 rule fastq_quality_filter:
     input:
         reads=os.path.join(
@@ -138,6 +150,7 @@ rule fastq_quality_filter:
 ### Convert fastq to fasta
 ###############################################################################
 
+
 rule fastq_to_fasta:
     input:
         reads=os.path.join(
@@ -162,6 +175,7 @@ rule fastq_to_fasta:
 ###############################################################################
 ### Format fasta file
 ###############################################################################
+
 
 rule fasta_formatter:
     input:
@@ -188,6 +202,7 @@ rule fasta_formatter:
 ###############################################################################
 ### Remove adapters
 ###############################################################################
+
 
 rule cutadapt:
     input:
@@ -225,6 +240,7 @@ rule cutadapt:
 ### Collapse identical reads
 ###############################################################################
 
+
 rule fastx_collapser:
     input:
         reads=os.path.join(config["output_dir"], "{sample}", "cut.fasta"),
@@ -245,6 +261,7 @@ rule fastx_collapser:
 ###############################################################################
 ### Segemehl genome mapping
 ###############################################################################
+
 
 rule mapping_genome_segemehl:
     input:
@@ -282,6 +299,7 @@ rule mapping_genome_segemehl:
 ###############################################################################
 ### Segemehl transcriptome mapping
 ###############################################################################
+
 
 rule mapping_transcriptome_segemehl:
     input:
@@ -321,6 +339,7 @@ rule mapping_transcriptome_segemehl:
 ### Filter fasta for oligomap mapping
 ###############################################################################
 
+
 rule filter_fasta_for_oligomap:
     input:
         reads=os.path.join(config["output_dir"], "{sample}", "collapsed.fasta"),
@@ -351,6 +370,7 @@ rule filter_fasta_for_oligomap:
 ###############################################################################
 ### Oligomap genome mapping
 ###############################################################################
+
 
 rule mapping_genome_oligomap:
     input:
@@ -392,6 +412,7 @@ rule mapping_genome_oligomap:
 ### Oligomap genome sorting
 ###############################################################################
 
+
 rule sort_genome_oligomap:
     input:
         tmap=os.path.join(
@@ -427,6 +448,7 @@ rule sort_genome_oligomap:
 ###############################################################################
 ### Oligomap genome mapping output to SAM
 ###############################################################################
+
 
 rule oligomap_genome_toSAM:
     input:
@@ -465,6 +487,7 @@ rule oligomap_genome_toSAM:
 ###############################################################################
 ### Oligomap trancriptome mapping
 ###############################################################################
+
 
 rule mapping_transcriptome_oligomap:
     input:
@@ -508,6 +531,7 @@ rule mapping_transcriptome_oligomap:
 ### Oligomap trancriptome sorting
 ###############################################################################
 
+
 rule sort_transcriptome_oligomap:
     input:
         tmap=os.path.join(
@@ -543,6 +567,7 @@ rule sort_transcriptome_oligomap:
 ###############################################################################
 ### Oligomap transcriptome mapping ouput to SAM
 ###############################################################################
+
 
 rule oligomap_transcriptome_toSAM:
     input:
@@ -584,6 +609,7 @@ rule oligomap_transcriptome_toSAM:
 ### Merge genome mappings
 ###############################################################################
 
+
 rule merge_genome_maps:
     input:
         gmap1=os.path.join(
@@ -611,6 +637,7 @@ rule merge_genome_maps:
 ###############################################################################
 ### Merge trancriptome mappings
 ###############################################################################
+
 
 rule merge_transcriptome_maps:
     input:
@@ -644,6 +671,7 @@ rule merge_transcriptome_maps:
 ### Filter NH genome
 ###############################################################################
 
+
 rule nh_filter_genome:
     input:
         gmaps=os.path.join(
@@ -672,33 +700,9 @@ rule nh_filter_genome:
 
 
 ###############################################################################
-### Remove header genome mappings
-###############################################################################
-
-rule remove_headers_genome:
-    input:
-        gmap=os.path.join(
-            config["output_dir"], "{sample}", "nhfiltered_GenomeMappings.sam"
-        ),
-    output:
-        gmap=os.path.join(
-            config["output_dir"], "{sample}", "noheader_GenomeMappings.sam"
-        ),
-    params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "remove_headers_genome_{sample}.log"
-        ),
-    log:
-        os.path.join(config["local_log"], "remove_headers_genome_{sample}.log"),
-    singularity:
-        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
-    shell:
-        "samtools view {input.gmap} > {output.gmap}"
-
-
-###############################################################################
 ### Filter NH transcriptome
 ###############################################################################
+
 
 rule filter_nh_transcriptome:
     input:
@@ -732,8 +736,35 @@ rule filter_nh_transcriptome:
 
 
 ###############################################################################
+### Remove header genome mappings
+###############################################################################
+
+
+rule remove_headers_genome:
+    input:
+        gmap=os.path.join(
+            config["output_dir"], "{sample}", "nhfiltered_GenomeMappings.sam"
+        ),
+    output:
+        gmap=os.path.join(
+            config["output_dir"], "{sample}", "noheader_GenomeMappings.sam"
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"], "remove_headers_genome_{sample}.log"
+        ),
+    log:
+        os.path.join(config["local_log"], "remove_headers_genome_{sample}.log"),
+    singularity:
+        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    shell:
+        "samtools view {input.gmap} > {output.gmap}"
+
+
+###############################################################################
 ### Remove header transcriptome mappings
 ###############################################################################
+
 
 rule remove_headers_transcriptome:
     input:
@@ -766,6 +797,7 @@ rule remove_headers_transcriptome:
 ### Transcriptome to genome coordinates
 ###############################################################################
 
+
 rule trans_to_gen:
     input:
         tmap=os.path.join(
@@ -797,6 +829,7 @@ rule trans_to_gen:
 ### Concatenate genome and trancriptome mappings
 ###############################################################################
 
+
 rule cat_mapping:
     input:
         gmap1=os.path.join(config["output_dir"], "{sample}", "TransToGen.sam"),
@@ -822,6 +855,7 @@ rule cat_mapping:
 ###############################################################################
 ### Add header
 ###############################################################################
+
 
 rule add_header:
     input:
@@ -851,6 +885,7 @@ rule add_header:
 ### Sort mapped file by IDs
 ###############################################################################
 
+
 rule sort_id:
     input:
         concatenate=os.path.join(
@@ -875,6 +910,7 @@ rule sort_id:
 ###############################################################################
 ### Remove inferior mappings (keeping multimappers)
 ###############################################################################
+
 
 rule remove_inferiors:
     input:
@@ -949,6 +985,7 @@ rule filter_by_indels:
 ### Uncollapse reads
 ###############################################################################
 
+
 rule uncollapse_reads:
     input:
         maps=os.path.join(
@@ -979,6 +1016,7 @@ rule uncollapse_reads:
 ### Convert SAM to BAM
 ###############################################################################
 
+
 rule convert_to_bam:
     input:
         maps=os.path.join(
@@ -1003,6 +1041,7 @@ rule convert_to_bam:
 ###############################################################################
 ### Sort by coordinate position
 ###############################################################################
+
 
 rule sort_by_position:
     input:
@@ -1030,6 +1069,7 @@ rule sort_by_position:
 ###############################################################################
 ### Create bam index
 ###############################################################################
+
 
 rule index_bam:
     input:
