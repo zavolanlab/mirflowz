@@ -74,7 +74,7 @@ rule finish:
             ),
             sample=pd.unique(samples_table.index.values),
         ),
-        table1=lambda wildcard:expand(
+        table=lambda wildcard:expand(
             os.path.join(
                 config["output_dir"], 
                 "TABLES", 
@@ -82,4 +82,3 @@ rule finish:
             ),
             mir=config["mir_list"],
         )
-        
