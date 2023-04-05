@@ -44,7 +44,7 @@ samples_table = pd.read_csv(
 
 rule finish_quantify:
     input:
-        table1=expand(
+        table=expand(
             os.path.join(
                 config["output_dir"], 
                 "TABLES", 
