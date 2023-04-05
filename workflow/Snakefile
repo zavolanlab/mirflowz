@@ -33,14 +33,6 @@ from snakemake.utils import validate
 
 validate(config, os.path.join("..", "config", "config_schema.json"))
 
-
-###############################################################################
-### Global configuration
-###############################################################################
-
-localrules:
-    finish,
-
 ###############################################################################
 ### Include subworkflows
 ###############################################################################
@@ -74,10 +66,6 @@ rule finish:
                 config["output_dir"], 
                 "mirna_annotations.bed",
         ),
-        isomirs=os.path.join(
-                config["output_dir"], 
-                "isomirs_annotation.bed",
-        ),
         maps=expand(
             os.path.join(
                 config["output_dir"],
@@ -93,9 +81,5 @@ rule finish:
                 "counts.{mir}.tab"
             ),
             mir=config["mir_list"],
-        ),
-        table2=os.path.join(
-            config["output_dir"], 
-            "TABLES", 
-            "counts.isomirs.tab"
-        ),
+        )
+        
