@@ -10,12 +10,10 @@
 ###############################################################################
 #
 # USAGE:
-
 # snakemake \
-#    --cores 4 \
-#    --configfile="path/to/config.yaml" \
 #    --use-singularity \
 #    --singularity-args "--bind $PWD/../" \
+#    --cores 4 \
 #    --printshellcmds \
 #    --rerun-incomplete \
 #    --verbose
@@ -23,31 +21,34 @@
 ################################################################################
 
 import os
-
 import pandas as pd
 from snakemake.utils import validate
 
-
 ###############################################################################
-### Validate configuration
+### Configuration validation
 ###############################################################################
 
 validate(config, os.path.join("..", "config", "config_schema.json"))
 
 
 ###############################################################################
-### Include subworkflows
+### Global configuration
+###############################################################################
+
+localrules:
+    finish,
+
+###############################################################################
+### Including subworkflows
 ###############################################################################
 
 include: os.path.join("rules" , "prepare.smk")
 include: os.path.join("rules" , "map.smk")
 include: os.path.join("rules" , "quantify.smk")
 
-
 ###############################################################################
 ### Finish rule
 ###############################################################################
-
 rule finish:
     input:
         idx_transcriptome=os.path.join(
@@ -70,6 +71,10 @@ rule finish:
                 config["output_dir"], 
                 "mirna_annotations.bed",
         ),
+        isomirs=os.path.join(
+                config["output_dir"], 
+                "isomirs_annotation.bed",
+        ),
         maps=expand(
             os.path.join(
                 config["output_dir"],
@@ -78,11 +83,16 @@ rule finish:
             ),
             sample=pd.unique(samples_table.index.values),
         ),
-        table=lambda wildcard:expand(
+        table1=lambda wildcard:expand(
             os.path.join(
                 config["output_dir"], 
                 "TABLES", 
                 "counts.{mir}.tab"
             ),
             mir=config["mir_list"],
-        )
+        ),
+        table2=os.path.join(
+            config["output_dir"], 
+            "TABLES", 
+            "counts.isomirs.tab"
+        ),
