@@ -25,6 +25,7 @@ import os
 ###############################################################################
 ### Finish rule
 ###############################################################################
+
 rule finish_prepare:
     input:
         idx_transcriptome=os.path.join(
@@ -81,7 +82,6 @@ rule trim_genome_seq_id:
 ### Extract transcriptome sequences in FASTA from genome.
 ###############################################################################
 
-
 rule extract_transcriptome_seqs:
     input:
         genome=os.path.join(
@@ -111,7 +111,6 @@ rule extract_transcriptome_seqs:
 ###############################################################################
 ### Trim transcript IDs from FASTA file
 ###############################################################################
-
 
 rule trim_fasta:
     input:
@@ -143,7 +142,6 @@ rule trim_fasta:
 ###############################################################################
 ### Generate segemehl index for transcripts
 ###############################################################################
-
 
 rule generate_segemehl_index_transcriptome:
     input:
@@ -179,7 +177,6 @@ rule generate_segemehl_index_transcriptome:
 ### Generate segemehl index for genome
 ###############################################################################
 
-
 rule generate_segemehl_index_genome:
     input:
         genome=os.path.join(
@@ -213,7 +210,6 @@ rule generate_segemehl_index_genome:
 ### GTF file of exons (genomic coordinates)
 ###############################################################################
 
-
 rule get_exons_gtf:
     input:
         gtf=config["gtf_file"],
@@ -242,7 +238,6 @@ rule get_exons_gtf:
 ### Convert GTF file of exons to BED file
 ###############################################################################
 
-
 rule gtftobed:
     input:
         exons=os.path.join(config["output_dir"], "exons.gtf"),
@@ -269,7 +264,6 @@ rule gtftobed:
 ### Create header for SAM file
 ###############################################################################
 
-
 rule create_header_genome:
     input:
         genome=os.path.join(
@@ -292,10 +286,10 @@ rule create_header_genome:
     shell:
         "(samtools dict -o {output.header} --uri=NA {input.genome}) &> {log}"
 
+
 ###############################################################################
 ### Mapping chromosomes names, UCSC <-> ENSEMBL
 ###############################################################################
-
 
 rule map_chr_names:
     input:
@@ -330,7 +324,6 @@ rule map_chr_names:
 ### GFF to BED (improve intersect memory efficient allowing to use -sorted)
 ###############################################################################
 
-
 rule gfftobed:
     input:
         gff=os.path.join(
@@ -360,7 +353,6 @@ rule gfftobed:
 ### Index genome fasta file
 ###############################################################################
 
-
 rule create_index_fasta:
     input:
         genome=os.path.join(
@@ -388,7 +380,6 @@ rule create_index_fasta:
 ### Extract chromosome length
 ###############################################################################
 
-
 rule extract_chr_len:
     input:
         genome=os.path.join(
@@ -413,7 +404,6 @@ rule extract_chr_len:
 ###############################################################################
 ### Extract mature miRNA
 ###############################################################################
-
 
 rule filter_mature_mirs:
     input:
