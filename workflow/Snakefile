@@ -10,10 +10,12 @@
 ###############################################################################
 #
 # USAGE:
+
 # snakemake \
+#    --cores 4 \
+#    --configfile="path/to/config.yaml" \
 #    --use-singularity \
 #    --singularity-args "--bind $PWD/../" \
-#    --cores 4 \
 #    --printshellcmds \
 #    --rerun-incomplete \
 #    --verbose
