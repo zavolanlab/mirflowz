@@ -71,10 +71,6 @@ rule finish:
                 config["output_dir"], 
                 "mirna_annotations.bed",
         ),
-        isomirs=os.path.join(
-                config["output_dir"], 
-                "isomirs_annotation.bed",
-        ),
         maps=expand(
             os.path.join(
                 config["output_dir"],
@@ -83,16 +79,11 @@ rule finish:
             ),
             sample=pd.unique(samples_table.index.values),
         ),
-        table1=lambda wildcard:expand(
+        table=lambda wildcard:expand(
             os.path.join(
                 config["output_dir"], 
                 "TABLES", 
                 "counts.{mir}.tab"
             ),
             mir=config["mir_list"],
-        ),
-        table2=os.path.join(
-            config["output_dir"], 
-            "TABLES", 
-            "counts.isomirs.tab"
         ),
