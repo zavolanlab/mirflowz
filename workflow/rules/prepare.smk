@@ -12,7 +12,7 @@
 # snakemake \
 #    --snakefile="path/to/repare.smk" \
 #    --cores 4 \
-#    --config="path/to/config.yaml" \
+#    --configfile="path/to/config.yaml" \
 #    --use-singularity \
 #    --singularity-args "--bind $PWD/../" \ 
 #    --printshellcmds \
