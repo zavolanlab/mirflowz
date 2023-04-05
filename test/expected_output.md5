@@ -7,6 +7,7 @@ ff3a3093b9919aedd1ff158ebd52db70  results/TABLES/counts.miRNA_primary_transcript
 a88287bfd79ef57e7e098721c1c97c38  results/test_lib/noheader_GenomeMappings.sam
 aa2f2c059ceaca70d8a9d4950a199c29  results/test_lib/sorted.alignments.bed12
 d41d8cd98f00b204e9800998ecf8427e  results/test_lib/oligoTranscriptome_sorted.fa
+a7245b3d0826a531a723475800610341  results/test_lib/removeMultimappers.sam
 defdc8c46e1d73692edde0e0278f2d5e  results/test_lib/oligoGenome_map.fa
 d41d8cd98f00b204e9800998ecf8427e  results/test_lib/oligoTranscriptome_converted.sam
 2b16e3a44e54eed1e8b05797b1b87486  results/test_lib/segemehlGenome_map.sam
