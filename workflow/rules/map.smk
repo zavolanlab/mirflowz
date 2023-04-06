@@ -11,7 +11,7 @@
 #    --snakefile="map.smk" \
 #    --cores 4 \
 #    --use-singularity \
-#    --singularity-args "--bind $PWD/../" \ 
+#    --singularity-args "--bind $PWD/../" \
 #    --printshellcmds \
 #    --rerun-incomplete \
 #    --verbose
@@ -30,35 +30,37 @@ import pandas as pd
 
 samples_table = pd.read_csv(
     config["samples"],
-    header = 0,
-    index_col = 0,
-    comment = "#",
-    engine = "python",
-    sep = "\t",
+    header=0,
+    index_col=0,
+    comment="#",
+    engine="python",
+    sep="\t",
 )
 
 ###############################################################################
 ### Functions
 ###############################################################################
 
-def get_sample(column_id: str, sample_id :int = None) -> str:
+
+def get_sample(column_id: str, sample_id: int = None) -> str:
     """Get relevant per sample information."""
     if sample_id:
         return str(
             samples_table[column_id][samples_table.index == sample_id][0]
         )
     else:
-        return str(
-            samples_table[column_id][0]
-        )
+        return str(samples_table[column_id][0])
+
 
 ###############################################################################
 ### Global configuration
 ###############################################################################
 
+
 localrules:
     start,
     finish_map,
+
 
 ###############################################################################
 ### Finish rule
@@ -77,15 +79,17 @@ rule finish_map:
         ),
 
 
-
 ###############################################################################
 ### Start rule (get samples)
 ###############################################################################
 
+
 rule start:
     input:
         reads=lambda wildcards: expand(
-            pd.Series(samples_table.loc[wildcards.sample, "sample_file"]).values,
+            pd.Series(
+                samples_table.loc[wildcards.sample, "sample_file"]
+            ).values,
             format=get_sample("format"),
         ),
     output:
@@ -94,7 +98,7 @@ rule start:
             "{sample}",
             "{format}",
             "reads.{format}",
-        )
+        ),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
@@ -209,9 +213,7 @@ rule cutadapt:
     output:
         reads=os.path.join(config["output_dir"], "{sample}", "cut.fasta"),
     params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "cutadapt_{sample}.log"
-        ),
+        cluster_log=os.path.join(config["cluster_log"], "cutadapt_{sample}.log"),
         adapter=lambda wildcards: get_sample("adapter", wildcards.sample),
         error_rate=config["error_rate"],
         minimum_length=config["minimum_length"],
@@ -266,7 +268,9 @@ rule mapping_genome_segemehl:
     input:
         reads=os.path.join(config["output_dir"], "{sample}", "collapsed.fasta"),
         genome=os.path.join(config["output_dir"], "genome.processed.fa"),
-        genome_index_segemehl=os.path.join(config["output_dir"], "genome_index_segemehl.idx"),
+        genome_index_segemehl=os.path.join(
+            config["output_dir"], "genome_index_segemehl.idx"
+        ),
     output:
         gmap=os.path.join(
             config["output_dir"], "{sample}", "segemehlGenome_map.sam"
@@ -303,8 +307,12 @@ rule mapping_genome_segemehl:
 rule mapping_transcriptome_segemehl:
     input:
         reads=os.path.join(config["output_dir"], "{sample}", "collapsed.fasta"),
-        transcriptome=os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
-        transcriptome_index_segemehl=os.path.join(config["output_dir"], "transcriptome_index_segemehl.idx"),
+        transcriptome=os.path.join(
+            config["output_dir"], "transcriptome_idtrim.fa"
+        ),
+        transcriptome_index_segemehl=os.path.join(
+            config["output_dir"], "transcriptome_index_segemehl.idx"
+        ),
     output:
         tmap=os.path.join(
             config["output_dir"], "{sample}", "segemehlTranscriptome_map.sam"

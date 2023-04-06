@@ -11,7 +11,7 @@
 #    --snakefile="quanitfy.smk" \
 #    --cores 4 \
 #    --use-singularity \
-#    --singularity-args "--bind $PWD/../" \ 
+#    --singularity-args "--bind $PWD/../" \
 #    --printshellcmds \
 #    --rerun-incomplete \
 #    --verbose
@@ -30,16 +30,17 @@ import pandas as pd
 
 samples_table = pd.read_csv(
     config["samples"],
-    header = 0,
-    index_col = 0,
-    comment = "#",
-    engine = "python",
-    sep = "\t",
+    header=0,
+    index_col=0,
+    comment="#",
+    engine="python",
+    sep="\t",
 )
 
 ###############################################################################
 ### Global configuration
 ###############################################################################
+
 
 localrules:
     finish_quantify,
@@ -54,17 +55,18 @@ rule finish_quantify:
     input:
         table1=expand(
             os.path.join(
-                config["output_dir"], 
-                "TABLES", 
+                config["output_dir"],
+                "TABLES",
                 "counts.{mir}.tab",
             ),
             mir=config["mir_list"],
         ),
         table2=os.path.join(
-            config["output_dir"], 
-            "TABLES", 
+            config["output_dir"],
+            "TABLES",
             "counts.isomirs.tab",
         ),
+
 
 ###############################################################################
 ### BAM to BED
@@ -83,9 +85,7 @@ rule bamtobed:
             config["output_dir"], "{sample}", "alignments.bed12"
         ),
     params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "bamtobed_{sample}.log"
-        ),
+        cluster_log=os.path.join(config["cluster_log"], "bamtobed_{sample}.log"),
     log:
         os.path.join(config["local_log"], "bamtobed_{sample}.log"),
     singularity:
@@ -143,9 +143,7 @@ rule intersect_mirna:
         alignment=os.path.join(
             config["output_dir"], "{sample}", "sorted.alignments.bed12"
         ),
-        mirna=os.path.join(
-            config["output_dir"], "mirna_annotations.bed"
-        ),
+        mirna=os.path.join(config["output_dir"], "mirna_annotations.bed"),
     output:
         intersect=os.path.join(
             config["output_dir"], "{sample}", "intersect_mirna.bed"
