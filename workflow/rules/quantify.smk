@@ -10,8 +10,8 @@
 # snakemake \
 #    --snakefile="quanitfy.smk" \
 #    --cores 4 \
-#    --use-singularity \
-#    --singularity-args "--bind $PWD/../" \
+#    --use-container \
+#    --container-args "--bind $PWD/../" \
 #    --printshellcmds \
 #    --rerun-incomplete \
 #    --verbose
@@ -88,7 +88,7 @@ rule bamtobed:
         cluster_log=os.path.join(config["cluster_log"], "bamtobed_{sample}.log"),
     log:
         os.path.join(config["local_log"], "bamtobed_{sample}.log"),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/bedtools:2.30.0--h468198e_3"
     shell:
         "(bedtools bamtobed \
@@ -122,7 +122,7 @@ rule sort_alignments:
     resources:
         mem=4,
         threads=8,
-    singularity:
+    container:
         "docker://ubuntu:lunar-20221207"
     shell:
         "(sort \
@@ -154,7 +154,7 @@ rule intersect_mirna:
         ),
     log:
         os.path.join(config["local_log"], "intersection_mirna_{sample}.log"),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/bedtools:2.30.0--h468198e_3"
     shell:
         "(bedtools intersect \
@@ -191,7 +191,7 @@ rule intersect_mirna:
 #         ),
 #     log:
 #         os.path.join(config["local_log"], "intersection_isomirs_{sample}.log"),
-#     singularity:
+#     container:
 #         "docker://quay.io/biocontainers/bedtools:2.30.0--h468198e_3"
 #     shell:
 #         "(bedtools intersect \
@@ -229,7 +229,7 @@ rule quant_mirna:
         ),
     log:
         os.path.join(config["local_log"], "quant_mirna_miRNA_{sample}.log"),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
     shell:
         "(python \
@@ -272,7 +272,7 @@ rule quant_mirna_pri:
             config["local_log"],
             "quant_mirna_miRNA_primary_transcript_{sample}.log",
         ),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
     shell:
         "(python \
@@ -307,7 +307,7 @@ rule quant_mirna_pri:
 #         ),
 #     log:
 #         os.path.join(config["local_log"], "quant_isomirs_{sample}.log"),
-#     singularity:
+#     container:
 #         "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
 #     shell:
 #         "(python \
@@ -343,7 +343,7 @@ rule merge_tables:
         input_dir=os.path.join(config["output_dir"], "TABLES"),
     log:
         os.path.join(config["local_log"], "merge_tables_{mir}.log"),
-    singularity:
+    container:
         "docker://zavolab/r-tidyverse:3.5.3"
     shell:
         "(Rscript \

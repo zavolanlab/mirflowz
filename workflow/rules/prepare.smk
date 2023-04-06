@@ -12,8 +12,8 @@
 # snakemake \
 #    --snakefile="prepare.smk" \
 #    --cores 4 \
-#    --use-singularity \
-#    --singularity-args "--bind $PWD/../" \
+#    --use-container \
+#    --container-args "--bind $PWD/../" \
 #    --printshellcmds \
 #    --rerun-incomplete \
 #    --verbose
@@ -82,7 +82,7 @@ rule trim_genome_seq_id:
         ),
     log:
         os.path.join(config["local_log"], "genome_process.log"),
-    singularity:
+    container:
         "docker://ubuntu:lunar-20221207"
     shell:
         """(zcat {input.genome} | 
@@ -114,7 +114,7 @@ rule extract_transcriptome_seqs:
             config["local_log"],
             "extract_transcriptome_seqs.log",
         ),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/cufflinks:2.2.1--py27_2"
     shell:
         "(zcat {input.gtf} | gffread -w {output.fasta} -g {input.genome}) &> {log}"
@@ -135,7 +135,7 @@ rule trim_fasta:
         cluster_log=os.path.join(config["cluster_log"], "trim_fasta.log"),
     log:
         os.path.join(config["local_log"], "trim_fasta.log"),
-    singularity:
+    container:
         "docker://ubuntu:lunar-20221207"
     shell:
         """(awk \
@@ -173,7 +173,7 @@ rule generate_segemehl_index_transcriptome:
         mem=10,
         threads=8,
         time=6,
-    singularity:
+    container:
         "docker://quay.io/biocontainers/segemehl:0.2.0--h20b1175_9"
     shell:
         "(segemehl.x -x {output.idx} -d {input.fasta}) &> {log}"
@@ -203,7 +203,7 @@ rule generate_segemehl_index_genome:
         mem=60,
         threads=8,
         time=6,
-    singularity:
+    container:
         "docker://quay.io/biocontainers/segemehl:0.2.0--h20b1175_9"
     shell:
         "(segemehl.x -x {output.idx} -d {input.genome}) &> {log}"
@@ -224,7 +224,7 @@ rule get_exons_gtf:
         cluster_log=os.path.join(config["cluster_log"], "get_exons_gtf.log"),
     log:
         os.path.join(config["local_log"], "get_exons_gtf.log"),
-    singularity:
+    container:
         "docker://ubuntu:lunar-20221207"
     shell:
         "(bash \
@@ -251,7 +251,7 @@ rule gtftobed:
         cluster_log=os.path.join(config["cluster_log"], "gtftobed.log"),
     log:
         os.path.join(config["local_log"], "gtftobed.log"),
-    singularity:
+    container:
         "docker://zavolab/r-zavolab:3.5.1"
     shell:
         "(Rscript \
@@ -277,7 +277,7 @@ rule create_header_genome:
         ),
     log:
         os.path.join(config["local_log"], "create_header_genome.log"),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
         "(samtools dict -o {output.header} --uri=NA {input.genome}) &> {log}"
@@ -301,7 +301,7 @@ rule map_chr_names:
         delimiter="TAB",
     log:
         os.path.join(config["local_log"], "map_chr_names.log"),
-    singularity:
+    container:
         "docker://perl:5.37.10"
     shell:
         "(perl {input.script} \
@@ -328,7 +328,7 @@ rule gfftobed:
         out_dir=config["output_dir"],
     log:
         os.path.join(config["local_log"], "gfftobed.log"),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/bedops:2.4.35--h6bb024c_2"
     shell:
         "(convert2bed -i gff < {input.gff} \
@@ -353,7 +353,7 @@ rule create_index_fasta:
         ),
     log:
         os.path.join(config["local_log"], "create_index_fasta.log"),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
         "(samtools faidx {input.genome}) &> {log}"
@@ -373,7 +373,7 @@ rule extract_chr_len:
         cluster_log=os.path.join(config["cluster_log"], "extract_chr_len.log"),
     log:
         os.path.join(config["local_log"], "extract_chr_len.log"),
-    singularity:
+    container:
         "docker://ubuntu:lunar-20221207"
     shell:
         "(cut -f1,2 {input.genome} > {output.chrsize}) &> {log}"
@@ -396,7 +396,7 @@ rule filter_mature_mirs:
         precursor="miRNA_primary_transcript",
     log:
         os.path.join(config["local_log"], "filter_mature_mirs.log"),
-    singularity:
+    container:
         "docker://ubuntu:lunar-20221207"
     shell:
         "(grep -v {params.precursor} {input.bed} > {output.bed}) &> {log}"
@@ -428,7 +428,7 @@ rule iso_anno:
             config["local_log"],
             "iso_anno_5p{bp_5p}_3p{bp_3p}.log",
         ),
-    singularity:
+    container:
         "docker://biocontainers/bedtools:v2.28.0_cv2"
     shell:
         "(bedtools slop \
@@ -468,7 +468,7 @@ rule iso_anno_rename:
             config["local_log"],
             "iso_anno_rename_5p{bp_5p}_3p{bp_3p}.log",
         ),
-    singularity:
+    container:
         "docker://ubuntu:lunar-20221207"
     shell:
         "(sed \
@@ -500,7 +500,7 @@ rule iso_anno_concat:
         prefix=os.path.join(config["output_dir"], "iso_anno_rename"),
     log:
         os.path.join(config["local_log"], "iso_anno_concat.log"),
-    singularity:
+    container:
         "docker://ubuntu:lunar-20221207"
     shell:
         "(cat {params.prefix}* > {output.bed}) &> {log}"
@@ -521,7 +521,7 @@ rule iso_anno_final:
         pattern="5p0_3p0",
     log:
         os.path.join(config["local_log"], "iso_anno_final.log"),
-    singularity:
+    container:
         "docker://ubuntu:lunar-20221207"
     shell:
         "(grep -v '{params.pattern}' {input.bed} > {output.bed}) &> {log}"
