@@ -25,7 +25,7 @@ import os
 import pandas as pd
 
 ###############################################################################
-### Reading samples' table
+### Reading samples table
 ###############################################################################
 
 samples_table = pd.read_csv(
@@ -37,8 +37,10 @@ samples_table = pd.read_csv(
     sep = "\t",
 )
 
-# Rules that require internet connection for downloading files are included
-# in the localrules
+###############################################################################
+### Global configuration
+###############################################################################
+
 localrules:
     finish_quantify,
 
