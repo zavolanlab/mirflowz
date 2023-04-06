@@ -25,7 +25,7 @@ import os
 import pandas as pd
 
 ###############################################################################
-### Reading sample and resources tables
+### Reading samples table
 ###############################################################################
 
 samples_table = pd.read_csv(
@@ -38,11 +38,11 @@ samples_table = pd.read_csv(
 )
 
 ###############################################################################
-### Funcitons get_sample and get_resource
+### Functions
 ###############################################################################
-# Function to get relevant per sample information from samples and resources table
 
-def get_sample(column_id, sample_id = None):
+def get_sample(column_id: str, sample_id :int = None) -> str:
+    """Get relevant per sample information."""
     if sample_id:
         return str(
             samples_table[column_id][samples_table.index == sample_id][0]
@@ -55,8 +55,7 @@ def get_sample(column_id, sample_id = None):
 ###############################################################################
 ### Global configuration
 ###############################################################################
-# Rules that require internet connection for downloading files are included
-# in the localrules
+
 localrules:
     start,
     finish_map,
