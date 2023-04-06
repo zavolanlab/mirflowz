@@ -71,6 +71,13 @@ conda env update -f environment.root.yml
 > (recommended in almost all cases), ask your systems administrator about
 > Singularity.
 
+Only if you are a developer, you must further update the conda environment using the
+`environment.dev.yml` with the command below.
+
+```bash
+conda env update -f environment.dev.yml
+```
+
 ### Testing your installation
 
 Several tests are provided to check the integrity of the installation. Follow
