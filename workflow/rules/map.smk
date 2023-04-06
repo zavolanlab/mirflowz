@@ -444,6 +444,8 @@ rule sort_genome_oligomap:
     resources:
         threads=8,
         time=6,
+    container:
+        "docker://ubuntu:lunar-20221207"
     shell:
         "(bash {input.script} \
         {input.tmap} \
@@ -563,6 +565,8 @@ rule sort_transcriptome_oligomap:
         ),
     resources:
         threads=8,
+    container:
+        "docker://ubuntu:lunar-20221207"
     shell:
         "(bash {input.script} \
         {input.tmap} \
