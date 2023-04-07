@@ -34,7 +34,7 @@ localrules:
 
 rule finish_quantify:
     input:
-        table1=expand(
+        table=expand(
             os.path.join(
                 config["output_dir"], 
                 "TABLES", 
@@ -42,11 +42,7 @@ rule finish_quantify:
             ),
             mir=config["mir_list"],
         ),
-        table2=os.path.join(
-            config["output_dir"], 
-            "TABLES", 
-            "counts.isomirs.tab",
-        ),
+
 
 ###############################################################################
 ### BAM to BED

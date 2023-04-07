@@ -16,7 +16,7 @@ user_dir=$PWD
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 cd $script_dir
 
-# Have to match directories indicated in config.yaml files
+# Create directories defined as in the configuration files
 mkdir -p logs/cluster
 mkdir -p logs/local
 mkdir -p results
