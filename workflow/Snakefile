@@ -8,17 +8,6 @@
 #   - quantify miRNAs, including isomiRs, from miRNA-seq alignments.
 #
 ###############################################################################
-#
-# USAGE:
-# snakemake \
-#    --use-singularity \
-#    --singularity-args "--bind $PWD/../" \
-#    --cores 4 \
-#    --printshellcmds \
-#    --rerun-incomplete \
-#    --verbose
-#
-################################################################################
 
 import os
 import pandas as pd

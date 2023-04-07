@@ -6,22 +6,7 @@
 # for smallRNA-seq related workflows.
 #
 ###############################################################################
-#
-# USAGE (from the file's directory):
-#
-# snakemake \
-#    --snakefile="prepare.smk" \
-#    --cores 4 \
-#    --use-singularity \
-#    --singularity-args "--bind $PWD/../" \ 
-#    --printshellcmds \
-#    --rerun-incomplete \
-#    --verbose
-#
-# IMPORTANT when executing this file alone:
-## * You must modify the config.yaml.
-## * Uncomment the configfile line.
-################################################################################
+
 import os
 
 localrules:

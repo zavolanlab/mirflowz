@@ -142,7 +142,7 @@
 <polygon fill="grey" stroke="grey" stroke-width="2" points="336.02,-1481.22 325.77,-1478.52 332.1,-1487.02 336.02,-1481.22"/>
 </g>
 <!-- 5&#45;&gt;0 -->
-<g id="edge2" class="edge">
+<g id="edge5" class="edge">
 <title>5&#45;&gt;0</title>
 <path fill="none" stroke="grey" stroke-width="2" d="M754.04,-1583.07C755.5,-1556.15 758,-1503.65 758,-1459 758,-1459 758,-1459 758,-161 758,-111.51 715.36,-69.44 682.24,-44.23"/>
 <polygon fill="grey" stroke="grey" stroke-width="2" points="684.47,-41.52 674.33,-38.44 680.33,-47.17 684.47,-41.52"/>
@@ -160,7 +160,7 @@
 <text text-anchor="middle" x="515" y="-1095.5" font-family="sans" font-size="10.00">gtftobed</text>
 </g>
 <!-- 6&#45;&gt;0 -->
-<g id="edge3" class="edge">
+<g id="edge2" class="edge">
 <title>6&#45;&gt;0</title>
 <path fill="none" stroke="grey" stroke-width="2" d="M544.74,-1094.75C578.51,-1090.55 632.81,-1078.51 663,-1044 689.63,-1013.56 682,-995.45 682,-955 682,-955 682,-955 682,-161 682,-121.16 667.87,-77.11 656.85,-48.8"/>
 <polygon fill="grey" stroke="grey" stroke-width="2" points="660.19,-47.73 653.19,-39.77 653.7,-50.36 660.19,-47.73"/>
@@ -370,7 +370,7 @@
 <text text-anchor="middle" x="385" y="-1095.5" font-family="sans" font-size="10.00">remove_headers_transcriptome</text>
 </g>
 <!-- 21&#45;&gt;20 -->
-<g id="edge26" class="edge">
+<g id="edge27" class="edge">
 <title>21&#45;&gt;20</title>
 <path fill="none" stroke="grey" stroke-width="2" d="M403.42,-1079.34C411.49,-1071.6 421.13,-1062.36 430.04,-1053.81"/>
 <polygon fill="grey" stroke="grey" stroke-width="2" points="432.35,-1056.44 437.15,-1047 427.51,-1051.39 432.35,-1056.44"/>

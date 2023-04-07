@@ -142,7 +142,6 @@ if (args.uniq):
     out = open(args.prefix, 'w')
     for x in counts[i].keys():
         cnt = str(counts[i][x])
-        print(x,cnt)
         out.write(x + '\t' + cnt + '\n') 
 
 ### SPLIT. CREATE A SEPARE COUNT TABLES FILES FOR EACH MIRNA TYPE
