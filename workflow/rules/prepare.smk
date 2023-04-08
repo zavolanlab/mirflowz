@@ -381,4 +381,3 @@ rule filter_mature_mirs:
         "docker://ubuntu:lunar-20221207"
     shell:
         "(grep -v {params.precursor} {input.bed} > {output.bed}) &> {log}"
-

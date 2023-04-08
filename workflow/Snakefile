@@ -74,11 +74,7 @@ rule finish:
             ),
             sample=pd.unique(samples_table.index.values),
         ),
-        table=lambda wildcard:expand(
-            os.path.join(
-                config["output_dir"], 
-                "TABLES", 
-                "counts.{mir}.tab"
-            ),
+        table=lambda wildcard: expand(
+            os.path.join(config["output_dir"], "TABLES", "counts.{mir}.tab"),
             mir=config["mir_list"],
         ),
