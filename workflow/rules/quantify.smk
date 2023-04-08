@@ -241,7 +241,7 @@ rule merge_tables:
             config["cluster_log"], "merge_tables_{mir}.log"
         ),
         prefix="{mir}_counts_",
-        input_dir=lambda wildcards, input: input[0][:-4],
+        input_dir=lambda wildcards, input: input[0][:14],
     log:
         os.path.join(config["local_log"], "merge_tables_{mir}.log"),
     container:
