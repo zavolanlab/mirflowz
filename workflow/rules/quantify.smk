@@ -166,9 +166,7 @@ rule quant_mirna:
         cluster_log=os.path.join(
             config["cluster_log"], "quant_mirna_miRNA_{sample}.log"
         ),
-        prefix=os.path.join(
-            config["output_dir"], "TABLES", "miRNA_counts_{sample}"
-        ),
+        prefix=lambda wildcards, output: output[0],
     log:
         os.path.join(config["local_log"], "quant_mirna_miRNA_{sample}.log"),
     container:
@@ -204,11 +202,7 @@ rule quant_mirna_pri:
             config["cluster_log"],
             "quant_mirna_miRNA_primary_transcript_{sample}.log",
         ),
-        prefix=os.path.join(
-            config["output_dir"],
-            "TABLES",
-            "miRNA_primary_transcript_counts_{sample}",
-        ),
+        prefix=lambda wildcards, output: output[0],
     log:
         os.path.join(
             config["local_log"],
@@ -247,7 +241,7 @@ rule merge_tables:
             config["cluster_log"], "merge_tables_{mir}.log"
         ),
         prefix="{mir}_counts_",
-        input_dir=os.path.join(config["output_dir"], "TABLES"),
+        input_dir=lambda wildcards, input: input[0][:-4],
     log:
         os.path.join(config["local_log"], "merge_tables_{mir}.log"),
     container:
