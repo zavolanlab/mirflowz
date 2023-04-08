@@ -13,7 +13,7 @@ import pandas as pd
 ### Including functions
 ###############################################################################
 
-include: os.path.join("rules", "common.smk")
+include: "common.smk"
 
 ###############################################################################
 ### Reading samples table
