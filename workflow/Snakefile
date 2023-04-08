@@ -8,17 +8,6 @@
 #   - quantify miRNAs, including isomiRs, from miRNA-seq alignments.
 #
 ###############################################################################
-#
-# USAGE:
-# snakemake \
-#    --use-singularity \
-#    --singularity-args "--bind $PWD/../" \
-#    --cores 4 \
-#    --printshellcmds \
-#    --rerun-incomplete \
-#    --verbose
-#
-################################################################################
 
 import os
 import pandas as pd
@@ -77,10 +66,6 @@ rule finish:
             config["output_dir"],
             "mirna_annotations.bed",
         ),
-        isomirs=os.path.join(
-            config["output_dir"],
-            "isomirs_annotation.bed",
-        ),
         maps=expand(
             os.path.join(
                 config["output_dir"],
@@ -89,10 +74,11 @@ rule finish:
             ),
             sample=pd.unique(samples_table.index.values),
         ),
-        table1=lambda wildcard: expand(
-            os.path.join(config["output_dir"], "TABLES", "counts.{mir}.tab"),
+        table=lambda wildcard:expand(
+            os.path.join(
+                config["output_dir"], 
+                "TABLES", 
+                "counts.{mir}.tab"
+            ),
             mir=config["mir_list"],
-        ),
-        table2=os.path.join(
-            config["output_dir"], "TABLES", "counts.isomirs.tab"
         ),

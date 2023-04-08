@@ -16,10 +16,10 @@ user_dir=$PWD
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 cd $script_dir
 
-# Have to match directories indicated in config.yaml files
-mkdir -p logs/cluster/{homo_sapiens/chrY,test_lib}
-mkdir -p logs/local/{homo_sapiens/chrY,test_lib}
-mkdir -p results/{homo_sapiens/chrY,test_lib}
+# Create directories defined as in the configuration files
+mkdir -p logs/cluster
+mkdir -p logs/local
+mkdir -p results
 
 # Run test
 snakemake \

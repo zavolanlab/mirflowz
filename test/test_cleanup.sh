@@ -21,6 +21,6 @@ rm -rf .snakemake/
 rm -rf .tmp/
 rm -rf logs/
 rm -rf results/
-rm -rf snakemake_report*.html
+rm -rf snakemake_report.html
 rm -rf wget-log*
 rm -rf .wget-hsts

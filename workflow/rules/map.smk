@@ -4,22 +4,6 @@
 #
 # Workflow to map small RNA-seq reads (e.g. from miRNA sequencing libraries).
 ###############################################################################
-#
-# USAGE (from the file's directory):
-#
-# snakemake \
-#    --snakefile="map.smk" \
-#    --cores 4 \
-#    --use-container \
-#    --container-args "--bind $PWD/../" \
-#    --printshellcmds \
-#    --rerun-incomplete \
-#    --verbose
-#
-# IMPORTANT when executing this file alone:
-## * You must modify the config.yaml.
-## * Uncomment the configfile line.
-################################################################################
 
 import os
 import pandas as pd
