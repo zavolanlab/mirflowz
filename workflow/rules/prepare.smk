@@ -160,7 +160,7 @@ rule generate_segemehl_index_transcriptome:
         threads=8,
         time=6,
     singularity:
-        "docker://quay.io/biocontainers/segemehl:0.2.0--h20b1175_9"
+        "docker://quay.io/biocontainers/segemehl:0.3.4--hf7d323f_8"
     shell:
         "(segemehl.x -x {output.idx} -d {input.fasta}) &> {log}"
 
@@ -194,7 +194,7 @@ rule generate_segemehl_index_genome:
         threads=8,
         time=6,
     singularity:
-        "docker://quay.io/biocontainers/segemehl:0.2.0--h20b1175_9"
+        "docker://quay.io/biocontainers/segemehl:0.3.4--hf7d323f_8"
     shell:
         "(segemehl.x -x {output.idx} -d {input.genome}) &> {log}"
 
