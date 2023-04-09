@@ -254,6 +254,42 @@ rule mapping_genome_segemehl:
         genome_index_segemehl=os.path.join(config["output_dir"], "genome_index_segemehl.idx"),
     output:
         gmap=os.path.join(
+            config["output_dir"], "{sample}", "all_segemehlGenome_map.sam"
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"], "all_mapping_genome_segemehl_{sample}.log"
+        ),
+    log:
+        os.path.join(
+            config["local_log"], "all_mapping_genome_segemehl_{sample}.log"
+        ),
+    resources:
+        mem=50,
+        time=12,
+        threads=8,
+    singularity:
+        "docker://quay.io/biocontainers/segemehl:0.3.4--hf7d323f_8"
+    shell:
+        "(segemehl.x \
+        -i {input.genome_index_segemehl} \
+        -d {input.genome} \
+        -t {threads} \
+        -q {input.reads} \
+        -outfile {output.gmap} \
+        ) &> {log}"
+
+###############################################################################
+### Remove unmapped to genome sequences
+###############################################################################
+
+rule remove_genome_unmapped:
+    input:
+        gmap=os.path.join(
+            config["output_dir"], "{sample}", "all_segemehlGenome_map.sam"
+        ),
+    output:
+        gmap=os.path.join(
             config["output_dir"], "{sample}", "segemehlGenome_map.sam"
         ),
     params:
@@ -264,20 +300,10 @@ rule mapping_genome_segemehl:
         os.path.join(
             config["local_log"], "mapping_genome_segemehl_{sample}.log"
         ),
-    resources:
-        mem=50,
-        time=12,
-        threads=8,
     singularity:
-        "docker://quay.io/biocontainers/segemehl:0.2.0--h20b1175_9"
+        "docker://ubuntu:lunar-20221207"
     shell:
-        "(segemehl.x \
-        -i {input.genome_index_segemehl} \
-        -d {input.genome} \
-        -t {threads} \
-        -q {input.reads} \
-        -outfile {output.gmap} \
-        ) &> {log}"
+        "(awk '$3 !~ /\*/ {{print $0}}' {input.gmap} > {output.gmap}) &> {log}"
 
 
 ###############################################################################
@@ -292,23 +318,23 @@ rule mapping_transcriptome_segemehl:
         transcriptome_index_segemehl=os.path.join(config["output_dir"], "transcriptome_index_segemehl.idx"),
     output:
         tmap=os.path.join(
-            config["output_dir"], "{sample}", "segemehlTranscriptome_map.sam"
+            config["output_dir"], "{sample}", "all_segemehlTranscriptome_map.sam"
         ),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
-            "mapping_transcriptome_segemehl_{sample}.log",
+            "all_mapping_transcriptome_segemehl_{sample}.log",
         ),
     log:
         os.path.join(
-            config["local_log"], "mapping_transcriptome_segemehl_{sample}.log"
+            config["local_log"], "all_mapping_transcriptome_segemehl_{sample}.log"
         ),
     resources:
         mem=10,
         time=12,
         threads=8,
     singularity:
-        "docker://quay.io/biocontainers/segemehl:0.2.0--h20b1175_9"
+        "docker://quay.io/biocontainers/segemehl:0.3.4--hf7d323f_8"
     shell:
         "(segemehl.x \
         -i {input.transcriptome_index_segemehl} \
@@ -317,6 +343,32 @@ rule mapping_transcriptome_segemehl:
         -q {input.reads} \
         -outfile {output.tmap} \
         ) &> {log}"
+
+###############################################################################
+### Remove unmapped to transcriptome sequences
+###############################################################################
+
+rule remove_transcriptome_unmapped:
+    input:
+        tmap=os.path.join(
+            config["output_dir"], "{sample}", "all_segemehlTranscriptome_map.sam"
+        ),
+    output:
+        tmap=os.path.join(
+            config["output_dir"], "{sample}", "segemehlTranscriptome_map.sam"
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"], "mapping_transcriptome_segemehl_{sample}.log"
+        ),
+    log:
+        os.path.join(
+            config["local_log"], "mapping_trnascriptome_segemehl_{sample}.log"
+        ),
+    singularity:
+        "docker://ubuntu:lunar-20221207"
+    shell:
+        "(awk '$3 !~ /\*/ {{print $0}}' {input.tmap} > {output.tmap}) &> {log}"
 
 
 ###############################################################################
@@ -447,15 +499,15 @@ rule oligomap_genome_toSAM:
         ),
     output:
         gmap=os.path.join(
-            config["output_dir"], "{sample}", "oligoGenome_converted.sam"
+            config["output_dir"], "{sample}", "m_oligoGenome_converted.sam"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "oligomap_genome_toSAM_{sample}.log"
+            config["cluster_log"], "m_oligomap_genome_toSAM_{sample}.log"
         ),
         nh=config["nh"],
     log:
-        os.path.join(config["local_log"], "oligomap_genome_toSAM_{sample}.log"),
+        os.path.join(config["local_log"], "m_oligomap_genome_toSAM_{sample}.log"),
     resources:
         time=1,
         queue=1,
@@ -466,6 +518,30 @@ rule oligomap_genome_toSAM:
         -i {input.sort} \
         -n {params.nh} \
         > {output.gmap}) &> {log}"
+
+###############################################################################
+### Genome CIGAR string Ms to equal sign
+###############################################################################
+
+rule genome_m2equal:
+    input:
+        gsam=os.path.join(
+            config["output_dir"], "{sample}", "m_oligoGenome_converted.sam"
+        ),
+    output:
+        gsam=os.path.join(
+            config["output_dir"], "{sample}", "oligoGenome_converted.sam"
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"], "oligomap_genome_toSAM_{sample}.log"
+        ),
+    log:
+        os.path.join(config["local_log"], "oligomap_genome_toSAM_{sample}.log"),
+    singularity:
+        "docker://ubuntu:lunar-20221207"
+    shell:
+        """(awk '{{gsub(/M/,"=",$6)}}' {input.gsam} > {output.gsam}) &> {log}"""
 
 
 ###############################################################################
@@ -568,16 +644,16 @@ rule oligomap_transcriptome_toSAM:
         tmap=os.path.join(
             config["output_dir"],
             "{sample}",
-            "oligoTranscriptome_converted.sam",
+            "m_oligoTranscriptome_converted.sam",
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "oligomap_transcriptome_toSAM_{sample}.log"
+            config["cluster_log"], "m_oligomap_transcriptome_toSAM_{sample}.log"
         ),
         nh=config["nh"],
     log:
         os.path.join(
-            config["local_log"], "oligomap_transcriptome_toSAM_{sample}.log"
+            config["local_log"], "m_oligomap_transcriptome_toSAM_{sample}.log"
         ),
     singularity:
         "docker://python:3.9.16"
@@ -588,6 +664,29 @@ rule oligomap_transcriptome_toSAM:
         > {output.tmap} \
         ) &> {log}"
 
+###############################################################################
+### Trancriptome CIGAR string Ms to equal sign
+###############################################################################
+
+rule transcriptome_m2equal:
+    input:
+        tsam=os.path.join(
+            config["output_dir"], "{sample}", "m_oligoTranscriptome_converted.sam"
+        ),
+    output:
+        tsam=os.path.join(
+            config["output_dir"], "{sample}", "oligoTranscriptome_converted.sam"
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"], "oligomap_transcriptome_toSAM_{sample}.log"
+        ),
+    log:
+        os.path.join(config["local_log"], "oligomap_transcriptome_toSAM_{sample}.log"),
+    singularity:
+        "docker://ubuntu:lunar-20221207"
+    shell:
+        """(awk '{{gsub(/M/,"=",$6)}}' {input.tsam} > {output.tsam}) &> {log}"""
 
 ###############################################################################
 ### Merge genome mappings
