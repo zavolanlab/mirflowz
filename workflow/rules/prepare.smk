@@ -53,6 +53,7 @@ rule finish_prepare:
 rule trim_genome_seq_id:
     input:
         genome=config["genome_file"],
+        script=os.path.join(config["scripts_dir"], "trim_id_fasta.sh"),
     output:
         genome=os.path.join(config["output_dir"], "genome.processed.fa"),
     params:
@@ -66,12 +67,7 @@ rule trim_genome_seq_id:
     container:
         "docker://ubuntu:lunar-20221207"
     shell:
-        """(zcat {input.genome} | 
-        awk \
-        -F" " \
-        "/^>/ {{print \$1; next}} 1" \
-        > {output.genome} \
-        ) &> {log}"""
+        "(zcat {input.genome} | {input.script} > {output.genome}) &> {log}"
 
 
 ###############################################################################
@@ -109,7 +105,7 @@ rule extract_transcriptome_seqs:
 rule trim_fasta:
     input:
         fasta=os.path.join(config["output_dir"], "transcriptome.fa"),
-        script=os.path.join(config["scripts_dir"], "validation_fasta.py"),
+        script=os.path.join(config["scripts_dir"], "trim_id_fasta.sh"),
     output:
         fasta=os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
     params:
@@ -119,12 +115,7 @@ rule trim_fasta:
     container:
         "docker://ubuntu:lunar-20221207"
     shell:
-        """(awk \
-        -F" " \
-        "/^>/ {{print \$1; next}} 1" \
-        {input.fasta} \
-        > {output.fasta} \
-        ) &> {log}"""
+        "(cat {input.fasta} | {input.script} > {output.fasta}) &> {log}"
 
 
 ###############################################################################
