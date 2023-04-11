@@ -71,6 +71,13 @@ conda env update -f environment.root.yml
 > (recommended in almost all cases), ask your systems administrator about
 > Singularity.
 
+If you would like to contribute to _MIRFLOWZ_ development, you may find it 
+useful to further update your environment with the development dependencies:
+
+```bash
+conda env update -f environment.dev.yml
+```
+
 ### Testing your installation
 
 Several tests are provided to check the integrity of the installation. Follow

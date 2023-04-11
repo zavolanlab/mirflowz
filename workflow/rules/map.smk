@@ -8,42 +8,37 @@
 import os
 import pandas as pd
 
+
 ###############################################################################
-### Reading sample and resources tables
+### Including functions
+###############################################################################
+
+
+include: "common.smk"
+
+
+###############################################################################
+### Reading samples table
 ###############################################################################
 
 samples_table = pd.read_csv(
     config["samples"],
-    header = 0,
-    index_col = 0,
-    comment = "#",
-    engine = "python",
-    sep = "\t",
+    header=0,
+    index_col=0,
+    comment="#",
+    engine="python",
+    sep="\t",
 )
-
-###############################################################################
-### Funcitons get_sample and get_resource
-###############################################################################
-# Function to get relevant per sample information from samples and resources table
-
-def get_sample(column_id, sample_id = None):
-    if sample_id:
-        return str(
-            samples_table[column_id][samples_table.index == sample_id][0]
-        )
-    else:
-        return str(
-            samples_table[column_id][0]
-        )
 
 ###############################################################################
 ### Global configuration
 ###############################################################################
-# Rules that require internet connection for downloading files are included
-# in the localrules
+
+
 localrules:
     start,
     finish_map,
+
 
 ###############################################################################
 ### Finish rule
@@ -62,15 +57,17 @@ rule finish_map:
         ),
 
 
-
 ###############################################################################
 ### Start rule (get samples)
 ###############################################################################
 
+
 rule start:
     input:
         reads=lambda wildcards: expand(
-            pd.Series(samples_table.loc[wildcards.sample, "sample_file"]).values,
+            pd.Series(
+                samples_table.loc[wildcards.sample, "sample_file"]
+            ).values,
             format=get_sample("format"),
         ),
     output:
@@ -79,7 +76,7 @@ rule start:
             "{sample}",
             "{format}",
             "reads.{format}",
-        )
+        ),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
@@ -90,7 +87,7 @@ rule start:
             config["local_log"],
             "uncompress_zipped_files_{sample}_{format}.log",
         ),
-    singularity:
+    container:
         "docker://ubuntu:lunar-20221207"
     shell:
         "(zcat {input.reads} > {output.reads}) &> {log}"
@@ -118,7 +115,7 @@ rule fastq_quality_filter:
         q=config["q_value"],
     log:
         os.path.join(config["local_log"], "fastq_quality_filter_{sample}.log"),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--H87F3376_10"
     shell:
         "(fastq_quality_filter \
@@ -150,7 +147,7 @@ rule fastq_to_fasta:
         ),
     log:
         os.path.join(config["local_log"], "fastq_to_fasta_{sample}.log"),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--H87F3376_10"
     shell:
         "(fastq_to_fasta -r -n -i {input.reads} > {output.reads}) &> {log}"
@@ -177,7 +174,7 @@ rule fasta_formatter:
         ),
     log:
         os.path.join(config["local_log"], "fasta_formatter_{sample}.log"),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--H87F3376_10"
     shell:
         "(fasta_formatter -w 0 -i {input.reads} > {output.reads}) &> {log}"
@@ -194,9 +191,7 @@ rule cutadapt:
     output:
         reads=os.path.join(config["output_dir"], "{sample}", "cut.fasta"),
     params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "cutadapt_{sample}.log"
-        ),
+        cluster_log=os.path.join(config["cluster_log"], "cutadapt_{sample}.log"),
         adapter=lambda wildcards: get_sample("adapter", wildcards.sample),
         error_rate=config["error_rate"],
         minimum_length=config["minimum_length"],
@@ -206,7 +201,7 @@ rule cutadapt:
         os.path.join(config["local_log"], "cutadapt_{sample}.log"),
     resources:
         threads=8,
-    singularity:
+    container:
         "docker://quay.io/biocontainers/cutadapt:4.3--py310h1425a21_0"
     shell:
         "(cutadapt \
@@ -236,7 +231,7 @@ rule fastx_collapser:
         ),
     log:
         os.path.join(config["local_log"], "fastx_collapser_{sample}.log"),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--H87F3376_10"
     shell:
         "(fastx_collapser -i {input.reads} > {output.reads}) &> {log}"
@@ -251,7 +246,9 @@ rule mapping_genome_segemehl:
     input:
         reads=os.path.join(config["output_dir"], "{sample}", "collapsed.fasta"),
         genome=os.path.join(config["output_dir"], "genome.processed.fa"),
-        genome_index_segemehl=os.path.join(config["output_dir"], "genome_index_segemehl.idx"),
+        genome_index_segemehl=os.path.join(
+            config["output_dir"], "genome_index_segemehl.idx"
+        ),
     output:
         gmap=os.path.join(
             config["output_dir"], "{sample}", "segemehlGenome_map.sam"
@@ -268,7 +265,7 @@ rule mapping_genome_segemehl:
         mem=50,
         time=12,
         threads=8,
-    singularity:
+    container:
         "docker://quay.io/biocontainers/segemehl:0.2.0--h20b1175_9"
     shell:
         "(segemehl.x \
@@ -288,8 +285,12 @@ rule mapping_genome_segemehl:
 rule mapping_transcriptome_segemehl:
     input:
         reads=os.path.join(config["output_dir"], "{sample}", "collapsed.fasta"),
-        transcriptome=os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
-        transcriptome_index_segemehl=os.path.join(config["output_dir"], "transcriptome_index_segemehl.idx"),
+        transcriptome=os.path.join(
+            config["output_dir"], "transcriptome_idtrim.fa"
+        ),
+        transcriptome_index_segemehl=os.path.join(
+            config["output_dir"], "transcriptome_index_segemehl.idx"
+        ),
     output:
         tmap=os.path.join(
             config["output_dir"], "{sample}", "segemehlTranscriptome_map.sam"
@@ -307,7 +308,7 @@ rule mapping_transcriptome_segemehl:
         mem=10,
         time=12,
         threads=8,
-    singularity:
+    container:
         "docker://quay.io/biocontainers/segemehl:0.2.0--h20b1175_9"
     shell:
         "(segemehl.x \
@@ -341,7 +342,7 @@ rule filter_fasta_for_oligomap:
         os.path.join(
             config["local_log"], "filter_fasta_for_oligomap_{sample}.log"
         ),
-    singularity:
+    container:
         "docker://python:3.9.16"
     shell:
         "(python {input.script} \
@@ -381,7 +382,7 @@ rule mapping_genome_oligomap:
         mem=50,
         time=6,
         threads=8,
-    singularity:
+    container:
         "docker://zavolab/oligomap:1.0"
     shell:
         "(oligomap \
@@ -421,6 +422,8 @@ rule sort_genome_oligomap:
     resources:
         threads=8,
         time=6,
+    container:
+        "docker://ubuntu:lunar-20221207"
     shell:
         "(bash {input.script} \
         {input.tmap} \
@@ -459,7 +462,7 @@ rule oligomap_genome_toSAM:
     resources:
         time=1,
         queue=1,
-    singularity:
+    container:
         "docker://python:3.9.16"
     shell:
         "(python {input.script} \
@@ -499,7 +502,7 @@ rule mapping_transcriptome_oligomap:
         mem=10,
         time=6,
         threads=8,
-    singularity:
+    container:
         "docker://zavolab/oligomap:1.0"
     shell:
         "(oligomap \
@@ -540,6 +543,8 @@ rule sort_transcriptome_oligomap:
         ),
     resources:
         threads=8,
+    container:
+        "docker://ubuntu:lunar-20221207"
     shell:
         "(bash {input.script} \
         {input.tmap} \
@@ -579,7 +584,7 @@ rule oligomap_transcriptome_toSAM:
         os.path.join(
             config["local_log"], "oligomap_transcriptome_toSAM_{sample}.log"
         ),
-    singularity:
+    container:
         "docker://python:3.9.16"
     shell:
         "(python {input.script} \
@@ -612,7 +617,7 @@ rule merge_genome_maps:
         ),
     log:
         os.path.join(config["local_log"], "merge_genome_maps_{sample}.log"),
-    singularity:
+    container:
         "docker://ubuntu:lunar-20221207"
     shell:
         "(cat {input.gmap1} {input.gmap2} > {output.gmaps}) &> {log}"
@@ -645,7 +650,7 @@ rule merge_transcriptome_maps:
         os.path.join(
             config["local_log"], "merge_transcriptome_maps_{sample}.log"
         ),
-    singularity:
+    container:
         "docker://ubuntu:lunar-20221207"
     shell:
         "(cat {input.tmap1} {input.tmap2} > {output.tmaps}) &> {log}"
@@ -673,7 +678,7 @@ rule nh_filter_genome:
         nh=config["nh"],
     log:
         os.path.join(config["local_log"], "nh_filter_genome_{sample}.log"),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
     shell:
         "(python {input.script} \
@@ -709,7 +714,7 @@ rule filter_nh_transcriptome:
         os.path.join(
             config["local_log"], "filter_nh_transcriptome_{sample}.log"
         ),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
     shell:
         "(python {input.script} \
@@ -739,7 +744,7 @@ rule remove_headers_genome:
         ),
     log:
         os.path.join(config["local_log"], "remove_headers_genome_{sample}.log"),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
         "samtools view {input.gmap} > {output.gmap}"
@@ -771,7 +776,7 @@ rule remove_headers_transcriptome:
         os.path.join(
             config["local_log"], "remove_headers_transcriptome_{sample}.log"
         ),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
         "samtools view {input.tmap} > {output.tmap}"
@@ -799,7 +804,7 @@ rule trans_to_gen:
         ),
     log:
         os.path.join(config["local_log"], "trans_to_gen_{sample}.log"),
-    singularity:
+    container:
         "docker://perl:5.37.10"
     shell:
         "(perl {input.script} \
@@ -830,7 +835,7 @@ rule cat_mapping:
         ),
     log:
         os.path.join(config["local_log"], "cat_mapping_{sample}.log"),
-    singularity:
+    container:
         "docker://ubuntu:lunar-20221207"
     shell:
         "(cat {input.gmap1} {input.gmap2} > {output.catmaps}) &> {log}"
@@ -859,7 +864,7 @@ rule add_header:
         ),
     log:
         os.path.join(config["local_log"], "add_header_{sample}.log"),
-    singularity:
+    container:
         "docker://ubuntu:lunar-20221207"
     shell:
         "(cat {input.header} {input.catmaps} > {output.concatenate}) &> {log}"
@@ -885,7 +890,7 @@ rule sort_id:
         cluster_log=os.path.join(config["cluster_log"], "sort_id_{sample}.log"),
     log:
         os.path.join(config["local_log"], "sort_id_{sample}.log"),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
         "(samtools sort -n -o {output.sort} {input.concatenate}) &> {log}"
@@ -918,7 +923,7 @@ rule remove_inferiors:
     resources:
         mem=15,
         threads=4,
-    singularity:
+    container:
         "docker://perl:5.37.10"
     shell:
         "(perl {input.script} \
@@ -956,7 +961,7 @@ rule filter_by_indels:
     resources:
         mem=15,
         threads=4,
-    singularity:
+    container:
         "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
     shell:
         "(python {input.script} \
@@ -986,7 +991,7 @@ rule uncollapse_reads:
         ),
     log:
         os.path.join(config["local_log"], "uncollapse_reads_{sample}.log"),
-    singularity:
+    container:
         "docker://perl:5.37.10"
     shell:
         "(perl {input.script} \
@@ -1016,7 +1021,7 @@ rule convert_to_bam:
         ),
     log:
         os.path.join(config["local_log"], "convert_to_bam_{sample}.log"),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
         "(samtools view -b {input.maps} > {output.maps}) &> {log}"
@@ -1044,7 +1049,7 @@ rule sort_by_position:
         ),
     log:
         os.path.join(config["local_log"], "sort_by_position_{sample}.log"),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
         "(samtools sort {input.maps} > {output.maps}) &> {log}"
@@ -1074,7 +1079,7 @@ rule index_bam:
         ),
     log:
         os.path.join(config["local_log"], "index_bam_{sample}.log"),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
         "(samtools index -b {input.maps} > {output.maps}) &> {log}"

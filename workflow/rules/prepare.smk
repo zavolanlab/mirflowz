@@ -2,15 +2,21 @@
 # (c) 2020 Paula Iborra, Zavolan Lab, Biozentrum, University of Basel
 # (@) paula.iborradetoledo@unibas.ch / paula.iborra@alumni.esci.upf.edu
 #
-# Snakemake workflow to download and prepare the necessary files 
+# Snakemake workflow to download and prepare the necessary files
 # for smallRNA-seq related workflows.
 #
 ###############################################################################
 
 import os
 
+###############################################################################
+### Global configuration
+###############################################################################
+
+
 localrules:
     finish_prepare,
+
 
 ###############################################################################
 ### Finish rule
@@ -18,25 +24,24 @@ localrules:
 rule finish_prepare:
     input:
         idx_transcriptome=os.path.join(
-                config["output_dir"],
-                "transcriptome_index_segemehl.idx",
-
+            config["output_dir"],
+            "transcriptome_index_segemehl.idx",
         ),
         idx_genome=os.path.join(
-                config["output_dir"],
-                "genome_index_segemehl.idx",
+            config["output_dir"],
+            "genome_index_segemehl.idx",
         ),
         exons=os.path.join(
-                config["output_dir"], 
-                "exons.bed",
+            config["output_dir"],
+            "exons.bed",
         ),
         header=os.path.join(
-                config["output_dir"],
-                "headerOfCollapsedFasta.sam",
+            config["output_dir"],
+            "headerOfCollapsedFasta.sam",
         ),
         mirnafilt=os.path.join(
-                config["output_dir"], 
-                "mirna_filtered.bed",
+            config["output_dir"],
+            "mirna_filtered.bed",
         ),
 
 
@@ -44,27 +49,25 @@ rule finish_prepare:
 ### Trim genome IDs
 ###############################################################################
 
+
 rule trim_genome_seq_id:
     input:
         genome=config["genome_file"],
+        script=os.path.join(config["scripts_dir"], "trim_id_fasta.sh"),
     output:
         genome=os.path.join(config["output_dir"], "genome.processed.fa"),
     params:
-        dir_out=config["output_dir"],
+        dir_out=lambda wildcards, output: output[0][:-4],
         cluster_log=os.path.join(
-            config["cluster_log"], "genome_process.log",
+            config["cluster_log"],
+            "genome_process.log",
         ),
     log:
         os.path.join(config["local_log"], "genome_process.log"),
-    singularity:
+    container:
         "docker://ubuntu:lunar-20221207"
     shell:
-        """(zcat {input.genome} | 
-        awk \
-        -F" " \
-        "/^>/ {{print \$1; next}} 1" \
-        > {output.genome} \
-        ) &> {log}"""
+        "(zcat {input.genome} | {input.script} > {output.genome}) &> {log}"
 
 
 ###############################################################################
@@ -74,14 +77,10 @@ rule trim_genome_seq_id:
 
 rule extract_transcriptome_seqs:
     input:
-        genome=os.path.join(
-            config["output_dir"], "genome.processed.fa"
-        ),
+        genome=os.path.join(config["output_dir"], "genome.processed.fa"),
         gtf=config["gtf_file"],
     output:
-        fasta=os.path.join(
-            config["output_dir"], "transcriptome.fa"
-        ),
+        fasta=os.path.join(config["output_dir"], "transcriptome.fa"),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
@@ -92,7 +91,7 @@ rule extract_transcriptome_seqs:
             config["local_log"],
             "extract_transcriptome_seqs.log",
         ),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/cufflinks:2.2.1--py27_2"
     shell:
         "(zcat {input.gtf} | gffread -w {output.fasta} -g {input.genome}) &> {log}"
@@ -105,29 +104,18 @@ rule extract_transcriptome_seqs:
 
 rule trim_fasta:
     input:
-        fasta=os.path.join(
-            config["output_dir"], "transcriptome.fa"
-        ),
-        script=os.path.join(config["scripts_dir"], "validation_fasta.py"),
+        fasta=os.path.join(config["output_dir"], "transcriptome.fa"),
+        script=os.path.join(config["scripts_dir"], "trim_id_fasta.sh"),
     output:
-        fasta=os.path.join(
-            config["output_dir"], "transcriptome_idtrim.fa"
-        ),
+        fasta=os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
     params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "trim_fasta.log"
-        ),
+        cluster_log=os.path.join(config["cluster_log"], "trim_fasta.log"),
     log:
         os.path.join(config["local_log"], "trim_fasta.log"),
-    singularity:
+    container:
         "docker://ubuntu:lunar-20221207"
     shell:
-        """(awk \
-        -F" " \
-        "/^>/ {{print \$1; next}} 1" \
-        {input.fasta} \
-        > {output.fasta} \
-        ) &> {log}"""
+        "(cat {input.fasta} | {input.script} > {output.fasta}) &> {log}"
 
 
 ###############################################################################
@@ -137,9 +125,7 @@ rule trim_fasta:
 
 rule generate_segemehl_index_transcriptome:
     input:
-        fasta=os.path.join(
-            config["output_dir"], "transcriptome_idtrim.fa"
-        ),
+        fasta=os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
     output:
         idx=os.path.join(
             config["output_dir"],
@@ -159,7 +145,7 @@ rule generate_segemehl_index_transcriptome:
         mem=10,
         threads=8,
         time=6,
-    singularity:
+    container:
         "docker://quay.io/biocontainers/segemehl:0.2.0--h20b1175_9"
     shell:
         "(segemehl.x -x {output.idx} -d {input.fasta}) &> {log}"
@@ -172,13 +158,9 @@ rule generate_segemehl_index_transcriptome:
 
 rule generate_segemehl_index_genome:
     input:
-        genome=os.path.join(
-            config["output_dir"], "genome.processed.fa"
-        ),
+        genome=os.path.join(config["output_dir"], "genome.processed.fa"),
     output:
-        idx=os.path.join(
-            config["output_dir"], "genome_index_segemehl.idx"
-        ),
+        idx=os.path.join(config["output_dir"], "genome_index_segemehl.idx"),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
@@ -193,7 +175,7 @@ rule generate_segemehl_index_genome:
         mem=60,
         threads=8,
         time=6,
-    singularity:
+    container:
         "docker://quay.io/biocontainers/segemehl:0.2.0--h20b1175_9"
     shell:
         "(segemehl.x -x {output.idx} -d {input.genome}) &> {log}"
@@ -211,12 +193,10 @@ rule get_exons_gtf:
     output:
         exons=os.path.join(config["output_dir"], "exons.gtf"),
     params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "get_exons_gtf.log"
-        ),
+        cluster_log=os.path.join(config["cluster_log"], "get_exons_gtf.log"),
     log:
         os.path.join(config["local_log"], "get_exons_gtf.log"),
-    singularity:
+    container:
         "docker://ubuntu:lunar-20221207"
     shell:
         "(bash \
@@ -240,12 +220,10 @@ rule gtftobed:
     output:
         exons=os.path.join(config["output_dir"], "exons.bed"),
     params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "gtftobed.log"
-        ),
+        cluster_log=os.path.join(config["cluster_log"], "gtftobed.log"),
     log:
         os.path.join(config["local_log"], "gtftobed.log"),
-    singularity:
+    container:
         "docker://zavolab/r-zavolab:3.5.1"
     shell:
         "(Rscript \
@@ -262,25 +240,20 @@ rule gtftobed:
 
 rule create_header_genome:
     input:
-        genome=os.path.join(
-            config["output_dir"], "genome.processed.fa"
-        ),
+        genome=os.path.join(config["output_dir"], "genome.processed.fa"),
     output:
-        header=os.path.join(
-            config["output_dir"], "headerOfCollapsedFasta.sam"
-        ),
+        header=os.path.join(config["output_dir"], "headerOfCollapsedFasta.sam"),
     params:
         cluster_log=os.path.join(
             config["cluster_log"], "create_header_genome.log"
         ),
     log:
-        os.path.join(
-            config["local_log"], "create_header_genome.log"
-        ),
-    singularity:
+        os.path.join(config["local_log"], "create_header_genome.log"),
+    container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
         "(samtools dict -o {output.header} --uri=NA {input.genome}) &> {log}"
+
 
 ###############################################################################
 ### Mapping chromosomes names, UCSC <-> ENSEMBL
@@ -293,18 +266,14 @@ rule map_chr_names:
         script=os.path.join(config["scripts_dir"], "map_chromosomes.pl"),
         map_chr=config["map_chr_file"],
     output:
-        gff=os.path.join(
-            config["output_dir"], "mirna_annotations.gff3"
-        ),
+        gff=os.path.join(config["output_dir"], "mirna_annotations.gff3"),
     params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "map_chr_names.log"
-        ),
+        cluster_log=os.path.join(config["cluster_log"], "map_chr_names.log"),
         column="1",
         delimiter="TAB",
     log:
         os.path.join(config["local_log"], "map_chr_names.log"),
-    singularity:
+    container:
         "docker://perl:5.37.10"
     shell:
         "(perl {input.script} \
@@ -323,21 +292,15 @@ rule map_chr_names:
 
 rule gfftobed:
     input:
-        gff=os.path.join(
-            config["output_dir"], "mirna_annotations.gff3"
-        ),
+        gff=os.path.join(config["output_dir"], "mirna_annotations.gff3"),
     output:
-        bed=os.path.join(
-            config["output_dir"], "mirna_annotations.bed"
-        ),
+        bed=os.path.join(config["output_dir"], "mirna_annotations.bed"),
     params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "gfftobed.log"
-        ),
-        out_dir=config["output_dir"]
+        cluster_log=os.path.join(config["cluster_log"], "gfftobed.log"),
+        out_dir=lambda wildcards, input: input[0][:-4],
     log:
         os.path.join(config["local_log"], "gfftobed.log"),
-    singularity:
+    container:
         "docker://quay.io/biocontainers/bedops:2.4.35--h6bb024c_2"
     shell:
         "(convert2bed -i gff < {input.gff} \
@@ -353,22 +316,16 @@ rule gfftobed:
 
 rule create_index_fasta:
     input:
-        genome=os.path.join(
-            config["output_dir"], "genome.processed.fa"
-        ),
+        genome=os.path.join(config["output_dir"], "genome.processed.fa"),
     output:
-        genome=os.path.join(
-            config["output_dir"], "genome.processed.fa.fai"
-        ),
+        genome=os.path.join(config["output_dir"], "genome.processed.fa.fai"),
     params:
         cluster_log=os.path.join(
             config["cluster_log"], "create_index_fasta.log"
         ),
     log:
-        os.path.join(
-            config["local_log"], "create_index_fasta.log"
-        ),
-    singularity:
+        os.path.join(config["local_log"], "create_index_fasta.log"),
+    container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
         "(samtools faidx {input.genome}) &> {log}"
@@ -381,20 +338,14 @@ rule create_index_fasta:
 
 rule extract_chr_len:
     input:
-        genome=os.path.join(
-            config["output_dir"], "genome.processed.fa.fai"
-        ),
+        genome=os.path.join(config["output_dir"], "genome.processed.fa.fai"),
     output:
-        chrsize=os.path.join(
-            config["output_dir"], "chr_size.txt"
-        ),
+        chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
     params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "extract_chr_len.log"
-        ),
+        cluster_log=os.path.join(config["cluster_log"], "extract_chr_len.log"),
     log:
         os.path.join(config["local_log"], "extract_chr_len.log"),
-    singularity:
+    container:
         "docker://ubuntu:lunar-20221207"
     shell:
         "(cut -f1,2 {input.genome} > {output.chrsize}) &> {log}"
@@ -407,24 +358,17 @@ rule extract_chr_len:
 
 rule filter_mature_mirs:
     input:
-        bed=os.path.join(
-            config["output_dir"], "mirna_annotations.bed"
-        ),
+        bed=os.path.join(config["output_dir"], "mirna_annotations.bed"),
     output:
-        bed=os.path.join(
-            config["output_dir"], "mirna_mature_filtered.bed"
-        ),
+        bed=os.path.join(config["output_dir"], "mirna_mature_filtered.bed"),
     params:
         cluster_log=os.path.join(
             config["cluster_log"], "filter_mature_mirs.log"
         ),
         precursor="miRNA_primary_transcript",
     log:
-        os.path.join(
-            config["local_log"], "filter_mature_mirs.log"
-        ),
-    singularity:
+        os.path.join(config["local_log"], "filter_mature_mirs.log"),
+    container:
         "docker://ubuntu:lunar-20221207"
     shell:
         "(grep -v {params.precursor} {input.bed} > {output.bed}) &> {log}"
-
