@@ -41,8 +41,8 @@ jobs:
         uses: snakemake/snakemake-github-action@v1
         with:
          directory: './test'
-         snakefile: '../workflow/Snakefile'
-         args: '--configfile="config.yaml" --lint'
+         snakefile: 'workflow/Snakefile'
+         args: '--configfile="test/config.yaml" --lint'
         
       - name: Run local test
         run: bash test/test_workflow_local.sh
