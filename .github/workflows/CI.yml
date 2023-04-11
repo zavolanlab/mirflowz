@@ -38,7 +38,7 @@ jobs:
         run: bash test/test_rule_graph.sh
       
       - name: Check workflow descriptor files for lints
-          uses: snakemake/snakemake-github-action@v1
+        uses: snakemake/snakemake-github-action@v1
           with:
             directory: '.test'
             snakefile: 'workflow/Snakefile'
