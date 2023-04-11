@@ -2,15 +2,17 @@
 # (c) 2020 Paula Iborra, Zavolan Lab, Biozentrum, University of Basel
 # (@) paula.iborradetoledo@unibas.ch / paula.iborra@alumni.esci.upf.edu
 #
-# Snakemake workflow to download and prepare the necessary files 
+# Snakemake workflow to download and prepare the necessary files
 # for smallRNA-seq related workflows.
 #
 ###############################################################################
 
 import os
 
+
 localrules:
     finish_prepare,
+
 
 ###############################################################################
 ### Finish rule
@@ -18,31 +20,31 @@ localrules:
 rule finish_prepare:
     input:
         idx_transcriptome=os.path.join(
-                config["output_dir"],
-                "transcriptome_index_segemehl.idx",
-
+            config["output_dir"],
+            "transcriptome_index_segemehl.idx",
         ),
         idx_genome=os.path.join(
-                config["output_dir"],
-                "genome_index_segemehl.idx",
+            config["output_dir"],
+            "genome_index_segemehl.idx",
         ),
         exons=os.path.join(
-                config["output_dir"], 
-                "exons.bed",
+            config["output_dir"],
+            "exons.bed",
         ),
         header=os.path.join(
-                config["output_dir"],
-                "headerOfCollapsedFasta.sam",
+            config["output_dir"],
+            "headerOfCollapsedFasta.sam",
         ),
         mirnafilt=os.path.join(
-                config["output_dir"], 
-                "mirna_filtered.bed",
+            config["output_dir"],
+            "mirna_filtered.bed",
         ),
 
 
 ###############################################################################
 ### Trim genome IDs
 ###############################################################################
+
 
 rule trim_genome_seq_id:
     input:
@@ -52,7 +54,8 @@ rule trim_genome_seq_id:
     params:
         dir_out=config["output_dir"],
         cluster_log=os.path.join(
-            config["cluster_log"], "genome_process.log",
+            config["cluster_log"],
+            "genome_process.log",
         ),
     log:
         os.path.join(config["local_log"], "genome_process.log"),
@@ -74,14 +77,10 @@ rule trim_genome_seq_id:
 
 rule extract_transcriptome_seqs:
     input:
-        genome=os.path.join(
-            config["output_dir"], "genome.processed.fa"
-        ),
+        genome=os.path.join(config["output_dir"], "genome.processed.fa"),
         gtf=config["gtf_file"],
     output:
-        fasta=os.path.join(
-            config["output_dir"], "transcriptome.fa"
-        ),
+        fasta=os.path.join(config["output_dir"], "transcriptome.fa"),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
@@ -105,18 +104,12 @@ rule extract_transcriptome_seqs:
 
 rule trim_fasta:
     input:
-        fasta=os.path.join(
-            config["output_dir"], "transcriptome.fa"
-        ),
+        fasta=os.path.join(config["output_dir"], "transcriptome.fa"),
         script=os.path.join(config["scripts_dir"], "validation_fasta.py"),
     output:
-        fasta=os.path.join(
-            config["output_dir"], "transcriptome_idtrim.fa"
-        ),
+        fasta=os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
     params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "trim_fasta.log"
-        ),
+        cluster_log=os.path.join(config["cluster_log"], "trim_fasta.log"),
     log:
         os.path.join(config["local_log"], "trim_fasta.log"),
     singularity:
@@ -137,9 +130,7 @@ rule trim_fasta:
 
 rule generate_segemehl_index_transcriptome:
     input:
-        fasta=os.path.join(
-            config["output_dir"], "transcriptome_idtrim.fa"
-        ),
+        fasta=os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
     output:
         idx=os.path.join(
             config["output_dir"],
@@ -172,13 +163,9 @@ rule generate_segemehl_index_transcriptome:
 
 rule generate_segemehl_index_genome:
     input:
-        genome=os.path.join(
-            config["output_dir"], "genome.processed.fa"
-        ),
+        genome=os.path.join(config["output_dir"], "genome.processed.fa"),
     output:
-        idx=os.path.join(
-            config["output_dir"], "genome_index_segemehl.idx"
-        ),
+        idx=os.path.join(config["output_dir"], "genome_index_segemehl.idx"),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
@@ -211,9 +198,7 @@ rule get_exons_gtf:
     output:
         exons=os.path.join(config["output_dir"], "exons.gtf"),
     params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "get_exons_gtf.log"
-        ),
+        cluster_log=os.path.join(config["cluster_log"], "get_exons_gtf.log"),
     log:
         os.path.join(config["local_log"], "get_exons_gtf.log"),
     singularity:
@@ -240,9 +225,7 @@ rule gtftobed:
     output:
         exons=os.path.join(config["output_dir"], "exons.bed"),
     params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "gtftobed.log"
-        ),
+        cluster_log=os.path.join(config["cluster_log"], "gtftobed.log"),
     log:
         os.path.join(config["local_log"], "gtftobed.log"),
     singularity:
@@ -262,25 +245,20 @@ rule gtftobed:
 
 rule create_header_genome:
     input:
-        genome=os.path.join(
-            config["output_dir"], "genome.processed.fa"
-        ),
+        genome=os.path.join(config["output_dir"], "genome.processed.fa"),
     output:
-        header=os.path.join(
-            config["output_dir"], "headerOfCollapsedFasta.sam"
-        ),
+        header=os.path.join(config["output_dir"], "headerOfCollapsedFasta.sam"),
     params:
         cluster_log=os.path.join(
             config["cluster_log"], "create_header_genome.log"
         ),
     log:
-        os.path.join(
-            config["local_log"], "create_header_genome.log"
-        ),
+        os.path.join(config["local_log"], "create_header_genome.log"),
     singularity:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
         "(samtools dict -o {output.header} --uri=NA {input.genome}) &> {log}"
+
 
 ###############################################################################
 ### Mapping chromosomes names, UCSC <-> ENSEMBL
@@ -293,13 +271,9 @@ rule map_chr_names:
         script=os.path.join(config["scripts_dir"], "map_chromosomes.pl"),
         map_chr=config["map_chr_file"],
     output:
-        gff=os.path.join(
-            config["output_dir"], "mirna_annotations.gff3"
-        ),
+        gff=os.path.join(config["output_dir"], "mirna_annotations.gff3"),
     params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "map_chr_names.log"
-        ),
+        cluster_log=os.path.join(config["cluster_log"], "map_chr_names.log"),
         column="1",
         delimiter="TAB",
     log:
@@ -323,18 +297,12 @@ rule map_chr_names:
 
 rule gfftobed:
     input:
-        gff=os.path.join(
-            config["output_dir"], "mirna_annotations.gff3"
-        ),
+        gff=os.path.join(config["output_dir"], "mirna_annotations.gff3"),
     output:
-        bed=os.path.join(
-            config["output_dir"], "mirna_annotations.bed"
-        ),
+        bed=os.path.join(config["output_dir"], "mirna_annotations.bed"),
     params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "gfftobed.log"
-        ),
-        out_dir=config["output_dir"]
+        cluster_log=os.path.join(config["cluster_log"], "gfftobed.log"),
+        out_dir=config["output_dir"],
     log:
         os.path.join(config["local_log"], "gfftobed.log"),
     singularity:
@@ -353,21 +321,15 @@ rule gfftobed:
 
 rule create_index_fasta:
     input:
-        genome=os.path.join(
-            config["output_dir"], "genome.processed.fa"
-        ),
+        genome=os.path.join(config["output_dir"], "genome.processed.fa"),
     output:
-        genome=os.path.join(
-            config["output_dir"], "genome.processed.fa.fai"
-        ),
+        genome=os.path.join(config["output_dir"], "genome.processed.fa.fai"),
     params:
         cluster_log=os.path.join(
             config["cluster_log"], "create_index_fasta.log"
         ),
     log:
-        os.path.join(
-            config["local_log"], "create_index_fasta.log"
-        ),
+        os.path.join(config["local_log"], "create_index_fasta.log"),
     singularity:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
@@ -381,17 +343,11 @@ rule create_index_fasta:
 
 rule extract_chr_len:
     input:
-        genome=os.path.join(
-            config["output_dir"], "genome.processed.fa.fai"
-        ),
+        genome=os.path.join(config["output_dir"], "genome.processed.fa.fai"),
     output:
-        chrsize=os.path.join(
-            config["output_dir"], "chr_size.txt"
-        ),
+        chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
     params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "extract_chr_len.log"
-        ),
+        cluster_log=os.path.join(config["cluster_log"], "extract_chr_len.log"),
     log:
         os.path.join(config["local_log"], "extract_chr_len.log"),
     singularity:
@@ -407,24 +363,17 @@ rule extract_chr_len:
 
 rule filter_mature_mirs:
     input:
-        bed=os.path.join(
-            config["output_dir"], "mirna_annotations.bed"
-        ),
+        bed=os.path.join(config["output_dir"], "mirna_annotations.bed"),
     output:
-        bed=os.path.join(
-            config["output_dir"], "mirna_mature_filtered.bed"
-        ),
+        bed=os.path.join(config["output_dir"], "mirna_mature_filtered.bed"),
     params:
         cluster_log=os.path.join(
             config["cluster_log"], "filter_mature_mirs.log"
         ),
         precursor="miRNA_primary_transcript",
     log:
-        os.path.join(
-            config["local_log"], "filter_mature_mirs.log"
-        ),
+        os.path.join(config["local_log"], "filter_mature_mirs.log"),
     singularity:
         "docker://ubuntu:lunar-20221207"
     shell:
         "(grep -v {params.precursor} {input.bed} > {output.bed}) &> {log}"
-

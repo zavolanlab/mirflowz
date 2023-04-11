@@ -14,11 +14,11 @@ import pandas as pd
 
 samples_table = pd.read_csv(
     config["samples"],
-    header = 0,
-    index_col = 0,
-    comment = "#",
-    engine = "python",
-    sep = "\t",
+    header=0,
+    index_col=0,
+    comment="#",
+    engine="python",
+    sep="\t",
 )
 
 ###############################################################################
@@ -26,15 +26,15 @@ samples_table = pd.read_csv(
 ###############################################################################
 # Function to get relevant per sample information from samples and resources table
 
-def get_sample(column_id, sample_id = None):
+
+def get_sample(column_id, sample_id=None):
     if sample_id:
         return str(
             samples_table[column_id][samples_table.index == sample_id][0]
         )
     else:
-        return str(
-            samples_table[column_id][0]
-        )
+        return str(samples_table[column_id][0])
+
 
 ###############################################################################
 ### Global configuration
@@ -44,6 +44,7 @@ def get_sample(column_id, sample_id = None):
 localrules:
     start,
     finish_map,
+
 
 ###############################################################################
 ### Finish rule
@@ -62,15 +63,17 @@ rule finish_map:
         ),
 
 
-
 ###############################################################################
 ### Start rule (get samples)
 ###############################################################################
 
+
 rule start:
     input:
         reads=lambda wildcards: expand(
-            pd.Series(samples_table.loc[wildcards.sample, "sample_file"]).values,
+            pd.Series(
+                samples_table.loc[wildcards.sample, "sample_file"]
+            ).values,
             format=get_sample("format"),
         ),
     output:
@@ -79,7 +82,7 @@ rule start:
             "{sample}",
             "{format}",
             "reads.{format}",
-        )
+        ),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
@@ -194,9 +197,7 @@ rule cutadapt:
     output:
         reads=os.path.join(config["output_dir"], "{sample}", "cut.fasta"),
     params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "cutadapt_{sample}.log"
-        ),
+        cluster_log=os.path.join(config["cluster_log"], "cutadapt_{sample}.log"),
         adapter=lambda wildcards: get_sample("adapter", wildcards.sample),
         error_rate=config["error_rate"],
         minimum_length=config["minimum_length"],
@@ -251,18 +252,20 @@ rule mapping_genome_segemehl:
     input:
         reads=os.path.join(config["output_dir"], "{sample}", "collapsed.fasta"),
         genome=os.path.join(config["output_dir"], "genome.processed.fa"),
-        genome_index_segemehl=os.path.join(config["output_dir"], "genome_index_segemehl.idx"),
+        genome_index_segemehl=os.path.join(
+            config["output_dir"], "genome_index_segemehl.idx"
+        ),
     output:
         gmap=os.path.join(
-            config["output_dir"], "{sample}", "all_segemehlGenome_map.sam"
+            config["output_dir"], "{sample}", "segemehlGenome_map.sam"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "all_mapping_genome_segemehl_{sample}.log"
+            config["cluster_log"], "mapping_genome_segemehl_{sample}.log"
         ),
     log:
         os.path.join(
-            config["local_log"], "all_mapping_genome_segemehl_{sample}.log"
+            config["local_log"], "mapping_genome_segemehl_{sample}.log"
         ),
     resources:
         mem=50,
@@ -279,32 +282,6 @@ rule mapping_genome_segemehl:
         -outfile {output.gmap} \
         ) &> {log}"
 
-###############################################################################
-### Remove unmapped to genome sequences
-###############################################################################
-
-rule remove_genome_unmapped:
-    input:
-        gmap=os.path.join(
-            config["output_dir"], "{sample}", "all_segemehlGenome_map.sam"
-        ),
-    output:
-        gmap=os.path.join(
-            config["output_dir"], "{sample}", "segemehlGenome_map.sam"
-        ),
-    params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "mapping_genome_segemehl_{sample}.log"
-        ),
-    log:
-        os.path.join(
-            config["local_log"], "mapping_genome_segemehl_{sample}.log"
-        ),
-    singularity:
-        "docker://ubuntu:lunar-20221207"
-    shell:
-        "(awk '$3 !~ /\*/ {{print $0}}' {input.gmap} > {output.gmap}) &> {log}"
-
 
 ###############################################################################
 ### Segemehl transcriptome mapping
@@ -314,20 +291,24 @@ rule remove_genome_unmapped:
 rule mapping_transcriptome_segemehl:
     input:
         reads=os.path.join(config["output_dir"], "{sample}", "collapsed.fasta"),
-        transcriptome=os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
-        transcriptome_index_segemehl=os.path.join(config["output_dir"], "transcriptome_index_segemehl.idx"),
+        transcriptome=os.path.join(
+            config["output_dir"], "transcriptome_idtrim.fa"
+        ),
+        transcriptome_index_segemehl=os.path.join(
+            config["output_dir"], "transcriptome_index_segemehl.idx"
+        ),
     output:
         tmap=os.path.join(
-            config["output_dir"], "{sample}", "all_segemehlTranscriptome_map.sam"
+            config["output_dir"], "{sample}", "segemehlTranscriptome_map.sam"
         ),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
-            "all_mapping_transcriptome_segemehl_{sample}.log",
+            "mapping_transcriptome_segemehl_{sample}.log",
         ),
     log:
         os.path.join(
-            config["local_log"], "all_mapping_transcriptome_segemehl_{sample}.log"
+            config["local_log"], "mapping_transcriptome_segemehl_{sample}.log"
         ),
     resources:
         mem=10,
@@ -343,32 +324,6 @@ rule mapping_transcriptome_segemehl:
         -q {input.reads} \
         -outfile {output.tmap} \
         ) &> {log}"
-
-###############################################################################
-### Remove unmapped to transcriptome sequences
-###############################################################################
-
-rule remove_transcriptome_unmapped:
-    input:
-        tmap=os.path.join(
-            config["output_dir"], "{sample}", "all_segemehlTranscriptome_map.sam"
-        ),
-    output:
-        tmap=os.path.join(
-            config["output_dir"], "{sample}", "segemehlTranscriptome_map.sam"
-        ),
-    params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "mapping_transcriptome_segemehl_{sample}.log"
-        ),
-    log:
-        os.path.join(
-            config["local_log"], "mapping_trnascriptome_segemehl_{sample}.log"
-        ),
-    singularity:
-        "docker://ubuntu:lunar-20221207"
-    shell:
-        "(awk '$3 !~ /\*/ {{print $0}}' {input.tmap} > {output.tmap}) &> {log}"
 
 
 ###############################################################################
@@ -499,15 +454,15 @@ rule oligomap_genome_toSAM:
         ),
     output:
         gmap=os.path.join(
-            config["output_dir"], "{sample}", "m_oligoGenome_converted.sam"
+            config["output_dir"], "{sample}", "oligoGenome_converted.sam"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "m_oligomap_genome_toSAM_{sample}.log"
+            config["cluster_log"], "oligomap_genome_toSAM_{sample}.log"
         ),
         nh=config["nh"],
     log:
-        os.path.join(config["local_log"], "m_oligomap_genome_toSAM_{sample}.log"),
+        os.path.join(config["local_log"], "oligomap_genome_toSAM_{sample}.log"),
     resources:
         time=1,
         queue=1,
@@ -518,30 +473,6 @@ rule oligomap_genome_toSAM:
         -i {input.sort} \
         -n {params.nh} \
         > {output.gmap}) &> {log}"
-
-###############################################################################
-### Genome CIGAR string Ms to equal sign
-###############################################################################
-
-rule genome_m2equal:
-    input:
-        gsam=os.path.join(
-            config["output_dir"], "{sample}", "m_oligoGenome_converted.sam"
-        ),
-    output:
-        gsam=os.path.join(
-            config["output_dir"], "{sample}", "oligoGenome_converted.sam"
-        ),
-    params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "oligomap_genome_toSAM_{sample}.log"
-        ),
-    log:
-        os.path.join(config["local_log"], "oligomap_genome_toSAM_{sample}.log"),
-    singularity:
-        "docker://ubuntu:lunar-20221207"
-    shell:
-        """(awk '{{gsub(/M/,"=",$6)}}' {input.gsam} > {output.gsam}) &> {log}"""
 
 
 ###############################################################################
@@ -644,16 +575,16 @@ rule oligomap_transcriptome_toSAM:
         tmap=os.path.join(
             config["output_dir"],
             "{sample}",
-            "m_oligoTranscriptome_converted.sam",
+            "oligoTranscriptome_converted.sam",
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "m_oligomap_transcriptome_toSAM_{sample}.log"
+            config["cluster_log"], "oligomap_transcriptome_toSAM_{sample}.log"
         ),
         nh=config["nh"],
     log:
         os.path.join(
-            config["local_log"], "m_oligomap_transcriptome_toSAM_{sample}.log"
+            config["local_log"], "oligomap_transcriptome_toSAM_{sample}.log"
         ),
     singularity:
         "docker://python:3.9.16"
@@ -664,29 +595,6 @@ rule oligomap_transcriptome_toSAM:
         > {output.tmap} \
         ) &> {log}"
 
-###############################################################################
-### Trancriptome CIGAR string Ms to equal sign
-###############################################################################
-
-rule transcriptome_m2equal:
-    input:
-        tsam=os.path.join(
-            config["output_dir"], "{sample}", "m_oligoTranscriptome_converted.sam"
-        ),
-    output:
-        tsam=os.path.join(
-            config["output_dir"], "{sample}", "oligoTranscriptome_converted.sam"
-        ),
-    params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "oligomap_transcriptome_toSAM_{sample}.log"
-        ),
-    log:
-        os.path.join(config["local_log"], "oligomap_transcriptome_toSAM_{sample}.log"),
-    singularity:
-        "docker://ubuntu:lunar-20221207"
-    shell:
-        """(awk '{{gsub(/M/,"=",$6)}}' {input.tsam} > {output.tsam}) &> {log}"""
 
 ###############################################################################
 ### Merge genome mappings

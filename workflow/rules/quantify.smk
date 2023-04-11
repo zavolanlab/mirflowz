@@ -14,12 +14,13 @@ import pandas as pd
 
 samples_table = pd.read_csv(
     config["samples"],
-    header = 0,
-    index_col = 0,
-    comment = "#",
-    engine = "python",
-    sep = "\t",
+    header=0,
+    index_col=0,
+    comment="#",
+    engine="python",
+    sep="\t",
 )
+
 
 # Rules that require internet connection for downloading files are included
 # in the localrules
@@ -36,8 +37,8 @@ rule finish_quantify:
     input:
         table=expand(
             os.path.join(
-                config["output_dir"], 
-                "TABLES", 
+                config["output_dir"],
+                "TABLES",
                 "counts.{mir}.tab",
             ),
             mir=config["mir_list"],
@@ -61,9 +62,7 @@ rule bamtobed:
             config["output_dir"], "{sample}", "alignments.bed12"
         ),
     params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "bamtobed_{sample}.log"
-        ),
+        cluster_log=os.path.join(config["cluster_log"], "bamtobed_{sample}.log"),
     log:
         os.path.join(config["local_log"], "bamtobed_{sample}.log"),
     singularity:
@@ -121,9 +120,7 @@ rule intersect_mirna:
         alignment=os.path.join(
             config["output_dir"], "{sample}", "sorted.alignments.bed12"
         ),
-        mirna=os.path.join(
-            config["output_dir"], "mirna_annotations.bed"
-        ),
+        mirna=os.path.join(config["output_dir"], "mirna_annotations.bed"),
     output:
         intersect=os.path.join(
             config["output_dir"], "{sample}", "intersect_mirna.bed"
@@ -224,7 +221,6 @@ rule quant_mirna_pri:
         --uniq=miRNA_primary_transcript \
         -p={params.prefix} \
         ) &> {log}"
-
 
 
 ###############################################################################

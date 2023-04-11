@@ -24,16 +24,20 @@ validate(config, os.path.join("..", "config", "config_schema.json"))
 ### Global configuration
 ###############################################################################
 
+
 localrules:
     finish,
+
 
 ###############################################################################
 ### Including subworkflows
 ###############################################################################
 
-include: os.path.join("rules" , "prepare.smk")
-include: os.path.join("rules" , "map.smk")
-include: os.path.join("rules" , "quantify.smk")
+
+include: os.path.join("rules", "prepare.smk")
+include: os.path.join("rules", "map.smk")
+include: os.path.join("rules", "quantify.smk")
+
 
 ###############################################################################
 ### Finish rule
@@ -41,24 +45,24 @@ include: os.path.join("rules" , "quantify.smk")
 rule finish:
     input:
         idx_transcriptome=os.path.join(
-                config["output_dir"],
-                "transcriptome_index_segemehl.idx",
+            config["output_dir"],
+            "transcriptome_index_segemehl.idx",
         ),
         idx_genome=os.path.join(
-                config["output_dir"],
-                "genome_index_segemehl.idx",
+            config["output_dir"],
+            "genome_index_segemehl.idx",
         ),
         exons=os.path.join(
-                config["output_dir"], 
-                "exons.bed",
+            config["output_dir"],
+            "exons.bed",
         ),
         header=os.path.join(
-                config["output_dir"],
-                "headerOfCollapsedFasta.sam",
+            config["output_dir"],
+            "headerOfCollapsedFasta.sam",
         ),
         mirnafilt=os.path.join(
-                config["output_dir"], 
-                "mirna_annotations.bed",
+            config["output_dir"],
+            "mirna_annotations.bed",
         ),
         maps=expand(
             os.path.join(
@@ -68,11 +72,7 @@ rule finish:
             ),
             sample=pd.unique(samples_table.index.values),
         ),
-        table=lambda wildcard:expand(
-            os.path.join(
-                config["output_dir"], 
-                "TABLES", 
-                "counts.{mir}.tab"
-            ),
+        table=lambda wildcard: expand(
+            os.path.join(config["output_dir"], "TABLES", "counts.{mir}.tab"),
             mir=config["mir_list"],
         ),
