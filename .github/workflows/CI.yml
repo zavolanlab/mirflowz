@@ -42,7 +42,7 @@ jobs:
         with:
          directory: './test'
          snakefile: 'workflow/Snakefile'
-         args: '--configfile="test/config.yaml" --lint'
+         args: '--configfile="/config.yaml" --lint'
         
       - name: Run local test
         run: bash test/test_workflow_local.sh
