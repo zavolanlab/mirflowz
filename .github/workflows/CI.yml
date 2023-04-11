@@ -37,8 +37,11 @@ jobs:
       - name: Run test for rule graph
         run: bash test/test_rule_graph.sh
       
-      - name: Run test for snakemake lint
-        run: bash test/test_lint.sh
+      - name: Check workflow descriptor files for lints
+        run: snakemake \
+        --snakefile="workflow/Snakefile" \
+        --configfile="test/config.yaml" \
+        --lint
         
       - name: Run local test
         run: bash test/test_workflow_local.sh
