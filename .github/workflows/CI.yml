@@ -40,9 +40,9 @@ jobs:
       - name: Check workflow descriptor files for lints
         uses: snakemake/snakemake-github-action@v1
         with:
-         directory: '.test'
+         directory: 'test'
          snakefile: 'workflow/Snakefile'
-         args: '--configfile="test/config.yaml" --lint'
+         args: '--lint'
         
       - name: Run local test
         run: bash test/test_workflow_local.sh
