@@ -1,0 +1,5 @@
+name: mirflowz
+channels:
+  - bioconda
+dependencies:
+  - snakefmt
