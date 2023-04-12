@@ -26,6 +26,7 @@ samples_table = pd.read_csv(
 ### Global configuration
 ###############################################################################
 
+
 localrules:
     finish_quantify,
 

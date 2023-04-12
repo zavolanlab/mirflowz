@@ -66,9 +66,7 @@ rule start:
     input:
         reads=lambda wildcards: expand(
             pd.Series(
-                
                 samples_table.loc[wildcards.sample, "sample_file"]
-            
             ).values,
             format=get_sample("format"),
         ),
@@ -249,9 +247,7 @@ rule mapping_genome_segemehl:
         reads=os.path.join(config["output_dir"], "{sample}", "collapsed.fasta"),
         genome=os.path.join(config["output_dir"], "genome.processed.fa"),
         genome_index_segemehl=os.path.join(
-            
             config["output_dir"], "genome_index_segemehl.idx"
-        
         ),
     output:
         gmap=os.path.join(
