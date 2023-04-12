@@ -78,7 +78,7 @@ rule start:
             "{sample}",
             "{format}",
             "reads.{format}",
-        ),,
+        ),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
