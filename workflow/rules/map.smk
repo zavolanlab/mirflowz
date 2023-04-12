@@ -278,6 +278,7 @@ rule mapping_genome_segemehl:
         -i {input.genome_index_segemehl} \
         -d {input.genome} \
         -t {threads} \
+        -e \
         -q {input.reads} \
         -outfile {output.gmap} \
         ) &> {log}"
@@ -322,6 +323,7 @@ rule mapping_transcriptome_segemehl:
         -d {input.transcriptome} \
         -t {threads} \
         -q {input.reads} \
+        -e \
         -outfile {output.tmap} \
         ) &> {log}"
 
