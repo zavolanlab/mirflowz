@@ -335,12 +335,12 @@ rule extract_chr_len:
 rule extend_mirs_annotations:
     input:
         gff3=os.path.join(config["output_dir"], "mirna_annotations.gff3"),
+        chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
         script=os.path.join(config["scripts_dir"], "mirna_extension.py"),
     output:
         gff3_mir=os.path.join(config["output_dir"], "extended_mirna.gff3"),
         gff3_premir=os.path.join(config["output_dir"], "extended_premirna.gff3"),
     params:
-        chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
         cluster_log=os.path.join(config["cluster_log"], "extend_mirnas.log"),
     log:
         os.path.join(config["local_log"], "extended_mirnas.log"),
@@ -349,7 +349,7 @@ rule extend_mirs_annotations:
     shell:
         "(python {input.script} \
         -i {input.gff3} \
-        --chr {params.chrsize} \
+        --chr {input.chrsize} \
         --extension 6 \
         --premir {output.gff3_premir} \
         --mir {output.gff3_mir} \
