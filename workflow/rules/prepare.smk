@@ -9,6 +9,8 @@
 
 import os
 
+from pathlib import Path
+
 ###############################################################################
 ### Global configuration
 ###############################################################################
@@ -296,7 +298,7 @@ rule gfftobed:
         bed=os.path.join(config["output_dir"], "mirna_annotations.bed"),
     params:
         cluster_log=os.path.join(config["cluster_log"], "gfftobed.log"),
-        out_dir=lambda wildcards, input: input[0][:-22],
+        out_dir=lambda wildcards, input: Path(input[0]).parent,
     log:
         os.path.join(config["local_log"], "gfftobed.log"),
     container:
