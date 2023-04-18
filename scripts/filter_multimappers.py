@@ -38,6 +38,7 @@ Usage:
     filter_multimappers.py SAM > SAM
 """
 import argparse
+from itertools import chain
 from pathlib import Path
 import sys
 from typing import List
@@ -67,7 +68,7 @@ def parse_arguments():
     return parser
 
 
-def count_indels(aln: pysam.AlignedSegment) -> int:
+def count_indels(aln: pysam.libcalignedsegment.AlignedSegment) -> int:
     """Count the number of indels in an alignment based on its CIGAR string.
 
     This function counts the number of indels in the alignment based on the
@@ -101,7 +102,7 @@ def find_best_alignments(alns: List[pysam.AlignedSegment]) -> List[pysam.Aligned
     Retrns:
         best_alignments: alignments with the less indels
     """
-    aln_indels = [(aln, count_indels(alignment=aln)) for aln in alns]
+    aln_indels = [(aln, count_indels(aln=aln)) for aln in alns]
     min_indels = min(aln_indels, key=lambda x: x[1])[1]
     best_alignments = [aln for i, (aln, indels) in enumerate(aln_indels) if indels == min_indels]
 
@@ -121,7 +122,7 @@ def write_output(alignments: List[pysam.AlignedSegment]) -> None:
     if len(alignments) == 1:
         sys.stdout.write(alignments[0].to_string() + '\n')
     else:
-        best_alignments = find_best_alignments(alignments=alignments)
+        best_alignments = find_best_alignments(alns=alignments)
         for alignment in best_alignments:
             sys.stdout.write(alignment.to_string() + '\n')
 
@@ -133,13 +134,20 @@ def main(sam_file: Path) -> None:
         sam_file: Path to the input SAM file.
     """
     with pysam.AlignmentFile(sam_file, "r") as samfile:
+      
+        try:
+            first_alignment = next(samfile)
+            
+        except StopIteration:
+            sys.stdout.write(str(samfile.header))
+            return
 
         sys.stdout.write(str(samfile.header))
 
         current_query = None
         current_alignments: list[pysam.AlignedSegment] = []
 
-        for alignment in samfile:
+        for alignment in chain([first_alignment],samfile):
 
             if alignment.is_secondary or alignment.is_supplementary:
                 continue
