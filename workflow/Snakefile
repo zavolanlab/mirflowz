@@ -62,10 +62,9 @@ rule finish:
             config["output_dir"],
             "headerOfCollapsedFasta.sam",
         ),
-        mirnafilt=os.path.join(
-            config["output_dir"],
-            "mirna_annotations.bed",
-        ),
+        chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
+        bed_mir=os.path.join(config["output_dir"], "extended_mirna.bed"),
+        bed_premir=os.path.join(config["output_dir"], "extended_premirna.bed"),
         maps=expand(
             os.path.join(
                 config["output_dir"],
@@ -74,7 +73,9 @@ rule finish:
             ),
             sample=pd.unique(samples_table.index.values),
         ),
-        table=lambda wildcard: expand(
-            os.path.join(config["output_dir"], "TABLES", "counts.{mir}.tab"),
-            mir=config["mir_list"],
-        ),
+
+
+#        table=lambda wildcard: expand(
+#            os.path.join(config["output_dir"], "TABLES", "counts.{mir}.tab"),
+#            mir=config["mir_list"],
+#        ),
