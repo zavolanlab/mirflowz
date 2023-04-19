@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import os
 import sys
 
 sys.path.append("../")
@@ -52,7 +53,11 @@ def parse_arguments():
 
 
 def main():
-    """Extend pre-miRNAs overhang."""
+    """Extend miRNAs start/end coordinates."""
+    if os.path.getsize(args.input) == 0:
+        print("Error: Input file is empty")
+        sys.exit(1)
+
     # Create dictionary with the ref. sequence length
     if args.chr:
         seq_lengths = {}
@@ -60,7 +65,6 @@ def main():
             for line in f:
                 ref_seq, length = line.strip().split("\t")
                 seq_lengths[ref_seq] = int(length)
-
     else:
         seq_lengths = None
 
