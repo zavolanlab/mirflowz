@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 
-from mirnaExtension_class import MirnaExtension
 import argparse
+import sys
 
+sys.path.append("../")
+
+from scripts.mirnaExtension_class import MirnaExtension
 
 def parse_arguments():
     """Command-line arguments parser."""
