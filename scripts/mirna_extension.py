@@ -23,12 +23,14 @@ def parse_arguments():
     parser.add_argument(
         '--premir',
         help="Path to the gff3 pre-miR output file",
-        type=str
+        type=str,
+        required=True
     )
     parser.add_argument(
         '--mir',
         help="Path to the gff3 miRNA output file.",
-        type=str
+        type=str,
+        required=True
     )
     parser.add_argument(
         '-e', '--extension',
