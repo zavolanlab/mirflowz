@@ -8,6 +8,7 @@ sys.path.append("../")
 
 from scripts.mirnaExtension_class import MirnaExtension
 
+
 def parse_arguments():
     """Command-line arguments parser."""
     parser = argparse.ArgumentParser(
