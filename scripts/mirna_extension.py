@@ -52,7 +52,7 @@ def parse_arguments():
     return parser
 
 
-def main():
+def main(args):
     """Extend miRNAs start/end coordinates."""
     if os.path.getsize(args.input) == 0:
         print("Error: Input file is empty")
@@ -82,4 +82,4 @@ def main():
 if __name__ == "__main__":
 
     args = parse_arguments().parse_args()
-    main()
+    main(args)
