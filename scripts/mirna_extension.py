@@ -1,5 +1,43 @@
 #!/usr/bin/env python
 
+"""Extend miRNAs start and end coordinates by n nucleotides.
+
+This script uses the class MirnaExtension to extend the start and end
+coordiantes of the mature miRNAs. Moreover, it will also extend the
+corresponding primary transcript start/end coordinates if these are
+surpassed by the new start/end coordinates.
+
+Input:
+    input_gff_file: 
+        Path to the GFF3 annotation file. If not provided, the input will be 
+        read from the standard input.
+    premir_out_file:
+        Path to the primary transcript GFF3 annotation file.
+    mir_out_file:
+        Path to the mature miRNA GFF3 annotation file.
+    extension:
+        Number of nucleotides to extend the coordinates. If not provided, the
+        extension will be of 6 nucleotides.
+    chromosome_size:
+        Path to the tabulated file containing the chromosome and its length.
+        If not provided, the length will be extracted form the input file.
+
+Output:
+    premir_out_file:
+        GFF3 file containing only the annotations for the primary transcripts.
+    mir_out_file:
+        GFF3 file containing only the annotations for the mature miRNAs.
+
+Functions:
+    parse_arguments():
+        Command-line arguments parser.
+    main():
+        Extend miRNAs start and end coordinates.
+
+Usage:
+    mirna_extension.py [-i GFF3] --premir GFF3 --mir GFF3 [-e int] [--chr Path]
+"""
+
 import argparse
 import os
 import sys
@@ -45,7 +83,7 @@ def parse_arguments():
     )
     parser.add_argument(
         '--chr',
-        help="Path to the tabulated file with the chromosome and its length.",
+        help="Path to the tabulated file with the chromosomes and its length.",
         type=str,
         default=None
     )
