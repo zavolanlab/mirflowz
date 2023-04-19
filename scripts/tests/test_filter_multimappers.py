@@ -1,6 +1,7 @@
 """Unit tests for module 'filter_multimappers.py'."""
 
 import argparse
+from itertools import chain
 import sys
 
 from pathlib import Path
@@ -37,12 +38,27 @@ def sam_multimappers_files():
 
 
 @pytest.fixture
-def sam_no_multimappers_files():
+def sam_no_multimappers_file():
     """Import path to test files with no multimappers."""
-    in_no_multi = Path("scripts/tests/files/in_sam_no_multimappers.sam")
-    out_no_multi = Path("scripts/tests/files/out_sam_no_multimappers.sam")
+    no_multi = Path("scripts/tests/files/sam_no_multimappers.sam")
 
-    return in_no_multi, out_no_multi
+    return no_multi
+
+@pytest.fixture
+def sam_unique_diff_multimappers_files():
+    """Import path to test files with a single multimapper."""
+    in_diff_multi = Path("scripts/tests/files/in_sam_diff_multimappers.sam")
+    out_diff_multi = Path("scripts/tests/files/out_sam_diff_multimappers.sam")
+
+    return in_diff_multi, out_diff_multi
+
+@pytest.fixture
+def sam_unique_equal_multimapper_files():
+    """Import path to the test file with a single multimapper."""
+    in_sam = Path("scripts/tests/files/in_sam_equal_multimappers.sam")
+    out_sam = Path("scripts/tests/files/out_sam_equal_multimappers.sam")
+
+    return in_sam, out_sam
 
 
 @pytest.fixture
@@ -118,9 +134,9 @@ class TestParseArguments:
             parse_arguments().parse_args()
         assert sysex.value.code == 2
 
-    def test_correct_input(self, monkeypatch, sam_no_multimappers_files):
+    def test_correct_input(self, monkeypatch, sam_no_multimappers_file):
         """Call with a single input file."""
-        sam_1, sam_2 = sam_no_multimappers_files
+        sam_1 = sam_no_multimappers_file
         monkeypatch.setattr(
             sys, 'argv',
             ['filter_multimappers',
@@ -194,29 +210,50 @@ class TestFindBestAlignments:
 class TestWriteOutout:
     """Test 'write_output()' function."""
 
-    def test_write_output_one_alignment(self, alns, capsys):
+    def test_write_output_one_alignment(self, capsys, sam_multimappers_files):
         """Test funciton with a single alignment."""
-        write_output([alns[2]])
+        in_sam, out_sam = sam_multimappers_files
 
-        # capture output
+        with pysam.AlignmentFile(in_sam, 'r') as in_file:
+            alignment = next(in_file)
+        
+        write_output([alignment])
         captured = capsys.readouterr()
-        assert captured.out == str(alns[2]) + "\n"
 
-    def test_write_output_multiple_alignments_diff_indels(self, alns, capsys):
-        """Test function with different multimappers."""
-        write_output(alns[:2])
+        with pysam.AlignmentFile(out_sam, 'r') as out_file:
+            out_alignment = next(out_file)
+        
+        assert captured.out == out_alignment.to_string() + '\n'
 
-        # capture output
+    def test_write_output_multiple_alignments_diff_indels(self, capsys, sam_unique_diff_multimappers_files):
+        """Test function with multimappers with different amount of indels."""
+        in_sam, out_sam = sam_unique_diff_multimappers_files
+
+        with pysam.AlignmentFile(in_sam, 'r') as in_file:
+            alignments_in = [aln for aln in in_file]
+
+        write_output(alignments_in)
         captured = capsys.readouterr()
-        assert captured.out == str(alns[0]) + "\n"
 
-    def test_write_output_multiple_alignments_equal_indels(self, alns, capsys):
+        with open(out_sam, 'r') as out_file:
+            expected_output = out_file.read()
+
+        assert captured.out == expected_output
+
+    def test_write_output_multiple_alignments_equal_indels(self, capsys, sam_unique_equal_multimapper_files):
         """Test function with equal multimappers."""
-        write_output(alns[2:])
+        in_sam, out_sam = sam_unique_equal_multimapper_files
 
-        # capture output
+        with pysam.AlignmentFile(in_sam, 'r') as in_file:
+            alignments_in = [aln for aln in in_file]
+        
+        write_output(alignments_in)
         captured = capsys.readouterr()
-        assert captured.out == str(alns[3]) + "\n" + str(alns[4]) + "\n"
+
+        with open(out_sam, 'r') as out_file:
+            expected_output = out_file.read()
+
+        assert captured.out == expected_output
 
 
 class TestMain:
@@ -229,8 +266,8 @@ class TestMain:
         main(in_sam)
         captured = capsys.readouterr()
 
-        with open(out_sam, 'r') as f:
-            expected_output = f.read()
+        with open(out_sam, 'r') as out_file:
+            expected_output = out_file.read()
 
         assert captured.out == expected_output
 
@@ -241,19 +278,19 @@ class TestMain:
         main(in_sam)
         captured = capsys.readouterr()
 
-        with open(out_sam, 'r') as f:
-            expected_output = f.read()
+        with open(out_sam, 'r') as out_file:
+            expected_output = out_file.read()
 
         assert captured.out == expected_output
 
-    def test_main_no_multimappers(self, capsys, sam_no_multimappers_files):
+    def test_main_no_multimappers(self, capsys, sam_no_multimappers_file):
         """Test main function with no multimappers."""
-        in_sam, out_sam = sam_no_multimappers_files
+        sam_file = sam_no_multimappers_file
 
-        main(in_sam)
+        main(sam_file)
         captured = capsys.readouterr()
 
-        with open(out_sam, 'r') as f:
-            expected_output = f.read()
+        with open(sam_file, 'r') as out_file:
+            expected_output = out_file.read()
 
         assert captured.out == expected_output
