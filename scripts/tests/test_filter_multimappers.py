@@ -1,7 +1,6 @@
 """Unit tests for module 'filter_multimappers.py'."""
 
 import argparse
-from itertools import chain
 import sys
 
 from pathlib import Path
