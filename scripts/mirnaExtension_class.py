@@ -1,5 +1,5 @@
 #! usr/bin/env python3
-"""Extend primary miRNAs overhang.
+"""Extend miRNAs star and end coordinates.
 
 This class is build upon two methods. The first one, turns a GFF3 file
 into an in-memory database using gffutils. The second method, iterares over
