@@ -4,7 +4,7 @@
 This class is build upon two methods. The first one, turns a GFF3 file
 into an in-memory database using gffutils. The second method, iterares over
 all primary miRNAS in the database to extend its mature forms' end and start
-cooridnates by n nucleotides without exceeding the chromosome bounderies.
+cooridnates by n nucleotides without exceeding the chromosome boundaries.
 Thereafter, the primary miRNAs star/end coordinates will also be extened if
 and only if, the mature miRNA coordinates exceeds the primary miRNA ones.
 Finally, two different annotation files will be created; on for the primary
@@ -15,7 +15,7 @@ import sys
 
 
 class MirnaExtension():
-    """Class to extend primary miRNAs overhang.
+    """Class to extend miRNAs start and end coordinates.
 
     Attributes:
         gff_file:
@@ -42,7 +42,7 @@ class MirnaExtension():
     """
 
     def __init__(self, premir_out: str, mir_out: str, gff_file: str = "", 
-                 n: int = 6, seq_lengths: dict[str, int] = dict()) -> None:
+                 n: int = 6, seq_lengths: dict[str, int] = None) -> None:
         """Initialize class.
 
         Args:
@@ -81,11 +81,13 @@ class MirnaExtension():
                                          force=True, keep_order=True)
     
     def extend_mirnas(self) -> None:
-        """Extend primary miRNAs start/end.
+        """Extend miRNAs start and end coordinates.
         
-        This method elongates miRNAs by n nucleotides both sides of the mature
-        miRNAs and in case the extension exceed the primary transcript 
-        start/end coordinates it equals them to the mature ones.
+        This method elongates the start and end coordinates of mature miRNAs
+        by n nucleotides. In the case that this extension makes the start/end
+        coordinates to exceed the corresponding primary miRNA boundaries,
+        these will be extended as far as the miRNA coordinates.
+        If provided, the elongation will take into account the chromosome size.
         """
         # Set end boundary
         if self.seq_lengths is None:
