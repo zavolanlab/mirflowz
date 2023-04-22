@@ -9,6 +9,8 @@
 
 import os
 
+from pathlib import Path
+
 ###############################################################################
 ### Global configuration
 ###############################################################################
@@ -57,7 +59,6 @@ rule trim_genome_seq_id:
     output:
         genome=os.path.join(config["output_dir"], "genome.processed.fa"),
     params:
-        dir_out=lambda wildcards, output: output[0][:-4],
         cluster_log=os.path.join(
             config["cluster_log"],
             "genome_process.log",
@@ -297,7 +298,7 @@ rule gfftobed:
         bed=os.path.join(config["output_dir"], "mirna_annotations.bed"),
     params:
         cluster_log=os.path.join(config["cluster_log"], "gfftobed.log"),
-        out_dir=lambda wildcards, input: input[0][:-4],
+        out_dir=lambda wildcards, input: Path(input[0]).parent,
     log:
         os.path.join(config["local_log"], "gfftobed.log"),
     container:
