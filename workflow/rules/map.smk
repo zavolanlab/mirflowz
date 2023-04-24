@@ -266,12 +266,13 @@ rule mapping_genome_segemehl:
         time=12,
         threads=8,
     container:
-        "docker://quay.io/biocontainers/segemehl:0.2.0--h20b1175_9"
+        "docker://quay.io/biocontainers/segemehl:0.3.4--hf7d323f_8"
     shell:
         "(segemehl.x \
         -i {input.genome_index_segemehl} \
         -d {input.genome} \
         -t {threads} \
+        -e \
         -q {input.reads} \
         -outfile {output.gmap} \
         ) &> {log}"
@@ -309,13 +310,14 @@ rule mapping_transcriptome_segemehl:
         time=12,
         threads=8,
     container:
-        "docker://quay.io/biocontainers/segemehl:0.2.0--h20b1175_9"
+        "docker://quay.io/biocontainers/segemehl:0.3.4--hf7d323f_8"
     shell:
         "(segemehl.x \
         -i {input.transcriptome_index_segemehl} \
         -d {input.transcriptome} \
         -t {threads} \
         -q {input.reads} \
+        -e \
         -outfile {output.tmap} \
         ) &> {log}"
 
@@ -908,7 +910,7 @@ rule remove_inferiors:
         ),
         script=os.path.join(
             config["scripts_dir"],
-            "sam_remove_duplicates_inferior_alignments_multimappers.1_6.pl",
+            "sam_remove_duplicates_inferior_alignments_multimappers.pl",
         ),
     output:
         remove_inf=os.path.join(
