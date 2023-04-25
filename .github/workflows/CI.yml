@@ -77,6 +77,5 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           directory: ./scripts/tests/
-          files: ./scripts/tests/coverage
           fail_ci_if_error: true
           verbose: true
