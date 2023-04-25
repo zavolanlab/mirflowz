@@ -59,6 +59,16 @@ def sam_unique_equal_multimapper_files():
 
     return in_sam, out_sam
 
+@pytest.fixture
+def sam_sec_sup_files():
+    """
+    Import path to the test files with secondary and supplementary alignments.
+    """
+    in_sam = Path("files/in_sam_sec_sup.sam")
+    out_sam = Path("files/out_sam_sec_sup.sam")
+
+    return in_sam, out_sam
+
 
 @pytest.fixture
 def alns():
@@ -290,6 +300,18 @@ class TestMain:
         captured = capsys.readouterr()
 
         with open(sam_file, 'r') as out_file:
+            expected_output = out_file.read()
+
+        assert captured.out == expected_output
+    
+    def test_main_secondary_supplementary(self, capsys, sam_sec_sup_files):
+        """Test main function with secondary and supplementary alignments."""
+        in_sam, out_sam = sam_sec_sup_files
+
+        main(in_sam)
+        captured = capsys.readouterr()
+
+        with open(out_sam, 'r') as out_file:
             expected_output = out_file.read()
 
         assert captured.out == expected_output
