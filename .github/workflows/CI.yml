@@ -70,8 +70,7 @@ jobs:
         run: mamba env update -n mirflowz -f environment.dev.yml
 
       - name: run unit tests
-        working-directory: ./scripts/tests
-        run: pytest --cov=scripts/ --cov-branch --cov-report=term-missing
+        run: pytest ./scripts/tests --cov=scripts --cov-branch --cov-report=term-missing
           
       - name: submit coverage report
         uses: codecov/codecov-action@v3
