@@ -21,8 +21,8 @@ from scripts.filter_multimappers import (
 @pytest.fixture
 def sam_empty_files():
     """Import path to empty test files."""
-    in_empty = Path("scripts/tests/files/in_sam_empty.sam")
-    out_empty = Path("scripts/tests/files/out_sam_empty.sam")
+    in_empty = Path("files/in_sam_empty.sam")
+    out_empty = Path("files/out_sam_empty.sam")
 
     return in_empty, out_empty
 
@@ -30,8 +30,8 @@ def sam_empty_files():
 @pytest.fixture
 def sam_multimappers_files():
     """Import path to test files with multimappers."""
-    in_multimappers = Path("scripts/tests/files/in_sam_multimappers.sam")
-    out_multimappers = Path("scripts/tests/files/out_sam_multimappers.sam")
+    in_multimappers = Path("files/in_sam_multimappers.sam")
+    out_multimappers = Path("files/out_sam_multimappers.sam")
 
     return in_multimappers, out_multimappers
 
@@ -39,23 +39,23 @@ def sam_multimappers_files():
 @pytest.fixture
 def sam_no_multimappers_file():
     """Import path to test files with no multimappers."""
-    no_multi = Path("scripts/tests/files/sam_no_multimappers.sam")
+    no_multi = Path("files/sam_no_multimappers.sam")
 
     return no_multi
 
 @pytest.fixture
 def sam_unique_diff_multimappers_files():
     """Import path to test files with a single multimapper."""
-    in_diff_multi = Path("scripts/tests/files/in_sam_diff_multimappers.sam")
-    out_diff_multi = Path("scripts/tests/files/out_sam_diff_multimappers.sam")
+    in_diff_multi = Path("files/in_sam_diff_multimappers.sam")
+    out_diff_multi = Path("files/out_sam_diff_multimappers.sam")
 
     return in_diff_multi, out_diff_multi
 
 @pytest.fixture
 def sam_unique_equal_multimapper_files():
     """Import path to the test file with a single multimapper."""
-    in_sam = Path("scripts/tests/files/in_sam_equal_multimappers.sam")
-    out_sam = Path("scripts/tests/files/out_sam_equal_multimappers.sam")
+    in_sam = Path("files/in_sam_equal_multimappers.sam")
+    out_sam = Path("files/out_sam_equal_multimappers.sam")
 
     return in_sam, out_sam
 
