@@ -77,6 +77,7 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          directory: /home/runner/work/mirflowz/mirflowz/scripts/tests/
           files: /home/runner/work/mirflowz/mirflowz/scripts/tests/coverage
           fail_ci_if_error: true
           verbose: true
