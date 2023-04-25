@@ -74,8 +74,8 @@ jobs:
         run: pytest --cov=scripts --cov-branch --cov-report=term-missing
           
       - name: submit coverage report
-        uses: codecov/codecov-action@v3.1.0
+        uses: codecov/codecov-action@v3.1.1
         with:
-          files: ./scripts/tests/coverage
+          files: /home/runner/work/mirflowz/mirflowz/scripts/tests/coverage
           fail_ci_if_error: true
           verbose: true
