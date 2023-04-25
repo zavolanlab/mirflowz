@@ -74,8 +74,8 @@ jobs:
         run: pytest --cov=scripts --cov-branch --cov-report=term-missing
           
       - name: submit coverage report
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
-          files: ./coverage
+          files: ./scripts/tests/coverage
           fail_ci_if_error: true
           verbose: true
