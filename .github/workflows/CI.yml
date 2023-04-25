@@ -70,14 +70,12 @@ jobs:
         run: mamba env update -n mirflowz -f environment.dev.yml
 
       - name: run unit tests
-        run: |
-          coverage run --source scripts -m pytest
-          coverage xml
+        working-directory: ./scripts/tests
+        run: pytest --cov=scripts/ --cov-branch --cov-report=term-missing
           
       - name: submit coverage report
         uses: codecov/codecov-action@v2
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
           fail_ci_if_error: true
           verbose: true
