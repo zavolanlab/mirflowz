@@ -71,7 +71,7 @@ jobs:
 
       - name: run unit tests
         working-directory: ./scripts/tests
-        run: pytest --cov=scripts --cov-branch --cov-report=term-missing && eho $PWD && ls -la
+        run: pytest --cov=scripts --cov-branch --cov-report=term-missing && echo $PWD && ls -la
           
       - name: submit coverage report
         uses: codecov/codecov-action@v3
