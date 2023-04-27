@@ -146,7 +146,7 @@ def main(sam_file: Path) -> None:
         sys.stdout.write(str(samfile.header))        
 
         for alignment in samfile:
-            if alignment.is_secondary or alignment.is_supplementary:
+            if alignment.is_supplementary:
                 continue
             
             if current_query == alignment.query_name:
