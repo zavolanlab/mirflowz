@@ -1,5 +1,5 @@
 fixes:
-  - "./::scripts/tests/"
+  - "::scripts/tests/"
 
 codecov:
   require_ci_to_pass: true
