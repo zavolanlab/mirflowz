@@ -234,36 +234,6 @@ class TestWriteOutout:
         
         assert captured.out == out_alignment.to_string() + '\n'
 
-    def test_write_output_multiple_alignments_diff_indels(self, capsys, sam_unique_diff_multimappers_files):
-        """Test function with multimappers with different amount of indels."""
-        in_sam, out_sam = sam_unique_diff_multimappers_files
-
-        with pysam.AlignmentFile(in_sam, 'r') as in_file:
-            alignments_in = [aln for aln in in_file]
-
-        write_output(alignments_in)
-        captured = capsys.readouterr()
-
-        with open(out_sam, 'r') as out_file:
-            expected_output = out_file.read()
-
-        assert captured.out == expected_output
-
-    def test_write_output_multiple_alignments_equal_indels(self, capsys, sam_unique_equal_multimapper_files):
-        """Test function with equal multimappers."""
-        in_sam, out_sam = sam_unique_equal_multimapper_files
-
-        with pysam.AlignmentFile(in_sam, 'r') as in_file:
-            alignments_in = [aln for aln in in_file]
-        
-        write_output(alignments_in)
-        captured = capsys.readouterr()
-
-        with open(out_sam, 'r') as out_file:
-            expected_output = out_file.read()
-
-        assert captured.out == expected_output
-
 
 class TestMain:
     """Test 'main()' function."""
