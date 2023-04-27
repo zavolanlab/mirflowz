@@ -168,5 +168,5 @@ def main(sam_file: Path) -> None:
 
 
 if __name__ == "__main__":
-    args = parse_arguments().parse_args() #pragma:no cover
-    main(sam_file=args.infile) #pragma: no cover
+    args = parse_arguments().parse_args()  # pragma:no cover
+    main(sam_file=args.infile)  # pragma: no cover
