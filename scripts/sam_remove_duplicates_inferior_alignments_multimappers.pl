@@ -182,6 +182,9 @@ sub filter_sam {
 				my ($tag, $value) = split ":", $_, 2;
 				$fields{$tag} = $value;
 			}
+			
+			 next if ($fields{"FLAG"} & 0x4); 																		# Skip the line if the sequence is unmapped
+			 
 			die "[ERROR] Edit distance ('NM tag') missing!" unless defined $fields{"NM"};						# Assert presence of NM tag
 
 			#---> Manage AoH: Grow if QNAMEs identical, else compare AoH entries, print record(s) and reset AoH <---#
