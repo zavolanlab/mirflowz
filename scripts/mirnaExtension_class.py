@@ -123,9 +123,14 @@ class MirnaExtension():
                             mir.end = seq_len
 
                         if mir.start < start:
+                            diff = start - mir.start
                             primary_mirna.start = mir.start
+                            primary_mirna.attributes["Name"][0] += f"_-{diff}"
+                            
                         if mir.end > end:
+                            diff = mir.end - end
                             primary_mirna.end = mir.end
+                            primary_mirna.attributes["Name"][0] += f"_+{diff}"
 
                         mirna.write(str(mir) + '\n')
 
