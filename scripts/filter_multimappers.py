@@ -113,16 +113,16 @@ def find_best_alignments(alns: List[pysam.AlignedSegment]) -> List[pysam.Aligned
     return best_alignments
 
 
-def write_output(alignments: List[pysam.AlignedSegment]) -> None:
+def write_output(alns: List[pysam.AlignedSegment]) -> None:
     """Write the output to the standard output (stdout).
 
     Args:
         alignments: alignments with the same query name
     """
-    if len(alignments) == 1:
-        sys.stdout.write(alignments[0].to_string() + '\n')
+    if len(alns) == 1:
+        sys.stdout.write(alns[0].to_string() + '\n')
     else:
-        best_alignments = find_best_alignments(alns=alignments)
+        best_alignments = find_best_alignments(alns=alns)
         for alignment in best_alignments:
             sys.stdout.write(alignment.to_string() + '\n')
 
@@ -135,36 +135,32 @@ def main(sam_file: Path) -> None:
     """
     with pysam.AlignmentFile(sam_file, "r") as samfile:
       
+        current_alignments: list[pysam.AlignedSegment] = []
+        
         try:
-            first_alignment = next(samfile)
-            
+            current_query = next(samfile)
+            current_alignments.append(current_query)
+
         except StopIteration:
             sys.stdout.write(str(samfile.header))
             return
 
         sys.stdout.write(str(samfile.header))
 
-        current_query = None
-        current_alignments: list[pysam.AlignedSegment] = []
-
-        for alignment in chain([first_alignment],samfile):
-
+        for alignment in samfile:
             if alignment.is_secondary or alignment.is_supplementary:
                 continue
-
-            if current_query is None:
-                current_query = alignment.query_name
-
+            
             if current_query == alignment.query_name:
                 current_alignments.append(alignment)
 
             else:
-                write_output(alignments=current_alignments)
+                write_output(alns=current_alignments)
 
                 current_query = alignment.query_name
                 current_alignments = [alignment]
 
-        write_output(alignments=current_alignments)
+        write_output(alns=current_alignments)
 
 
 if __name__ == "__main__":
