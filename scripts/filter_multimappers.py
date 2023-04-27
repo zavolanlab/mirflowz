@@ -38,7 +38,6 @@ Usage:
     filter_multimappers.py SAM > SAM
 """
 import argparse
-from itertools import chain
 from pathlib import Path
 import sys
 from typing import List
@@ -102,15 +101,19 @@ def find_best_alignments(alns: List[pysam.AlignedSegment]) -> List[pysam.Aligned
     Retrns:
         best_alignments: alignments with the less indels
     """
-    aln_indels = [(aln, count_indels(aln=aln)) for aln in alns]
-    min_indels = min(aln_indels, key=lambda x: x[1])[1]
-    best_alignments = [aln for i, (aln, indels) in enumerate(aln_indels) if indels == min_indels]
+    if len(alns) == 1:
+        return alns
+    
+    else:
+        aln_indels = [(aln, count_indels(aln=aln)) for aln in alns]
+        min_indels = min(aln_indels, key=lambda x: x[1])[1]
+        best_alignments = [aln for i, (aln, indels) in enumerate(aln_indels) if indels == min_indels]
 
-    for i in range(len(best_alignments)):
-        best_alignments[i].set_tag('NH', len(best_alignments))
-        best_alignments[i].set_tag('HI', i + 1)
+        for i in range(len(best_alignments)):
+            best_alignments[i].set_tag('NH', len(best_alignments))
+            best_alignments[i].set_tag('HI', i + 1)
 
-    return best_alignments
+        return best_alignments
 
 
 def write_output(alns: List[pysam.AlignedSegment]) -> None:
@@ -119,12 +122,8 @@ def write_output(alns: List[pysam.AlignedSegment]) -> None:
     Args:
         alignments: alignments with the same query name
     """
-    if len(alns) == 1:
-        sys.stdout.write(alns[0].to_string() + '\n')
-    else:
-        best_alignments = find_best_alignments(alns=alns)
-        for alignment in best_alignments:
-            sys.stdout.write(alignment.to_string() + '\n')
+    for alignment in alns:
+        sys.stdout.write(alignment.to_string() + '\n')
 
 
 def main(sam_file: Path) -> None:
@@ -135,17 +134,16 @@ def main(sam_file: Path) -> None:
     """
     with pysam.AlignmentFile(sam_file, "r") as samfile:
       
-        current_alignments: list[pysam.AlignedSegment] = []
-        
         try:
-            current_query = next(samfile)
-            current_alignments.append(current_query)
+            first_alignment = next(samfile)
+            current_query = first_alignment.query_name
+            current_alignments: list[pysam.AlignedSegment] = [first_alignment]
 
         except StopIteration:
             sys.stdout.write(str(samfile.header))
             return
 
-        sys.stdout.write(str(samfile.header))
+        sys.stdout.write(str(samfile.header))        
 
         for alignment in samfile:
             if alignment.is_secondary or alignment.is_supplementary:
@@ -155,13 +153,14 @@ def main(sam_file: Path) -> None:
                 current_alignments.append(alignment)
 
             else:
+                current_alignments = find_best_alignments(current_alignments)
                 write_output(alns=current_alignments)
 
                 current_query = alignment.query_name
                 current_alignments = [alignment]
 
+        current_alignments = find_best_alignments(current_alignments)
         write_output(alns=current_alignments)
-
 
 if __name__ == "__main__":
     args = parse_arguments().parse_args()  # pragma:no cover
