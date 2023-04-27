@@ -1,5 +1,9 @@
 name: mirflowz
 channels:
   - bioconda
-dependencies:
+dependencies: 
+  - coverage>=7.2
+  - gffutils>=0.11.1
+  - pytest>=7.1.2
+  - pytest-cov
   - snakefmt
