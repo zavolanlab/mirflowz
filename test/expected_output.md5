@@ -39,8 +39,8 @@ d34fc868b861b1bc46db07a397dc0f10  results/genome.processed.fa.fai
 21e102e4ebd3508bb06f46366a3d578d  results/exons.gtf
 7eb64c112830266bcf416ded60b4cf77  results/transcriptome_index_segemehl.idx
 4fba145540a2c61f29bfddfd0f5a4d4e  results/genome.processed.fa
-214957445e4d280f8bce3f6e2fa065cd  results/extended_premirna.gff3
-8142a60695860bf27df51bc445a68480  results/extended_premirna.bed
+2d894237f188594ede779ac92fd96652  results/extended_premirna.gff3
+370a7b6cf61025d9f4389cb2f15507e0  results/extended_premirna.bed
 be7a0d92e57480190de57eb30baffa36  results/extended_mirna.gff3
 8148cd880602255be166beb59bbed95a  results/headerOfCollapsedFasta.sam
 44dbf7c3eae00d0bc8d5e1319123746c  results/chr_size.txt
