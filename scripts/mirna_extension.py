@@ -120,5 +120,5 @@ def main(args):
 
 if __name__ == "__main__":
 
-    args = parse_arguments().parse_args()
-    main(args)
+    args = parse_arguments().parse_args()  # pragma: no cover
+    main(args)  # pragma: no cover
