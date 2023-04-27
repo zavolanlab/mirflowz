@@ -134,21 +134,19 @@ def main(sam_file: Path) -> None:
     """
     with pysam.AlignmentFile(sam_file, "r") as samfile:
       
-        try:
-            first_alignment = next(samfile)
-            current_query = first_alignment.query_name
-            current_alignments: list[pysam.AlignedSegment] = [first_alignment]
+        sys.stdout.write(str(samfile.header))    
+  
+        current_alignments: list[pysam.AlignedSegment] = []
+        current_query = None
+        
+        for alignment in samfile: 
 
-        except StopIteration:
-            sys.stdout.write(str(samfile.header))
-            return
-
-        sys.stdout.write(str(samfile.header))        
-
-        for alignment in samfile:
             if alignment.is_supplementary:
                 continue
             
+            if current_query == None:
+                current_query = alignment.query_name
+                
             if current_query == alignment.query_name:
                 current_alignments.append(alignment)
 
@@ -159,8 +157,9 @@ def main(sam_file: Path) -> None:
                 current_query = alignment.query_name
                 current_alignments = [alignment]
 
-        current_alignments = find_best_alignments(current_alignments)
-        write_output(alns=current_alignments)
+        if len(current_alignments) > 0: 
+            current_alignments = find_best_alignments(current_alignments)
+            write_output(alns=current_alignments)
 
 if __name__ == "__main__":
     args = parse_arguments().parse_args()  # pragma:no cover
