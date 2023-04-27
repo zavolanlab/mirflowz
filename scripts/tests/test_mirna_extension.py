@@ -20,7 +20,7 @@ from scripts.mirna_extension import(
 @pytest.fixture
 def gff_empty():
     """Import path to empty test file."""
-    empty = Path("scripts/tests/files/empty.gff3")
+    empty = Path("files/empty.gff3")
 
     return empty
 
@@ -28,9 +28,9 @@ def gff_empty():
 @pytest.fixture
 def gff_no_extremes():
     """Import path to miRNA annotation files."""
-    in_no_extreme = Path("scripts/tests/files/in_mirna_anno.gff3")
-    out_premir = Path("scripts/tests/files/out_premir_anno.gff3")
-    out_mir = Path("scripts/tests/files/out_mir_anno.gff3")
+    in_no_extreme = Path("files/in_mirna_anno.gff3")
+    out_premir = Path("files/out_premir_anno.gff3")
+    out_mir = Path("files/out_mir_anno.gff3")
 
     return in_no_extreme, out_premir, out_mir
 
@@ -38,9 +38,9 @@ def gff_no_extremes():
 @pytest.fixture
 def gff_extremes():
     """Import path to mirna annotation files with extreme miRNA coords."""
-    in_extremes = Path("scripts/tests/files/in_mirna_extreme_mirs.gff3")
-    out_premir = Path("scripts/tests/files/out_extreme_premir_anno.gff3")
-    out_mir = Path("scripts/tests/files/out_extreme_mir_anno.gff3")
+    in_extremes = Path("files/in_mirna_extreme_mirs.gff3")
+    out_premir = Path("files/out_extreme_premir_anno.gff3")
+    out_mir = Path("files/out_extreme_mir_anno.gff3")
     
     return in_extremes, out_premir, out_mir
 
@@ -48,10 +48,10 @@ def gff_extremes():
 @pytest.fixture
 def gff_extremes_chr():
     """Import path to mirna annotation files and chr size."""
-    chr_size = Path("scripts/tests/files/chr_size.txt")
-    in_chr_extremes = Path("scripts/tests/files/in_mirna_extreme_chr_mirs.gff3")
-    out_premir = Path("scripts/tests/files/out_extreme_chr_premir_anno.gff3")
-    out_mir = Path("scripts/tests/files/out_extreme_chr_mir_anno.gff3")
+    chr_size = Path("files/chr_size.txt")
+    in_chr_extremes = Path("files/in_mirna_extreme_chr_mirs.gff3")
+    out_premir = Path("files/out_extreme_chr_premir_anno.gff3")
+    out_mir = Path("files/out_extreme_chr_mir_anno.gff3")
     
     return chr_size, in_chr_extremes, out_premir, out_mir
 
