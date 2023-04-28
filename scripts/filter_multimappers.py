@@ -103,7 +103,7 @@ def find_best_alignments(alns: List[pysam.AlignedSegment]) -> List[pysam.Aligned
     """
     if len(alns) == 1:
         return alns
-    
+
     else:
         aln_indels = [(aln, count_indels(aln=aln)) for aln in alns]
         min_indels = min(aln_indels, key=lambda x: x[1])[1]
@@ -133,20 +133,20 @@ def main(sam_file: Path) -> None:
         sam_file: Path to the input SAM file.
     """
     with pysam.AlignmentFile(sam_file, "r") as samfile:
-      
-        sys.stdout.write(str(samfile.header))    
-  
+
+        sys.stdout.write(str(samfile.header))
+
         current_alignments: list[pysam.AlignedSegment] = []
         current_query = None
-        
-        for alignment in samfile: 
+
+        for alignment in samfile:
 
             if alignment.is_supplementary:
                 continue
-            
-            if current_query == None:
+
+            if current_query is None:
                 current_query = alignment.query_name
-                
+
             if current_query == alignment.query_name:
                 current_alignments.append(alignment)
 
@@ -157,9 +157,10 @@ def main(sam_file: Path) -> None:
                 current_query = alignment.query_name
                 current_alignments = [alignment]
 
-        if len(current_alignments) > 0: 
+        if len(current_alignments) > 0:
             current_alignments = find_best_alignments(current_alignments)
             write_output(alns=current_alignments)
+
 
 if __name__ == "__main__":
     args = parse_arguments().parse_args()  # pragma:no cover
