@@ -1,5 +1,10 @@
 name: mirflowz
 channels:
   - bioconda
+  - defaults
 dependencies:
+  - coverage>=7.2
+  - pytest>=7.1.2
+  - pytest-cov
+  - pysam>=0.21.0
   - snakefmt

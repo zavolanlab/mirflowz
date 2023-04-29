@@ -15,6 +15,7 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}
+  
     steps:
     
       - name: Checkout Repository
@@ -43,3 +44,31 @@ jobs:
         
       - name: Run local test
         run: bash test/test_workflow_local.sh
+
+  unit-testing:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+         
+      - name: Setup environment
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          mamba-version: "*"
+          activate-environment: mirflowz
+          environment-file: environment.yml
+          auto-activate-base: false
+      
+      - name: Update mirflowz env with root packages
+        run: mamba env update -n mirflowz -f environment.root.yml
+      
+      - name: Update mirflowz env with dev packages
+        run: mamba env update -n mirflowz -f environment.dev.yml
+
+      - name: run unit tests
+        working-directory: ./scripts/tests
+        run: pytest --cov=scripts --cov-branch --cov-report=term-missing
