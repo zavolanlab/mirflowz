@@ -1,0 +1,35 @@
+INTERSECT BAM FILE WITH EXTENDED PREMIRS
+
+The command line to create a file that creates a SAM file containing only the
+alignments that intersect with the extended premirs is:
+
+(samtools view -H uncollapsedMappings.sam; awk 'NR==FNR { bed[$14]=1; next } $1 in bed' intersect_mirna.bed uncollapsedMappings.sam) > output.sam
+---
+
+COLLAPSE SAM FILE BY SEQUENCE
+
+Given a SAM file, output a SAM file that has the alignments with the same sequence collapsed. 
+In addition, the new ID must be the collapse of all the reads IDs collapsed, 
+update the HI tag and create a new one containing the total counts. 
+The total count is calculated as the number of collapsed reads divided by the NH tag.
+
+SCRIPT: collpase_sam_by_seq.py
+
+MISSING: Unit tests for collpase_sam_by_seq.py
+
+---
+
+CREATE BAM/BAI FILE
+
+Copy/paste the three last rules of map.smk
+
+---
+
+INTERSECT BAM FILE WITH EXTENDED MIRS
+
+
+***
+
+QUESTIONS
+
+If there is no adapter to add ot the table; what should be put there? will it raise an error not having nothing there?
