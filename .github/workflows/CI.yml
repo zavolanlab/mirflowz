@@ -15,6 +15,7 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}
+  
     steps:
     
       - name: Checkout Repository
@@ -53,7 +54,7 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-
+        
       - name: Setup environment
         uses: conda-incubator/setup-miniconda@v2
         with:
@@ -71,11 +72,3 @@ jobs:
       - name: run unit tests
         working-directory: ./scripts/tests
         run: pytest --cov=scripts --cov-branch --cov-report=term-missing
-
-      - name: submit coverage report
-        uses: codecov/codecov-action@v3
-        with:
-          directory: ./scripts/tests/
-          files: .coverage
-          fail_ci_if_error: true
-          verbose: true

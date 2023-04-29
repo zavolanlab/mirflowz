@@ -67,7 +67,7 @@ def parse_arguments():
     return parser
 
 
-def count_indels(aln: pysam.AlignedSegment) -> int:
+def count_indels(aln: pysam.libcalignedsegment.AlignedSegment) -> int:
     """Count the number of indels in an alignment based on its CIGAR string.
 
     This function counts the number of indels in the alignment based on the
@@ -101,29 +101,29 @@ def find_best_alignments(alns: List[pysam.AlignedSegment]) -> List[pysam.Aligned
     Retrns:
         best_alignments: alignments with the less indels
     """
-    aln_indels = [(aln, count_indels(alignment=aln)) for aln in alns]
-    min_indels = min(aln_indels, key=lambda x: x[1])[1]
-    best_alignments = [aln for i, (aln, indels) in enumerate(aln_indels) if indels == min_indels]
+    if len(alns) == 1:
+        return alns
 
-    for i in range(len(best_alignments)):
-        best_alignments[i].set_tag('NH', len(best_alignments))
-        best_alignments[i].set_tag('HI', i + 1)
+    else:
+        aln_indels = [(aln, count_indels(aln=aln)) for aln in alns]
+        min_indels = min(aln_indels, key=lambda x: x[1])[1]
+        best_alignments = [aln for i, (aln, indels) in enumerate(aln_indels) if indels == min_indels]
 
-    return best_alignments
+        for i in range(len(best_alignments)):
+            best_alignments[i].set_tag('NH', len(best_alignments))
+            best_alignments[i].set_tag('HI', i + 1)
+
+        return best_alignments
 
 
-def write_output(alignments: List[pysam.AlignedSegment]) -> None:
+def write_output(alns: List[pysam.AlignedSegment]) -> None:
     """Write the output to the standard output (stdout).
 
     Args:
         alignments: alignments with the same query name
     """
-    if len(alignments) == 1:
-        sys.stdout.write(alignments[0].to_string() + '\n')
-    else:
-        best_alignments = find_best_alignments(alignments=alignments)
-        for alignment in best_alignments:
-            sys.stdout.write(alignment.to_string() + '\n')
+    for alignment in alns:
+        sys.stdout.write(alignment.to_string() + '\n')
 
 
 def main(sam_file: Path) -> None:
@@ -136,12 +136,12 @@ def main(sam_file: Path) -> None:
 
         sys.stdout.write(str(samfile.header))
 
-        current_query = None
         current_alignments: list[pysam.AlignedSegment] = []
+        current_query = None
 
         for alignment in samfile:
 
-            if alignment.is_secondary or alignment.is_supplementary:
+            if alignment.is_supplementary:
                 continue
 
             if current_query is None:
@@ -151,14 +151,17 @@ def main(sam_file: Path) -> None:
                 current_alignments.append(alignment)
 
             else:
-                write_output(alignments=current_alignments)
+                current_alignments = find_best_alignments(current_alignments)
+                write_output(alns=current_alignments)
 
                 current_query = alignment.query_name
                 current_alignments = [alignment]
 
-        write_output(alignments=current_alignments)
+        if len(current_alignments) > 0:
+            current_alignments = find_best_alignments(current_alignments)
+            write_output(alns=current_alignments)
 
 
 if __name__ == "__main__":
-    args = parse_arguments().parse_args()
-    main(sam_file=args.infile)
+    args = parse_arguments().parse_args()  # pragma:no cover
+    main(sam_file=args.infile)  # pragma: no cover
