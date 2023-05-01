@@ -338,21 +338,25 @@ rule extend_mirs_annotations:
         chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
         script=os.path.join(config["scripts_dir"], "mirna_extension.py"),
     output:
-        gff3_mir=os.path.join(config["output_dir"], "extended_mirna.gff3"),
-        gff3_premir=os.path.join(config["output_dir"], "extended_premirna.gff3"),
+        gff3_mir=os.path.join(
+            config["output_dir"], "mirna_annotation_extended_6_nt_mir.gff3"
+        ),
+        gff3_premir=os.path.join(
+            config["output_dir"], "mirna_annotation_extended_6_nt_premir.gff3"
+        ),
     params:
         cluster_log=os.path.join(config["cluster_log"], "extend_mirnas.log"),
+        out_dir=lambda wildcards, input: Path(input[0]).parent,
     log:
         os.path.join(config["local_log"], "extended_mirnas.log"),
     container:
         "docker://quay.io/biocontainers/gffutils:0.11.1--pyh7cba7a3_0"
     shell:
         "(python {input.script} \
-        -i {input.gff3} \
+        {input.gff3} \
         --chr {input.chrsize} \
         --extension 6 \
-        --premir {output.gff3_premir} \
-        --mir {output.gff3_mir} \
+        --out_dir {output.out_dir} \
         ) &> {log}"
 
 
@@ -363,7 +367,9 @@ rule extend_mirs_annotations:
 
 rule premirna_gfftobed:
     input:
-        gff=os.path.join(config["output_dir"], "extended_premirna.gff3"),
+        gff=os.path.join(
+            config["output_dir"], "mirna_annotation_extended_6_nt_premir.gff3"
+        ),
     output:
         bed_premir=os.path.join(config["output_dir"], "extended_premirna.bed"),
     params:
@@ -387,7 +393,9 @@ rule premirna_gfftobed:
 
 rule mirna_gfftobed:
     input:
-        gff=os.path.join(config["output_dir"], "extended_mirna.gff3"),
+        gff=os.path.join(
+            config["output_dir"], "mirna_annotation_extended_6_nt_mir.gff3"
+        ),
     output:
         bed_mir=os.path.join(config["output_dir"], "extended_mirna.bed"),
     params:
