@@ -3,54 +3,140 @@
 """Extend miRNAs start and end coordinates by n nucleotides.
 
 This script uses the class MirnaExtension to extend the start and end
-coordiantes of the mature miRNAs. Moreover, it will also extend the
-corresponding primary transcript start/end coordinates if these are
-surpassed by the new start/end coordinates.
-
-Input:
-    input_gff_file: 
-        Path to the GFF3 annotation file. If not provided, the input will be 
-        read from the standard input.
-    premir_out_file:
-        Path to the primary transcript GFF3 annotation file.
-    mir_out_file:
-        Path to the mature miRNA GFF3 annotation file.
-    extension:
-        Number of nucleotides to extend the coordinates. If not provided, the
-        extension will be of 6 nucleotides.
-    chromosome_size:
-        Path to the tabulated file containing the chromosome and its length.
-        If not provided, the length will be extracted form the input file.
-
-Output:
-    premir_out_file:
-        GFF3 file containing only the annotations for the primary transcripts.
-    mir_out_file:
-        GFF3 file containing only the annotations for the mature miRNAs.
-
-Functions:
-    parse_arguments():
-        Command-line arguments parser.
-    main():
-        Extend miRNAs start and end coordinates.
+coordiantes of the mature miRNAs.This class is build upon two methods. The
+first one, turns a GFF3 file into an in-memory database using gffutils. The
+second method, iterares over all primary miRNAS in the database to extend
+its mature forms' end and start cooridnates by n nucleotides without exceeding
+the chromosome boundaries. Thereafter, the primary miRNAs star/end coordinates
+will also be extened if and only if, the mature miRNA coordinates exceeds the
+primary miRNA ones; this extension will be recorded as _-y and/or _+x being the
+the extension on the 5' and 3' respectively. Finally, two different annotation
+files will be created; one for the primary miRNAs and one for the mature forms.
 
 Usage:
-    mirna_extension.py [-i GFF3] --premir GFF3 --mir GFF3 [-e int] [--chr Path]
+    mirna_extension.py GFF3 [--outdir Path] [-e int] [--chr Path]
+    GFF3 > mirna_extension.py [--outdir Path] --mir GFF3 [-e int] [--chr Path]
 """
 
 import argparse
+import gffutils
 import os
+from pathlib import Path
 import sys
 
-sys.path.append("../")
+class MirnaExtension():
+    """Class to extend miRNAs start and end coordinates.
 
-from scripts.mirnaExtension_class import MirnaExtension
+    Attributes:
+        premir_out:
+            Path to the output GFF3 file for pre-miRs
+        mir_out:
+            Path to the output GFF3 file for miRs
+        db:
+            in-memory database of the GFF3 file.
+
+    Methods:
+        load_gff_file:
+            creates an in-memory db from an input file
+        extend_mirnas:
+            extends the start and end of the mature miRNAs by n nucleotides
+    """
+
+    def __init__(self) -> None:
+        """Initialize class."""
+        self.db = None
+
+    def load_gff_file(self, gff_file: str = "") -> None:
+        """Load GFF3 file.
+
+        This method uses the gffutils package to create and in-memory database
+        of the GFF3 file.
+        
+        Args:
+            gff_file:
+                path to the input GFF3 file. If None, input is taken from the
+                standard input (stdin).
+        """
+        if gff_file == "":
+            self.db = gffutils.create_db(sys.stdin, dbfn=':memory:', 
+                                         force=True, keep_order=True)
+        else:
+            self.db = gffutils.create_db(gff_file, dbfn=':memory:', 
+                                         force=True, keep_order=True)
+    
+    def extend_mirnas(self, premir_out: str, mir_out: str, n: int = 6, seq_lengths: dict[str, int] = None) -> None:
+        """Extend miRNAs start and end coordinates.
+        
+        This method elongates the start and end coordinates of mature miRNAs
+        by n nucleotides. In the case that this extension makes the start/end
+        coordinates to exceed the corresponding primary miRNA boundaries,
+        these will be extended as far as the miRNA coordinates.
+        If provided, the elongation will take into account the chromosome size.
+
+        Args:
+            outdir:
+                path to the output directory.
+            n:
+                number of nucleotides to extend miRs start and end coordinates.
+            seq_lengths:
+                a dictionary that maps reference sequence IDs to their lengths
+                (in  nucleotides). If None, sequence lengths are inferred from
+                the input GFF3 file.
+        """
+        # Set end boundary
+        if seq_lengths is None:
+            seq_lengths = {}
+            for seqid in self.db.seqids():
+                seq_lengths[seqid] = max(rec.end for rec in self.db.region(seqid))
+
+        with open(premir_out, 'w') as premir, open(mir_out, 'w') as mirna:
+
+            for primary_mirna in self.db.features_of_type('miRNA_primary_transcript'):
+                seqid = primary_mirna.seqid
+                seq_len = seq_lengths[seqid]
+                start = int(primary_mirna.start)
+                end = int(primary_mirna.end)
+
+                mature_miRNAs = list(self.db.region(seqid=seqid,
+                                                    start=start,
+                                                    end=end,
+                                                    featuretype='miRNA',
+                                                    completely_within=True))
+
+                if mature_miRNAs:
+
+                    for mir in mature_miRNAs:
+                        if mir.start - n > 0:
+                            mir.start -= n
+                        else:
+                            mir.start = 0
+
+                        if mir.end + n < seq_len:
+                            mir.end += n
+                        else:
+                            mir.end = seq_len
+
+                        if mir.start < start:
+                            primary_mirna.start = mir.start
+                            
+                        if mir.end > end:
+                            primary_mirna.end = mir.end
+
+                        mirna.write(str(mir) + '\n')
+
+                    start_diff = start - primary_mirna.start
+                    end_diff = primary_mirna.end - end
+                    primary_mirna.attributes["Name"][0] += f"_-{start_diff}"
+                    primary_mirna.attributes["Name"][0] += f"_+{end_diff}"
+                    
+                premir.write(str(primary_mirna) + '\n')
+
 
 
 def parse_arguments():
     """Command-line arguments parser."""
     parser = argparse.ArgumentParser(
-        description="Script to extend pre-miRNs overhang."
+        description="Script to extend miRNAs start and end coordinates."
         )
     parser.add_argument(
         '-v', '--version',
@@ -59,33 +145,30 @@ def parse_arguments():
         help="Show program's version number and exit"
     )
     parser.add_argument(
-        '-i', '--input',
-        help="Path to the gff3 input file",
+        'input',
+        help="Path to the GFF3 annotation file. If not provided, the input will\
+             be read from the standard input.",
         type=str
     )
     parser.add_argument(
-        '--premir',
-        help="Path to the gff3 pre-miR output file",
-        type=str,
-        required=True
-    )
-    parser.add_argument(
-        '--mir',
-        help="Path to the gff3 miRNA output file.",
-        type=str,
-        required=True
+        '--outdir',
+        help="Path to the output directory. Default = current working directory.",
+        default=Path.cwd(),
+        type=str
     )
     parser.add_argument(
         '-e', '--extension',
-        help="Number of nucleotides to extend miRs coordinates. Default=6.",
+        help="Number of nucleotides to extend the coordinates. Default=6.",
         default=6,
         type=int
     )
     parser.add_argument(
         '--chr',
-        help="Path to the tabulated file with the chromosomes and its length.",
-        type=str,
-        default=None
+        help="Path to the tabulated file containing the chromosome and its \
+            length in basepairs. If not provided, the length will be set to \
+            the biggest coordinate of the last miRNA primary transcript.",
+        default=None,
+        type=str
     )
 
     return parser
@@ -93,9 +176,17 @@ def parse_arguments():
 
 def main(args):
     """Extend miRNAs start/end coordinates."""
+    outdir = Path(args.outdir)
+    outdir.mkdir(parents=True, exist_ok=True)
+
+    premir_out = outdir/f"mirna_annotation_extended_{args.extension}_nt_premir.gff3"
+    mir_out = outdir/f"mirna_annotation_extended_{args.extension}_nt_mir.gff3"
+    
     if os.path.getsize(args.input) == 0:
-        print("Error: Input file is empty")
-        sys.exit(1)
+        with open(premir_out, 'w') as premir, open(mir_out, 'w') as mir:
+            premir.write("")
+            mir.write("")
+            return
 
     # Create dictionary with the ref. sequence length
     if args.chr:
@@ -107,15 +198,12 @@ def main(args):
     else:
         seq_lengths = None
 
-    m = MirnaExtension(
-        gff_file=args.input,
-        premir_out=args.premir,
-        mir_out=args.mir,
-        n=args.extension,
-        seq_lengths=seq_lengths
-        )
-    m.load_gff_file()
-    m.extend_mirnas()
+    m = MirnaExtension()
+    m.load_gff_file(args.input)
+    m.extend_mirnas(n = args.extension, 
+                    seq_lengths = seq_lengths, 
+                    premir_out=premir_out,
+                    mir_out = mir_out)
 
 
 if __name__ == "__main__":
