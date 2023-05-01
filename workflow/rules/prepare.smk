@@ -356,7 +356,7 @@ rule extend_mirs_annotations:
         {input.gff3} \
         --chr {input.chrsize} \
         --extension 6 \
-        --out_dir {output.out_dir} \
+        --outdir {params.out_dir} \
         ) &> {log}"
 
 
