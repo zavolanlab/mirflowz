@@ -39,13 +39,13 @@ d34fc868b861b1bc46db07a397dc0f10  results/genome.processed.fa.fai
 21e102e4ebd3508bb06f46366a3d578d  results/exons.gtf
 7eb64c112830266bcf416ded60b4cf77  results/transcriptome_index_segemehl.idx
 4fba145540a2c61f29bfddfd0f5a4d4e  results/genome.processed.fa
-2d894237f188594ede779ac92fd96652  results/extended_premirna.gff3
-370a7b6cf61025d9f4389cb2f15507e0  results/extended_premirna.bed
-be7a0d92e57480190de57eb30baffa36  results/extended_mirna.gff3
+eaf8f009e233571805047ffdca02dc37  results/extended_premirna.bed
 8148cd880602255be166beb59bbed95a  results/headerOfCollapsedFasta.sam
 44dbf7c3eae00d0bc8d5e1319123746c  results/chr_size.txt
 f28cc0143ab6659bef3de3a7afa1dccc  results/mirna_annotations.gff3
 c44cfe44f02c44fd8dcdd2f4c2da2724  results/extended_mirna.bed
 003b92b245ac336e3d70a513033e1cee  results/transcriptome_idtrim.fa
 2d437f8681f4248d4f2075f86debb920  results/transcriptome.fa
+cc5c3512dab0e269d82bd625de74198e  results/mirna_annotation_extended_6_nt_premir.gff3
+be7a0d92e57480190de57eb30baffa36  results/mirna_annotation_extended_6_nt_mir.gff3
 4fb453846e88593d0cac13220ec2d685  results/genome_index_segemehl.idx
