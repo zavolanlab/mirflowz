@@ -125,7 +125,7 @@ rule intersect_mirna:
         alignment=os.path.join(
             config["output_dir"], "{sample}", "sorted.alignments.bed12"
         ),
-        mirna=os.path.join(config["output_dir"], "extended_mirna.bed"),
+        mirna=os.path.join(config["output_dir"], "mirna_annotations.bed"),
     output:
         intersect=os.path.join(
             config["output_dir"], "{sample}", "intersect_mirna.bed"
@@ -186,42 +186,42 @@ rule quant_mirna:
 ################################################################################
 #### miRNAs counting table - miRNA_primary
 ################################################################################
-#
-#
-# rule quant_mirna_pri:
-#    input:
-#        intersect=os.path.join(
-#            config["output_dir"], "{sample}", "intersect_mirna.bed"
-#        ),
-#        script=os.path.join(config["scripts_dir"], "mirna_quantification.py"),
-#    output:
-#        table=os.path.join(
-#            config["output_dir"],
-#            "TABLES",
-#            "miRNA_primary_transcript_counts_{sample}",
-#        ),
-#    params:
-#        cluster_log=os.path.join(
-#            config["cluster_log"],
-#            "quant_mirna_miRNA_primary_transcript_{sample}.log",
-#        ),
-#        prefix=lambda wildcards, output: output[0],
-#    log:
-#        os.path.join(
-#            config["local_log"],
-#            "quant_mirna_miRNA_primary_transcript_{sample}.log",
-#        ),
-#    container:
-#        "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
-#    shell:
-#        "(python \
-#        {input.script} \
-#        -i {input.intersect} \
-#        --uniq=miRNA_primary_transcript \
-#        -p={params.prefix} \
-#        ) &> {log}"
-#
-#
+
+
+rule quant_mirna_pri:
+   input:
+       intersect=os.path.join(
+           config["output_dir"], "{sample}", "intersect_mirna.bed"
+       ),
+       script=os.path.join(config["scripts_dir"], "mirna_quantification.py"),
+   output:
+       table=os.path.join(
+           config["output_dir"],
+           "TABLES",
+           "miRNA_primary_transcript_counts_{sample}",
+       ),
+   params:
+       cluster_log=os.path.join(
+           config["cluster_log"],
+           "quant_mirna_miRNA_primary_transcript_{sample}.log",
+       ),
+       prefix=lambda wildcards, output: output[0],
+   log:
+       os.path.join(
+           config["local_log"],
+           "quant_mirna_miRNA_primary_transcript_{sample}.log",
+       ),
+   container:
+       "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
+   shell:
+       "(python \
+       {input.script} \
+       -i {input.intersect} \
+       --uniq=miRNA_primary_transcript \
+       -p={params.prefix} \
+       ) &> {log}"
+
+
 ################################################################################
 #### Merge counting tables for all samples by mature/primary/isomirs forms.
 ################################################################################
