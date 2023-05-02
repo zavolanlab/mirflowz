@@ -63,8 +63,12 @@ rule finish:
             "headerOfCollapsedFasta.sam",
         ),
         chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
-        bed_mir=os.path.join(config["output_dir"], "extended_mirna.bed"),
-        bed_premir=os.path.join(config["output_dir"], "extended_premirna.bed"),
+        exteneded_mir=os.path.join(
+            config["output_dir"], "mirna_annotation_extended_6_nt_mir.gff3"
+        ),
+        extended_premir=os.path.join(
+            config["output_dir"], "mirna_annotation_extended_6_nt_premir.gff3"
+        ),
         maps=expand(
             os.path.join(
                 config["output_dir"],
