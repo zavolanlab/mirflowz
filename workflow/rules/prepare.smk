@@ -42,8 +42,12 @@ rule finish_prepare:
             "headerOfCollapsedFasta.sam",
         ),
         chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
-        bed_mir=os.path.join(config["output_dir"], "extended_mirna.bed"),
-        bed_premir=os.path.join(config["output_dir"], "extended_premirna.bed"),
+        exteneded_mir=os.path.join(
+            config["output_dir"], "mirna_annotation_extended_6_nt_mir.gff3"
+        ),
+        extended_premir=os.path.join(
+            config["output_dir"], "mirna_annotation_extended_6_nt_premir.gff3"
+        ),
 
 
 ###############################################################################
@@ -338,10 +342,10 @@ rule extend_mirs_annotations:
         chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
         script=os.path.join(config["scripts_dir"], "mirna_extension.py"),
     output:
-        gff3_mir=os.path.join(
+        exteneded_mir=os.path.join(
             config["output_dir"], "mirna_annotation_extended_6_nt_mir.gff3"
         ),
-        gff3_premir=os.path.join(
+        extended_premir=os.path.join(
             config["output_dir"], "mirna_annotation_extended_6_nt_premir.gff3"
         ),
     params:
@@ -359,54 +363,25 @@ rule extend_mirs_annotations:
         --outdir {params.out_dir} \
         ) &> {log}"
 
-
 ###############################################################################
-### pre-miRNAs GFF to BED
+### GFF to BED (improve intersect memory efficient allowing to use -sorted)
 ###############################################################################
 
 
-rule premirna_gfftobed:
+rule gfftobed:
     input:
-        gff=os.path.join(
-            config["output_dir"], "mirna_annotation_extended_6_nt_premir.gff3"
-        ),
+        gff=os.path.join(config["output_dir"], "mirna_annotations.gff3"),
     output:
-        bed_premir=os.path.join(config["output_dir"], "extended_premirna.bed"),
+        bed=os.path.join(config["output_dir"], "mirna_annotations.bed"),
     params:
-        cluster_log=os.path.join(config["cluster_log"], "gfftobed_premirna.log"),
+        cluster_log=os.path.join(config["cluster_log"], "gfftobed.log"),
         out_dir=lambda wildcards, input: Path(input[0]).parent,
     log:
-        os.path.join(config["local_log"], "gfftobed_premirna.log"),
+        os.path.join(config["local_log"], "gfftobed.log"),
     container:
         "docker://quay.io/biocontainers/bedops:2.4.35--h6bb024c_2"
     shell:
         "(convert2bed -i gff < {input.gff} \
         --sort-tmpdir={params.out_dir} \
-        > {output.bed_premir} \
-        ) &> {log}"
-
-
-###############################################################################
-### miRNAs GFF to BED
-###############################################################################
-
-
-rule mirna_gfftobed:
-    input:
-        gff=os.path.join(
-            config["output_dir"], "mirna_annotation_extended_6_nt_mir.gff3"
-        ),
-    output:
-        bed_mir=os.path.join(config["output_dir"], "extended_mirna.bed"),
-    params:
-        cluster_log=os.path.join(config["cluster_log"], "gfftobed_mirna.log"),
-        out_dir=lambda wildcards, input: Path(input[0]).parent,
-    log:
-        os.path.join(config["local_log"], "gfftobed_mirna.log"),
-    container:
-        "docker://quay.io/biocontainers/bedops:2.4.35--h6bb024c_2"
-    shell:
-        "(convert2bed -i gff < {input.gff} \
-        --sort-tmpdir={params.out_dir} \
-        > {output.bed_mir} \
+        > {output.bed} \
         ) &> {log}"
