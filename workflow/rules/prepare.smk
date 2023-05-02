@@ -42,11 +42,19 @@ rule finish_prepare:
             "headerOfCollapsedFasta.sam",
         ),
         chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
-        exteneded_mir=os.path.join(
-            config["output_dir"], "mirna_annotation_extended_6_nt_mir.gff3"
+        exteneded_mir=expand(
+            os.path.join(
+                config["output_dir"], 
+                "mirna_annotation_extended_{extension}_nt_mir.gff3"
+            ),
+            extension=config["extension"]
         ),
-        extended_premir=os.path.join(
-            config["output_dir"], "mirna_annotation_extended_6_nt_premir.gff3"
+        exteneded_premir=expand(
+            os.path.join(
+                config["output_dir"], 
+                "mirna_annotation_extended_{extension}_nt_premir.gff3"
+            ),
+            extension=config["extension"]
         ),
 
 
@@ -342,15 +350,24 @@ rule extend_mirs_annotations:
         chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
         script=os.path.join(config["scripts_dir"], "mirna_extension.py"),
     output:
-        exteneded_mir=os.path.join(
-            config["output_dir"], "mirna_annotation_extended_6_nt_mir.gff3"
+        exteneded_mir=expand(
+            os.path.join(
+                config["output_dir"], 
+                "mirna_annotation_extended_{extension}_nt_mir.gff3"
+            ),
+            extension=config["extension"]
         ),
-        extended_premir=os.path.join(
-            config["output_dir"], "mirna_annotation_extended_6_nt_premir.gff3"
+        exteneded_premir=expand(
+            os.path.join(
+                config["output_dir"], 
+                "mirna_annotation_extended_{extension}_nt_premir.gff3"
+            ),
+            extension=config["extension"]
         ),
     params:
         cluster_log=os.path.join(config["cluster_log"], "extend_mirnas.log"),
         out_dir=lambda wildcards, input: Path(input[0]).parent,
+        extension=config["extension"],
     log:
         os.path.join(config["local_log"], "extended_mirnas.log"),
     container:
@@ -359,7 +376,7 @@ rule extend_mirs_annotations:
         "(python {input.script} \
         {input.gff3} \
         --chr {input.chrsize} \
-        --extension 6 \
+        --extension {params.extension} \
         --outdir {params.out_dir} \
         ) &> {log}"
 
