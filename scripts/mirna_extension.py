@@ -20,7 +20,6 @@ Usage:
 
 import argparse
 import gffutils
-import os
 from pathlib import Path
 import sys
 from typing import Dict, Optional
@@ -43,7 +42,7 @@ class MirnaExtension():
         """Initialize class."""
         self.db = None
 
-    def load_gff_file(self, gff_file: str = None) -> None:
+    def load_gff_file(self, gff_file: Optional[Path] = None) -> None:
         """Load GFF3 file.
 
         This method uses the gffutils package to create and in-memory database
@@ -54,11 +53,11 @@ class MirnaExtension():
                 path to the input GFF3 file. If None, input is taken from the
                 standard input (stdin).
         """
-        if gff_file == None:
+        if gff_file is None:
             self.db = gffutils.create_db(sys.stdin, dbfn=':memory:', 
                                          force=True, keep_order=True)
         else:
-            self.db = gffutils.create_db(gff_file, dbfn=':memory:', 
+            self.db = gffutils.create_db(str(gff_file), dbfn=':memory:', 
                                          force=True, keep_order=True)
     
     def extend_mirnas(self, premir_out: Path, mir_out: Path, n: int = 6, seq_lengths: Optional[dict[str, int]] = None) -> None:
@@ -179,11 +178,12 @@ def main(args):
     premir_out = outdir/f"mirna_annotation_extended_{args.extension}_nt_premir.gff3"
     mir_out = outdir/f"mirna_annotation_extended_{args.extension}_nt_mir.gff3"
     
-    if os.path.getsize(args.input) == 0:
-        with open(premir_out, 'w') as premir, open(mir_out, 'w') as mir:
-            premir.write("")
-            mir.write("")
-            return
+    with open(args.input, 'r') as input:
+        if len(input.read()) == 0:
+            with open(premir_out, 'w') as premir, open(mir_out, 'w') as mir:
+                premir.write("")
+                mir.write("")
+                return
 
     # Create dictionary with the ref. sequence length
     seq_lengths: Optional[Dict] = None
@@ -195,7 +195,7 @@ def main(args):
                 seq_lengths[ref_seq] = int(length)
 
     m = MirnaExtension()
-    m.load_gff_file(str(args.input))
+    m.load_gff_file(args.input)
     m.extend_mirnas(n = args.extension, 
                     seq_lengths = seq_lengths, 
                     premir_out=premir_out,
