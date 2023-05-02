@@ -45,6 +45,11 @@
             "default": "../scripts/",
             "description": "Path to the scripts directory."
         },
+        "extension":{
+            "type": "integer",
+            "default": 6,
+            "description": "Number of nucleotides to extend the mature miRNA start and end coordinates."
+        },
         "bp_5p":{
             "type": "array",
             "default": [-2, -1, 0, 1, 2],
