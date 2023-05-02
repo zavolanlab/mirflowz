@@ -36,26 +36,10 @@ local_log: logs/local/
 cluster_log: logs/cluster/
 scripts_dir: ../scripts/
 
-
-#### ISOMIR GENERATION PARAMETERS ####
-
-# Generate isomiR annotations with the indicated number of shifts relative to
-# the start and end position of each annotated mature miRNA, as an array of
-# relative positions
-# Examples:
-# - `bp_5p: [-2,0,+1]` and `bp_3p: [+1]` generates 3 isomiRs for each mature
-#   miRNA: one that starts two nucleotides before, one that starts exactly at
-#   and one that starts one nucleotide after the annotated mature miRNA; all
-#   isomiRs will stop one nucleotide after the end of the annotated mature
-#   miRNA; note that because `0` is not included in the `bp_3p` array, the
-#   annotated mature miRNAs will not be included in this example
-# - Use `bp_5p: [0]` and `bp_3p: [0]` to only include the mature annotated
-#   miRNAs and no isomiRs
-
-bp_5p: [-2, -1, 0, +1, +2]
-bp_3p: [-2, -1, 0, +1, +2]
-
 #### PROCESSING PARAMETERS #### 
+
+# annotation modifications
+extension: 6 # extension of the mature miRNA start and end coordinates in bp
 
 # quality filter
 q_value: 10 # Q (Phred) score; minimum quality score to keep
