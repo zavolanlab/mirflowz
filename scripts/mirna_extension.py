@@ -23,15 +23,12 @@ import gffutils
 import os
 from pathlib import Path
 import sys
+from typing import Dict, Optional
 
 class MirnaExtension():
     """Class to extend miRNAs start and end coordinates.
 
     Attributes:
-        premir_out:
-            Path to the output GFF3 file for pre-miRs
-        mir_out:
-            Path to the output GFF3 file for miRs
         db:
             in-memory database of the GFF3 file.
 
@@ -46,7 +43,7 @@ class MirnaExtension():
         """Initialize class."""
         self.db = None
 
-    def load_gff_file(self, gff_file: str = "") -> None:
+    def load_gff_file(self, gff_file: str = None) -> None:
         """Load GFF3 file.
 
         This method uses the gffutils package to create and in-memory database
@@ -57,14 +54,14 @@ class MirnaExtension():
                 path to the input GFF3 file. If None, input is taken from the
                 standard input (stdin).
         """
-        if gff_file == "":
+        if gff_file == None:
             self.db = gffutils.create_db(sys.stdin, dbfn=':memory:', 
                                          force=True, keep_order=True)
         else:
             self.db = gffutils.create_db(gff_file, dbfn=':memory:', 
                                          force=True, keep_order=True)
     
-    def extend_mirnas(self, premir_out: str, mir_out: str, n: int = 6, seq_lengths: dict[str, int] = None) -> None:
+    def extend_mirnas(self, premir_out: Path, mir_out: Path, n: int = 6, seq_lengths: Optional[dict[str, int]] = None) -> None:
         """Extend miRNAs start and end coordinates.
         
         This method elongates the start and end coordinates of mature miRNAs
@@ -148,7 +145,7 @@ def parse_arguments():
         'input',
         help="Path to the GFF3 annotation file. If not provided, the input will\
              be read from the standard input.",
-        type=str
+        type=Path
     )
     parser.add_argument(
         '--outdir',
@@ -158,7 +155,7 @@ def parse_arguments():
     )
     parser.add_argument(
         '-e', '--extension',
-        help="Number of nucleotides to extend the coordinates. Default=6.",
+        help="Number of nucleotides to extend the coordinates. Default: %(default)d.",
         default=6,
         type=int
     )
@@ -189,17 +186,16 @@ def main(args):
             return
 
     # Create dictionary with the ref. sequence length
+    seq_lengths: Optional[Dict] = None
     if args.chr:
         seq_lengths = {}
         with open(args.chr, 'r') as f:
             for line in f:
                 ref_seq, length = line.strip().split("\t")
                 seq_lengths[ref_seq] = int(length)
-    else:
-        seq_lengths = None
 
     m = MirnaExtension()
-    m.load_gff_file(args.input)
+    m.load_gff_file(str(args.input))
     m.extend_mirnas(n = args.extension, 
                     seq_lengths = seq_lengths, 
                     premir_out=premir_out,
