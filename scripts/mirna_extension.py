@@ -70,8 +70,10 @@ class MirnaExtension():
         If provided, the elongation will take into account the chromosome size.
 
         Args:
-            outdir:
-                path to the output directory.
+            premir_out:
+                path to the output extended precursor miRNA file.
+            mir_out:
+                path to the output extended mature miRNA file.
             n:
                 number of nucleotides to extend miRs start and end coordinates.
             seq_lengths:
@@ -148,9 +150,9 @@ def parse_arguments():
     )
     parser.add_argument(
         '--outdir',
-        help="Path to the output directory. Default = current working directory.",
+        help="Path to the output directory. Default: %(default)s.",
         default=Path.cwd(),
-        type=str
+        type=Path
     )
     parser.add_argument(
         '-e', '--extension',
@@ -164,7 +166,7 @@ def parse_arguments():
             length in basepairs. If not provided, the length will be set to \
             the biggest coordinate of the last miRNA primary transcript.",
         default=None,
-        type=str
+        type=Path
     )
 
     return parser
