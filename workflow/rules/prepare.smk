@@ -41,9 +41,20 @@ rule finish_prepare:
             config["output_dir"],
             "headerOfCollapsedFasta.sam",
         ),
-        mirnafilt=os.path.join(
-            config["output_dir"],
-            "mirna_filtered.bed",
+        chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
+        exteneded_mir=expand(
+            os.path.join(
+                config["output_dir"], 
+                "mirna_annotation_extended_{extension}_nt_mir.gff3"
+            ),
+            extension=config["extension"]
+        ),
+        exteneded_premir=expand(
+            os.path.join(
+                config["output_dir"], 
+                "mirna_annotation_extended_{extension}_nt_premir.gff3"
+            ),
+            extension=config["extension"]
         ),
 
 
@@ -287,30 +298,6 @@ rule map_chr_names:
 
 
 ###############################################################################
-### GFF to BED (improve intersect memory efficient allowing to use -sorted)
-###############################################################################
-
-
-rule gfftobed:
-    input:
-        gff=os.path.join(config["output_dir"], "mirna_annotations.gff3"),
-    output:
-        bed=os.path.join(config["output_dir"], "mirna_annotations.bed"),
-    params:
-        cluster_log=os.path.join(config["cluster_log"], "gfftobed.log"),
-        out_dir=lambda wildcards, input: Path(input[0]).parent,
-    log:
-        os.path.join(config["local_log"], "gfftobed.log"),
-    container:
-        "docker://quay.io/biocontainers/bedops:2.4.35--h6bb024c_2"
-    shell:
-        "(convert2bed -i gff < {input.gff} \
-        --sort-tmpdir={params.out_dir} \
-        > {output.bed} \
-        ) &> {log}"
-
-
-###############################################################################
 ### Index genome fasta file
 ###############################################################################
 
@@ -353,23 +340,65 @@ rule extract_chr_len:
 
 
 ###############################################################################
-### Extract mature miRNA
+### Extend miRNAs annotations
 ###############################################################################
 
 
-rule filter_mature_mirs:
+rule extend_mirs_annotations:
     input:
-        bed=os.path.join(config["output_dir"], "mirna_annotations.bed"),
+        gff3=os.path.join(config["output_dir"], "mirna_annotations.gff3"),
+        chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
+        script=os.path.join(config["scripts_dir"], "mirna_extension.py"),
     output:
-        bed=os.path.join(config["output_dir"], "mirna_mature_filtered.bed"),
-    params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "filter_mature_mirs.log"
+        exteneded_mir=expand(
+            os.path.join(
+                config["output_dir"], 
+                "mirna_annotation_extended_{extension}_nt_mir.gff3"
+            ),
+            extension=config["extension"]
         ),
-        precursor="miRNA_primary_transcript",
+        exteneded_premir=expand(
+            os.path.join(
+                config["output_dir"], 
+                "mirna_annotation_extended_{extension}_nt_premir.gff3"
+            ),
+            extension=config["extension"]
+        ),
+    params:
+        cluster_log=os.path.join(config["cluster_log"], "extend_mirnas.log"),
+        out_dir=lambda wildcards, input: Path(input[0]).parent,
+        extension=config["extension"],
     log:
-        os.path.join(config["local_log"], "filter_mature_mirs.log"),
+        os.path.join(config["local_log"], "extended_mirnas.log"),
     container:
-        "docker://ubuntu:lunar-20221207"
+        "docker://quay.io/biocontainers/gffutils:0.11.1--pyh7cba7a3_0"
     shell:
-        "(grep -v {params.precursor} {input.bed} > {output.bed}) &> {log}"
+        "(python {input.script} \
+        {input.gff3} \
+        --chr {input.chrsize} \
+        --extension {params.extension} \
+        --outdir {params.out_dir} \
+        ) &> {log}"
+
+###############################################################################
+### GFF to BED (improve intersect memory efficient allowing to use -sorted)
+###############################################################################
+
+
+rule gfftobed:
+    input:
+        gff=os.path.join(config["output_dir"], "mirna_annotations.gff3"),
+    output:
+        bed=os.path.join(config["output_dir"], "mirna_annotations.bed"),
+    params:
+        cluster_log=os.path.join(config["cluster_log"], "gfftobed.log"),
+        out_dir=lambda wildcards, input: Path(input[0]).parent,
+    log:
+        os.path.join(config["local_log"], "gfftobed.log"),
+    container:
+        "docker://quay.io/biocontainers/bedops:2.4.35--h6bb024c_2"
+    shell:
+        "(convert2bed -i gff < {input.gff} \
+        --sort-tmpdir={params.out_dir} \
+        > {output.bed} \
+        ) &> {log}"

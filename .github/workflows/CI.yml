@@ -54,7 +54,7 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-         
+        
       - name: Setup environment
         uses: conda-incubator/setup-miniconda@v2
         with:
@@ -62,10 +62,10 @@ jobs:
           activate-environment: mirflowz
           environment-file: environment.yml
           auto-activate-base: false
-      
+
       - name: Update mirflowz env with root packages
         run: mamba env update -n mirflowz -f environment.root.yml
-      
+
       - name: Update mirflowz env with dev packages
         run: mamba env update -n mirflowz -f environment.dev.yml
 

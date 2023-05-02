@@ -62,9 +62,20 @@ rule finish:
             config["output_dir"],
             "headerOfCollapsedFasta.sam",
         ),
-        mirnafilt=os.path.join(
-            config["output_dir"],
-            "mirna_annotations.bed",
+        chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
+        exteneded_mir=expand(
+            os.path.join(
+                config["output_dir"], 
+                "mirna_annotation_extended_{extension}_nt_mir.gff3"
+            ),
+            extension=config["extension"]
+        ),
+        exteneded_premir=expand(
+            os.path.join(
+                config["output_dir"], 
+                "mirna_annotation_extended_{extension}_nt_premir.gff3"
+            ),
+            extension=config["extension"]
         ),
         maps=expand(
             os.path.join(
