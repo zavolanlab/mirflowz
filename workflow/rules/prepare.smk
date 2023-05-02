@@ -381,20 +381,28 @@ rule extend_mirs_annotations:
         ) &> {log}"
 
 ###############################################################################
-### GFF to BED (improve intersect memory efficient allowing to use -sorted)
+### premiR GFF to BED
 ###############################################################################
 
 
-rule gfftobed:
+rule premir_gfftobed:
     input:
-        gff=os.path.join(config["output_dir"], "mirna_annotations.gff3"),
+        gff=expand(
+            os.path.join(
+                config["output_dir"], 
+                "mirna_annotation_extended_{extension}_nt_premir.gff3"
+            ),
+            extension=config["extension"]
+        ),
     output:
-        bed=os.path.join(config["output_dir"], "mirna_annotations.bed"),
+        bed=os.path.join(
+            config["output_dir"], "premir_extended_annotations.bed"
+        ),
     params:
-        cluster_log=os.path.join(config["cluster_log"], "gfftobed.log"),
+        cluster_log=os.path.join(config["cluster_log"], "premir_gfftobed.log"),
         out_dir=lambda wildcards, input: Path(input[0]).parent,
     log:
-        os.path.join(config["local_log"], "gfftobed.log"),
+        os.path.join(config["local_log"], "premir_gfftobed.log"),
     container:
         "docker://quay.io/biocontainers/bedops:2.4.35--h6bb024c_2"
     shell:

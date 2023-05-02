@@ -85,6 +85,12 @@ rule finish:
             ),
             sample=pd.unique(samples_table.index.values),
         ),
+        intersect_sam=expand(
+            os.path.join(
+                config["output_dir"], "{sample}", "intersectedAlignments.sam"
+            ),
+            sample=pd.unique(samples_table.index.values),
+        ),
         table=lambda wildcard: expand(
             os.path.join(config["output_dir"], "TABLES", "counts.{mir}.tab"),
             mir=config["mir_list"],

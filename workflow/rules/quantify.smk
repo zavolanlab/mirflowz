@@ -40,7 +40,10 @@ localrules:
 
 rule finish_quantify:
    input:
-       table=expand(
+        intersect_sam=os.path.join(
+            config["output_dir"], "{sample}", "intersectedAlignments.sam"
+        ),
+        table=expand(
            os.path.join(
                config["output_dir"],
                "TABLES",
@@ -116,104 +119,147 @@ rule sort_alignments:
 
 
 ###############################################################################
-### miRNAs intersection
+### Intersection with extended pri-miRs
 ###############################################################################
 
 
-rule intersect_mirna:
+rule intersect_extended_premir:
     input:
         alignment=os.path.join(
             config["output_dir"], "{sample}", "sorted.alignments.bed12"
         ),
-        mirna=os.path.join(config["output_dir"], "mirna_annotations.bed"),
+        premir=os.path.join(
+            config["output_dir"], "premir_extended_annotations.bed"
+        ),
     output:
         intersect=os.path.join(
-            config["output_dir"], "{sample}", "intersect_mirna.bed"
+            config["output_dir"], "{sample}", 
+            "intersection_extended_premir.bed"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "intersection_mirna_{sample}.log"
+            config["cluster_log"], 
+            "intersection_extended_premir_{sample}.log"
         ),
     log:
-        os.path.join(config["local_log"], "intersection_mirna_{sample}.log"),
+        os.path.join(config["local_log"], 
+        "intersection_extended_premir_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/bedtools:2.30.0--h468198e_3"
     shell:
         "(bedtools intersect \
-        -wao \
+        -wb \
         -s \
         -F 1 \
         -sorted \
         -b {input.alignment} \
-        -a {input.mirna} \
+        -a {input.premir} \
         > {output.intersect} \
+        ) &> {log}"
+
+
+###############################################################################
+### Intersection with extended pri-miRs
+###############################################################################
+
+
+rule intersection_sam_file:
+    input:
+        alignments=os.path.join(
+            config["output_dir"], "{sample}", "uncollapsedMappings.sam"
+        ),
+        intersect=os.path.join(
+            config["output_dir"], "{sample}", 
+            "intersection_extended_premir.bed"
+        ),
+    output:
+        sam=os.path.join(
+            config["output_dir"], "{sample}", "intersectedAlignments.sam"
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"], 
+            "intersection_sam_file_{sample}.log"
+        ),
+    log:
+        os.path.join(config["local_log"], 
+        "intersection_sam_file_{sample}.log"),
+    container:
+        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    shell:
+        "((samtools view \
+        -H {input.alignments}; \
+        awk 'NR==FNR {{bed[$14]=1; next}} $1 in bed' \
+        {input.intersect} {input.alignments} \
+        ) > {output.sam} \
         ) &> {log}"
 
 
 ###############################################################################
 ### miRNAs counting table - miRNA
 ###############################################################################
-
-
-rule quant_mirna:
-   input:
-       intersect=os.path.join(
-           config["output_dir"], "{sample}", "intersect_mirna.bed"
-       ),
-       script=os.path.join(config["scripts_dir"], "mirna_quantification.py"),
-   output:
-       table=os.path.join(
-           config["output_dir"], "TABLES", "miRNA_counts_{sample}"
-       ),
-   params:
-       cluster_log=os.path.join(
-           config["cluster_log"], "quant_mirna_miRNA_{sample}.log"
-       ),
-       prefix=lambda wildcards, output: output[0],
-   log:
-       os.path.join(config["local_log"], "quant_mirna_miRNA_{sample}.log"),
-   container:
-       "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
-   shell:
-       "(python \
-       {input.script} \
-       -i {input.intersect} \
-       --uniq=miRNA \
-       -p={params.prefix} \
-       ) &> {log}"
-
-
+#
+#
+#rule quant_mirna:
+#   input:
+#       intersect=os.path.join(
+#           config["output_dir"], "{sample}", "intersect_mirna.bed"
+#       ),
+#       script=os.path.join(config["scripts_dir"], "mirna_quantification.py"),
+#   output:
+#       table=os.path.join(
+#           config["output_dir"], "TABLES", "miRNA_counts_{sample}"
+#       ),
+#   params:
+#       cluster_log=os.path.join(
+#           config["cluster_log"], "quant_mirna_miRNA_{sample}.log"
+#       ),
+#       prefix=lambda wildcards, output: output[0],
+#   log:
+#       os.path.join(config["local_log"], "quant_mirna_miRNA_{sample}.log"),
+#   container:
+#       "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
+#   shell:
+#       "(python \
+#       {input.script} \
+#       -i {input.intersect} \
+#       --uniq=miRNA \
+#       -p={params.prefix} \
+#       ) &> {log}"
+#
+#
 ################################################################################
 #### miRNAs counting table - miRNA_primary
 ################################################################################
 
 
 rule quant_mirna_pri:
-   input:
-       intersect=os.path.join(
-           config["output_dir"], "{sample}", "intersect_mirna.bed"
-       ),
-       script=os.path.join(config["scripts_dir"], "mirna_quantification.py"),
-   output:
-       table=os.path.join(
+    input:
+        intersect=os.path.join(
+            config["output_dir"], "{sample}", 
+            "intersection_extended_premir.bed"
+        ),
+        script=os.path.join(config["scripts_dir"], "mirna_quantification.py"),
+    output:
+        table=os.path.join(
            config["output_dir"],
            "TABLES",
            "miRNA_primary_transcript_counts_{sample}",
-       ),
-   params:
-       cluster_log=os.path.join(
+        ),
+    params:
+        cluster_log=os.path.join(
            config["cluster_log"],
            "quant_mirna_miRNA_primary_transcript_{sample}.log",
-       ),
-       prefix=lambda wildcards, output: output[0],
-   log:
-       os.path.join(
+        ),
+        prefix=lambda wildcards, output: output[0],
+    log:
+        os.path.join(
            config["local_log"],
            "quant_mirna_miRNA_primary_transcript_{sample}.log",
-       ),
-   container:
+        ),
+    container:
        "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
-   shell:
+    shell:
        "(python \
        {input.script} \
        -i {input.intersect} \
