@@ -15,7 +15,7 @@ files will be created; one for the primary miRNAs and one for the mature forms.
 
 Usage:
     mirna_extension.py GFF3 [--outdir Path] [-e int] [--chr Path]
-    GFF3 > mirna_extension.py [--outdir Path] --mir GFF3 [-e int] [--chr Path]
+    GFF3 > mirna_extension.py [--outdir Path] [-e int] [--chr Path]
 """
 
 import argparse
