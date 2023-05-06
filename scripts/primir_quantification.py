@@ -59,7 +59,7 @@ def parse_arguments():
 def main(args) -> None:
     """Create pri-miRs counting table."""
     with open(args.outfile, 'w') as outfile:
-        header = ["Name", "Count", "5p_extension", "3p_extension"]
+        header = ["Name", "5p_extension", "3p_extension", "Count"]
         outfile.write("\t".join(header) + "\n")
 
     if os.path.getsize(args.bed) == 0:
@@ -96,14 +96,14 @@ def main(args) -> None:
             if current_name == name:
                 count += (1/nh_value)
             else:
-                pri_data.insert(1, str(count))
+                pri_data.append(str(count))
                 outfile.write("\t".join(pri_data) + "\n")
 
                 current_name = name
                 pri_data = name.split("_")
                 count = (1/nh_value)
  
-        pri_data.insert(1, str(count))
+        pri_data.append(str(count))
         outfile.write("\t".join(pri_data) + "\n")
 
 if __name__ == "__main__":
