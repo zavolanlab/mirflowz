@@ -14,12 +14,13 @@ will be split to retrieve the actual pri-miRNA name and the relative
 extensions.
 
 Usage:
-    primir_quantification.py --bed BED --sam SAM --outfile outputfile
+    primir_quantification.py --bed BED --sam SAM
+    primir_quantification.py --bed BED --sam SAM > outfile
 """
 
 import argparse
-import os
 from pathlib import Path
+import sys
 
 import pysam
 
@@ -37,7 +38,9 @@ def parse_arguments():
     )
     parser.add_argument(
         '-b', '--bed',
-        help="Path to the extended pri-miR intersection BED file.",
+        help="Path to the extended pri-miR intersection BED file. This file \
+            must be the output of the call `bedtools intersect -wb -s -F 1 \
+            -sorted`.",
         type=Path,
         required=True
     )
@@ -47,23 +50,17 @@ def parse_arguments():
         type=Path,
         required=True
     )
-    parser.add_argument(
-        '--outfile',
-        help="Path to the output file.",
-        type=Path,
-        required=True
-    )
 
     return parser
 
 def main(args) -> None:
     """Create pri-miRs counting table."""
-    with open(args.outfile, 'w') as outfile:
-        header = ["Name", "5p_extension", "3p_extension", "Count"]
-        outfile.write("\t".join(header) + "\n")
+    header = ["Name", "5p_extension", "3p_extension", "Count"]
+    sys.stdout.write("\t".join(header) + "\n")
 
-    if os.path.getsize(args.bed) == 0:
-        return
+    with open(args.bed, 'r') as bedfile:
+        if len(bedfile.read()) == 0:
+            return
     
     with pysam.AlignmentFile(args.sam, "r") as samfile:
         align_nh =  {}
@@ -74,7 +71,7 @@ def main(args) -> None:
         if len(align_nh.items()) == 0:
             return
     
-    with open(args.bed, "r") as bedfile, open(args.outfile, "a") as outfile:
+    with open(args.bed, "r") as bedfile:
 
         count = 0
         current_name = None
@@ -97,14 +94,14 @@ def main(args) -> None:
                 count += (1/nh_value)
             else:
                 pri_data.append(str(count))
-                outfile.write("\t".join(pri_data) + "\n")
+                sys.stdout.write("\t".join(pri_data) + "\n")
 
                 current_name = name
                 pri_data = name.split("_")
                 count = (1/nh_value)
  
         pri_data.append(str(count))
-        outfile.write("\t".join(pri_data) + "\n")
+        sys.stdout.write("\t".join(pri_data) + "\n")
 
 if __name__ == "__main__":
 
