@@ -9,9 +9,10 @@ create a dictionary that will have as keys the alignment names and their NH tag
 as value. Thereafter, and under the assumption that the BED file is sorted by
 the primary transcript name, the counting will be made. For each pri-miRNA, the
 counting will consist on the sum of each of its intersecting alignment; the
-contribution is computed as 1/NH. Finally, the pri-miRNA name in the BED file
-will be split to retrieve the actual pri-miRNA name and the relative 
-extensions.
+contribution is computed as 1/NH. As for the relative extension fields, if the
+extensions are not provided in the primary transcript name separated by an
+underscore, a '-0' and a '+0' will be add for the 5' and 3' end relative
+extension respectively.
 
 Usage:
     primir_quantification.py --bed BED --sam SAM
@@ -38,9 +39,8 @@ def parse_arguments():
     )
     parser.add_argument(
         '-b', '--bed',
-        help="Path to the extended pri-miR intersection BED file. This file \
-            must be the output of the call `bedtools intersect -wb -s -F 1 \
-            -sorted`.",
+        help="Path to the pri-miR BED file. This file must be the \
+            output of the call `bedtools intersect -wb -s -F 1 -sorted`.",
         type=Path,
         required=True
     )
@@ -55,8 +55,6 @@ def parse_arguments():
 
 def main(args) -> None:
     """Create pri-miRs counting table."""
-    header = ["Name", "5p_extension", "3p_extension", "Count"]
-    sys.stdout.write("\t".join(header) + "\n")
 
     with open(args.bed, 'r') as bedfile:
         if len(bedfile.read()) == 0:
@@ -93,14 +91,22 @@ def main(args) -> None:
             if current_name == name:
                 count += (1/nh_value)
             else:
-                pri_data.append(str(count))
+                pri_data.insert(1, str(count))
+
+                if len(pri_data) < 4:
+                    pri_data.extend(['-0', '+0'])
+
                 sys.stdout.write("\t".join(pri_data) + "\n")
 
                 current_name = name
                 pri_data = name.split("_")
                 count = (1/nh_value)
  
-        pri_data.append(str(count))
+        pri_data.insert(1, str(count))
+
+        if len(pri_data) < 4:
+            pri_data.extend(['-0', '+0'])
+
         sys.stdout.write("\t".join(pri_data) + "\n")
 
 if __name__ == "__main__":
