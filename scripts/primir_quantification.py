@@ -1,27 +1,28 @@
 #!/usr/bin/env python
 
-"""Pri-miR quantification.
+"""Tabulate bedtools intersect output BED file.
 
-This script creates the miRNA primary transcript counting table build upon four
-columns: the primary transcript name, the count, the 5' end relative extension
-and the 3' end relative extension. First, the SAM file will be traversed to
-create a dictionary that will have as keys the alignment names and their NH tag
-as value. Thereafter, and under the assumption that the BED file is sorted by
-the primary transcript name, the counting will be made. For each pri-miRNA, the
-counting will consist on the sum of each of its intersecting alignment; the
-contribution is computed as 1/NH. As for the relative extension fields, if the
-extensions are not provided in the primary transcript name separated by an
-underscore, a '-0' and a '+0' will be add for the 5' and 3' end relative
-extension respectively.
-
-Usage:
-    primir_quantification.py --bed BED --sam SAM
-    primir_quantification.py --bed BED --sam SAM > outfile
+Read the input BED file, calculate the sum of the intersecting contributions
+for each feature and print the result in tab-delimited format. The name of the
+feature is determined by the value of the --id argument, which must match one
+of the fields in the attributes column of the original GFF/GTF file used in
+the bedtools intersect command. If a SAM file is provided, the contribution
+of each alignment is computed as 1/NH.If an alignment is not found, its
+contribution is assumed to be 0. If no SAM file is provided, the contribution
+of each alignment is assumed to be 1. If either the BED or SAM file is empty,
+no output is produced. The output columns are also determined by the flags --read-ids
+and --feat-extension. If --read-ids is set, the last column will contain a
+semicolon-separated list of all alignment IDs that overlap with the feature.
+If --feat-extension is set, two additional columns will be added to the output,
+containing the 5' and 3' end shifts of the feature (if found in the feature
+name, separated by an underscore). If --feat-extension is set but --id is set
+to something other than "name", no extra columns will be added.
 """
 
 import argparse
 from pathlib import Path
 import sys
+from typing import Dict, Optional
 
 import pysam
 
@@ -29,7 +30,7 @@ import pysam
 def parse_arguments():
     """Command-line arguments parser."""
     parser = argparse.ArgumentParser(
-        description="Script to quantify pri-miRs."
+        description=__doc__
         )
     parser.add_argument(
         '-v', '--version',
@@ -38,76 +39,134 @@ def parse_arguments():
         help="Show program's version number and exit"
     )
     parser.add_argument(
-        '-b', '--bed',
-        help="Path to the pri-miR BED file. This file must be the \
-            output of the call `bedtools intersect -wb -s -F 1 -sorted`.",
-        type=Path,
-        required=True
+        'bedfile',
+        help="Path to the BED file. This file must be the output of a \
+            bedtools intersect call.",
+        type=Path
     )
     parser.add_argument(
         '-s', '--sam',
         help="Path to the SAM file containing the intersecting alignments.",
-        type=Path,
-        required=True
+        type=Path
+    )
+    parser.add_argument(
+        '--id',
+        help="ID used to identify the feature in the output table. \
+            The ID must be in lowercase. Default: %(default)s.",
+        default="name",
+        type=str
+    )
+    parser.add_argument(
+        '--read-ids',
+        help="Include read IDs of the alignments intersecting a feature in \
+            the output table. Default: %(default)s.",
+        action='store_true',
+        default= False
+    )
+    parser.add_argument(
+        '--feat-extension',
+        help="If any of the feature's coordinates had been extended, include \
+            the extension in the output table. It is assumed that the \
+            extensions are found within the feature id 'name' and separated \
+            by an underscore. Default: %(default)s.",
+        action='store_true',
+        default=False
     )
 
     return parser
 
-def main(args) -> None:
-    """Create pri-miRs counting table."""
-
-    with open(args.bed, 'r') as bedfile:
-        if len(bedfile.read()) == 0:
-            return
+def nh_dictionary(samfile: Path) -> Optional[Dict[str, int]]:
+    """Create dictionary from SAM file.
     
-    with pysam.AlignmentFile(args.sam, "r") as samfile:
+    Create a dictionary form a SAM file where keys are the alignments IDs
+    and values are the NH tag.
+    """
+    with pysam.AlignmentFile(samfile, 'r') as samfile:
         align_nh =  {}
 
         for alignment in samfile:
-            align_nh[alignment.query_name] = alignment.get_tag("NH")
+            align_nh[alignment.query_name] = alignment.get_tag('NH')
+
+    return align_nh
+
+def attributes_dictionary(attr: str) -> Optional[Dict[str, str]]:
+    """Create attributes dicctionary."""
+    pairs = attr.split(';')
+
+    if len(pairs[0].split('=')) == 2:
+        attr_dict = {p.split('=')[0].lower(): p.split('=')[1] for p in pairs}
+    else:
+        attr_dict = {p.split('"')[0].strip().lower(): p.split('"')[1] for p in pairs}
+
+    return attr_dict
+
+def main(args) -> None:
+    """Tabulate a bedtools intersect BED file."""
+
+    with open(args.bedfile, 'r') as bedfile:
+        if len(bedfile.read()) == 0:
+            return
+
+    align_nh: Optional[Dict] = None 
+    if args.sam:
+        align_nh = nh_dictionary(args.sam)
     
         if len(align_nh.items()) == 0:
             return
     
-    with open(args.bed, "r") as bedfile:
+    with open(args.bedfile, 'r') as bedfile:
 
         count = 0
         current_name = None
+        read_ID = []
 
         for line in bedfile:
 
-            line = line.strip().split("\t")
-            name = line[9].split(";")[2].split("=")[1]
+            line = line.strip().split('\t')
+            name = attributes_dictionary(line[9])[args.id]
+            
+            if align_nh:
+                try:
+                    contribution = 1/align_nh[line[13]]
+                except KeyError:
+                    continue
+            else:
+                contribution = 1
 
             if current_name is None:
                 current_name = name
-                pri_data = name.split("_")
-            
-            try:
-                nh_value = align_nh[line[13]]
-            except KeyError:
-                continue
+                if args.feat_extension:
+                    feat_data = name.split('_')
+                else:
+                    feat_data = [name]
 
             if current_name == name:
-                count += (1/nh_value)
+                count += contribution
+                read_ID.append(line[13])
+
             else:
-                pri_data.insert(1, str(count))
+                feat_data.insert(1, str(count))
 
-                if len(pri_data) < 4:
-                    pri_data.extend(['-0', '+0'])
+                if args.read_ids:
+                    feat_data.append(';'.join(sorted(read_ID)))
+                    
+                sys.stdout.write('\t'.join(feat_data) + '\n')
 
-                sys.stdout.write("\t".join(pri_data) + "\n")
+                if args.feat_extension:
+                    feat_data = name.split('_')
+                else:
+                    feat_data = [name]
 
                 current_name = name
-                pri_data = name.split("_")
-                count = (1/nh_value)
+                count = contribution
+                read_ID = [line[13]]
  
-        pri_data.insert(1, str(count))
+        feat_data.insert(1, str(count))
 
-        if len(pri_data) < 4:
-            pri_data.extend(['-0', '+0'])
+        if args.read_ids:
+            feat_data.append(';'.join(sorted(read_ID)))
 
-        sys.stdout.write("\t".join(pri_data) + "\n")
+        sys.stdout.write('\t'.join(feat_data) + '\n')
 
 if __name__ == "__main__":
 
