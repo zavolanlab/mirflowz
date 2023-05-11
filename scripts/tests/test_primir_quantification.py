@@ -18,7 +18,7 @@ from scripts.primir_quantification import (
 def empty_file():
     """Import path to empty file."""
     empty_file = Path("files/empty_file")
-    sam_empty_file = Path("files/in_sam_empty.sam")
+    sam_empty_file = Path("files/header_only.sam")
 
     return empty_file, sam_empty_file
 
