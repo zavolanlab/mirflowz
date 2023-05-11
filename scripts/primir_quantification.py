@@ -11,8 +11,8 @@ of each alignment is computed as 1/NH.If an alignment is not found, its
 contribution is assumed to be 0. If no SAM file is provided, the contribution
 of each alignment is assumed to be 1. If either the BED or SAM file is empty,
 no output is produced. The output columns are also determined by the flags --read-ids
-and --feat-extension. If --read-ids is set, the last column will contain a
-semicolon-separated list of all alignment IDs that overlap with the feature.
+and --feat-extension. If --read-ids is set, a semicolon-separated list of all
+alignment IDs that overlap with the feature will always be in the last column.
 If --feat-extension is set, two additional columns will be added to the output,
 containing the 5' and 3' end shifts of the feature (if found in the feature
 name, separated by an underscore). If --feat-extension is set but --id is set
