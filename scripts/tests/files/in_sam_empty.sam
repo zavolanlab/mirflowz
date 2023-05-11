@@ -1,3 +1,0 @@
-@HD	VN:1.0	SO:queryname
-@SQ	SN:19	LN:600000	M5:f9635dbff42b16049de830a7a121fa12	UR:NA
-@PG	ID:samtools	PN:samtools	VN:1.16.1	CL:samtools sort -n -o results/test_lib/header_sorted_catMappings.sam results/test_lib/concatenated_header_catMappings.sam
