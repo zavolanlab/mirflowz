@@ -1,5 +1,5 @@
 363ecee318c57ee7e2e45ca468007baa  results/TABLES/counts.miRNA_primary_transcript.tab
-a844e3a29159e36e2f17a0646d1e8c5f  results/TABLES/miRNA_primary_transcript_counts_test_lib
+2d5bae96f531f6876439860b922071e5  results/TABLES/miRNA_primary_transcript_counts_test_lib
 a4cb8756e316275f29f7be6ad7fb8cff  results/test_lib/convertedSortedMappings_test_lib.bam.bai
 822259a173c9da7e962d0f7659d12886  results/test_lib/uncollapsedMappings.sam
 a124a5afdb5f7bfbcc5683260556c9c4  results/test_lib/noheader_GenomeMappings.sam
