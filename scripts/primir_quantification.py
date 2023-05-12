@@ -137,6 +137,8 @@ def main(args) -> None:
                 current_name = name
                 if args.feat_extension:
                     feat_data = name.split('_')
+                    if len(feat_data) == 1:
+                        feat_data.extend(['NA', 'NA'])
                 else:
                     feat_data = [name]
 
@@ -154,6 +156,8 @@ def main(args) -> None:
 
                 if args.feat_extension:
                     feat_data = name.split('_')
+                    if len(feat_data) == 1:
+                        feat_data.extend(['NA', 'NA'])
                 else:
                     feat_data = [name]
 
