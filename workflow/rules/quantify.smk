@@ -239,7 +239,7 @@ rule quant_mirna_pri:
             config["output_dir"], "{sample}", 
             "intersection_extended_premir.bed"
         ),
-        script=os.path.join(config["scripts_dir"], "mirna_quantification.py"),
+        script=os.path.join(config["scripts_dir"], "primir_quantification.py"),
     output:
         table=os.path.join(
            config["output_dir"],
@@ -251,7 +251,6 @@ rule quant_mirna_pri:
            config["cluster_log"],
            "quant_mirna_miRNA_primary_transcript_{sample}.log",
         ),
-        prefix=lambda wildcards, output: output[0],
     log:
         os.path.join(
            config["local_log"],
@@ -262,9 +261,8 @@ rule quant_mirna_pri:
     shell:
        "(python \
        {input.script} \
-       -i {input.intersect} \
-       --uniq=miRNA_primary_transcript \
-       -p={params.prefix} \
+       {input.intersect} \
+       > {output.table} \
        ) &> {log}"
 
 
