@@ -92,6 +92,14 @@ def bed_no_sam_files():
     return in_bed, out_table
     
 
+@pytest.fixture
+def bed_some_extension_files():
+    """Import path to test files with some extension."""
+    in_bed = Path("files/in_intersection_some_extension.bed")
+    out_table = Path("files/some_extension_primir_quantification")
+
+    return in_bed, out_table
+
 
 class TestParseArguments:
     """Test 'parse_arguments()' function."""
@@ -314,6 +322,24 @@ class TestMain:
             sys, 'argv',
             ['primir_quantification',
              str(in_bed),
+             ]
+        )
+        args = parse_arguments().parse_args()
+        main(args)
+        captured = capsys.readouterr()
+
+        with open(expected_out, 'r') as out_file:
+            assert captured.out == out_file.read()
+
+    def test_main_some_extension_file(self, monkeypatch, capsys, bed_some_extension_files):
+        """Test main function with read names."""
+        in_bed, expected_out = bed_some_extension_files
+
+        monkeypatch.setattr(
+            sys, 'argv',
+            ['primir_quantification',
+             str(in_bed),
+             '--feat-extension',
              ]
         )
         args = parse_arguments().parse_args()
