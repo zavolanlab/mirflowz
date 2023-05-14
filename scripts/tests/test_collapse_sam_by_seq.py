@@ -128,7 +128,7 @@ class TestMain:
 
         monkeypatch.setattr(
             sys, 'argv',
-            ['primir_quantification',
+            ['collapse_sam_by_seq',
              str(in_sam),
              ]
         )
@@ -145,7 +145,7 @@ class TestMain:
 
         monkeypatch.setattr(
             sys, 'argv',
-            ['primir_quantification',
+            ['collapse_sam_by_seq',
              str(in_sam),
              ]
         )
