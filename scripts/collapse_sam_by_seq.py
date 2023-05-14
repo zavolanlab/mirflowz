@@ -120,5 +120,5 @@ def main(sam_file: Path) -> None:
         sys.stdout.write(collapsed_aln.to_string() + '\n')
         
 if __name__ == "__main__":
-    args = parse_arguments().parse_args()
-    main(sam_file=args.infile)
+    args = parse_arguments().parse_args() # pragma: no cover
+    main(sam_file=args.infile) # pragma: no cover
