@@ -68,18 +68,21 @@ def collapse_alignments(alns: list[pysam.AlignedSegment], aln: int) -> pysam.Ali
 
     if len(alns) == 1:
         xc_count = 1 / nh_tag
-        new_alignment.set_tags([("NH", nh_tag,),
+        new_alignment.set_tags([("NH", nh_tag),
+                                ("MD", new_alignment.get_tag("MD")),
                                 ("XC", xc_count), 
                                 ("ZS", new_alignment.query_name)])
 
     else:
         xc_count = len(alns) / nh_tag
         read_ids = sorted({aln.query_name for aln in alns})
-        new_alignment.query_name = f'set_{len(read_ids)}.{aln}'
         new_alignment.set_tags([("NH", nh_tag),
+                                ("MD", new_alignment.get_tag("MD")),
                                 ("XC", xc_count), 
                                 ("HI", 1), 
                                 ("ZS", "_".join(read_ids))])
+        
+    new_alignment.query_name = f'set_{len(alns)}.{aln}'
 
     return new_alignment
 
