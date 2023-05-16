@@ -10,7 +10,6 @@ import pytest
 sys.path.append("../../")
 
 from scripts.collapse_sam_by_seq import (
-    collapse_alignments,
     main,
     parse_arguments,
 )
@@ -25,25 +24,28 @@ def sam_empty_file():
 
 @pytest.fixture
 def sam_files():
-    in_sam = Path("files/in_alignments.sam")
+    in_sam = Path("files/in_alignments_collapse.sam")
     out_sam = Path("files/collapsed_alignments.sam")
+    out_sam_reads = Path("files/collapsed_alignments_reads.sam")
 
-    return in_sam, out_sam
+    return in_sam, out_sam, out_sam_reads
 
 
 @pytest.fixture
 def sam_no_collapse():
     in_sam = Path("files/in_alignments_missing.sam")
     out_sam = Path("files/no_collapsed_alignments.sam")
+    out_sam_reads = Path("files/no_collapsed_alignments_reads.sam")
 
-    return in_sam, out_sam
+    return in_sam, out_sam, out_sam_reads
 
 @pytest.fixture
 def sam_no_NH():
-    in_sam = Path("files/in_alignments_no_NH.sam")
+    in_sam = Path("files/in_alignments_collapse_no_NH.sam")
     out_sam = Path("files/no_NH_collapsed_alignments.sam")
+    out_sam_reads = Path("files/no_NH_collapsed_alignments_reads.sam")
 
-    return in_sam, out_sam
+    return in_sam, out_sam, out_sam_reads
 
 
 class TestParseArguments:
@@ -66,6 +68,19 @@ class TestParseArguments:
             sys, 'argv',
             ['collapse_sam_by_seq',
              str(sam),
+             ]
+        )
+        args = parse_arguments().parse_args()
+        assert isinstance(args, argparse.Namespace)
+
+    def test_all_options(self, monkeypatch, sam_empty_file):
+        """Call with a single input file."""
+        sam = sam_empty_file
+        monkeypatch.setattr(
+            sys, 'argv',
+            ['collapse_sam_by_seq',
+             str(sam),
+             '--read-ids',
              ]
         )
         args = parse_arguments().parse_args()
@@ -99,15 +114,15 @@ class TestMain:
              ]
         )
         args = parse_arguments().parse_args()
-        main(args.infile)
+        main(args)
         captured = capsys.readouterr()
 
         with open(in_sam, 'r') as out_file:
             assert captured.out == out_file.read()
 
     def test_main_complete_file(self, monkeypatch, capsys, sam_files):
-        """Test main function with no extension in features names."""
-        in_sam, expected_out = sam_files
+        """Test main function with alignments to collapse."""
+        in_sam, expected_out, expected_out_reads = sam_files
 
         monkeypatch.setattr(
             sys, 'argv',
@@ -116,42 +131,79 @@ class TestMain:
              ]
         )
         args = parse_arguments().parse_args()
-        main(args.infile)
+        main(args)
+        captured = capsys.readouterr()
+
+        with open(expected_out, 'r') as out_file:
+            assert captured.out == out_file.read()
+
+    def test_main_complete_file_reads(self, monkeypatch, capsys, sam_files):
+        """Test main function with alignments to collapse with read ids tag."""
+        in_sam, expected_out, expected_out_reads = sam_files
+
+        monkeypatch.setattr(
+            sys, 'argv',
+            ['collapse_sam_by_seq',
+             str(in_sam),
+             '--read-ids',
+             ]
+        )
+        args = parse_arguments().parse_args()
+        main(args)
+        captured = capsys.readouterr()
+
+        with open(expected_out_reads, 'r') as out_file:
+            assert captured.out == out_file.read()
+
+    def test_main_no_collapse(self, monkeypatch, capsys, sam_no_collapse):
+        """Test main function with no alignments to collapse."""
+        in_sam, expected_out, expected_out_reads = sam_no_collapse
+
+        monkeypatch.setattr(
+            sys, 'argv',
+            ['collapse_sam_by_seq',
+             str(in_sam),
+             ]
+        )
+        args = parse_arguments().parse_args()
+        main(args)
         captured = capsys.readouterr()
 
         with open(expected_out, 'r') as out_file:
             assert captured.out == out_file.read()
 
     def test_main_no_collapse(self, monkeypatch, capsys, sam_no_collapse):
-        """Test main function with no alignments to collapse."""
-        in_sam, expected_out = sam_no_collapse
+        """Test main function with no alignments to collapse with reads tag."""
+        in_sam, expected_out, expected_out_reads = sam_no_collapse
 
         monkeypatch.setattr(
             sys, 'argv',
             ['collapse_sam_by_seq',
              str(in_sam),
+             '--read-ids',
              ]
         )
         args = parse_arguments().parse_args()
-        main(args.infile)
+        main(args)
         captured = capsys.readouterr()
 
-        with open(expected_out, 'r') as out_file:
+        with open(expected_out_reads, 'r') as out_file:
             assert captured.out == out_file.read()
 
     def test_main_no_NH(self, monkeypatch, capsys, sam_no_NH):
-        """Test main function with no NH tag in some alignments."""
-        in_sam, expected_out = sam_no_NH
+        """Test main function with some missing NH tag and read ids tag."""
+        in_sam, expected_out, expected_out_reads = sam_no_NH
 
         monkeypatch.setattr(
             sys, 'argv',
             ['collapse_sam_by_seq',
              str(in_sam),
+             '--read-ids',
              ]
         )
         args = parse_arguments().parse_args()
-        main(args.infile)
+        main(args)
         captured = capsys.readouterr()
 
-        with open(expected_out, 'r') as out_file:
+        with open(expected_out_reads, 'r') as out_file:
             assert captured.out == out_file.read()
