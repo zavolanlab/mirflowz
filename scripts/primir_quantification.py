@@ -45,9 +45,11 @@ def parse_arguments():
         type=Path
     )
     parser.add_argument(
-        '-s', '--sam',
-        help="Path to the SAM file containing the intersecting alignments.",
-        type=Path
+        '--collapsed',
+        help="Indicate that the file used in bedtools intersect has the\
+            reads collapsed by sequence and alignment. Default %(default)s.",
+        action='store_true',
+        default=False
     )
     parser.add_argument(
         '--id',
@@ -75,20 +77,6 @@ def parse_arguments():
 
     return parser
 
-def nh_dictionary(samfile: Path) -> Optional[Dict[str, int]]:
-    """Create dictionary from SAM file.
-    
-    Create a dictionary form a SAM file where keys are the alignments IDs
-    and values are the NH tag.
-    """
-    with pysam.AlignmentFile(samfile, 'r') as samfile:
-        align_nh =  {}
-
-        for alignment in samfile:
-            align_nh[alignment.query_name] = alignment.get_tag('NH')
-
-    return align_nh
-
 def attributes_dictionary(attr: str) -> Optional[Dict[str, str]]:
     """Create attributes dicctionary."""
     pairs = attr.split(';')
@@ -104,17 +92,6 @@ def main(args) -> None:
     """Tabulate a bedtools intersect BED file."""
 
     with open(args.bedfile, 'r') as bedfile:
-        if len(bedfile.read()) == 0:
-            return
-
-    align_nh: Optional[Dict] = None 
-    if args.sam:
-        align_nh = nh_dictionary(args.sam)
-    
-        if len(align_nh.items()) == 0:
-            return
-    
-    with open(args.bedfile, 'r') as bedfile:
 
         count = 0
         current_name = None
@@ -125,13 +102,10 @@ def main(args) -> None:
             line = line.strip().split('\t')
             name = attributes_dictionary(line[9])[args.id]
             
-            if align_nh:
-                try:
-                    contribution = 1/align_nh[line[13]]
-                except KeyError:
-                    continue
+            if args.collapsed:
+                contribution = int(line[13].split('-')[1])/int(line[14])
             else:
-                contribution = 1
+                contribution = 1/int(line[14])
 
             if current_name is None:
                 current_name = name
@@ -165,12 +139,15 @@ def main(args) -> None:
                 count = contribution
                 read_ID = [line[13]]
  
-        feat_data.insert(1, str(count))
+        if current_name is not None:
+            feat_data.insert(1, str(count))
 
-        if args.read_ids:
-            feat_data.append(';'.join(sorted(read_ID)))
+            if args.read_ids:
+                feat_data.append(';'.join(sorted(read_ID)))
 
-        sys.stdout.write('\t'.join(feat_data) + '\n')
+            sys.stdout.write('\t'.join(feat_data) + '\n')
+        else:
+            return
 
 if __name__ == "__main__":
 
