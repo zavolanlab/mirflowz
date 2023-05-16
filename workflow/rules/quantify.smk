@@ -51,6 +51,22 @@ rule finish_quantify:
            ),
            mir=config["mir_list"],
         ),
+        uncollapsed_bam=expand(
+            os.path.join(
+                config["output_dir"],
+                "{sample}",
+                "uncollapsedSortedMappings_{sample}.bam",
+            ),
+            sample=pd.unique(samples_table.index.values),
+        ),
+        uncollapsed_bai=expand(
+            os.path.join(
+                config["output_dir"],
+                "{sample}",
+                "uncollapsedSortedMappings_{sample}.bam.bai",
+            ),
+            sample=pd.unique(samples_table.index.values),
+        )
 
 
 ###############################################################################
@@ -166,7 +182,7 @@ rule intersect_extended_premir:
 rule intersection_sam_file:
     input:
         alignments=os.path.join(
-            config["output_dir"], "{sample}", "uncollapsedMappings.sam"
+            config["output_dir"], "{sample}", "removeMultimappers.sam"
         ),
         intersect=os.path.join(
             config["output_dir"], "{sample}", 
@@ -262,6 +278,7 @@ rule quant_mirna_pri:
        "(python \
        {input.script} \
        {input.intersect} \
+       --collapsed \
        > {output.table} \
        ) &> {log}"
 
@@ -301,4 +318,128 @@ rule merge_tables:
        --prefix {params.prefix} \
        --verbose \
        ) &> {log}"
+
+
+###############################################################################
+### Uncollapse reads
+###############################################################################
+
+
+rule uncollapse_reads:
+    input:
+        maps=os.path.join(
+            config["output_dir"], "{sample}", "intersectedAlignments.sam"
+        ),
+        script=os.path.join(config["scripts_dir"], "sam_uncollapse.pl"),
+    output:
+        maps=os.path.join(
+            config["output_dir"], "{sample}", "uncollapsedMappings.sam"
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"], "uncollapse_reads_{sample}.log"
+        ),
+    log:
+        os.path.join(config["local_log"], "uncollapse_reads_{sample}.log"),
+    container:
+        "docker://perl:5.37.10"
+    shell:
+        "(perl {input.script} \
+        --suffix \
+        --in {input.maps} \
+        --out {output.maps} \
+        ) &> {log}"
+
+
+###############################################################################
+### Convert SAM to BAM
+###############################################################################
+
+
+rule uncollpased_convert_to_bam:
+    input:
+        maps=os.path.join(
+            config["output_dir"], "{sample}", "uncollapsedMappings.sam"
+        ),
+    output:
+        maps=os.path.join(
+            config["output_dir"], "{sample}", "uncollapsedMappings.bam"
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"], "convert_uncollpased_to_bam_{sample}.log"
+        ),
+    log:
+        os.path.join(
+            config["local_log"], 
+            "convert_uncollapsed_to_bam_{sample}.log"
+        ),
+    container:
+        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    shell:
+        "(samtools view -b {input.maps} > {output.maps}) &> {log}"
+
+
+###############################################################################
+### Sort by coordinate position
+###############################################################################
+
+
+rule sort_uncollpased_by_position:
+    input:
+        maps=os.path.join(
+            config["output_dir"], "{sample}", "uncollapsedMappings.bam"
+        ),
+    output:
+        maps=os.path.join(
+            config["output_dir"],
+            "{sample}",
+            "uncollapsedSortedMappings_{sample}.bam",
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"], "sort_uncollapsed_by_position_{sample}.log"
+        ),
+    log:
+        os.path.join(
+            config["local_log"], 
+            "sort_uncollapsed_by_position_{sample}.log"
+        ),
+    container:
+        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    shell:
+        "(samtools sort {input.maps} > {output.maps}) &> {log}"
+
+
+###############################################################################
+### Create bam index
+###############################################################################
+
+
+rule uncollapsed_index_bam:
+    input:
+        maps=os.path.join(
+            config["output_dir"],
+            "{sample}",
+            "uncollapsedSortedMappings_{sample}.bam",
+        ),
+    output:
+        maps=os.path.join(
+            config["output_dir"],
+            "{sample}",
+            "uncollapsedSortedMappings_{sample}.bam.bai",
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"], "uncollapsed_index_bam_{sample}.log"
+        ),
+    log:
+        os.path.join(
+            config["local_log"], 
+            "uncollapsed_index_bam_{sample}.log"
+        ),
+    container:
+        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    shell:
+        "(samtools index -b {input.maps} > {output.maps}) &> {log}"
 
