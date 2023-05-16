@@ -24,8 +24,6 @@ from pathlib import Path
 import sys
 from typing import Dict, Optional
 
-import pysam
-
 
 def parse_arguments():
     """Command-line arguments parser."""
