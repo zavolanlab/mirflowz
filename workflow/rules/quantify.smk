@@ -70,71 +70,6 @@ rule finish_quantify:
 
 
 ###############################################################################
-### BAM to BED
-###############################################################################
-
-
-rule bamtobed:
-    input:
-        alignment=os.path.join(
-            config["output_dir"],
-            "{sample}",
-            "convertedSortedMappings_{sample}.bam",
-        ),
-    output:
-        alignment=os.path.join(
-            config["output_dir"], "{sample}", "alignments.bed12"
-        ),
-    params:
-        cluster_log=os.path.join(config["cluster_log"], "bamtobed_{sample}.log"),
-    log:
-        os.path.join(config["local_log"], "bamtobed_{sample}.log"),
-    container:
-        "docker://quay.io/biocontainers/bedtools:2.30.0--h468198e_3"
-    shell:
-        "(bedtools bamtobed \
-        -bed12 \
-        -tag NH \
-        -i {input.alignment} \
-        > {output.alignment} \
-        ) &> {log}"
-
-
-###############################################################################
-### Sort alignments
-###############################################################################
-
-
-rule sort_alignments:
-    input:
-        alignment=os.path.join(
-            config["output_dir"], "{sample}", "alignments.bed12"
-        ),
-    output:
-        alignment=os.path.join(
-            config["output_dir"], "{sample}", "sorted.alignments.bed12"
-        ),
-    params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "sortalignment_{sample}.log"
-        ),
-    log:
-        os.path.join(config["local_log"], "sortalignment_{sample}.log"),
-    resources:
-        mem=4,
-        threads=8,
-    container:
-        "docker://ubuntu:lunar-20221207"
-    shell:
-        "(sort \
-        -k1,1 \
-        -k2,2n \
-        {input.alignment} \
-        > {output.alignment} \
-        ) &> {log}"
-
-
-###############################################################################
 ### Intersection with extended pri-miRs
 ###############################################################################
 
@@ -142,7 +77,9 @@ rule sort_alignments:
 rule intersect_extended_premir:
     input:
         alignment=os.path.join(
-            config["output_dir"], "{sample}", "sorted.alignments.bed12"
+            config["output_dir"],
+            "{sample}",
+            "convertedSortedMappings_{sample}.bam",
         ),
         premir=os.path.join(
             config["output_dir"], "premir_extended_annotations.bed"
@@ -170,12 +107,13 @@ rule intersect_extended_premir:
         -sorted \
         -b {input.alignment} \
         -a {input.premir} \
+        -bed \
         > {output.intersect} \
         ) &> {log}"
 
 
 ###############################################################################
-### Intersection with extended pri-miRs
+### Filter SAM file with intersected alignments
 ###############################################################################
 
 
@@ -279,6 +217,7 @@ rule quant_mirna_pri:
        {input.script} \
        {input.intersect} \
        --collapsed \
+       --nh \
        > {output.table} \
        ) &> {log}"
 
