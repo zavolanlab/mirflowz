@@ -66,6 +66,23 @@ def bed_some_extension_files():
 
     return in_bed, out_table
 
+@pytest.fixture
+def bed_collapsed_file():
+    """Import path to test files with full content."""
+    in_bed = Path("files/in_intersection_collapsed.bed")
+    out_table = Path("files/collapsed_primir_quantification")
+
+    return in_bed, out_table
+
+
+@pytest.fixture
+def bed_nh_file():
+    """Import path to test files with full content."""
+    in_bed = Path("files/in_intersection.bed")
+    out_table = Path("files/nh_primir_quantification")
+
+    return in_bed, out_table
+
 
 class TestParseArguments:
     """Test 'parse_arguments()' function."""
@@ -120,6 +137,7 @@ class TestParseArguments:
              '--feat-extension',
              '--read-ids',
              '--collapsed',
+             '--nh'
              ]
         )
         args = parse_arguments().parse_args()
@@ -218,9 +236,28 @@ class TestMain:
         with open(expected_out, 'r') as out_file:
             assert captured.out == out_file.read()
 
-    def test_main_collpased_file(self, monkeypatch, capsys, bed_file):
-        """Test main function with collapsed alignments."""
+    def test_main_collpased_nh_file(self, monkeypatch, capsys, bed_file):
+        """Test main function with collapsed alignments and nh value."""
         in_bed, expected_out = bed_file
+
+        monkeypatch.setattr(
+            sys, 'argv',
+            ['primir_quantification',
+             str(in_bed),
+             '--collapsed',
+             '--nh',
+             ]
+        )
+        args = parse_arguments().parse_args()
+        main(args)
+        captured = capsys.readouterr()
+
+        with open(expected_out, 'r') as out_file:
+            assert captured.out == out_file.read()
+
+    def test_main_collpased_file(self, monkeypatch, capsys, bed_collapsed_file):
+        """Test main function with collapsed alignments."""
+        in_bed, expected_out = bed_collapsed_file
 
         monkeypatch.setattr(
             sys, 'argv',
@@ -235,3 +272,21 @@ class TestMain:
 
         with open(expected_out, 'r') as out_file:
             assert captured.out == out_file.read()
+
+    def test_main_nh_file(self, monkeypatch, capsys, bed_nh_file):
+        """Test main function with nh value."""
+        in_bed, expected_out = bed_nh_file
+
+        monkeypatch.setattr(
+            sys, 'argv',
+            ['primir_quantification',
+             str(in_bed),
+             '--nh',
+             ]
+        )
+        args = parse_arguments().parse_args()
+        main(args)
+        captured = capsys.readouterr()
+
+        with open(expected_out, 'r') as out_file:
+            assert captured.out == out_file.read()            
