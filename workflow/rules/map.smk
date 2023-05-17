@@ -968,6 +968,7 @@ rule filter_by_indels:
     shell:
         "(python {input.script} \
         {input.sam} \
+        --nh \
         > {output.sam} \
         ) &> {log}"
 
