@@ -128,7 +128,8 @@ def get_contribution(query_id:str, collapsed: bool = False, nh: bool = False) ->
         nh_value = 1
 
     else:
-        num_reads, nh_value = 1
+        num_reads = 1
+        nh_value = 1
     
     return num_reads/nh_value
 
