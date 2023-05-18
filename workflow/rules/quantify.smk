@@ -196,6 +196,146 @@ rule intersection_sam_file:
 
 
 ###############################################################################
+### Convert SAM to BAM
+###############################################################################
+
+
+rule convert_intersected_premir_to_bam:
+    input:
+        maps=os.path.join(
+            config["output_dir"], 
+            "{sample}", 
+            "intersectedAlignments.sam"
+        ),
+    output:
+        maps=os.path.join(
+            config["output_dir"], 
+            "{sample}", 
+            "intersected_premirAlignments.bam"
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"], 
+            "convert_intersected_premir_to_bam_{sample}.log"
+        ),
+    log:
+        os.path.join(
+            config["local_log"], 
+            "convert_intersected_premir_to_bam_{sample}.log"
+        ),
+    container:
+        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    shell:
+        "(samtools view -b {input.maps} > {output.maps}) &> {log}"
+
+
+###############################################################################
+### Sort by coordinate position
+###############################################################################
+
+
+rule sort_intersected_premir_by_position:
+    input:
+        maps=os.path.join(
+            config["output_dir"], 
+            "{sample}", 
+            "intersected_premirAlignments.bam"
+        ),
+    output:
+        maps=os.path.join(
+            config["output_dir"], 
+            "{sample}", 
+            "sorted_intersected_premirAlignments.bam"
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"],
+            "sort_intersected_premir_by_position_{sample}.log"
+        ),
+    log:
+        os.path.join(
+            config["local_log"],
+            "sort__intersected_premir_by_position_{sample}.log"),
+    container:
+        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    shell:
+        "(samtools sort {input.maps} > {output.maps}) &> {log}"
+
+
+###############################################################################
+### Create bam index
+###############################################################################
+
+
+rule index_intersected_premir_bam:
+    input:
+        maps=os.path.join(
+            config["output_dir"], 
+            "{sample}", 
+            "sorted_intersected_premirAlignments.bam"
+        ),
+    output:
+        maps=os.path.join(
+            config["output_dir"], 
+            "{sample}", 
+            "sorted_intersected_premirAlignments.bam.bai"
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"], "index_bam_{sample}.log"
+        ),
+    log:
+        os.path.join(config["local_log"], "index_bam_{sample}.log"),
+    container:
+        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    shell:
+        "(samtools index -b {input.maps} > {output.maps}) &> {log}"
+
+
+###############################################################################
+### Intersection with extended miRNAs
+###############################################################################
+
+
+rule intersect_extended_mirna:
+    input:
+        alignment=os.path.join(
+            config["output_dir"], 
+            "{sample}", 
+            "sorted_intersected_premirAlignments.bam"
+        ),
+        premir=os.path.join(
+            config["output_dir"], "mirna_extended_annotations.bed"
+        ),
+    output:
+        intersect=os.path.join(
+            config["output_dir"], "{sample}", 
+            "intersection_extended_mirna.bed"
+        ),
+    params:
+        cluster_log=os.path.join(
+            config["cluster_log"], 
+            "intersection_extended_mirna_{sample}.log"
+        ),
+    log:
+        os.path.join(config["local_log"], 
+        "intersection_extended_mirna_{sample}.log"),
+    container:
+        "docker://quay.io/biocontainers/bedtools:2.30.0--h468198e_3"
+    shell:
+        "(bedtools intersect \
+        -wb \
+        -s \
+        -F 1 \
+        -sorted \
+        -b {input.alignment} \
+        -a {input.premir} \
+        -bed \
+        > {output.intersect} \
+        ) &> {log}"
+
+
+###############################################################################
 ### miRNAs counting table - miRNA
 ###############################################################################
 #
