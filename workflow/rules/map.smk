@@ -968,39 +968,10 @@ rule filter_by_indels:
     shell:
         "(python {input.script} \
         {input.sam} \
+        --nh \
         > {output.sam} \
         ) &> {log}"
 
-
-###############################################################################
-### Uncollapse reads
-###############################################################################
-
-
-rule uncollapse_reads:
-    input:
-        maps=os.path.join(
-            config["output_dir"], "{sample}", "removeMultimappers.sam"
-        ),
-        script=os.path.join(config["scripts_dir"], "sam_uncollapse.pl"),
-    output:
-        maps=os.path.join(
-            config["output_dir"], "{sample}", "uncollapsedMappings.sam"
-        ),
-    params:
-        cluster_log=os.path.join(
-            config["cluster_log"], "uncollapse_reads_{sample}.log"
-        ),
-    log:
-        os.path.join(config["local_log"], "uncollapse_reads_{sample}.log"),
-    container:
-        "docker://perl:5.37.10"
-    shell:
-        "(perl {input.script} \
-        --suffix \
-        --in {input.maps} \
-        --out {output.maps} \
-        ) &> {log}"
 
 
 ###############################################################################
@@ -1011,7 +982,7 @@ rule uncollapse_reads:
 rule convert_to_bam:
     input:
         maps=os.path.join(
-            config["output_dir"], "{sample}", "uncollapsedMappings.sam"
+            config["output_dir"], "{sample}", "removeMultimappers.sam"
         ),
     output:
         maps=os.path.join(

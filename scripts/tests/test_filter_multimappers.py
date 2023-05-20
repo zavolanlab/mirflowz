@@ -68,6 +68,16 @@ def sam_sec_sup_files():
 
     return in_sam, out_sam
 
+@pytest.fixture
+def sam_multimappers_nh_files():
+    """
+    Import path to test files with multimappers and the NH tag in the query name.
+    """
+    in_multimappers = Path("files/in_multimappers.sam")
+    out_multimappers = Path("files/multimappers_nh.sam")
+
+    return in_multimappers, out_multimappers
+
 
 @pytest.fixture
 def alns():
@@ -153,6 +163,19 @@ class TestParseArguments:
         )
         args = parse_arguments().parse_args()
         assert isinstance(args, argparse.Namespace)
+    
+    def test_all_input_options(self, monkeypatch, sam_no_multimappers_file):
+        """Call with a single input file and the --nh option."""
+        sam_1 = sam_no_multimappers_file
+        monkeypatch.setattr(
+            sys, 'argv',
+            ['filter_multimappers',
+             str(sam_1),
+             '--nh',
+             ]
+        )
+        args = parse_arguments().parse_args()
+        assert isinstance(args, argparse.Namespace)
 
     def test_too_many_inputs(self, monkeypatch, sam_multimappers_files):
         """Call with too many input files."""
@@ -213,6 +236,33 @@ class TestFindBestAlignments:
         assert output[1].get_tag("NH") == 2
         assert output[0].get_tag("HI") == 1
         assert output[1].get_tag("HI") == 2
+    
+    def test_find_best_alignments_multimappers_nh(self, alns):
+        """Test function with multimappers with different indel count."""
+        output = find_best_alignments([alns[0], alns[1]], True)
+
+        assert len(output) == 1
+        assert output[0] == alns[0]
+        assert output[0].query_name == "read1_1"
+
+        assert output[0].get_tag("NH") == 1
+        assert output[0].get_tag("HI") == 1
+
+    def test_find_best_alignments_equal_multimappers_nh(self, alns):
+        """Test function with multimappers with same indel count."""
+        output = find_best_alignments([alns[3], alns[4]], True)
+
+        assert len(output) == 2
+        assert output[0] == alns[3]
+        assert output[1] == alns[4]
+
+        assert output[0].query_name == "read2_2"
+        assert output[1].query_name == "read2_2"
+
+        assert output[0].get_tag("NH") == 2
+        assert output[1].get_tag("NH") == 2
+        assert output[0].get_tag("HI") == 1
+        assert output[1].get_tag("HI") == 2
 
 
 class TestWriteOutout:
@@ -237,50 +287,88 @@ class TestWriteOutout:
 class TestMain:
     """Test 'main()' function."""
 
-    def test_main_empty_file(self, capsys, sam_empty_file):
+    def test_main_empty_file(self, capsys, monkeypatch, sam_empty_file):
         """Test main function with an empty file."""
         empty_file = sam_empty_file
 
-        main(empty_file)
+        monkeypatch.setattr(
+            sys, 'argv',
+            ['filter_multimappers',
+             str(empty_file),
+             ]
+        )
+        args = parse_arguments().parse_args()
+        main(args)
         captured = capsys.readouterr()
 
         with open(empty_file, 'r') as out_file:
-            expected_output = out_file.read()
+            assert captured.out == out_file.read()
 
-        assert captured.out == expected_output
-
-    def test_main_multimappers(self, capsys, sam_multimappers_files):
+    def test_main_multimappers(self, capsys, monkeypatch, sam_multimappers_files):
         """Test main function with multimappers."""
         in_sam, out_sam = sam_multimappers_files
 
-        main(in_sam)
+        monkeypatch.setattr(
+            sys, 'argv',
+            ['filter_multimappers',
+             str(in_sam),
+             ]
+        )
+        args = parse_arguments().parse_args()
+        main(args)
         captured = capsys.readouterr()
 
         with open(out_sam, 'r') as out_file:
-            expected_output = out_file.read()
+            assert captured.out == out_file.read()
 
-        assert captured.out == expected_output
+    def test_main_multimappers_nh(self, capsys, monkeypatch, sam_multimappers_nh_files):
+        """Test main function with multimappers with nh argument."""
+        in_sam, out_sam = sam_multimappers_nh_files
 
-    def test_main_no_multimappers(self, capsys, sam_no_multimappers_file):
+        monkeypatch.setattr(
+            sys, 'argv',
+            ['filter_multimappers',
+             str(in_sam),
+             '--nh',
+             ]
+        )
+        args = parse_arguments().parse_args()
+        main(args)
+        captured = capsys.readouterr()
+
+        with open(out_sam, 'r') as out_file:
+            assert captured.out == out_file.read()
+
+    def test_main_no_multimappers(self, capsys, monkeypatch, sam_no_multimappers_file):
         """Test main function with no multimappers."""
         sam_file = sam_no_multimappers_file
 
-        main(sam_file)
+        monkeypatch.setattr(
+            sys, 'argv',
+            ['filter_multimappers',
+             str(sam_file),
+             ]
+        )
+        args = parse_arguments().parse_args()
+        main(args)
         captured = capsys.readouterr()
 
         with open(sam_file, 'r') as out_file:
-            expected_output = out_file.read()
-
-        assert captured.out == expected_output
+            assert captured.out == out_file.read()
     
-    def test_main_secondary_supplementary(self, capsys, sam_sec_sup_files):
+    def test_main_secondary_supplementary(self, capsys, monkeypatch, sam_sec_sup_files):
         """Test main function with secondary and supplementary alignments."""
         in_sam, out_sam = sam_sec_sup_files
 
-        main(in_sam)
+        monkeypatch.setattr(
+            sys, 'argv',
+            ['filter_multimappers',
+             str(in_sam),
+             ]
+        )
+        args = parse_arguments().parse_args()
+        main(args)
         captured = capsys.readouterr()
 
         with open(out_sam, 'r') as out_file:
-            expected_output = out_file.read()
-
-        assert captured.out == expected_output
+            assert captured.out == out_file.read()
