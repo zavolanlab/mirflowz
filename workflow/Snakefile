@@ -95,3 +95,19 @@ rule finish:
             os.path.join(config["output_dir"], "TABLES", "counts.{mir}.tab"),
             mir=config["mir_list"],
         ),
+        uncollapsed_bam=expand(
+            os.path.join(
+                config["output_dir"],
+                "{sample}",
+                "uncollapsedSortedMappings_{sample}.bam",
+            ),
+            sample=pd.unique(samples_table.index.values),
+        ),
+        uncollapsed_bai=expand(
+            os.path.join(
+                config["output_dir"],
+                "{sample}",
+                "uncollapsedSortedMappings_{sample}.bam.bai",
+            ),
+            sample=pd.unique(samples_table.index.values),
+        )

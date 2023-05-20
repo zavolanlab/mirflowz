@@ -13,7 +13,8 @@ and current alignments list are reset to the new query and alignment
 respectively.
 Finally, if there are any remaining alignments in the current alignments
 list and selects the best alignment(s) for those queries, writing them to
-standard output.
+standard output. If --nh is set, all query names are modified to include the
+NH tag after an underscore.
 
 Input:
     input_sam_file: Path to the input SAM file, ordered by query name.
@@ -63,6 +64,16 @@ def parse_arguments():
         help="Path to the SAM input file, sorted by query name.",
         type=Path
         )
+    
+    parser.add_argument(
+        '--nh',
+        help=(
+            "If set, the NH tag will be include in the alignment name after"
+            "and underscore. Default: %(default)s."
+        ),
+        action='store_true',
+        default=False
+    )
 
     return parser
 
@@ -86,14 +97,16 @@ def count_indels(aln: pysam.libcalignedsegment.AlignedSegment) -> int:
     return sum([op[1] for op in aln.cigartuples if op[0] == 1 or op[0] == 2])
 
 
-def find_best_alignments(alns: List[pysam.AlignedSegment]) -> List[pysam.AlignedSegment]:
+def find_best_alignments(alns: List[pysam.AlignedSegment], nh: bool = False) -> List[pysam.AlignedSegment]:
     """Find alignments with less indels.
 
     This function creates a list of tuples with the alignment object and its
     number of indels. Then, computes the minimum number of indels and returns
     a list with the alignments that have no more than that minimum number of
-    indels. In addition, it updates the tag 'NH' and 'HI' to match the final
-    number of alignments kept and its identifier respectively.
+    indels. In addition, it updates the 'NH' and 'HI' tags to match the final
+    number of alignments kept and its identifier respectively. If 'nh' is set
+    to 'True', all query names are modified to include the NH tag after an
+    underscore.
 
     Args:
         alignments: alignments with the same query name
@@ -102,6 +115,10 @@ def find_best_alignments(alns: List[pysam.AlignedSegment]) -> List[pysam.Aligned
         best_alignments: alignments with the less indels
     """
     if len(alns) == 1:
+        if nh:
+            name = f'{alns[0].query_name}_{alns[0].get_tag("NH")}'
+            alns[0].query_name = name
+
         return alns
 
     else:
@@ -110,8 +127,14 @@ def find_best_alignments(alns: List[pysam.AlignedSegment]) -> List[pysam.Aligned
         best_alignments = [aln for i, (aln, indels) in enumerate(aln_indels) if indels == min_indels]
 
         for i in range(len(best_alignments)):
+
+            if nh:
+                name = f'{best_alignments[i].query_name}_{len(best_alignments)}'
+                best_alignments[i].query_name = name
+
             best_alignments[i].set_tag('NH', len(best_alignments))
             best_alignments[i].set_tag('HI', i + 1)
+            
 
         return best_alignments
 
@@ -126,13 +149,9 @@ def write_output(alns: List[pysam.AlignedSegment]) -> None:
         sys.stdout.write(alignment.to_string() + '\n')
 
 
-def main(sam_file: Path) -> None:
-    """Filter multimappers by indels count.
-
-    Args:
-        sam_file: Path to the input SAM file.
-    """
-    with pysam.AlignmentFile(sam_file, "r") as samfile:
+def main(args) -> None:
+    """Filter multimappers by indels count."""
+    with pysam.AlignmentFile(args.infile, "r") as samfile:
 
         sys.stdout.write(str(samfile.header))
 
@@ -151,17 +170,17 @@ def main(sam_file: Path) -> None:
                 current_alignments.append(alignment)
 
             else:
-                current_alignments = find_best_alignments(current_alignments)
+                current_alignments = find_best_alignments(current_alignments, args.nh)
                 write_output(alns=current_alignments)
 
                 current_query = alignment.query_name
                 current_alignments = [alignment]
 
         if len(current_alignments) > 0:
-            current_alignments = find_best_alignments(current_alignments)
+            current_alignments = find_best_alignments(current_alignments, args.nh)
             write_output(alns=current_alignments)
 
 
 if __name__ == "__main__":
     args = parse_arguments().parse_args()  # pragma:no cover
-    main(sam_file=args.infile)  # pragma: no cover
+    main(args) # pragma: no cover
