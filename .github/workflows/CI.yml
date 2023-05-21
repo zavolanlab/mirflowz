@@ -24,7 +24,7 @@ jobs:
       - name: Setup environment
         uses: conda-incubator/setup-miniconda@v2
         with:
-          mamba-version: "0.25.0"
+          mamba-version: "=0.25.0"
           activate-environment: mirflowz
           environment-file: environment.yml
           auto-activate-base: false
