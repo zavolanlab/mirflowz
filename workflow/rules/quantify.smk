@@ -81,8 +81,12 @@ rule intersect_extended_premir:
             "{sample}",
             "convertedSortedMappings_{sample}.bam",
         ),
-        premir=os.path.join(
-            config["output_dir"], "premir_extended_annotations.bed"
+        premir=expand(
+            os.path.join(
+                config["output_dir"], 
+                "mirna_annotation_extended_{extension}_nt_premir.gff3"
+            ),
+            extension=config["extension"]
         ),
     output:
         intersect=os.path.join(
@@ -143,7 +147,7 @@ rule intersection_sam_file:
     shell:
         "((samtools view \
         -H {input.alignments}; \
-        awk 'NR==FNR {{bed[$14]=1; next}} $1 in bed' \
+        awk 'NR==FNR {{bed[$13]=1; next}} $1 in bed' \
         {input.intersect} {input.alignments} \
         ) > {output.sam} \
         ) &> {log}"
@@ -258,8 +262,12 @@ rule intersect_extended_mirna:
             "{sample}", 
             "sorted_intersected_premirAlignments.bam"
         ),
-        premir=os.path.join(
-            config["output_dir"], "mirna_extended_annotations.bed"
+        mirna=expand(
+            os.path.join(
+                config["output_dir"], 
+                "mirna_annotation_extended_{extension}_nt_mir.gff3"
+            ),
+            extension=config["extension"]
         ),
     output:
         intersect=os.path.join(
@@ -283,7 +291,7 @@ rule intersect_extended_mirna:
         -F 1 \
         -sorted \
         -b {input.alignment} \
-        -a {input.premir} \
+        -a {input.mirna} \
         -bed \
         > {output.intersect} \
         ) &> {log}"
