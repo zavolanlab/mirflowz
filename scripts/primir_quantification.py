@@ -138,9 +138,9 @@ def main(args) -> None:
 
     with open(args.bedfile, 'r') as bedfile:
 
-        Fields = namedtuple('Fields',("feat_chr", "feat_start", "feat_end", 
-                                      "feat_id", "feat_score", "strand", "idk", 
-                                      "feat_type", "idkidk", "feat_attributes", 
+        Fields = namedtuple('Fields',("feat_chr", "NA", "feat_type",
+                                      "feat_start", "feat_end", "feat_score", 
+                                      "strand", "NaN", "feat_attributes", 
                                       "read_chr", "read_start", "read_end", 
                                       "read_name", "read_score", "read_strand"))
         count = 0
