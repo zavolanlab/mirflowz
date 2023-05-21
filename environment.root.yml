@@ -2,4 +2,4 @@ name: mirflowz
 channels:
   - conda-forge
 dependencies:
-  - singularity=3.5.2
+  - singularity>=3.5.2

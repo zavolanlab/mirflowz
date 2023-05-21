@@ -21,7 +21,7 @@ df83ee50310049a0e344d4f665454dd0  results/test_lib/removeInferiors.sam
 ec0e9bcc8ea857da897035c8fca4078f  results/test_lib/cut.fasta
 fe5388094985e9604a302d39d2abc82c  results/test_lib/oligoTranscriptome_report.txt
 4c5b1320310096d14b2bb691d0754cb4  results/test_lib/nhfiltered_GenomeMappings.sam
-06cbc257051a640f57a9e73547f9d33e  results/test_lib/intersection_extended_premir.bed
+f68693cfaa1e6ea78e1a5562ade6d9ed  results/test_lib/intersection_extended_premir.bed
 8871da49edddfa07ac7ffbe2c252f8be  results/test_lib/TranscriptomeMappings.sam
 8871da49edddfa07ac7ffbe2c252f8be  results/test_lib/segemehlTranscriptome_map.sam
 c02a3b44a4fc8ea2f5f581ee4817b4e6  results/test_lib/convertedSortedMappings_test_lib.bam
@@ -46,7 +46,6 @@ d34fc868b861b1bc46db07a397dc0f10  results/genome.processed.fa.fai
 f28cc0143ab6659bef3de3a7afa1dccc  results/mirna_annotations.gff3
 003b92b245ac336e3d70a513033e1cee  results/transcriptome_idtrim.fa
 2d437f8681f4248d4f2075f86debb920  results/transcriptome.fa
-eaf8f009e233571805047ffdca02dc37  results/premir_extended_annotations.bed
 cc5c3512dab0e269d82bd625de74198e  results/mirna_annotation_extended_6_nt_premir.gff3
 be7a0d92e57480190de57eb30baffa36  results/mirna_annotation_extended_6_nt_mir.gff3
 4fb453846e88593d0cac13220ec2d685  results/genome_index_segemehl.idx
