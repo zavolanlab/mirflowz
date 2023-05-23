@@ -85,9 +85,27 @@ rule finish:
             ),
             sample=pd.unique(samples_table.index.values),
         ),
+        premir_intersect_sam=expand(
+            os.path.join(
+                config["output_dir"], 
+                "{sample}", 
+                "premir_intersectedAlignments.sam"
+            ),
+            sample=pd.unique(samples_table.index.values),
+        ),
+        mirna_intersect_sam=expand(
+            os.path.join(
+                config["output_dir"], 
+                "{sample}", 
+                "mirna_intersectedAlignments.sam"
+            ),
+            sample=pd.unique(samples_table.index.values),
+        ),
         intersect_sam=expand(
             os.path.join(
-                config["output_dir"], "{sample}", "intersectedAlignments.sam"
+                config["output_dir"], 
+                "{sample}", 
+                "mirna_intersecting_tag.sam"
             ),
             sample=pd.unique(samples_table.index.values),
         ),
