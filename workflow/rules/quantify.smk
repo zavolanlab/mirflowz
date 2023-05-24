@@ -296,7 +296,7 @@ rule intersect_extended_mirna:
         "docker://quay.io/biocontainers/bedtools:2.30.0--h468198e_3"
     shell:
         "(bedtools intersect \
-        -wb \
+        -wo \
         -s \
         -F 1 \
         -b {input.alignment} \
