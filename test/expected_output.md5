@@ -6,7 +6,7 @@ e1abb9d720ed40756d786c21a333e585  results/test_lib/convertedSortedMappings_test_
 a124a5afdb5f7bfbcc5683260556c9c4  results/test_lib/noheader_GenomeMappings.sam
 d41d8cd98f00b204e9800998ecf8427e  results/test_lib/oligoTranscriptome_sorted.fa
 48c9803aef0e0301185fe4e334893d42  results/test_lib/removeMultimappers.sam
-90085feaa36661fe4d9e8b9ac8fc407f  results/test_lib/mirna_intersecting_tag.sam
+40e464c5880c9bde9bc1a0d903686c4c  results/test_lib/mirna_intersecting_tag.sam
 defdc8c46e1d73692edde0e0278f2d5e  results/test_lib/oligoGenome_map.fa
 d41d8cd98f00b204e9800998ecf8427e  results/test_lib/oligoTranscriptome_converted.sam
 996144601fa12ada8f07fc8b74567363  results/test_lib/premir_intersectedAlignments.sam
@@ -38,6 +38,9 @@ d41d8cd98f00b204e9800998ecf8427e  results/test_lib/oligoTranscriptome_map.fa
 8871da49edddfa07ac7ffbe2c252f8be  results/test_lib/nhfiltered_TranscriptomeMappings.sam
 d41d8cd98f00b204e9800998ecf8427e  results/test_lib/TransToGen.sam
 4c5b1320310096d14b2bb691d0754cb4  results/test_lib/GenomeMappings.sam
+cab21458621ec12cebd226ed7d0cc6c5  results/test_lib/fastq/reads.fa
+6c08f801191a3535bd06bb71caa79b0b  results/test_lib/fastq/filtered_reads.fastq
+d0453cb79154a463b3d5e7c3651780e9  results/test_lib/fastq/reads.fastq
 2c77ffa021dda190d82f3f54a3312393  results/test_lib/collapsed.fasta
 0d76977b2e36046cc176112776c5fa4e  results/test_lib/uncollapsedSortedMappings_test_lib.bam.bai
 89579013c65ba052efcdd11f51a8998f  results/test_lib/uncollapsedMappings.bam
