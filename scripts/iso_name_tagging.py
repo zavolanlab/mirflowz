@@ -130,7 +130,7 @@ def parse_intersect_output(intersect_file: Path, id: str = "name", extension: in
         return intersect_data
 
 
-def get_tags(intersecting_mirna: list, alignment: pysam.AlignedSegment, extension: int = 0) -> set:
+def get_tags(intersecting_mirna: list, alignment: pysam.AlignedSegment, extension: int) -> set:
     """Get tag for alignment.
 
     Given an alignment and a list containing the feature name, start position,
@@ -157,13 +157,13 @@ def get_tags(intersecting_mirna: list, alignment: pysam.AlignedSegment, extensio
     """
     cigar = alignment.cigarstring
     md = alignment.get_tag('MD')
+    limit = extension + 1
 
     tags = []
 
     for miRNA_name, miRNA_start, miRNA_end in intersecting_mirna:
         shift_5p = alignment.reference_start - miRNA_start + 1
         shift_3p = alignment.reference_end - miRNA_end
-        limit = extension + 1
 
         if -limit < shift_5p < limit and -limit < shift_3p < limit:
             tags.append(f'{miRNA_name}|{shift_5p}|{shift_3p}|{cigar}|{md}')
