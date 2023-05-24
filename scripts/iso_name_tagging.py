@@ -108,7 +108,8 @@ def parse_intersect_output(intersect_file: Path, id: str = "name", extension: in
                                    "feat_start", "feat_end", "feat_score",
                                    "strand", "phase", "feat_attributes",
                                    "read_chr", "read_start", "read_end",
-                                   "read_name", "read_score", "read_strand"))
+                                   "read_name", "read_score", "read_strand",
+                                   "overlap_len"))
 
     with open(intersect_file, 'r') as bedfile:
         for line in bedfile:
@@ -129,7 +130,7 @@ def parse_intersect_output(intersect_file: Path, id: str = "name", extension: in
         return intersect_data
 
 
-def get_tags(intersecting_mirna: list, alignment: pysam.AlignedSegment, extension: int = 0) -> list:
+def get_tags(intersecting_mirna: list, alignment: pysam.AlignedSegment, extension: int = 0) -> set:
     """Get tag for alignment.
 
     Given an alignment and a list containing the feature name, start position,
@@ -152,7 +153,7 @@ def get_tags(intersecting_mirna: list, alignment: pysam.AlignedSegment, extensio
 
     Returns:
         tags:
-            list of strings containing the new tag
+            set of strings containing the new tag
     """
     cigar = alignment.cigarstring
     md = alignment.get_tag('MD')
@@ -162,11 +163,12 @@ def get_tags(intersecting_mirna: list, alignment: pysam.AlignedSegment, extensio
     for miRNA_name, miRNA_start, miRNA_end in intersecting_mirna:
         shift_5p = alignment.reference_start - miRNA_start + 1
         shift_3p = alignment.reference_end - miRNA_end
+        limit = extension + 1
 
-        if (-extension - 1) < shift_5p < (extension + 1) and (-extension - 1) < shift_3p < (extension + 1):
+        if -limit < shift_5p < limit and -limit < shift_3p < limit:
             tags.append(f'{miRNA_name}|{shift_5p}|{shift_3p}|{cigar}|{md}')
 
-    return tags
+    return set(tags)
 
 
 def main(args) -> None:
