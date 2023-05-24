@@ -160,10 +160,10 @@ def get_tags(intersecting_mirna: list, alignment: pysam.AlignedSegment, extensio
     tags = []
 
     for miRNA_name, miRNA_start, miRNA_end in intersecting_mirna:
-        shift_5p = alignment.reference_start - miRNA_start
+        shift_5p = alignment.reference_start - miRNA_start + 1
         shift_3p = alignment.reference_end - miRNA_end
 
-        if shift_3p < (extension + 1) and shift_5p < (extension + 1):
+        if (-extension - 1) < shift_5p < (extension + 1) and (-extension - 1) < shift_3p < (extension + 1):
             tags.append(f'{miRNA_name}|{shift_5p}|{shift_3p}|{cigar}|{md}')
 
     return tags
