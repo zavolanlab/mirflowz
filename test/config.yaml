@@ -3,4 +3,4 @@ genome_file: test_files/genome.fa.gz
 gtf_file: test_files/gene_annotations.gtf.gz
 mirna_file: test_files/mirna_annotations.gff3
 map_chr_file: test_files/ucsc_to_ensembl.txt
-mir_list: ["miRNA_primary_transcript"]
+mir_list: ["miRNA", "miRNA_primary_transcript"]
