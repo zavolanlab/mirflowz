@@ -1,5 +1,7 @@
 363ecee318c57ee7e2e45ca468007baa  results/TABLES/counts.miRNA_primary_transcript.tab
+68f943f89b52d628851dd97fb1399d68  results/TABLES/counts.miRNA.tab
 a844e3a29159e36e2f17a0646d1e8c5f  results/TABLES/miRNA_primary_transcript_counts_test_lib
+eec9be6cda61d2728290c92c1209f455  results/TABLES/miRNA_counts_test_lib
 6e4aee315140a67ff8d214bdce359e6b  results/test_lib/intersected_premirAlignments.bam
 e1abb9d720ed40756d786c21a333e585  results/test_lib/convertedSortedMappings_test_lib.bam.bai
 5de6743dbf17c6ab5283db8608270b86  results/test_lib/uncollapsedMappings.sam
@@ -30,6 +32,7 @@ f68693cfaa1e6ea78e1a5562ade6d9ed  results/test_lib/intersection_extended_premir.
 8871da49edddfa07ac7ffbe2c252f8be  results/test_lib/segemehlTranscriptome_map.sam
 c02a3b44a4fc8ea2f5f581ee4817b4e6  results/test_lib/convertedSortedMappings_test_lib.bam
 7f15dafb80d3dc00e3d13f7d3ce3019a  results/test_lib/header_sorted_catMappings.sam
+299c853f67474045c577137d9b16c4cd  results/test_lib/mirna_intersecting_sort_tag.sam
 48e605df55bf2dd37ea5a5a74eb5872a  results/test_lib/concatenated_header_catMappings.sam
 a960fabda21f76b8d1871dabe4bc74a7  results/test_lib/sorted_intersected_premirAlignments.bam
 31924339fc9241f80bebe80e2cdc6845  results/test_lib/mappingsConverted.bam
