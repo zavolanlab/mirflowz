@@ -427,14 +427,22 @@ rule quant_mirna:
         ),
     output:
         table=os.path.join(
-            config["output_dir"], "TABLES", "miRNA_counts_{sample}"
+            config["output_dir"], "TABLES", "{mir}_counts_{sample}"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "quant_miRNA_{sample}.log"
+            config["cluster_log"], "quant_{mir}_{sample}.log"
+        ),
+        mir_list=config["mir_list"],
+        library="{sample}",
+        out_dir=os.path.join(
+            config["output_dir"],
+            "TABLES",
         ),
     log:
-        os.path.join(config["local_log"], "quantmiRNA_{sample}.log"),
+        os.path.join(config["local_log"], "quant_{mir}_{sample}.log"),
+    wildcard_constraints:
+        mir="(?!pri_mir).*",
     container:
         "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
     shell:
@@ -443,7 +451,9 @@ rule quant_mirna:
         {input.alignments} \
         --collapsed \
         --nh \
-        > {output.table} \
+        --mir-list {params.mir_list} \
+        --lib {params.library} \
+        --outdir {params.out_dir} \
         ) &> {log}"
 
 
@@ -464,7 +474,7 @@ rule quant_mirna_pri:
         table=os.path.join(
             config["output_dir"],
             "TABLES",
-            "miRNA_primary_transcript_counts_{sample}",
+            "pri_mir_counts_{sample}",
         ),
     params:
         cluster_log=os.path.join(
