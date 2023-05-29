@@ -29,6 +29,7 @@ will always be in the last column.
 import argparse
 from pathlib import Path
 import sys
+from typing import Optional
 
 import pysam
 
@@ -53,15 +54,39 @@ def parse_arguments():
         type=Path
     )
     parser.add_argument(
-        '--tag',
+        '--outdir',
+        help="Path to the output directory. Default: %(default)s.",
+        default=Path.cwd(),
+        type=Path
+    )
+    parser.add_argument(
+        '--mir-list',
+        help=(
+            "List of miRNA species to have in the different output tables."
+            "Default: %(default)s"
+        ),
+        default=['iso_mirna'],
+        type=str
+    )
+    parser.add_argument(
+        '--lib',
+        help=(
+            "Library to which the alignments belong to. Default : %(deafult)s"
+        ),
+        type=str,
+        default="lib",
+    )
+    parser.add_argument(
+        '-t', '--tag',
         help=(
             "Indicate the tag storing the read species name in uppercase."
             "Default %(default)s."
         ),
-        default='YW'
+        default='YW',
+        type=str
     )
     parser.add_argument(
-        '--collapsed',
+        '-c', '--collapsed',
         help=(
             "Indicate that the SAM file has the reads collapsed by sequence"
             "and alignment. The collapsed name must be build by the alignment"
@@ -102,6 +127,20 @@ def parse_arguments():
 
     return parser
 
+def get_out_dirs(mir_list: list[str], library: str, outdir: Path) -> list[Optional[Path]]:
+    """Get output directories."""
+    mir_out = None
+    isomir_out = None
+    iso_mirna_out = None
+
+    if 'mirna' in mir_list:
+        mir_out = outdir/f'mirna_counts_{library}'
+    if 'isomir' in mir_list:
+        isomir_out = outdir/f'isomir_counts_{library}'
+    if 'iso_mirna' in mir_list:
+        iso_mirna_out = outdir/f'iso_mirna_counts_{library}'
+    
+    return mir_out, isomir_out, iso_mirna_out
 
 def get_contribution(aln: pysam.AlignedSegment, collapsed: bool = False, nh: bool = False) -> float:
     """Get contribution of an alignment to the overall count.
@@ -121,7 +160,7 @@ def get_contribution(aln: pysam.AlignedSegment, collapsed: bool = False, nh: boo
         collapsed:
             indicates if the alignment is collapsed or not
         nh:
-            indicates if the NH vale is found on the alingment name
+            indicates if the NH vale is found on the alignment name
     Returns:
         the contribution of the alignment to the overall total
     """
@@ -152,7 +191,7 @@ def get_contribution(aln: pysam.AlignedSegment, collapsed: bool = False, nh: boo
     return num_reads/nh_value
 
 
-def get_name(pre_name: str) -> str:
+def get_name(pre_name: str) -> list[str]:
     """Get the final name for the spieces name.
 
     Take a string and processes it to obtain the final name for the species.
@@ -165,19 +204,48 @@ def get_name(pre_name: str) -> str:
             string with the format feat_name|5p-shift|3p-shift|CIGAR|MD
 
     Returns:
-        the species name to be found in the final table
+        the species name to be found in the final table and its type
     """
     data_name = pre_name.split("|")
 
-    if data_name[1] == '0' and data_name[2] == '0':
-        if data_name[3][:2] == data_name[4]:
-            return data_name[0]
+    if data_name[1] == '0' and data_name[2] == '0' and data_name[3][:2] == data_name[4]:
+            return ['canonical', data_name[0]]
 
-    return pre_name
+    return ['isomir', pre_name]
 
+def write_output(name: str, species: list[str], mir_out: Path, isomir_out: Path, iso_mirna_out: Path) -> None:
+    """Write the output to the correct file."""
+    if mir_out:
+        with open(mir_out, 'a') as mir:
+            if name == 'canonical':
+                mir.write('\t'.join(species) + '\n')
+            else:
+                mir.write('')
+
+    if isomir_out:
+        with open(isomir_out, 'a') as isomir:
+            if name == 'isomir':
+                isomir.write('\t'.join(species) + '\n')
+            else:
+                isomir.write('')
+
+    if iso_mirna_out:
+        with open(iso_mirna_out, 'a') as isomirna:
+            if name == '':
+                isomirna.write('')
+            else:
+                isomirna.write('\t'.join(species) + '\n')
+    
 
 def main(args) -> None:
     """Classify and tabulate a SAM file."""
+    outdir = Path(args.outdir)
+    outdir.mkdir(parents=True, exist_ok=True)
+
+    mir_out, isomir_out, iso_mirna_out = get_out_dirs(mir_list=args.mir_list,
+                                                      library=args.lib,
+                                                      outdir=outdir)
+
     read_ID = []
     count = 0
 
@@ -191,7 +259,10 @@ def main(args) -> None:
                 count = get_contribution(first_aln, args.collapsed, args.nh)
 
         except StopIteration:
-            sys.stdout.write('')
+            write_output(name="", species=[],
+                         mir_out=mir_out,
+                         isomir_out=isomir_out,
+                         iso_mirna_out=iso_mirna_out)
             return
 
         for alignment in samfile:
@@ -206,25 +277,31 @@ def main(args) -> None:
                     read_ID.append(alignment.query_name)
 
             else:
-                species = [get_name(current_species), str(count)]
+                name = get_name(current_species)
+                species = [name[1], str(count)]
                 if args.len:
                     species.append(str(alignment.query_alignment_length))
                 if args.read_ids:
                     species.append(';'.join(read_ID))
 
-                sys.stdout.write('\t'.join(species) + '\n')
+                write_output(name[0], species, mir_out=mir_out,
+                              isomir_out=isomir_out,
+                              iso_mirna_out=iso_mirna_out)
 
                 current_species = alignment.get_tag(args.tag)
                 count = get_contribution(alignment, args.collapsed, args.nh)
                 read_ID = [alignment.query_name]
 
-        species = [get_name(current_species), str(count)]
+        name = get_name(current_species)
+        species = [name[1], str(count)]
         if args.len:
             species.append(str(alignment.query_alignment_length))
         if args.read_ids:
             species.append(';'.join(read_ID))
-
-        sys.stdout.write('\t'.join(species) + '\n')
+        
+        write_output(name[0], species, mir_out=mir_out,
+                      isomir_out=isomir_out,
+                      iso_mirna_out=iso_mirna_out)
 
 
 if __name__ == "__main__":
