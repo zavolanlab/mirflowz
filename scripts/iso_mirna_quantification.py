@@ -13,22 +13,29 @@ only the `feat_name` is returned. Otherwise the entire name is returned. If
 there are different features in the tag separated by a semi-colon, they are
 treated as a unique name. The appropriate contribution of each
 alignment is computed as the number of reads divided by NH. The flags
---collapsed and --nh determine if these values are taken from the alignment
+`--collapsed` and `--nh` determine if these values are taken from the alignment
 name. If both flags are set, the contribution of each alignment is
 computed as # of reads/NH and the values are extracted from the name. If only
---collapsed is set, the contribution is # of reads/NH_tag. If only --nh is set,
-the contribution is 1/NH. Otherwise, the contribution is 1/NH_tag. If --nh is
-not set and the NH tag is not found, the value is set to 1. If the SAM file is
-empty, no output is produced. The output columns are also determined by the
-flags --read-ids and --len. If --len is set, the length of the species sequence
-is add as a new column in the output table. If --read-ids is set, a
-semicolon-separated list of all alignment IDs that overlap with the feature
-will always be in the last column.
+`--collapsed` is set, the contribution is # of reads/NH_tag. If only `--nh` is
+set, the contribution is 1/NH. Otherwise, the contribution is 1/NH_tag. If
+`--nh` is not set and the NH tag is not found, the value is set to 1. If the
+SAM file is empty, an empty file is produced. The output columns are also
+determined by the flags `--read-ids` and `--len`. If `--len` is set, the
+length of the species sequence is add as a new column in the output table.
+If `--read-ids` is set, a semicolon-separated list of all alignment IDs that
+overlap with the feature will always be in the last column. The output file(s)
+are determined by the arguments `--mir-list` and `--lib`. The `--mir-list`
+determines which tables are created and how the classification is done. If the
+value of `--mir-list` is 'iso_mirna', a single table is created that includes
+both isomiR and canonical miRNAs. If the value is either 'isomir' or 'mirna',
+a single table is created containing only the specified feature type. If the
+value is 'isomir' and 'mirna', two separate tables are created for each feature
+type. The `--lib` argument determines the suffix of the output table. If it is
+not specified, the suffix 'lib' is used.
 """
 
 import argparse
 from pathlib import Path
-import sys
 from typing import Optional
 
 import pysam
@@ -127,8 +134,24 @@ def parse_arguments():
 
     return parser
 
-def get_out_dirs(mir_list: list[str], library: str, outdir: Path) -> list[Optional[Path]]:
-    """Get output directories."""
+
+def get_out_dirs(mir_list: list[str], library: str, outdir: Path) -> Optional[Path]:
+    """Get output directories.
+    
+    Create directories for each miRNA type specified in a list and return a
+    the new directories. If a miRNA type is not found, its corresponding value
+    in the returned list is None.
+
+    Args:
+        mir_list:
+            list with the desired miRNA types tables
+        library:
+            library where the species to be classified belong to
+        outdir:
+            path to the output directory
+    Returns:
+        the new directories and/or None
+    """
     mir_out = None
     isomir_out = None
     iso_mirna_out = None
@@ -139,8 +162,9 @@ def get_out_dirs(mir_list: list[str], library: str, outdir: Path) -> list[Option
         isomir_out = outdir/f'isomir_counts_{library}'
     if 'iso_mirna' in mir_list:
         iso_mirna_out = outdir/f'iso_mirna_counts_{library}'
-    
+
     return mir_out, isomir_out, iso_mirna_out
+
 
 def get_contribution(aln: pysam.AlignedSegment, collapsed: bool = False, nh: bool = False) -> float:
     """Get contribution of an alignment to the overall count.
@@ -194,24 +218,26 @@ def get_contribution(aln: pysam.AlignedSegment, collapsed: bool = False, nh: boo
 def get_name(pre_name: str) -> list[str]:
     """Get the final name for the spieces name.
 
-    Take a string and processes it to obtain the final name for the species.
-    Only the feat_name is returned if the 3p-shift and 5p-shift are 0 and the
-    CIGAR and MD are the same - excluding the last character in the CIGAR
-    string. Otherwise, the whole input string is returned.
+    Take a string and processes it to obtain the final name for the species
+    and the type of miRNA the string belongs to. Only the feat_name is
+    returned if the 3p-shift and 5p-shift are 0 and the CIGAR and MD are the
+    same - excluding the last character in the CIGAR string. Otherwise, the
+    whole input string is returned.
 
     Args:
         pre_name:
             string with the format feat_name|5p-shift|3p-shift|CIGAR|MD
 
     Returns:
-        the species name to be found in the final table and its type
+        list with the species name to be found in the final table and its type
     """
     data_name = pre_name.split("|")
 
     if data_name[1] == '0' and data_name[2] == '0' and data_name[3][:2] == data_name[4]:
-            return ['canonical', data_name[0]]
+        return ['canonical', data_name[0]]
 
     return ['isomir', pre_name]
+
 
 def write_output(name: str, species: list[str], mir_out: Path, isomir_out: Path, iso_mirna_out: Path) -> None:
     """Write the output to the correct file."""
@@ -235,7 +261,7 @@ def write_output(name: str, species: list[str], mir_out: Path, isomir_out: Path,
                 isomirna.write('')
             else:
                 isomirna.write('\t'.join(species) + '\n')
-    
+
 
 def main(args) -> None:
     """Classify and tabulate a SAM file."""
@@ -285,8 +311,8 @@ def main(args) -> None:
                     species.append(';'.join(read_ID))
 
                 write_output(name[0], species, mir_out=mir_out,
-                              isomir_out=isomir_out,
-                              iso_mirna_out=iso_mirna_out)
+                             isomir_out=isomir_out,
+                             iso_mirna_out=iso_mirna_out)
 
                 current_species = alignment.get_tag(args.tag)
                 count = get_contribution(alignment, args.collapsed, args.nh)
@@ -298,10 +324,10 @@ def main(args) -> None:
             species.append(str(alignment.query_alignment_length))
         if args.read_ids:
             species.append(';'.join(read_ID))
-        
+
         write_output(name[0], species, mir_out=mir_out,
-                      isomir_out=isomir_out,
-                      iso_mirna_out=iso_mirna_out)
+                     isomir_out=isomir_out,
+                     iso_mirna_out=iso_mirna_out)
 
 
 if __name__ == "__main__":
