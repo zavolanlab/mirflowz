@@ -1,7 +1,7 @@
-363ecee318c57ee7e2e45ca468007baa  results/TABLES/counts.miRNA_primary_transcript.tab
-68f943f89b52d628851dd97fb1399d68  results/TABLES/counts.miRNA.tab
-a844e3a29159e36e2f17a0646d1e8c5f  results/TABLES/miRNA_primary_transcript_counts_test_lib
-eec9be6cda61d2728290c92c1209f455  results/TABLES/miRNA_counts_test_lib
+eec9be6cda61d2728290c92c1209f455  results/TABLES/iso_mirna_counts_test_lib
+68f943f89b52d628851dd97fb1399d68  results/TABLES/counts.iso_mirna.tab
+a844e3a29159e36e2f17a0646d1e8c5f  results/TABLES/pri_mir_counts_test_lib
+363ecee318c57ee7e2e45ca468007baa  results/TABLES/counts.pri_mir.tab
 6e4aee315140a67ff8d214bdce359e6b  results/test_lib/intersected_premirAlignments.bam
 e1abb9d720ed40756d786c21a333e585  results/test_lib/convertedSortedMappings_test_lib.bam.bai
 5de6743dbf17c6ab5283db8608270b86  results/test_lib/uncollapsedMappings.sam
