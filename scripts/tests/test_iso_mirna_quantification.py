@@ -304,8 +304,6 @@ class TestMain:
         iso_output = tmp_path/"isomir_counts_lib"
         mirna_output = tmp_path/"mirna_counts_lib"
 
-        mir_list = ["isomir", "mirna"]
-
         monkeypatch.setattr(
             sys, 'argv',
             ['iso_mirna_quantification',
@@ -313,7 +311,7 @@ class TestMain:
              '--collapsed',
              '--nh',
              '--outdir', str(tmp_path),
-             '--mir-list', mir_list,
+             '--mir-list', "isomir", "mirna"
              ]
         )
         args = parse_arguments().parse_args()
