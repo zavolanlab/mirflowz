@@ -435,10 +435,7 @@ rule quant_mirna:
         ),
         mir_list=config["mir_list"],
         library="{sample}",
-        out_dir=os.path.join(
-            config["output_dir"],
-            "TABLES",
-        ),
+        out_dir=lambda wildcards, output: Path(output[0]).parent,
     log:
         os.path.join(config["local_log"], "quant_{mir}_{sample}.log"),
     wildcard_constraints:
@@ -451,9 +448,9 @@ rule quant_mirna:
         {input.alignments} \
         --collapsed \
         --nh \
-        --mir-list {params.mir_list} \
         --lib {params.library} \
         --outdir {params.out_dir} \
+        --mir-list {params.mir_list} \
         ) &> {log}"
 
 
