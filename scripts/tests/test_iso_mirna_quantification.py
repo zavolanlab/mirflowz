@@ -35,6 +35,16 @@ def sam_file():
 
 
 @pytest.fixture
+def iso_mirna_sam_file():
+    """Import path to test files with full content."""
+    sam_file = Path("files/in_aln_tag.sam")
+    iso_out_table = Path("files/iso_quantification")
+    mirna_out_table = Path("files/mirna_quantification")
+
+    return sam_file, iso_out_table, mirna_out_table
+
+
+@pytest.fixture
 def xn_tag_sam_file():
     """Import path to test files with feat names in XN tag."""
     sam_file = Path("files/in_aln_tag_XN.sam")
@@ -162,6 +172,7 @@ class TestParseArguments:
             sys, 'argv',
             ['iso_mirna__quantification',
              str(in_sam),
+             '--lib', 'test_lib',
              ]
         )
         args = parse_arguments().parse_args()
@@ -193,7 +204,10 @@ class TestParseArguments:
              '--read-ids',
              '--collapsed',
              '--nh',
-             '--tag', 'YW'
+             '--tag', 'YW',
+             '--outdir', 'Path.cwd()',
+             '--lib', 'test_lib',
+             '--mir-list', '[mirna, isomir]'
              ]
         )
         args = parse_arguments().parse_args()
@@ -229,118 +243,150 @@ class TestGetName:
 
     def test_canonical(self):
         """Test canonical miRNA name."""
-        name = "hsa-miR-1323"
+        name = ["canonical", "hsa-miR-1323"]
         assert get_name("hsa-miR-1323|0|0|22M|22") == name
 
     def test_iso_0_shift(self):
         """Test isoform with 0 shift."""
-        name = "hsa-miR-1323|0|0|18M3I4M|22"
+        name = ["isomir", "hsa-miR-1323|0|0|18M3I4M|22"]
         assert get_name("hsa-miR-1323|0|0|18M3I4M|22") == name
 
     def test_iso(self):
         """Test isoform with shift."""
-        name = "hsa-miR-1323|2|0|18M3I4M|22"
+        name = ["isomir", "hsa-miR-1323|2|0|18M3I4M|22"]
         assert get_name("hsa-miR-1323|2|0|18M3I4M|22") == name
 
 
 class TestMain:
     """Test 'main()' function."""
 
-    def test_main_empty_sam_file(self, monkeypatch, capsys, empty_file):
+    def test_main_empty_sam_file(self, monkeypatch, tmp_path, empty_file):
         """Test main function with an empty SAM file."""
         empty_in, empty_out = empty_file
+        output = tmp_path/"iso_mirna_counts_lib"
 
         monkeypatch.setattr(
             sys, 'argv',
             ['iso_mirna_quantification',
              str(empty_in),
+             '--outdir', str(tmp_path),
              ]
         )
         args = parse_arguments().parse_args()
         main(args)
-        captured = capsys.readouterr()
 
-        with open(empty_out, 'r') as out_file:
-            assert captured.out == out_file.read()
+        with open(empty_out, 'r') as expected, open(output, 'r') as out_file:
+            assert out_file.read() == expected.read()
 
-    def test_main_sam_file(self, monkeypatch, capsys, sam_file):
+    def test_main_isomir_mirna_sam_file(self, monkeypatch, tmp_path, sam_file):
         """Test main function with complete SAM file."""
-        infile, out_file = sam_file
+        infile, out_table = sam_file
+        output = tmp_path/"iso_mirna_counts_lib"
 
         monkeypatch.setattr(
             sys, 'argv',
             ['iso_mirna_quantification',
              str(infile),
              '--collapsed',
-             '--nh'
+             '--nh',
+             '--outdir', str(tmp_path),
              ]
         )
         args = parse_arguments().parse_args()
         main(args)
-        captured = capsys.readouterr()
 
-        with open(out_file, 'r') as output:
-            assert captured.out == output.read()
+        with open(out_table, 'r') as expected, open(output, 'r') as out_file:
+            assert out_file.read() == expected.read()
 
-    def test_main_xn_tag_sam_file(self, monkeypatch, capsys, xn_tag_sam_file):
+    def test_main_iso_mirna_sam_file(self, monkeypatch, tmp_path, iso_mirna_sam_file):
+        """Test main function with complete SAM file."""
+        infile, iso_out_table, mirna_out_table = iso_mirna_sam_file
+        iso_output = tmp_path/"isomir_counts_lib"
+        mirna_output = tmp_path/"mirna_counts_lib"
+
+        mir_list = ["isomir", "mirna"]
+
+        monkeypatch.setattr(
+            sys, 'argv',
+            ['iso_mirna_quantification',
+             str(infile),
+             '--collapsed',
+             '--nh',
+             '--outdir', str(tmp_path),
+             '--mir-list', mir_list,
+             ]
+        )
+        args = parse_arguments().parse_args()
+        main(args)
+
+        with open(iso_out_table, 'r') as expected, open(iso_output, 'r') as out_file:
+            assert out_file.read() == expected.read()
+        
+        with open(mirna_out_table, 'r') as expected, open(mirna_output, 'r') as out_file:
+            assert out_file.read() == expected.read()    
+    def test_main_xn_tag_sam_file(self, monkeypatch, tmp_path, xn_tag_sam_file):
         """Test main function with feature name in the XN tag."""
-        infile, out_file = xn_tag_sam_file
+        infile, out_table = xn_tag_sam_file
+        output = tmp_path/"iso_mirna_counts_lib"
 
         monkeypatch.setattr(
             sys, 'argv',
             ['iso_mirna_quantification',
              str(infile),
              '--collapsed',
-             '--tag', 'XN'
+             '--tag', 'XN',
+             '--outdir', str(tmp_path),
              ]
         )
         args = parse_arguments().parse_args()
         main(args)
-        captured = capsys.readouterr()
 
-        with open(out_file, 'r') as output:
-            assert captured.out == output.read()
+        with open(out_table, 'r') as expected, open(output, 'r') as out_file:
+            assert out_file.read() == expected.read()
 
-    def test_main_nh_missing_sam_file(self, monkeypatch, capsys, nh_missing_sam_file):
+    def test_main_nh_missing_sam_file(self, monkeypatch, tmp_path, nh_missing_sam_file):
         """Test main function with some missing NH tag in SAM file."""
-        infile, out_file = nh_missing_sam_file
+        infile, out_table = nh_missing_sam_file
+        output = tmp_path/"iso_mirna_counts_lib"
 
         monkeypatch.setattr(
             sys, 'argv',
             ['iso_mirna_quantification',
              str(infile),
              '--collapsed',
+             '--outdir', str(tmp_path),
              ]
         )
         args = parse_arguments().parse_args()
         main(args)
-        captured = capsys.readouterr()
 
-        with open(out_file, 'r') as output:
-            assert captured.out == output.read()
+        with open(out_table, 'r') as expected, open(output, 'r') as out_file:
+            assert out_file.read() == expected.read()
 
-    def test_main_seq_len_sam_file(self, monkeypatch, capsys, len_sam_file):
+    def test_main_seq_len_sam_file(self, monkeypatch, tmp_path, len_sam_file):
         """Test main function with read lenght in output table."""
-        infile, out_file = len_sam_file
+        infile, out_table = len_sam_file
+        output = tmp_path/"iso_mirna_counts_lib"
 
         monkeypatch.setattr(
             sys, 'argv',
             ['iso_mirna_quantification',
              str(infile),
              '--collapsed',
-             '--len'
+             '--len',
+             '--outdir', str(tmp_path),
              ]
         )
         args = parse_arguments().parse_args()
         main(args)
-        captured = capsys.readouterr()
 
-        with open(out_file, 'r') as output:
-            assert captured.out == output.read()
+        with open(out_table, 'r') as expected, open(output, 'r') as out_file:
+            assert out_file.read() == expected.read()
 
-    def test_main_read_sam_file(self, monkeypatch, capsys, read_sam_file):
+    def test_main_read_sam_file(self, monkeypatch, tmp_path, read_sam_file):
         """Test main function with intersecting read IDs in the output."""
-        infile, out_file = read_sam_file
+        infile, out_table = read_sam_file
+        output = tmp_path/"iso_mirna_counts_lib"
 
         monkeypatch.setattr(
             sys, 'argv',
@@ -348,18 +394,19 @@ class TestMain:
              str(infile),
              '--collapsed',
              '--read-ids',
+             '--outdir', str(tmp_path),
              ]
         )
         args = parse_arguments().parse_args()
         main(args)
-        captured = capsys.readouterr()
 
-        with open(out_file, 'r') as output:
-            assert captured.out == output.read()
+        with open(out_table, 'r') as expected, open(output, 'r') as out_file:
+            assert out_file.read() == expected.read()
 
-    def test_main_read_len_sam_file(self, monkeypatch, capsys, read_len_sam_file):
+    def test_main_read_len_sam_file(self, monkeypatch, tmp_path, read_len_sam_file):
         """Test main function with read IDs and feature length im output."""
-        infile, out_file = read_len_sam_file
+        infile, out_table = read_len_sam_file
+        output = tmp_path/"iso_mirna_counts_lib"
 
         monkeypatch.setattr(
             sys, 'argv',
@@ -368,46 +415,49 @@ class TestMain:
              '--collapsed',
              '--len',
              '--read-ids',
+             '--outdir', str(tmp_path),
              ]
         )
         args = parse_arguments().parse_args()
         main(args)
-        captured = capsys.readouterr()
 
-        with open(out_file, 'r') as output:
-            assert captured.out == output.read()
+        with open(out_table, 'r') as expected, open(output, 'r') as out_file:
+            assert out_file.read() == expected.read()
 
-    def test_main_uncollpased_sam_file(self, monkeypatch, capsys, uncollapsed_sam_file):
+
+    def test_main_uncollpased_sam_file(self, monkeypatch, tmp_path, uncollapsed_sam_file):
         """Test main function with uncollapsed SAM file."""
-        infile, out_file = uncollapsed_sam_file
+        infile, out_table = uncollapsed_sam_file
+        output = tmp_path/"iso_mirna_counts_lib"
 
         monkeypatch.setattr(
             sys, 'argv',
             ['iso_mirna_quantification',
              str(infile),
-             '--nh'
+             '--nh',
+             '--outdir', str(tmp_path),
              ]
         )
         args = parse_arguments().parse_args()
         main(args)
-        captured = capsys.readouterr()
 
-        with open(out_file, 'r') as output:
-            assert captured.out == output.read()
+        with open(out_table, 'r') as expected, open(output, 'r') as out_file:
+            assert out_file.read() == expected.read()
 
-    def test_main_uncollpased_missing_nh_sam_file(self, monkeypatch, capsys, uncollapsed_missing_nh_sam_file):
+    def test_main_uncollpased_missing_nh_sam_file(self, monkeypatch, tmp_path, uncollapsed_missing_nh_sam_file):
         """Test main function with uncollapsed SAM file and missing NH tags."""
-        infile, out_file = uncollapsed_missing_nh_sam_file
+        infile, out_table = uncollapsed_missing_nh_sam_file
+        output = tmp_path/"iso_mirna_counts_lib"
 
         monkeypatch.setattr(
             sys, 'argv',
             ['iso_mirna_quantification',
              str(infile),
+             '--outdir', str(tmp_path),
              ]
         )
         args = parse_arguments().parse_args()
         main(args)
-        captured = capsys.readouterr()
 
-        with open(out_file, 'r') as output:
-            assert captured.out == output.read()
+        with open(out_table, 'r') as expected, open(output, 'r') as out_file:
+            assert out_file.read() == expected.read()
