@@ -72,6 +72,7 @@ def parse_arguments():
             "List of miRNA species to have in the different output tables."
             "Default: %(default)s"
         ),
+        nargs='*',
         default=['iso_mirna'],
         type=str
     )
