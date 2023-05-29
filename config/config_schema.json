@@ -92,7 +92,7 @@
         },
         "mir_list":{
             "type": "array",
-            "default": ["miRNA", "miRNA_primary_transcript", "isomirs"]
+            "default": ["iso_mirna", "pri_mir"]
         }
     }
 }
