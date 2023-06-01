@@ -109,9 +109,9 @@ rule finish:
             ),
             sample=pd.unique(samples_table.index.values),
         ),
-        table=lambda wildcard: expand(
+        table=expand(
             os.path.join(config["output_dir"], "TABLES", "counts.{mir}.tab"),
-            mir=config["mir_list"],
+            mir=[mir for mir in config["mir_list"] if mir != 'isomir'],
         ),
         uncollapsed_bam=expand(
             os.path.join(
