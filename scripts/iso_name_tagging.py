@@ -2,15 +2,29 @@
 
 """Add intersecting feature(s) into a SAM file as a tag.
 
-Add intersecting feature names from a BED file as a tag to alignments in a SAM
-file using the format: feat-name|5p-shift|3p-shift|CIGAR|MD. Multiple
-intersecting feature names are separated by a semi-colon. The 5p-shift and the
-3p-shift are calculated as the difference between the alignment and the feature
-start/end positions. If --extension is provided, it adjusts the feature start
-position by adding the given value and subtracts it from the end position. The
---id string specifies the feature name to be used within the attributes column
-in the BED file. If either the BED or the SAM file is empty, only the SAM file
-header will be returned.
+Build new names for the intersecting features from a BED file and add them as a
+tag to alignments in a SAM file using the format
+FEATURE_ID|5p-shift|3p-shift|CIGAR|MD. If either the BED or the SAM file is
+empty, only the SAM file header is returned.
+
+EXPECTED INPUT FILES
+The BED file must be the output a bedtools intersect call with -a being a GFF3
+file and -b a BAM file. If the GFF3 used in the bedtools intersect call has the
+features start and end coordinates extended, the number of additional
+nucleotides can be specified using the CLI option `--extension`. The SAM file
+must contian only the reads that have an intersecting feature.
+
+NAME CREATION and TAG ADDITION
+For each alignment, the name of the the intersecting feature will follow the
+format FEATURE_ID|5p-shift|3p-shift|CIGAR|MD. The CLI option `--id` specifies
+the feature identifier to be used as FEATURE_ID from within the attributes
+column in the BED file. The 5p-shift and the 3-p shift values are the
+difference between the feature start and end coordinates and the alignment
+start and end coordinates. If `--extension` is provided, the feature start
+position by are adjusted by adding the given value and subtracting it from the
+end position. If both, the 5p-shift and the 3p-shift, are within the range 
++/- extension + 1 the feature name is added to the alignment as the new tag
+"YW". Multiple intersecting feature names are separated by a semi-colon.
 """
 
 import argparse
@@ -25,12 +39,13 @@ import pysam
 def parse_arguments():
     """Command-line arguments parser."""
     parser = argparse.ArgumentParser(
-        description=__doc__
-        )
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument(
         '-v', '--version',
         action='version',
-        version='%(prog)s 1.0',
+        version='%(prog)s 1.0.0',
         help="Show program's version number and exit"
     )
     parser.add_argument(
@@ -53,7 +68,7 @@ def parse_arguments():
         '-e', '--extension',
         help=(
             "Number of nucleotides the start and end coordinates of the"
-            "annotated feature has been extended. Default: %(default)d."
+            "annotated feature had been extended. Default: %(default)d."
         ),
         default=0,
         type=int
@@ -61,7 +76,7 @@ def parse_arguments():
     parser.add_argument(
         '--id',
         help=(
-            "ID used to identify the feature in the name add as tag."
+            "ID used to identify the feature in the name that is added as tag."
             "The ID must be in lowercase. Default: %(default)s."
         ),
         default="name",
@@ -135,7 +150,7 @@ def get_tags(intersecting_mirna: list, alignment: pysam.AlignedSegment, extensio
 
     Given an alignment and a list containing the feature name, start position,
     and end position, create a list of strings to be added as a new tag to that
-    alignment. The string has the format: feat-name|5p-shift|3p-shift|CIGAR|MD.
+    alignment. The string has the format: feature-id|5p-shift|3p-shift|CIGAR|MD.
     The 5p-shift and 3p-shift are calculated as a difference between the
     feature start/end position and the alignment start/end position. If the
     start and end position of the alignment differs at most by the extension
