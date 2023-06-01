@@ -12,11 +12,11 @@ EXPECTED INPUT
 The SAM file must contain only the alignments that interesct with canonical
 miRNAs and/or isomiRs. For each alignment, the intersecting feature name(s)
 must be stored in a tag. If the tag determined by the CLI argument `--tag` is
-empty, the alignment is ignored. Finally, the SAM file must be sorted by the
-tag storing the feature names. Optionally, the SAM file can contain collapsed
-reads, as, e.g., produced by the 'fastx_collapser' tool of the FASTX-Toolkit:
-http://hannonlab.cshl.edu/fastx_toolkit/". Finally, read names can contain the
-alignment NH vale (see 'READ NAME FORMAT' section)
+empty, the alignment is ignored. In addition, the SAM file must be sorted by
+the tag storing the feature names. Optionally, the SAM file can contain
+collapsed reads, as, e.g., produced by the 'fastx_collapser' tool of the
+FASTX-Toolkit: http://hannonlab.cshl.edu/fastx_toolkit/". Finally, read names
+can also contain the alignment NH vale (see 'READ NAME FORMAT' section)
 
 FEATURE NAME FORMAT
 The name of the intersecting feature(s) has to follow the format:
@@ -179,10 +179,14 @@ def parse_arguments():
     parser.add_argument(
         '-c', '--collapsed',
         help=(
-            "Indicate that the SAM file has the reads collapsed by sequence"
-            "and alignment. The collapsed name must be build by the alignment"
-            "name followed by a '-' and the number of collpased alignments,"
-            "i.e 1-4. Default: %(default)s."
+            "Indicate that the SAM file has the reads collapsed by sequence."
+            "In that case, the SAM query names are expected to follow the "
+            "format NAME-COUNT where NAME is an aribitrary unique name and "
+            "COUNT is  is the number of identical reads that were collapsed "
+            "i.e my_query_name-13. The required naming format is produced, "
+            "e.g., by the 'fastx_collapser' tool of the "
+            "FASTX-Toolkit: http://hannonlab.cshl.edu/fastx_toolkit/"
+            " Default: %(default)s."
         ),
         action='store_true',
         default=False
@@ -190,9 +194,10 @@ def parse_arguments():
     parser.add_argument(
         '--nh',
         help=(
-            "Indicate that the SAM file has the NH tag in the read query name."
-            "The name must be build by the alignment name followed by an"
-            "underscore and the NH value, i.e 1-2_4. Default: %(default)s."
+            "Indicate that the SAM file has the NH value at the end of the read"
+            " query name. In that case, SAM query names are expected to follow"
+            " the format NAME_NH where NAME is an aribitrary unique name and "
+            "NH is the NH value, i.e my_query_name_4. Default: %(default)s."
         ),
         action='store_true',
         default=False
@@ -200,7 +205,7 @@ def parse_arguments():
     parser.add_argument(
         '--len',
         help=(
-            "If set, include the miRNA length in the output table."
+            "If set, the miRNA length is incluedd in the output table."
             " Default: %(default)s."
         ),
         action='store_true',
@@ -209,8 +214,8 @@ def parse_arguments():
     parser.add_argument(
         '--read-ids',
         help=(
-            "If set, include read IDs classified as "
-            "the output table. Default: %(default)s."
+            "If set, the read IDs that belong to each miRNA are included in "
+            "the output table separated by a semi-colon. Default: %(default)s."
         ),
         action='store_true',
         default=False
