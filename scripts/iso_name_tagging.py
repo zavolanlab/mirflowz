@@ -52,8 +52,8 @@ def parse_arguments():
         '-b', '--bed',
         help=(
             "Path to the BED file. This file must be the output of "
-            "a bedtools intersect call with -a being a GFF3 file and"
-            "-b a BAM file."
+            " a bedtools intersect call with -a being a GFF3 file and"
+            " -b a BAM file."
         ),
         type=Path,
         required=True
@@ -68,7 +68,7 @@ def parse_arguments():
         '-e', '--extension',
         help=(
             "Number of nucleotides the start and end coordinates of the"
-            "annotated feature had been extended. Default: %(default)d."
+            " annotated features had been extended. Default: %(default)d."
         ),
         default=0,
         type=int
@@ -77,7 +77,7 @@ def parse_arguments():
         '--id',
         help=(
             "ID used to identify the feature in the name that is added as tag."
-            "The ID must be in lowercase. Default: %(default)s."
+            " The ID must be in lowercase. Default: %(default)s."
         ),
         default="name",
         type=str
