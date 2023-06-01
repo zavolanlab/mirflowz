@@ -92,7 +92,7 @@
         },
         "mir_list":{
             "type": "array",
-            "default": ["iso_mirna", "pri_mir"]
+            "default": ["isomir", "mirna", "pri-mir"]
         }
     }
 }
