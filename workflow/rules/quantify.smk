@@ -51,13 +51,10 @@ rule finish_quantify:
         intersect_sam=os.path.join(
             config["output_dir"], "{sample}", "mirna_intersecting_sort_tag.sam"
         ),
-        table=expand(
-            os.path.join(
+        table=os.path.join(
                 config["output_dir"],
                 "TABLES",
                 "counts.{mir}.tab",
-            ),
-            mir=config["mir_list"],
         ),
         uncollapsed_bam=expand(
             os.path.join(
@@ -423,23 +420,21 @@ rule quant_mirna:
             "mirna_intersecting_sort_tag.sam",
         ),
         script=os.path.join(
-            config["scripts_dir"], "iso_mirna_quantification.py"
+            config["scripts_dir"], "mirna_quantification.py"
         ),
     output:
         table=os.path.join(
-            config["output_dir"], "TABLES", "{mir}_counts_{sample}"
+            config["output_dir"], "TABLES", "mirna_counts_{sample}"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "quant_{mir}_{sample}.log"
+            config["cluster_log"], "quant_mir_{sample}.log"
         ),
         mir_list=config["mir_list"],
         library="{sample}",
         out_dir=lambda wildcards, output: Path(output[0]).parent,
     log:
-        os.path.join(config["local_log"], "quant_{mir}_{sample}.log"),
-    wildcard_constraints:
-        mir="(?!pri_mir).*",
+        os.path.join(config["local_log"], "quant_mir_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
     shell:
@@ -471,7 +466,7 @@ rule quant_mirna_pri:
         table=os.path.join(
             config["output_dir"],
             "TABLES",
-            "pri_mir_counts_{sample}",
+            "pri-mir_counts_{sample}",
         ),
     params:
         cluster_log=os.path.join(
@@ -507,19 +502,19 @@ rule merge_tables:
                 config["output_dir"], "TABLES", "{mir}_counts_{sample}"
             ),
             sample=pd.unique(samples_table.index.values),
-            mir=config["mir_list"],
+            mir=[mir for mir in config["mir_list"] if mir != 'isomir'],
         ),
         script=os.path.join(config["scripts_dir"], "merge_tables.R"),
     output:
-        table=os.path.join(config["output_dir"], "TABLES", "counts.{mir}.tab"),
+        table=os.path.join(config["output_dir"], "TABLES", "counts.{mirna}.tab"),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "merge_tables_{mir}.log"
+            config["cluster_log"], "merge_tables_{mirna}.log"
         ),
-        prefix="{mir}_counts_",
+        prefix="{mirna}_counts_",
         input_dir=lambda wildcards, input: Path(input[0]).parent,
     log:
-        os.path.join(config["local_log"], "merge_tables_{mir}.log"),
+        os.path.join(config["local_log"], "merge_tables_{mirna}.log"),
     container:
         "docker://zavolab/r-tidyverse:3.5.3"
     shell:
