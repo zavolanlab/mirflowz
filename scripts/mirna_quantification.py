@@ -121,8 +121,6 @@ import re
 
 import pysam
 
-sys.tracebacklimit = 0
-
 
 def parse_arguments():
     """Command-line arguments parser."""
