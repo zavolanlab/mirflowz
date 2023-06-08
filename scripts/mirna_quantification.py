@@ -431,6 +431,9 @@ def main(args) -> None:
                 count = get_contribution(alignment)
                 read_ID = [alignment.query_name]
 
+        if count == 0:
+            count = get_contribution(alignment)
+
         name = get_name(current_species)
         species = [name[1], str(count)]
         if args.len:
