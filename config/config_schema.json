@@ -92,6 +92,10 @@
         },
         "mir_list":{
             "type": "array",
+            "items":{
+                "type": "string",
+                "enum": ["isomir", "mirna", "pri-mir"]
+            },
             "default": ["isomir", "mirna", "pri-mir"]
         }
     }
