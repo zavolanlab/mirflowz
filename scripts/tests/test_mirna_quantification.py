@@ -105,7 +105,7 @@ def uncollapsed_sam_file():
 def uncollapsed_missing_nh_sam_file():
     """Import path to uncollapsed test files."""
     sam_file = Path("files/in_aln_tag_missing_nh.sam")
-    out_table = Path("files/uncollpased_missing_nh_iso_mirna_quantification")
+    out_table = Path("files/uncollapsed_missing_nh_iso_mirna_quantification")
 
     return sam_file, out_table
 
@@ -203,6 +203,7 @@ class TestParseArguments:
             sys, 'argv',
             ['mirna_quantification',
              str(in_sam),
+             '--count',
              '--len',
              '--read-ids',
              '--collapsed',
@@ -476,6 +477,7 @@ class TestMain:
             sys, 'argv',
             ['mirna_quantification',
              str(infile),
+             '--count',
              '--outdir', str(tmp_path),
              ]
         )
