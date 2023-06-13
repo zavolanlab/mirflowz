@@ -65,17 +65,17 @@ rule finish:
         chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
         exteneded_mir=expand(
             os.path.join(
-                config["output_dir"], 
-                "mirna_annotation_extended_{extension}_nt_mir.gff3"
+                config["output_dir"],
+                "mirna_annotation_extended_{extension}_nt_mir.gff3",
             ),
-            extension=config["extension"]
+            extension=config["extension"],
         ),
         exteneded_premir=expand(
             os.path.join(
-                config["output_dir"], 
-                "mirna_annotation_extended_{extension}_nt_premir.gff3"
+                config["output_dir"],
+                "mirna_annotation_extended_{extension}_nt_premir.gff3",
             ),
-            extension=config["extension"]
+            extension=config["extension"],
         ),
         maps=expand(
             os.path.join(
@@ -87,31 +87,31 @@ rule finish:
         ),
         premir_intersect_sam=expand(
             os.path.join(
-                config["output_dir"], 
-                "{sample}", 
-                "premir_intersectedAlignments.sam"
+                config["output_dir"],
+                "{sample}",
+                "premir_intersectedAlignments.sam",
             ),
             sample=pd.unique(samples_table.index.values),
         ),
         mirna_intersect_sam=expand(
             os.path.join(
-                config["output_dir"], 
-                "{sample}", 
-                "mirna_intersectedAlignments.sam"
+                config["output_dir"],
+                "{sample}",
+                "mirna_intersectedAlignments.sam",
             ),
             sample=pd.unique(samples_table.index.values),
         ),
         intersect_sam=expand(
             os.path.join(
-                config["output_dir"], 
-                "{sample}", 
-                "mirna_intersecting_tag.sam"
+                config["output_dir"],
+                "{sample}",
+                "mirna_intersecting_sort_tag.sam",
             ),
             sample=pd.unique(samples_table.index.values),
         ),
-        table=lambda wildcard: expand(
+        table=expand(
             os.path.join(config["output_dir"], "TABLES", "counts.{mir}.tab"),
-            mir=config["mir_list"],
+            mir=[mir for mir in config["mir_list"] if mir != 'isomir'],
         ),
         uncollapsed_bam=expand(
             os.path.join(
@@ -128,4 +128,4 @@ rule finish:
                 "uncollapsedSortedMappings_{sample}.bam.bai",
             ),
             sample=pd.unique(samples_table.index.values),
-        )
+        ),

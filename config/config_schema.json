@@ -92,7 +92,11 @@
         },
         "mir_list":{
             "type": "array",
-            "default": ["miRNA", "miRNA_primary_transcript", "isomirs"]
+            "items":{
+                "type": "string",
+                "enum": ["isomir", "mirna", "pri-mir"]
+            },
+            "default": ["isomir", "mirna", "pri-mir"]
         }
     }
 }
