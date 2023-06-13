@@ -21,10 +21,59 @@ the feature identifier to be used as FEATURE_ID from within the attributes
 column in the BED file. The 5p-shift and the 3-p shift values are the
 difference between the feature start and end coordinates and the alignment
 start and end coordinates. If `--extension` is provided, the feature start
-position by are adjusted by adding the given value and subtracting it from the
+position are adjusted by adding the given value and subtracting it from the
 end position. If both, the 5p-shift and the 3p-shift, are within the range 
 +/- extension + 1 the feature name is added to the alignment as the new tag
 "YW". Multiple intersecting feature names are separated by a semi-colon.
+
+EXAMPLES
+    Example 1
+    in BED record:
+        19	.	miRNA	44377	44398	.	+	.	ID=MIMAT0002849;Alias=MIMAT0002849;Name=hsa-miR-524-5p;Derives_from=MI0003160	19	44376	44398	13-1_1	1	+	22
+    in SAM record:
+        13-1_1	0	19	44377	1	11M3I11M	*	0	0	CTACAAAGGGAGGTAGCACTTTCTC	*	HI:i:0	MD:Z:22	NH:i:1	NM:i:3	RG:Z:A1	YZ:Z:0
+    command:
+        iso_name_tagging.py -b BED -s SAM
+    new name:
+        hsa-miR-524-5p|0|0|11M3I11M|22
+    out SAM record:
+        13-1_1	0	19	44377	1	11M3I11M	*	0	0	CTACAAAGGGAGGTAGCACTTTCTC	*	HI:i:0	MD:Z:22	NH:i:1	NM:i:3	RG:Z:A1	YZ:Z:0	YW:Z:hsa-miR-524-5p|0|0|11M3I11M|22
+
+    Example 2
+    in BED record:
+        19	.	miRNA	5338	5359	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	48-1_1	255	+	21
+    in SAM record:
+        48-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
+    command:
+        iso_name_tagging.py -b BED -s SAM
+    new name: 
+        ""
+    out SAM record: 
+        48-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0	YW:Z:
+
+    Example 3
+    in BED record:
+        19	.	miRNA	5332	5365	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	48-1_1	255	+	21
+    in SAM record:
+        48-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
+    command:
+        iso_name_tagging.py -b BED -s SAM --extension 6
+    new name:
+        hsa-miR-1323|0|-1|21M|21
+    out SAM record:
+        48-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0	YW:Z:hsa-miR-1323|0|-1|21M|21
+
+    Example 4
+    in BED record:
+        19	.	miRNA	44377	44398	.	+	.	ID=MIMAT0002849;Alias=MIMAT0002849;Name=hsa-miR-524-5p;Derives_from=MI0003160	19	44376	44398	13-1_1	1	+	22
+    in SAM record:
+        13-1_1	0	19	44377	1	11M3I11M	*	0	0	CTACAAAGGGAGGTAGCACTTTCTC	*	HI:i:0	MD:Z:22	NH:i:1	NM:i:3	RG:Z:A1	YZ:Z:0
+    command:
+        iso_name_tagging.py -b BED -s SAM --id id
+    new name:
+        MIMAT0002849|0|0|11M3I11M|22
+    out SAM record:
+        13-1_1	0	19	44377	1	11M3I11M	*	0	0	CTACAAAGGGAGGTAGCACTTTCTC	*	HI:i:0	MD:Z:22	NH:i:1	NM:i:3	RG:Z:A1	YZ:Z:0	YW:Z:MIMAT0002849|0|0|11M3I11M|22
 """
 
 import argparse
