@@ -58,11 +58,13 @@ OUTPUT FORMAT
 The output is tab-delimited file named 'mir_counts_LIB', where LIB is
 the read's library name set in the CLI option `--lib`. If the SAM file is
 empty, an empty file is produced. By default each row contains the feature
-name and its partial count. Two extra columns can be added by using the CLI
-flags `--len` and `--read-ids`. If `--len` is set, the output table will
-contain the read's length. If `--read-ids` is set, a semicolon-separated list
-of all alignment IDs that overlap with the feature will always be in the last
-column.
+name and its partial count. Three extra columns can be added by using the CLI
+flags `--count`, `--len` and `--read-ids`. If `--count` is set, the output
+table will contain the number of best alignments for each feature. If `--len`
+is set, the output table will contain the read's length. If both `--count` and
+`--len` are set, the count will always be followed by the read's lenght. If
+`--read-ids` is set, a semicolon-separated list of all alignment IDs that
+overlap with the feature will always be in the last column.
 
 EXAMPLES
     Example 1
@@ -79,7 +81,7 @@ EXAMPLES
 
     Example 3
     input: SAM meeting the minimal characteristics
-    command: mirna_quantification.py SAM --mir-list mirna
+    command: mirna_quantification.py SAM --mir-list isomir
     output: hsa-miR-512-3p|0|1|23M|22C	1.6666666666666665
             hsa-miR-517-5p|-1|0|23M|22T	0.6000000000000001
 
@@ -109,9 +111,9 @@ EXAMPLES
 
     Example 8
     input: SAM meeting the minimal characteristics
-    command: mirna_quantification.py SAM --len --mir-list isomir
-    output: hsa-miR-512-3p|0|1|23M|22C0	4.333333333333333 23
-            hsa-miR-512-3p|0|1|23M|3T18C0 12.0 19
+    command: mirna_quantification.py SAM --count --len --mir-list isomir
+    output: hsa-miR-512-3p|0|1|23M|22C0	4.333333333333333  6 23
+            hsa-miR-512-3p|0|1|23M|3T18C0 12.0  8 19
 """
 
 import argparse
@@ -201,9 +203,18 @@ def parse_arguments():
         default=False
     )
     parser.add_argument(
+        '--count',
+        help=(
+        "If set, the amount of best alignments for each miRNA is included in "
+        "the output table. Default: %(default)s"
+        ),
+        action='store_true',
+        default=False
+    )
+    parser.add_argument(
         '--len',
         help=(
-            "If set, the miRNA length is incluedd in the output table."
+            "If set, the miRNA length is included in the output table."
             " Default: %(default)s."
         ),
         action='store_true',
@@ -385,6 +396,7 @@ def main(args) -> None:
 
     read_ID = []
     count = 0
+    alns_count = 0
 
     with pysam.AlignmentFile(args.samfile, 'r') as samfile:
 
@@ -394,6 +406,7 @@ def main(args) -> None:
             if current_species:
                 read_ID.append(first_aln.query_name)
                 count = get_contribution(first_aln)
+                alns_count += 1
 
         except StopIteration:
             write_output(name="",
@@ -408,6 +421,7 @@ def main(args) -> None:
             if current_species == '':
                 current_species = alignment.get_tag(args.tag)
                 count = get_contribution(alignment)
+                alns_count = 1
 
                 if args.read_ids:
                     read_ID = [alignment.query_name]
@@ -416,12 +430,15 @@ def main(args) -> None:
 
             if current_species == alignment.get_tag(args.tag):
                 count += get_contribution(alignment)
+                alns_count += 1
                 if args.read_ids:
                     read_ID.append(alignment.query_name)
 
             else:
                 name = get_name(current_species)
                 species = [name[1], str(count)]
+                if args.count:
+                    species.append(str(alns_count))
                 if args.len:
                     species.append(str(alignment.query_alignment_length))
                 if args.read_ids:
@@ -434,10 +451,13 @@ def main(args) -> None:
 
                 current_species = alignment.get_tag(args.tag)
                 count = get_contribution(alignment)
+                alns_count = 1
                 read_ID = [alignment.query_name]
 
         name = get_name(current_species)
         species = [name[1], str(count)]
+        if args.count:
+            species.append(str(alns_count))
         if args.len:
             species.append(str(alignment.query_alignment_length))
         if args.read_ids:
