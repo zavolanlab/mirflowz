@@ -271,15 +271,12 @@ sub sam_AoH_filter_records_w_ident_QNAME {
 			my $edit_distance = ($hash_ref->{"NM"} =~ /^.*:(\d+)/)[0];
 			$min_edit_distance = $edit_distance if ! defined $min_edit_distance || $edit_distance < $min_edit_distance;
 			push @edit_distances, $edit_distance;
+			my $alignment_type = ($hash_ref->{"FLAG"} & 0x10) ? 16 : 0;																			# Set FLAG to 0 or 16 (reversed complementary)
+       		$hash_ref->{"FLAG"} = $alignment_type;
 		}	
 		for ( my $index = $#edit_distances; $index >= 0; $index-- ) {
 			splice @$AoH_ref, $index, 1 if $edit_distances[$index] != $min_edit_distance; 
 		}
-
-		foreach my $hash_ref (@$AoH_ref) {
-        	my $alignment_type = ($hash_ref->{"FLAG"} & 0x10) ? 16 : 0;										# Set FLAG to 0 or 16 (reversed complementary)
-       		$hash_ref->{"FLAG"} = $alignment_type;
-    	}
 	
 	#---> RETURN VALUE <---#
 	return $AoH_ref;
