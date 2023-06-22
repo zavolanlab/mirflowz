@@ -183,7 +183,7 @@ sub filter_sam {
 				$fields{$tag} = $value;
 			}
 			
-			 next if ($fields{"FLAG"} & 0x4); 																		# Skip the line if the sequence is unmapped
+			next if ($fields{"FLAG"} & 0x4); 																	# Skip the line if the sequence is unmapped
 			 
 			die "[ERROR] Edit distance ('NM tag') missing!" unless defined $fields{"NM"};						# Assert presence of NM tag
 
@@ -256,10 +256,10 @@ sub sam_AoH_filter_records_w_ident_QNAME {
 	
 	#---> BODY <---#
 
-		#---> Remove "true duplicates" (same QNAME, FLAG, RNAME, POS & CIGAR) / KEEP ONE!!! <---#
+		#---> Remove "true duplicates" (same QNAME, 0x10 bit in FLAG, RNAME, POS & CIGAR) / KEEP ONE!!! <---#
 		my %true_dup;
 		for my $hash_ref (@$AoH_ref) {
-			my $id_coord = join "", $hash_ref->{"QNAME"}, $hash_ref->{"FLAG"}, $hash_ref->{"RNAME"}, $hash_ref->{"POS"}, $hash_ref->{"CIGAR"};	# make string to unambiguously define mapping position
+			my $id_coord = join "", $hash_ref->{"QNAME"}, ($hash_ref->{"FLAG"} & 0x10), $hash_ref->{"RNAME"}, $hash_ref->{"POS"}, $hash_ref->{"CIGAR"};	# make string to unambiguously define mapping position
 			$true_dup{$id_coord} = $hash_ref;																									# Add to hash
 		}
 		$AoH_ref = [values %true_dup];	
@@ -271,10 +271,12 @@ sub sam_AoH_filter_records_w_ident_QNAME {
 			my $edit_distance = ($hash_ref->{"NM"} =~ /^.*:(\d+)/)[0];
 			$min_edit_distance = $edit_distance if ! defined $min_edit_distance || $edit_distance < $min_edit_distance;
 			push @edit_distances, $edit_distance;
+			my $alignment_type = ($hash_ref->{"FLAG"} & 0x10) ? 16 : 0;																			# Set FLAG to 0 or 16 (reversed complementary)
+       		$hash_ref->{"FLAG"} = $alignment_type;
 		}	
 		for ( my $index = $#edit_distances; $index >= 0; $index-- ) {
 			splice @$AoH_ref, $index, 1 if $edit_distances[$index] != $min_edit_distance; 
-		}		
+		}
 	
 	#---> RETURN VALUE <---#
 	return $AoH_ref;
