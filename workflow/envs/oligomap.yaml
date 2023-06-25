@@ -1,0 +1,7 @@
+---
+channels:
+  - conda-forge
+  - dblue
+dependencies:
+  - oligomap
+...

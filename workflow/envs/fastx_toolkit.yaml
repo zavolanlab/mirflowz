@@ -1,0 +1,7 @@
+---
+channels:
+  - conda-forge
+  - kantorlab
+dependencies:
+  - fastx_toolkit=0.0.14
+...

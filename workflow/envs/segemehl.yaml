@@ -1,0 +1,6 @@
+---
+channels:
+  - bioconda
+dependencies:
+  - segemehl=0.3.4
+...
