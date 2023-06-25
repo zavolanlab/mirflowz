@@ -109,12 +109,13 @@ rule intersect_extended_premir:
         ),
     container:
         "docker://quay.io/biocontainers/bedtools:2.30.0--h468198e_3"
+    conda:
+        os.path.join(workflow.basedir, "envs", "bedtools.yaml")
     shell:
         "(bedtools intersect \
         -wb \
         -s \
         -F 1 \
-        -sorted \
         -b {input.alignment} \
         -a {input.premir} \
         -bed \
@@ -153,6 +154,8 @@ rule premir_intersection_sam_file:
         ),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "samtools.yaml")
     shell:
         "((samtools view \
         -H {input.alignments}; \
@@ -192,6 +195,8 @@ rule convert_intersected_premir_to_bam:
         ),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "samtools.yaml")
     shell:
         "(samtools view -b {input.maps} > {output.maps}) &> {log}"
 
@@ -226,6 +231,8 @@ rule sort_intersected_premir_by_position:
         ),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "samtools.yaml")
     shell:
         "(samtools sort -n {input.maps} > {output.maps}) &> {log}"
 
@@ -256,6 +263,8 @@ rule index_intersected_premir_bam:
         os.path.join(config["local_log"], "index_bam_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "samtools.yaml")
     shell:
         "(samtools index -b {input.maps} > {output.maps}) &> {log}"
 
@@ -293,6 +302,8 @@ rule intersect_extended_mirna:
         ),
     container:
         "docker://quay.io/biocontainers/bedtools:2.30.0--h468198e_3"
+    conda:
+        os.path.join(workflow.basedir, "envs", "bedtools.yaml")
     shell:
         "(bedtools intersect \
         -wo \
@@ -334,6 +345,8 @@ rule mirna_intersection_sam_file:
         ),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "samtools.yaml")
     shell:
         "((samtools view \
         -H {input.alignments}; \
@@ -370,6 +383,8 @@ rule intersected_mirna_tag:
         os.path.join(config["local_log"], "mirna_intersecting_tag_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
+    conda:
+        os.path.join(workflow.basedir, "envs", "pysam.yaml")
     shell:
         "(python {input.script} \
         --bed {input.intersect} \
@@ -403,6 +418,8 @@ rule sort_by_feat_tag:
         os.path.join(config["local_log"], "sort_by_feat_tag_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "samtools.yaml")
     shell:
         "(samtools sort -t YW -O SAM {input.sam} > {output.sam}) &> {log}"
 
@@ -437,6 +454,8 @@ rule quant_mirna:
         os.path.join(config["local_log"], "quant_mir_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
+    conda:
+        os.path.join(workflow.basedir, "envs", "pysam.yaml")
     shell:
         "(python \
         {input.script} \
@@ -480,6 +499,8 @@ rule quant_mirna_pri:
         ),
     container:
         "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
+    conda:
+        os.path.join(workflow.basedir, "envs", "pysam.yaml")
     shell:
         "(python \
         {input.script} \
@@ -517,6 +538,8 @@ rule merge_tables:
         os.path.join(config["local_log"], "merge_tables_{mirna}.log"),
     container:
         "docker://zavolab/r-tidyverse:3.5.3"
+    conda:
+        os.path.join(workflow.basedir, "envs", "r.yaml")
     shell:
         "(Rscript \
         {input.script} \
@@ -550,6 +573,8 @@ rule uncollapse_reads:
         os.path.join(config["local_log"], "uncollapse_reads_{sample}.log"),
     container:
         "docker://perl:5.37.10"
+    conda:
+        os.path.join(workflow.basedir, "envs", "perl.yaml")
     shell:
         "(perl {input.script} \
         --suffix \
@@ -582,6 +607,8 @@ rule uncollpased_convert_to_bam:
         ),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "samtools.yaml")
     shell:
         "(samtools view -b {input.maps} > {output.maps}) &> {log}"
 
@@ -612,6 +639,8 @@ rule sort_uncollpased_by_position:
         ),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "samtools.yaml")
     shell:
         "(samtools sort {input.maps} > {output.maps}) &> {log}"
 
@@ -642,5 +671,7 @@ rule uncollapsed_index_bam:
         os.path.join(config["local_log"], "uncollapsed_index_bam_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "samtools.yaml")
     shell:
         "(samtools index -b {input.maps} > {output.maps}) &> {log}"
