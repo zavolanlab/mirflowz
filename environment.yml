@@ -1,7 +1,7 @@
 name: mirflowz
 channels:
-  - conda-forge
   - bioconda
+  - conda-forge
 dependencies:
   - graphviz
   - python>=3.9.16
