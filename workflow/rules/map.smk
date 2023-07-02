@@ -385,7 +385,7 @@ rule mapping_genome_oligomap:
         time=6,
         threads=8,
     container:
-        "docker://zavolab/oligomap:1.0"
+        "docker://quay.io/biocontainers/oligomap:1.0.1--hdcf5f25_0"
     shell:
         "(oligomap \
         {input.target} \
@@ -505,7 +505,7 @@ rule mapping_transcriptome_oligomap:
         time=6,
         threads=8,
     container:
-        "docker://zavolab/oligomap:1.0"
+        "docker://quay.io/biocontainers/oligomap:1.0.1--hdcf5f25_0"
     shell:
         "(oligomap \
         {input.target} \
