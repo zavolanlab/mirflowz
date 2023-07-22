@@ -9,6 +9,13 @@ on installation and usage please see [here](README.md).
 - [Third-party software used](#third-party-software-used)
 - [Description of workflow steps](#description-of-workflow-steps)
   - [Rule graph](#rule-graph)
+  - [Preparatory](#preparatory)
+    - [Read sample table](#read-sample-table)
+    - [Configuration file](#configuration-file)
+  - [Prepare workflow](#prepare-workflow)
+  - [Map workflow](#map-workflow)
+  - [Quantify workflow](#quantify-workflow)
+
 
 ## Third-party software used
 
@@ -42,6 +49,40 @@ also described.
 
 Visual representation of the workflow. Automatically prepared with
 [Snakemake][docs-snakemake].
+
+### Preparatory
+
+#### Read sample table
+
+##### Requirements
+
+- tab-separated values (`.tsv` and `.csv`) file
+- first row has to contain parameter names as in 
+[`samples_table.csv`](test/test_files/samples_table.csv) 
+- first column used as sample identifiers
+
+Parameter name | Description | Data type(s)
+ --- | --- | --- 
+sample | Descriptive sample name. | `str`
+sample_file | Path of the library file in either `.fa.gz` or `.fastq.gz` format. | `str`
+adapter | Required for [Cutadapt](#third-party-software-used). Use a value such as `XXXXXXXXXX` if no adapter is present or if no trimming is desired | `str`
+format | There are two allowed values, `fa` and `fastq` according to the library format | `str`
+
+
+#### Configuration file
+
+COMING SOON (maybe)
+
+### Prepare workflow
+
+
+### Map workflow
+
+
+### Quantify workflow
+
+
+
 
 [code-bedtools]: <https://github.com/arq5x/bedtools2>
 [code-cufflinks]: <https://github.com/cole-trapnell-lab/cufflinks>
