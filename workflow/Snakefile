@@ -46,45 +46,6 @@ include: os.path.join("rules", "quantify.smk")
 
 rule finish:
     input:
-        idx_transcriptome=os.path.join(
-            config["output_dir"],
-            "transcriptome_index_segemehl.idx",
-        ),
-        idx_genome=os.path.join(
-            config["output_dir"],
-            "genome_index_segemehl.idx",
-        ),
-        exons=os.path.join(
-            config["output_dir"],
-            "exons.bed",
-        ),
-        header=os.path.join(
-            config["output_dir"],
-            "headerOfCollapsedFasta.sam",
-        ),
-        chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
-        exteneded_mir=expand(
-            os.path.join(
-                config["output_dir"],
-                "mirna_annotation_extended_{extension}_nt_mir.gff3",
-            ),
-            extension=config["extension"],
-        ),
-        exteneded_primir=expand(
-            os.path.join(
-                config["output_dir"],
-                "mirna_annotation_extended_{extension}_nt_primir.gff3",
-            ),
-            extension=config["extension"],
-        ),
-        maps=expand(
-            os.path.join(
-                config["output_dir"],
-                "{sample}",
-                "convertedSortedMappings_{sample}.bam.bai",
-            ),
-            sample=pd.unique(samples_table.index.values),
-        ),
         primir_intersect_sam=expand(
             os.path.join(
                 config["output_dir"],
