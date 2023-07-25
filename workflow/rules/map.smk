@@ -185,7 +185,7 @@ rule fasta_formatter:
 ###############################################################################
 
 
-rule cutadapt:
+rule remove_adapters:
     input:
         reads=os.path.join(config["output_dir"], "{sample}", "formatted.fasta"),
     output:
@@ -220,7 +220,7 @@ rule cutadapt:
 ###############################################################################
 
 
-rule fastx_collapser:
+rule collapse_indetical_fasta:
     input:
         reads=os.path.join(config["output_dir"], "{sample}", "cut.fasta"),
     output:
@@ -439,7 +439,7 @@ rule sort_genome_oligomap:
 ###############################################################################
 
 
-rule oligomap_genome_toSAM:
+rule oligomap_genome_to_sam:
     input:
         report=os.path.join(
             config["output_dir"], "{sample}", "oligoGenome_report.txt"
@@ -560,7 +560,7 @@ rule sort_transcriptome_oligomap:
 ###############################################################################
 
 
-rule oligomap_transcriptome_toSAM:
+rule oligomap_transcriptome_to_sam:
     input:
         report=os.path.join(
             config["output_dir"], "{sample}", "oligoTranscriptome_report.txt"
@@ -695,7 +695,7 @@ rule nh_filter_genome:
 ###############################################################################
 
 
-rule filter_nh_transcriptome:
+rule nh_filter_transcriptome:
     input:
         tmaps=os.path.join(
             config["output_dir"], "{sample}", "TranscriptomeMappings.sam"
@@ -821,7 +821,7 @@ rule trans_to_gen:
 ###############################################################################
 
 
-rule cat_mapping:
+rule merge_all_maps:
     input:
         gmap1=os.path.join(config["output_dir"], "{sample}", "TransToGen.sam"),
         gmap2=os.path.join(
@@ -848,7 +848,7 @@ rule cat_mapping:
 ###############################################################################
 
 
-rule add_header:
+rule add_header_all_maps:
     input:
         header=os.path.join(config["output_dir"], "headerOfCollapsedFasta.sam"),
         catmaps=os.path.join(
@@ -877,7 +877,7 @@ rule add_header:
 ###############################################################################
 
 
-rule sort_id:
+rule sort_maps_by_id:
     input:
         concatenate=os.path.join(
             config["output_dir"],
@@ -1005,7 +1005,7 @@ rule convert_to_bam:
 ###############################################################################
 
 
-rule sort_by_position:
+rule sort_bam_by_position:
     input:
         maps=os.path.join(
             config["output_dir"], "{sample}", "mappingsConverted.bam"
