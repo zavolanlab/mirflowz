@@ -7,7 +7,7 @@
     "mem": "4G"
   },
 
-  "cutadapt":
+  "remove_adapters":
   {
     "threads":"{resources.threads}"
   },
@@ -58,11 +58,5 @@
   {
     "threads":"{resources.threads}",
     "mem":"{resources.mem}G"
-  },
-
-  "sort_alignment":
-  {
-    "mem":"{resources.mem}G",
-    "threads":"{resources.threads}"
   }
 }
