@@ -60,7 +60,7 @@ class MirnaExtension():
             self.db = gffutils.create_db(str(gff_file), dbfn=':memory:', 
                                          force=True, keep_order=True)
     
-    def extend_mirnas(self, premir_out: Path, mir_out: Path, n: int = 6, seq_lengths: Optional[dict[str, int]] = None) -> None:
+    def extend_mirnas(self, primir_out: Path, mir_out: Path, n: int = 6, seq_lengths: Optional[dict[str, int]] = None) -> None:
         """Extend miRNAs start and end coordinates.
         
         This method elongates the start and end coordinates of mature miRNAs
@@ -70,7 +70,7 @@ class MirnaExtension():
         If provided, the elongation will take into account the chromosome size.
 
         Args:
-            premir_out:
+            primir_out:
                 path to the output extended precursor miRNA file.
             mir_out:
                 path to the output extended mature miRNA file.
@@ -87,7 +87,7 @@ class MirnaExtension():
             for seqid in self.db.seqids():
                 seq_lengths[seqid] = max(rec.end for rec in self.db.region(seqid))
 
-        with open(premir_out, 'w') as premir, open(mir_out, 'w') as mirna:
+        with open(primir_out, 'w') as primir, open(mir_out, 'w') as mirna:
 
             for primary_mirna in self.db.features_of_type('miRNA_primary_transcript'):
                 seqid = primary_mirna.seqid
@@ -127,7 +127,7 @@ class MirnaExtension():
                     primary_mirna.attributes["Name"][0] += f"_-{start_diff}"
                     primary_mirna.attributes["Name"][0] += f"_+{end_diff}"
                     
-                premir.write(str(primary_mirna) + '\n')
+                primir.write(str(primary_mirna) + '\n')
 
 
 
@@ -177,13 +177,13 @@ def main(args):
     outdir = Path(args.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
 
-    premir_out = outdir/f"mirna_annotation_extended_{args.extension}_nt_premir.gff3"
+    primir_out = outdir/f"mirna_annotation_extended_{args.extension}_nt_primir.gff3"
     mir_out = outdir/f"mirna_annotation_extended_{args.extension}_nt_mir.gff3"
     
     with open(args.input, 'r') as input:
         if len(input.read()) == 0:
-            with open(premir_out, 'w') as premir, open(mir_out, 'w') as mir:
-                premir.write("")
+            with open(primir_out, 'w') as primir, open(mir_out, 'w') as mir:
+                primir.write("")
                 mir.write("")
                 return
 
@@ -200,7 +200,7 @@ def main(args):
     m.load_gff_file(args.input)
     m.extend_mirnas(n = args.extension, 
                     seq_lengths = seq_lengths, 
-                    premir_out=premir_out,
+                    primir_out=primir_out,
                     mir_out = mir_out)
 
 
