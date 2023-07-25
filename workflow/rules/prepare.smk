@@ -49,10 +49,10 @@ rule finish_prepare:
             ),
             extension=config["extension"]
         ),
-        exteneded_premir=expand(
+        exteneded_primir=expand(
             os.path.join(
                 config["output_dir"], 
-                "mirna_annotation_extended_{extension}_nt_premir.gff3"
+                "mirna_annotation_extended_{extension}_nt_primir.gff3"
             ),
             extension=config["extension"]
         ),
@@ -114,7 +114,7 @@ rule extract_transcriptome_seqs:
 ###############################################################################
 
 
-rule trim_fasta:
+rule trim_fasta_seqs_id:
     input:
         fasta=os.path.join(config["output_dir"], "transcriptome.fa"),
         script=os.path.join(config["scripts_dir"], "trim_id_fasta.sh"),
@@ -225,7 +225,7 @@ rule get_exons_gtf:
 ###############################################################################
 
 
-rule gtftobed:
+rule gtf_to_bed:
     input:
         exons=os.path.join(config["output_dir"], "exons.gtf"),
         script=os.path.join(config["scripts_dir"], "gtf_exons_bed.1.1.2.R"),
@@ -250,7 +250,7 @@ rule gtftobed:
 ###############################################################################
 
 
-rule create_header_genome:
+rule create_genome_header:
     input:
         genome=os.path.join(config["output_dir"], "genome.processed.fa"),
     output:
@@ -357,10 +357,10 @@ rule extend_mirs_annotations:
             ),
             extension=config["extension"]
         ),
-        exteneded_premir=expand(
+        exteneded_primir=expand(
             os.path.join(
                 config["output_dir"], 
-                "mirna_annotation_extended_{extension}_nt_premir.gff3"
+                "mirna_annotation_extended_{extension}_nt_primir.gff3"
             ),
             extension=config["extension"]
         ),

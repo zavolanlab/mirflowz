@@ -70,10 +70,10 @@ rule finish:
             ),
             extension=config["extension"],
         ),
-        exteneded_premir=expand(
+        exteneded_primir=expand(
             os.path.join(
                 config["output_dir"],
-                "mirna_annotation_extended_{extension}_nt_premir.gff3",
+                "mirna_annotation_extended_{extension}_nt_primir.gff3",
             ),
             extension=config["extension"],
         ),
@@ -85,11 +85,11 @@ rule finish:
             ),
             sample=pd.unique(samples_table.index.values),
         ),
-        premir_intersect_sam=expand(
+        primir_intersect_sam=expand(
             os.path.join(
                 config["output_dir"],
                 "{sample}",
-                "premir_intersectedAlignments.sam",
+                "primir_intersectedAlignments.sam",
             ),
             sample=pd.unique(samples_table.index.values),
         ),
