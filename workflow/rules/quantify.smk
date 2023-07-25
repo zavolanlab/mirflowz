@@ -127,7 +127,7 @@ rule intersect_extended_primir:
 ###############################################################################
 
 
-rule primir_intersection_sam_file:
+rule intersected_primir_sam_file:
     input:
         alignments=os.path.join(
             config["output_dir"], "{sample}", "removeMultimappers.sam"
@@ -310,7 +310,7 @@ rule intersect_extended_mirna:
 ###############################################################################
 
 
-rule mirna_intersection_sam_file:
+rule intersected_mirna_sam_file:
     input:
         alignments=os.path.join(
             config["output_dir"],
@@ -348,7 +348,7 @@ rule mirna_intersection_sam_file:
 ###############################################################################
 
 
-rule intersected_mirna_tag:
+rule add_intersected_mirna_tag:
     input:
         alignments=os.path.join(
             config["output_dir"], "{sample}", "mirna_intersectedAlignments.sam"
@@ -384,7 +384,7 @@ rule intersected_mirna_tag:
 ###############################################################################
 
 
-rule sort_by_feat_tag:
+rule sort_intersectd_mirna_by_feat_tag:
     input:
         sam=os.path.join(
             config["output_dir"], "{sample}", "mirna_intersecting_tag.sam"
@@ -563,7 +563,7 @@ rule uncollapse_reads:
 ###############################################################################
 
 
-rule uncollpased_convert_to_bam:
+rule uncollpased_sam_to_bam:
     input:
         maps=os.path.join(
             config["output_dir"], "{sample}", "uncollapsedMappings.sam"
