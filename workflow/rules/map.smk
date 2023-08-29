@@ -401,7 +401,7 @@ rule mapping_genome_oligomap:
         time=6,
         threads=8,
     container:
-        "docker://zavolab/oligomap:1.0"
+        "docker://quay.io/biocontainers/oligomap:1.0.1--hdcf5f25_0"
     conda:
         os.path.join(workflow.basedir, "envs", "oligomap.yaml")
     shell:
@@ -525,7 +525,7 @@ rule mapping_transcriptome_oligomap:
         time=6,
         threads=8,
     container:
-        "docker://zavolab/oligomap:1.0"
+       "docker://quay.io/biocontainers/oligomap:1.0.1--hdcf5f25_0"
     conda:
         os.path.join(workflow.basedir, "envs", "oligomap.yaml")
     shell:
