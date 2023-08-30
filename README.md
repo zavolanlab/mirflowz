@@ -57,10 +57,10 @@ conda env create -f environment.yml
 conda activate mirflowz
 ```
 
-If you do not already have Singularity installed globally on your system,
-you must further update the Conda environment using the
-`environment.root.yml` with the command below. Mind that you must have the
-environment activated to update it.
+If you plan to run _MIRFLOWZ_ via Singularity and do not already have it
+installed globally on your system, you must further update the Conda
+environment using the `environment.root.yml` with the command below.
+Mind that you must have the environment activated to update it.
 
 ```bash
 conda env update -f environment.root.yml
@@ -85,18 +85,37 @@ the instructions in this section to make sure the workflow is ready to use.
 
 #### Run test workflow on local machine
 
-Execute the following command to run the test workflow on your local machine:
+Execute one of the following commands to run the test workflow on your local
+machine:
+
+- Test workflow on local machine with **Singularity**:
 
 ```bash
-bash test/test_workflow_local.sh
+bash test/test_workflow_local_with_singularity.sh
+```
+
+- Test workflow on local machine with **Conda**:
+
+```bash
+bash test/test_workflow_local_with_conda.sh
 ```
 
 #### Run test workflow on a cluster via SLURM
 
-Execute the following command to run the test workflow on a cluster via SLURM:
+Execute one of the following commands to run the test workflow on a
+[Slurm][slurm]-managed high-performance computing (HPC) cluster:
+
+- Test workflow with **Singularity**:
 
 ```bash
-bash test/test_workflow_slurm.sh
+bash test/test_workflow_slurm_with_singularity.sh
+```
+
+
+- Test workflow with **Conda**:
+
+```bash
+bash test/test_workflow_slurm_with_conda.sh
 ```
 
 #### Rule graph
@@ -130,7 +149,7 @@ tested, you can go ahead and run the workflow on your samples.
 It is suggested to have all the input files for a given run (or hard links 
 pointing to them) inside a dedicated directory, for instance under the 
 _MIRFLOWZ_ root directory. This way it is easier to keep the data together, 
-reproduce an analysis and set up `Singularity` access to them.  
+reproduce an analysis and set up Singularity access to them.  
 
 #### 1. Prepare a sample table
 
