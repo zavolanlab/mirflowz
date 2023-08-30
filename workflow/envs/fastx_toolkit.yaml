@@ -1,7 +1,6 @@
 ---
 channels:
-  - conda-forge
-  - kantorlab
+  - bioconda
 dependencies:
   - fastx_toolkit=0.0.14
 ...
