@@ -51,7 +51,7 @@ rule finish_map:
             os.path.join(
                 config["output_dir"],
                 "{sample}",
-                "convertedSortedMappings_{sample}.bam.bai",
+                "alignments_all_sorted_{sample}.bam.bai",
             ),
             sample=pd.unique(samples_table.index.values),
         ),
@@ -158,7 +158,7 @@ rule fastq_to_fasta:
 ###############################################################################
 
 
-rule fasta_formatter:
+rule format_fasta:
     input:
         reads=lambda wildcards: os.path.join(
             config["output_dir"],
@@ -167,13 +167,15 @@ rule fasta_formatter:
             "reads.fa",
         ),
     output:
-        reads=os.path.join(config["output_dir"], "{sample}", "formatted.fasta"),
+        reads=os.path.join(
+            config["output_dir"], "{sample}", "reads_formatted.fasta"
+        ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "fasta_formatter_{sample}.log"
+            config["cluster_log"], "format_fasta_{sample}.log"
         ),
     log:
-        os.path.join(config["local_log"], "fasta_formatter_{sample}.log"),
+        os.path.join(config["local_log"], "format_fasta_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--H87F3376_10"
     shell:
@@ -187,18 +189,24 @@ rule fasta_formatter:
 
 rule remove_adapters:
     input:
-        reads=os.path.join(config["output_dir"], "{sample}", "formatted.fasta"),
+        reads=os.path.join(
+            config["output_dir"], "{sample}", "reads_formatted.fasta"
+        ),
     output:
-        reads=os.path.join(config["output_dir"], "{sample}", "cut.fasta"),
+        reads=os.path.join(
+            config["output_dir"], "{sample}", "reads_trimmed_adapters.fasta"
+        ),
     params:
-        cluster_log=os.path.join(config["cluster_log"], "cutadapt_{sample}.log"),
         adapter=lambda wildcards: get_sample("adapter", wildcards.sample),
         error_rate=config["error_rate"],
         minimum_length=config["minimum_length"],
         overlap=config["overlap"],
         max_n=config["max_n"],
+        cluster_log=os.path.join(
+            config["cluster_log"], "remove_adapters_{sample}.log"
+        ),
     log:
-        os.path.join(config["local_log"], "cutadapt_{sample}.log"),
+        os.path.join(config["local_log"], "remove_adapters_{sample}.log"),
     resources:
         threads=8,
     container:
@@ -220,17 +228,23 @@ rule remove_adapters:
 ###############################################################################
 
 
-rule collapse_indetical_fasta:
+rule collapse_identical_reads:
     input:
-        reads=os.path.join(config["output_dir"], "{sample}", "cut.fasta"),
+        reads=os.path.join(
+            config["output_dir"], "{sample}", "reads_trimmed_adapters.fasta"
+        ),
     output:
-        reads=os.path.join(config["output_dir"], "{sample}", "collapsed.fasta"),
+        reads=os.path.join(
+            config["output_dir"], "{sample}", "reads_collapsed.fasta"
+        ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "fastx_collapser_{sample}.log"
+            config["cluster_log"], "collapse__identical_reads_{sample}.log"
         ),
     log:
-        os.path.join(config["local_log"], "fastx_collapser_{sample}.log"),
+        os.path.join(
+            config["local_log"], "collapse_identical_reads_{sample}.log"
+        ),
     container:
         "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--H87F3376_10"
     shell:
@@ -242,25 +256,25 @@ rule collapse_indetical_fasta:
 ###############################################################################
 
 
-rule mapping_genome_segemehl:
+rule map_genome_segemehl:
     input:
-        reads=os.path.join(config["output_dir"], "{sample}", "collapsed.fasta"),
-        genome=os.path.join(config["output_dir"], "genome.processed.fa"),
+        reads=os.path.join(
+            config["output_dir"], "{sample}", "reads_collapsed.fasta"
+        ),
+        genome=os.path.join(config["output_dir"], "genome_processed.fa"),
         genome_index_segemehl=os.path.join(
-            config["output_dir"], "genome_index_segemehl.idx"
+            config["output_dir"], "segemehl_genome_index.idx"
         ),
     output:
         gmap=os.path.join(
-            config["output_dir"], "{sample}", "segemehlGenome_map.sam"
+            config["output_dir"], "{sample}", "segemehl_genome_mappings.sam"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "mapping_genome_segemehl_{sample}.log"
+            config["cluster_log"], "map_genome_segemehl_{sample}.log"
         ),
     log:
-        os.path.join(
-            config["local_log"], "mapping_genome_segemehl_{sample}.log"
-        ),
+        os.path.join(config["local_log"], "map_genome_segemehl_{sample}.log"),
     resources:
         mem=50,
         time=12,
@@ -283,27 +297,31 @@ rule mapping_genome_segemehl:
 ###############################################################################
 
 
-rule mapping_transcriptome_segemehl:
+rule map_transcriptome_segemehl:
     input:
-        reads=os.path.join(config["output_dir"], "{sample}", "collapsed.fasta"),
+        reads=os.path.join(
+            config["output_dir"], "{sample}", "reads_collapsed.fasta"
+        ),
         transcriptome=os.path.join(
-            config["output_dir"], "transcriptome_idtrim.fa"
+            config["output_dir"], "transcriptome_trimmed_id.fa"
         ),
         transcriptome_index_segemehl=os.path.join(
-            config["output_dir"], "transcriptome_index_segemehl.idx"
+            config["output_dir"], "segemehl_transcriptome_index.idx"
         ),
     output:
         tmap=os.path.join(
-            config["output_dir"], "{sample}", "segemehlTranscriptome_map.sam"
+            config["output_dir"],
+            "{sample}",
+            "segemehl_transcriptome_mappings.sam",
         ),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
-            "mapping_transcriptome_segemehl_{sample}.log",
+            "map_transcriptome_segemehl_{sample}.log",
         ),
     log:
         os.path.join(
-            config["local_log"], "mapping_transcriptome_segemehl_{sample}.log"
+            config["local_log"], "map_transcriptome_segemehl_{sample}.log"
         ),
     resources:
         mem=10,
@@ -329,11 +347,15 @@ rule mapping_transcriptome_segemehl:
 
 rule filter_fasta_for_oligomap:
     input:
-        reads=os.path.join(config["output_dir"], "{sample}", "collapsed.fasta"),
+        reads=os.path.join(
+            config["output_dir"], "{sample}", "reads_collapsed.fasta"
+        ),
         script=os.path.join(config["scripts_dir"], "validation_fasta.py"),
     output:
         reads=os.path.join(
-            config["output_dir"], "{sample}", "filtered_for_oligomap.fasta"
+            config["output_dir"],
+            "{sample}",
+            "reads_filtered_for_oligomap.fasta",
         ),
     params:
         cluster_log=os.path.join(
@@ -359,27 +381,27 @@ rule filter_fasta_for_oligomap:
 ###############################################################################
 
 
-rule mapping_genome_oligomap:
+rule map_genome_oligomap:
     input:
         reads=os.path.join(
-            config["output_dir"], "{sample}", "filtered_for_oligomap.fasta"
+            config["output_dir"],
+            "{sample}",
+            "reads_filtered_for_oligomap.fasta",
         ),
-        target=os.path.join(config["output_dir"], "genome.processed.fa"),
+        target=os.path.join(config["output_dir"], "genome_processed.fa"),
     output:
         gmap=os.path.join(
-            config["output_dir"], "{sample}", "oligoGenome_map.fa"
+            config["output_dir"], "{sample}", "oligomap_genome_mappings.fasta"
         ),
         report=os.path.join(
-            config["output_dir"], "{sample}", "oligoGenome_report.txt"
+            config["output_dir"], "{sample}", "oligomap_genome_report.txt"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "mapping_genome_oligomap_{sample}.log"
+            config["cluster_log"], "map_genome_oligomap_{sample}.log"
         ),
     log:
-        os.path.join(
-            config["local_log"], "mapping_genome_oligomap_{sample}.log"
-        ),
+        os.path.join(config["local_log"], "map_genome_oligomap_{sample}.log"),
     resources:
         mem=50,
         time=6,
@@ -403,24 +425,22 @@ rule mapping_genome_oligomap:
 rule sort_genome_oligomap:
     input:
         tmap=os.path.join(
-            config["output_dir"], "{sample}", "oligoGenome_map.fa"
+            config["output_dir"], "{sample}", "oligomap_genome_mappings.fasta"
         ),
         report=os.path.join(
-            config["output_dir"], "{sample}", "oligoGenome_report.txt"
+            config["output_dir"], "{sample}", "oligomap_genome_report.txt"
         ),
         script=os.path.join(config["scripts_dir"], "blocksort.sh"),
     output:
         sort=os.path.join(
-            config["output_dir"], "{sample}", "oligoGenome_sorted.fa"
+            config["output_dir"], "{sample}", "oligomap_genome_sorted.fasta"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "sorting_genome_oligomap_{sample}.log"
+            config["cluster_log"], "sort_genome_oligomap_{sample}.log"
         ),
     log:
-        os.path.join(
-            config["local_log"], "sorting_genome_oligomap_{sample}.log"
-        ),
+        os.path.join(config["local_log"], "sort_genome_oligomap_{sample}.log"),
     resources:
         threads=8,
         time=6,
@@ -442,25 +462,25 @@ rule sort_genome_oligomap:
 rule oligomap_genome_to_sam:
     input:
         report=os.path.join(
-            config["output_dir"], "{sample}", "oligoGenome_report.txt"
+            config["output_dir"], "{sample}", "oligomap_genome_report.txt"
         ),
         sort=os.path.join(
-            config["output_dir"], "{sample}", "oligoGenome_sorted.fa"
+            config["output_dir"], "{sample}", "oligomap_genome_sorted.fasta"
         ),
         script=os.path.join(
             config["scripts_dir"], "oligomapOutputToSam_nhfiltered.py"
         ),
     output:
         gmap=os.path.join(
-            config["output_dir"], "{sample}", "oligoGenome_converted.sam"
+            config["output_dir"], "{sample}", "oligomap_genome_mappings.sam"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "oligomap_genome_toSAM_{sample}.log"
+            config["cluster_log"], "oligomap_genome_to_sam_{sample}.log"
         ),
         nh=config["nh"],
     log:
-        os.path.join(config["local_log"], "oligomap_genome_toSAM_{sample}.log"),
+        os.path.join(config["local_log"], "oligomap_genome_to_sam_{sample}.log"),
     resources:
         time=1,
         queue=1,
@@ -474,31 +494,37 @@ rule oligomap_genome_to_sam:
 
 
 ###############################################################################
-### Oligomap trancriptome mapping
+### Oligomap transcriptome mapping
 ###############################################################################
 
 
-rule mapping_transcriptome_oligomap:
+rule map_transcriptome_oligomap:
     input:
         reads=os.path.join(
-            config["output_dir"], "{sample}", "filtered_for_oligomap.fasta"
+            config["output_dir"],
+            "{sample}",
+            "reads_filtered_for_oligomap.fasta",
         ),
-        target=os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
+        target=os.path.join(config["output_dir"], "transcriptome_trimmed_id.fa"),
     output:
         tmap=os.path.join(
-            config["output_dir"], "{sample}", "oligoTranscriptome_map.fa"
+            config["output_dir"],
+            "{sample}",
+            "oligomap_transcriptome_mappings.fasta",
         ),
         report=os.path.join(
-            config["output_dir"], "{sample}", "oligoTranscriptome_report.txt"
+            config["output_dir"],
+            "{sample}",
+            "oligomap_transcriptome_report.txt",
         ),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
-            "mapping_transcriptome_oligomap_{sample}.log",
+            "map_transcriptome_oligomap_{sample}.log",
         ),
     log:
         os.path.join(
-            config["local_log"], "mapping_transcriptome_oligomap_{sample}.log"
+            config["local_log"], "map_transcriptome_oligomap_{sample}.log"
         ),
     resources:
         mem=10,
@@ -517,31 +543,37 @@ rule mapping_transcriptome_oligomap:
 
 
 ###############################################################################
-### Oligomap trancriptome sorting
+### Oligomap transcriptome sorting
 ###############################################################################
 
 
 rule sort_transcriptome_oligomap:
     input:
         tmap=os.path.join(
-            config["output_dir"], "{sample}", "oligoTranscriptome_map.fa"
+            config["output_dir"],
+            "{sample}",
+            "oligomap_transcriptome_mappings.fasta",
         ),
         report=os.path.join(
-            config["output_dir"], "{sample}", "oligoTranscriptome_report.txt"
+            config["output_dir"],
+            "{sample}",
+            "oligomap_transcriptome_report.txt",
         ),
         script=os.path.join(config["scripts_dir"], "blocksort.sh"),
     output:
         sort=os.path.join(
-            config["output_dir"], "{sample}", "oligoTranscriptome_sorted.fa"
+            config["output_dir"],
+            "{sample}",
+            "oligomap_transcriptome_sorted.fasta",
         ),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
-            "sorting_transcriptome_oligomap_{sample}.log",
+            "sort_transcriptome_oligomap_{sample}.log",
         ),
     log:
         os.path.join(
-            config["local_log"], "sorting_transcriptome_oligomap_{sample}.log"
+            config["local_log"], "sort_transcriptome_oligomap_{sample}.log"
         ),
     resources:
         threads=8,
@@ -556,17 +588,21 @@ rule sort_transcriptome_oligomap:
 
 
 ###############################################################################
-### Oligomap transcriptome mapping ouput to SAM
+### Oligomap transcriptome mapping output to SAM
 ###############################################################################
 
 
 rule oligomap_transcriptome_to_sam:
     input:
         report=os.path.join(
-            config["output_dir"], "{sample}", "oligoTranscriptome_report.txt"
+            config["output_dir"],
+            "{sample}",
+            "oligomap_transcriptome_report.txt",
         ),
         sort=os.path.join(
-            config["output_dir"], "{sample}", "oligoTranscriptome_sorted.fa"
+            config["output_dir"],
+            "{sample}",
+            "oligomap_transcriptome_sorted.fasta",
         ),
         script=os.path.join(
             config["scripts_dir"], "oligomapOutputToSam_nhfiltered.py"
@@ -575,16 +611,16 @@ rule oligomap_transcriptome_to_sam:
         tmap=os.path.join(
             config["output_dir"],
             "{sample}",
-            "oligoTranscriptome_converted.sam",
+            "oligomap_transcriptome_mappings.sam",
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "oligomap_transcriptome_toSAM_{sample}.log"
+            config["cluster_log"], "oligomap_transcriptome_to_sam_{sample}.log"
         ),
         nh=config["nh"],
     log:
         os.path.join(
-            config["local_log"], "oligomap_transcriptome_toSAM_{sample}.log"
+            config["local_log"], "oligomap_transcriptome_to_sam_{sample}.log"
         ),
     container:
         "docker://python:3.9.16"
@@ -604,14 +640,14 @@ rule oligomap_transcriptome_to_sam:
 rule merge_genome_maps:
     input:
         gmap1=os.path.join(
-            config["output_dir"], "{sample}", "segemehlGenome_map.sam"
+            config["output_dir"], "{sample}", "segemehl_genome_mappings.sam"
         ),
         gmap2=os.path.join(
-            config["output_dir"], "{sample}", "oligoGenome_converted.sam"
+            config["output_dir"], "{sample}", "oligomap_genome_mappings.sam"
         ),
     output:
         gmaps=os.path.join(
-            config["output_dir"], "{sample}", "GenomeMappings.sam"
+            config["output_dir"], "{sample}", "genome_mappings.sam"
         ),
     params:
         cluster_log=os.path.join(
@@ -626,23 +662,25 @@ rule merge_genome_maps:
 
 
 ###############################################################################
-### Merge trancriptome mappings
+### Merge transcriptome mappings
 ###############################################################################
 
 
 rule merge_transcriptome_maps:
     input:
         tmap1=os.path.join(
-            config["output_dir"], "{sample}", "segemehlTranscriptome_map.sam"
+            config["output_dir"],
+            "{sample}",
+            "segemehl_transcriptome_mappings.sam",
         ),
         tmap2=os.path.join(
             config["output_dir"],
             "{sample}",
-            "oligoTranscriptome_converted.sam",
+            "oligomap_transcriptome_mappings.sam",
         ),
     output:
         tmaps=os.path.join(
-            config["output_dir"], "{sample}", "TranscriptomeMappings.sam"
+            config["output_dir"], "{sample}", "transcriptome_mappings.sam"
         ),
     params:
         cluster_log=os.path.join(
@@ -663,23 +701,23 @@ rule merge_transcriptome_maps:
 ###############################################################################
 
 
-rule nh_filter_genome:
+rule filter_genome_by_nh:
     input:
         gmaps=os.path.join(
-            config["output_dir"], "{sample}", "GenomeMappings.sam"
+            config["output_dir"], "{sample}", "genome_mappings.sam"
         ),
         script=os.path.join(config["scripts_dir"], "nh_filter.py"),
     output:
         gmaps=os.path.join(
-            config["output_dir"], "{sample}", "nhfiltered_GenomeMappings.sam"
+            config["output_dir"], "{sample}", "genome_mappings_filtered_nh.sam"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "nh_filter_genome_{sample}.log"
+            config["cluster_log"], "filter_genome_by_nh_{sample}.log"
         ),
         nh=config["nh"],
     log:
-        os.path.join(config["local_log"], "nh_filter_genome_{sample}.log"),
+        os.path.join(config["local_log"], "filter_genome_by_nh_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
     shell:
@@ -695,26 +733,26 @@ rule nh_filter_genome:
 ###############################################################################
 
 
-rule nh_filter_transcriptome:
+rule filter_transcriptome_by_nh:
     input:
         tmaps=os.path.join(
-            config["output_dir"], "{sample}", "TranscriptomeMappings.sam"
+            config["output_dir"], "{sample}", "transcriptome_mappings.sam"
         ),
         script=os.path.join(config["scripts_dir"], "nh_filter.py"),
     output:
         tmaps=os.path.join(
             config["output_dir"],
             "{sample}",
-            "nhfiltered_TranscriptomeMappings.sam",
+            "transcriptome_mappings_filtered_nh.sam",
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "filter_nh_transcriptome_{sample}.log"
+            config["cluster_log"], "filter_transcriptome_by_nh_{sample}.log"
         ),
         nh=config["nh"],
     log:
         os.path.join(
-            config["local_log"], "filter_nh_transcriptome_{sample}.log"
+            config["local_log"], "filter_transcriptome_by_nh_{sample}.log"
         ),
     container:
         "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
@@ -731,21 +769,23 @@ rule nh_filter_transcriptome:
 ###############################################################################
 
 
-rule remove_headers_genome:
+rule remove_header_genome_mappings:
     input:
         gmap=os.path.join(
-            config["output_dir"], "{sample}", "nhfiltered_GenomeMappings.sam"
+            config["output_dir"], "{sample}", "genome_mappings_filtered_nh.sam"
         ),
     output:
         gmap=os.path.join(
-            config["output_dir"], "{sample}", "noheader_GenomeMappings.sam"
+            config["output_dir"], "{sample}", "genome_mappings_no_header.sam"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "remove_headers_genome_{sample}.log"
+            config["cluster_log"], "remove_header_genome_mappings_{sample}.log"
         ),
     log:
-        os.path.join(config["local_log"], "remove_headers_genome_{sample}.log"),
+        os.path.join(
+            config["local_log"], "remove_header_genome_mappings_{sample}.log"
+        ),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
@@ -757,26 +797,28 @@ rule remove_headers_genome:
 ###############################################################################
 
 
-rule remove_headers_transcriptome:
+rule remove_header_transcriptome_mappings:
     input:
         tmap=os.path.join(
             config["output_dir"],
             "{sample}",
-            "nhfiltered_TranscriptomeMappings.sam",
+            "transcriptome_mappings_filtered_nh.sam",
         ),
     output:
         tmap=os.path.join(
             config["output_dir"],
             "{sample}",
-            "noheader_TranscriptomeMappings.sam",
+            "transcriptome_mappings_no_header.sam",
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "remove_headers_transcriptome_{sample}.log"
+            config["cluster_log"],
+            "remove_header_transcriptome_mappings_{sample}.log",
         ),
     log:
         os.path.join(
-            config["local_log"], "remove_headers_transcriptome_{sample}.log"
+            config["local_log"],
+            "remove_header_transcriptome_mappings_{sample}.log",
         ),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
@@ -789,23 +831,29 @@ rule remove_headers_transcriptome:
 ###############################################################################
 
 
-rule trans_to_gen:
+rule transcriptome_to_genome_maps:
     input:
         tmap=os.path.join(
             config["output_dir"],
             "{sample}",
-            "noheader_TranscriptomeMappings.sam",
+            "transcriptome_mappings_no_header.sam",
         ),
         script=os.path.join(config["scripts_dir"], "sam_trx_to_sam_gen.pl"),
         exons=os.path.join(config["output_dir"], "exons.bed"),
     output:
-        genout=os.path.join(config["output_dir"], "{sample}", "TransToGen.sam"),
+        genout=os.path.join(
+            config["output_dir"],
+            "{sample}",
+            "transcriptome_mappings_to_genome.sam",
+        ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "trans_to_gen_{sample}.log"
+            config["cluster_log"], "transcriptome_to_genome_maps_{sample}.log"
         ),
     log:
-        os.path.join(config["local_log"], "trans_to_gen_{sample}.log"),
+        os.path.join(
+            config["local_log"], "transcriptome_to_genome_maps_{sample}.log"
+        ),
     container:
         "docker://perl:5.37.10"
     shell:
@@ -817,26 +865,30 @@ rule trans_to_gen:
 
 
 ###############################################################################
-### Concatenate genome and trancriptome mappings
+### Concatenate genome and transcriptome mappings
 ###############################################################################
 
 
 rule merge_all_maps:
     input:
-        gmap1=os.path.join(config["output_dir"], "{sample}", "TransToGen.sam"),
+        gmap1=os.path.join(
+            config["output_dir"],
+            "{sample}",
+            "transcriptome_mappings_to_genome.sam",
+        ),
         gmap2=os.path.join(
-            config["output_dir"], "{sample}", "noheader_GenomeMappings.sam"
+            config["output_dir"], "{sample}", "genome_mappings_no_header.sam"
         ),
     output:
         catmaps=os.path.join(
-            config["output_dir"], "{sample}", "catMappings.sam"
+            config["output_dir"], "{sample}", "mappings_all_no_header.sam"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "cat_mapping_{sample}.log"
+            config["cluster_log"], "merge_all_mappings_{sample}.log"
         ),
     log:
-        os.path.join(config["local_log"], "cat_mapping_{sample}.log"),
+        os.path.join(config["local_log"], "merge_all_mappings_{sample}.log"),
     container:
         "docker://ubuntu:lunar-20221207"
     shell:
@@ -850,15 +902,15 @@ rule merge_all_maps:
 
 rule add_header_all_maps:
     input:
-        header=os.path.join(config["output_dir"], "headerOfCollapsedFasta.sam"),
+        header=os.path.join(config["output_dir"], "genome_header.sam"),
         catmaps=os.path.join(
-            config["output_dir"], "{sample}", "catMappings.sam"
+            config["output_dir"], "{sample}", "mappings_all_no_header.sam"
         ),
     output:
         concatenate=os.path.join(
             config["output_dir"],
             "{sample}",
-            "concatenated_header_catMappings.sam",
+            "mappings_all.sam",
         ),
     params:
         cluster_log=os.path.join(
@@ -882,16 +934,18 @@ rule sort_maps_by_id:
         concatenate=os.path.join(
             config["output_dir"],
             "{sample}",
-            "concatenated_header_catMappings.sam",
+            "mappings_all.sam",
         ),
     output:
         sort=os.path.join(
-            config["output_dir"], "{sample}", "header_sorted_catMappings.sam"
+            config["output_dir"], "{sample}", "mappings_all_sorted_by_id.sam"
         ),
     params:
-        cluster_log=os.path.join(config["cluster_log"], "sort_id_{sample}.log"),
+        cluster_log=os.path.join(
+            config["cluster_log"], "sort_maps_by_id_{sample}.log"
+        ),
     log:
-        os.path.join(config["local_log"], "sort_id_{sample}.log"),
+        os.path.join(config["local_log"], "sort_maps_by_id_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
@@ -906,7 +960,7 @@ rule sort_maps_by_id:
 rule remove_inferiors:
     input:
         sort=os.path.join(
-            config["output_dir"], "{sample}", "header_sorted_catMappings.sam"
+            config["output_dir"], "{sample}", "mappings_all_sorted_by_id.sam"
         ),
         script=os.path.join(
             config["scripts_dir"],
@@ -914,7 +968,9 @@ rule remove_inferiors:
         ),
     output:
         remove_inf=os.path.join(
-            config["output_dir"], "{sample}", "removeInferiors.sam"
+            config["output_dir"],
+            "{sample}",
+            "mappings_all_removed_inferiors.sam",
         ),
     params:
         cluster_log=os.path.join(
@@ -944,16 +1000,16 @@ rule remove_inferiors:
 rule filter_by_indels:
     input:
         sam=os.path.join(
-            config["output_dir"], "{sample}", "removeInferiors.sam"
+            config["output_dir"],
+            "{sample}",
+            "mappings_all_removed_inferiors.sam",
         ),
         script=os.path.join(
             config["scripts_dir"],
             "filter_multimappers.py",
         ),
     output:
-        sam=os.path.join(
-            config["output_dir"], "{sample}", "removeMultimappers.sam"
-        ),
+        sam=os.path.join(config["output_dir"], "{sample}", "alignments_all.sam"),
     params:
         cluster_log=os.path.join(
             config["cluster_log"], "remove_multimappers_{sample}.log"
@@ -973,27 +1029,28 @@ rule filter_by_indels:
         ) &> {log}"
 
 
-
 ###############################################################################
 ### Convert SAM to BAM
 ###############################################################################
 
 
-rule convert_to_bam:
+rule convert_all_alns_sam_to_bam:
     input:
         maps=os.path.join(
-            config["output_dir"], "{sample}", "removeMultimappers.sam"
+            config["output_dir"], "{sample}", "alignments_all.sam"
         ),
     output:
         maps=os.path.join(
-            config["output_dir"], "{sample}", "mappingsConverted.bam"
+            config["output_dir"], "{sample}", "alignments_all.bam"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "convert_to_bam_{sample}.log"
+            config["cluster_log"], "convert_all_alns_sam_to_bam_{sample}.log"
         ),
     log:
-        os.path.join(config["local_log"], "convert_to_bam_{sample}.log"),
+        os.path.join(
+            config["local_log"], "convert_all_alns_sam_to_bam_{sample}.log"
+        ),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
@@ -1005,23 +1062,25 @@ rule convert_to_bam:
 ###############################################################################
 
 
-rule sort_bam_by_position:
+rule sort_all_alns_bam_by_position:
     input:
         maps=os.path.join(
-            config["output_dir"], "{sample}", "mappingsConverted.bam"
+            config["output_dir"], "{sample}", "alignments_all.bam"
         ),
     output:
         maps=os.path.join(
             config["output_dir"],
             "{sample}",
-            "convertedSortedMappings_{sample}.bam",
+            "alignments_all_sorted_{sample}.bam",
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "sort_by_position_{sample}.log"
+            config["cluster_log"], "sort_all_alns_bam_by_position_{sample}.log"
         ),
     log:
-        os.path.join(config["local_log"], "sort_by_position_{sample}.log"),
+        os.path.join(
+            config["local_log"], "sort_all_alns_bam_by_position_{sample}.log"
+        ),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
@@ -1033,25 +1092,25 @@ rule sort_bam_by_position:
 ###############################################################################
 
 
-rule index_bam:
+rule index_all_alns_bam:
     input:
         maps=os.path.join(
             config["output_dir"],
             "{sample}",
-            "convertedSortedMappings_{sample}.bam",
+            "alignments_all_sorted.bam",
         ),
     output:
         maps=os.path.join(
             config["output_dir"],
             "{sample}",
-            "convertedSortedMappings_{sample}.bam.bai",
+            "alignments_all_sorted.bam.bai",
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "index_bam_{sample}.log"
+            config["cluster_log"], "index_all_alns_bam_{sample}.log"
         ),
     log:
-        os.path.join(config["local_log"], "index_bam_{sample}.log"),
+        os.path.join(config["local_log"], "index_all_alns_bam_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
