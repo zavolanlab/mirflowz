@@ -43,24 +43,28 @@ rule finish_quantify:
         primir_intersect_sam=os.path.join(
             config["output_dir"],
             "{sample}",
-            "primir_intersectedAlignments.sam",
+            "alignments_intersecting_primir.sam",
         ),
         mirna_intersect_sam=os.path.join(
-            config["output_dir"], "{sample}", "mirna_intersectedAlignments.sam"
+            config["output_dir"],
+            "{sample}",
+            "alignments_intersecting_mirna.sam",
         ),
         intersect_sam=os.path.join(
-            config["output_dir"], "{sample}", "mirna_intersecting_sort_tag.sam"
+            config["output_dir"],
+            "{sample}",
+            "alignments_intersecting_mirna_sorted_tag.sam",
         ),
         table=os.path.join(
-                config["output_dir"],
-                "TABLES",
-                "counts.{mir}.tab",
+            config["output_dir"],
+            "TABLES",
+            "all_{mir}_counts.tab",
         ),
         uncollapsed_bam=expand(
             os.path.join(
                 config["output_dir"],
                 "{sample}",
-                "uncollapsedSortedMappings_{sample}.bam",
+                "alignments_intersecting_mirna_uncollapsed_sorted.bam",
             ),
             sample=pd.unique(samples_table.index.values),
         ),
@@ -68,7 +72,7 @@ rule finish_quantify:
             os.path.join(
                 config["output_dir"],
                 "{sample}",
-                "uncollapsedSortedMappings_{sample}.bam.bai",
+                "alignments_intersecting_mirna_uncollapsed_sorted.bam.bai",
             ),
             sample=pd.unique(samples_table.index.values),
         ),
@@ -84,12 +88,12 @@ rule intersect_extended_primir:
         alignment=os.path.join(
             config["output_dir"],
             "{sample}",
-            "convertedSortedMappings_{sample}.bam",
+            "alignments_all_sorted_{sample}.bam",
         ),
         primir=expand(
             os.path.join(
                 config["output_dir"],
-                "mirna_annotation_extended_{extension}_nt_primir.gff3",
+                "extended_primir_annotation_{extension}_nt.gff3",
             ),
             extension=config["extension"],
         ),
@@ -97,15 +101,15 @@ rule intersect_extended_primir:
         intersect=os.path.join(
             config["output_dir"],
             "{sample}",
-            "intersection_extended_primir.bed",
+            "intersected_extended_primir.bed",
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "intersection_extended_primir_{sample}.log"
+            config["cluster_log"], "intersect_extended_primir_{sample}.log"
         ),
     log:
         os.path.join(
-            config["local_log"], "intersection_extended_primir_{sample}.log"
+            config["local_log"], "intersect_extended_primir_{sample}.log"
         ),
     container:
         "docker://quay.io/biocontainers/bedtools:2.30.0--h468198e_3"
@@ -123,33 +127,35 @@ rule intersect_extended_primir:
 
 
 ###############################################################################
-### Filter SAM file with intersected alignments (pre-miR)
+### Filter SAM file with intersecting alignments (pri-miR)
 ###############################################################################
 
 
-rule intersected_primir_sam_file:
+rule filter_sam_by_intersecting_primir:
     input:
         alignments=os.path.join(
-            config["output_dir"], "{sample}", "removeMultimappers.sam"
+            config["output_dir"], "{sample}", "alignments_all.sam"
         ),
         intersect=os.path.join(
             config["output_dir"],
             "{sample}",
-            "intersection_extended_primir.bed",
+            "intersected_extended_primir.bed",
         ),
     output:
         sam=os.path.join(
             config["output_dir"],
             "{sample}",
-            "primir_intersectedAlignments.sam",
+            "alignments_intersecting_primir.sam",
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "primir_intersection_sam_file_{sample}.log"
+            config["cluster_log"],
+            "filter_sam_by_intersecting_primir_{sample}.log",
         ),
     log:
         os.path.join(
-            config["local_log"], "primir_intersection_sam_file_{sample}.log"
+            config["local_log"],
+            "filter_sam_by_intersecting_primir_{sample}.log",
         ),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
@@ -167,28 +173,28 @@ rule intersected_primir_sam_file:
 ###############################################################################
 
 
-rule convert_intersected_primir_to_bam:
+rule convert_intersecting_primir_sam_to_bam:
     input:
         maps=os.path.join(
             config["output_dir"],
             "{sample}",
-            "primir_intersectedAlignments.sam",
+            "alignments_intersecting_primir.sam",
         ),
     output:
         maps=os.path.join(
             config["output_dir"],
             "{sample}",
-            "intersected_primirAlignments.bam",
+            "alignments_intersecting_primir.bam",
         ),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
-            "convert_intersected_primir_to_bam_{sample}.log",
+            "convert_intersecting_primir_sam_to_bam_{sample}.log",
         ),
     log:
         os.path.join(
             config["local_log"],
-            "convert_intersected_primir_to_bam_{sample}.log",
+            "convert_intersecting_primir_sam_to_bam_{sample}.log",
         ),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
@@ -201,28 +207,28 @@ rule convert_intersected_primir_to_bam:
 ###############################################################################
 
 
-rule sort_intersected_primir_by_position:
+rule sort_intersecting_primir_bam_by_position:
     input:
         maps=os.path.join(
             config["output_dir"],
             "{sample}",
-            "intersected_primirAlignments.bam",
+            "alignments_intersecting_primir.bam",
         ),
     output:
         maps=os.path.join(
             config["output_dir"],
             "{sample}",
-            "sorted_intersected_primirAlignments.bam",
+            "alignments_intersecting_primir_sorted.bam",
         ),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
-            "sort_intersected_primir_by_position_{sample}.log",
+            "sort_intersecting_primir_bam_by_position_{sample}.log",
         ),
     log:
         os.path.join(
             config["local_log"],
-            "sort_intersected_primir_by_position_{sample}.log",
+            "sort_intersecting_primir_bam_by_position_{sample}.log",
         ),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
@@ -235,25 +241,27 @@ rule sort_intersected_primir_by_position:
 ###############################################################################
 
 
-rule index_intersected_primir_bam:
+rule index_intersecting_primir_bam:
     input:
         maps=os.path.join(
             config["output_dir"],
             "{sample}",
-            "sorted_intersected_primirAlignments.bam",
+            "alignments_intersecting_primir_sorted.bam",
         ),
     output:
         maps=os.path.join(
             config["output_dir"],
             "{sample}",
-            "sorted_intersected_primirAlignments.bam.bai",
+            "alignments_intersecting_primir_sorted.bam.bai",
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "index_bam_{sample}.log"
+            config["cluster_log"], "index_intersecting_primir_bam_{sample}.log"
         ),
     log:
-        os.path.join(config["local_log"], "index_bam_{sample}.log"),
+        os.path.join(
+            config["local_log"], "index_intersecting_primir_bam_{sample}.log"
+        ),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
@@ -270,26 +278,26 @@ rule intersect_extended_mirna:
         alignment=os.path.join(
             config["output_dir"],
             "{sample}",
-            "sorted_intersected_primirAlignments.bam",
+            "alignments_intersecting_primir_sorted.bam",
         ),
         mirna=expand(
             os.path.join(
                 config["output_dir"],
-                "mirna_annotation_extended_{extension}_nt_mir.gff3",
+                "extended_mirna_annotation_{extension}_nt.gff3",
             ),
             extension=config["extension"],
         ),
     output:
         intersect=os.path.join(
-            config["output_dir"], "{sample}", "intersection_extended_mirna.bed"
+            config["output_dir"], "{sample}", "intersected_extended_mirna.bed"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "intersection_extended_mirna_{sample}.log"
+            config["cluster_log"], "intersect_extended_mirna_{sample}.log"
         ),
     log:
         os.path.join(
-            config["local_log"], "intersection_extended_mirna_{sample}.log"
+            config["local_log"], "intersect_extended_mirna_{sample}.log"
         ),
     container:
         "docker://quay.io/biocontainers/bedtools:2.30.0--h468198e_3"
@@ -306,31 +314,35 @@ rule intersect_extended_mirna:
 
 
 ###############################################################################
-### Filter SAM file with intersected alignments (miRNAs)
+### Filter SAM file with intersecting alignments (miRNAs)
 ###############################################################################
 
 
-rule intersected_mirna_sam_file:
+rule filter_sam_by_intersecting_mirna:
     input:
         alignments=os.path.join(
             config["output_dir"],
             "{sample}",
-            "primir_intersectedAlignments.sam",
+            "alignments_intersecting_primir.sam",
         ),
         intersect=os.path.join(
-            config["output_dir"], "{sample}", "intersection_extended_mirna.bed"
+            config["output_dir"], "{sample}", "intersected_extended_mirna.bed"
         ),
     output:
         sam=os.path.join(
-            config["output_dir"], "{sample}", "mirna_intersectedAlignments.sam"
+            config["output_dir"],
+            "{sample}",
+            "alignments_intersecting_mirna.sam",
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "mirna_intersection_sam_file_{sample}.log"
+            config["cluster_log"],
+            "filter_sam_by__intersecting_mirna_{sample}.log",
         ),
     log:
         os.path.join(
-            config["local_log"], "mirna_intersection_sam_file_{sample}.log"
+            config["local_log"],
+            "filter_sam_by_intersecting_mirna_{sample}.log",
         ),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
@@ -348,26 +360,32 @@ rule intersected_mirna_sam_file:
 ###############################################################################
 
 
-rule add_intersected_mirna_tag:
+rule add_intersecting_mirna_tag:
     input:
         alignments=os.path.join(
-            config["output_dir"], "{sample}", "mirna_intersectedAlignments.sam"
+            config["output_dir"],
+            "{sample}",
+            "alignments_intersecting_mirna.sam",
         ),
         intersect=os.path.join(
-            config["output_dir"], "{sample}", "intersection_extended_mirna.bed"
+            config["output_dir"], "{sample}", "intersected_extended_mirna.bed"
         ),
         script=os.path.join(config["scripts_dir"], "iso_name_tagging.py"),
     output:
         sam=os.path.join(
-            config["output_dir"], "{sample}", "mirna_intersecting_tag.sam"
+            config["output_dir"],
+            "{sample}",
+            "alignments_intersecting_mirna_tag.sam",
         ),
     params:
         extension=config["extension"],
         cluster_log=os.path.join(
-            config["cluster_log"], "mirna_intersecting_tag_{sample}.log"
+            config["cluster_log"], "add_intersecting_mirna_tag_{sample}.log"
         ),
     log:
-        os.path.join(config["local_log"], "mirna_intersecting_tag_{sample}.log"),
+        os.path.join(
+            config["local_log"], "add_intersecting_mirna_tag_{sample}.log"
+        ),
     container:
         "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
     shell:
@@ -384,23 +402,29 @@ rule add_intersected_mirna_tag:
 ###############################################################################
 
 
-rule sort_intersectd_mirna_by_feat_tag:
+rule sort_intersecting_mirna_by_feat_tag:
     input:
         sam=os.path.join(
-            config["output_dir"], "{sample}", "mirna_intersecting_tag.sam"
+            config["output_dir"],
+            "{sample}",
+            "alignments_intersecting_mirna_tag.sam",
         ),
     output:
         sam=os.path.join(
             config["output_dir"],
             "{sample}",
-            "mirna_intersecting_sort_tag.sam",
+            "alignments_intersecting_mirna_sorted_tag.sam",
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "sort_by_feat_tag_{sample}.log"
+            config["cluster_log"],
+            "sort_intersecting_mirna_by_feat_tag_{sample}.log",
         ),
     log:
-        os.path.join(config["local_log"], "sort_by_feat_tag_{sample}.log"),
+        os.path.join(
+            config["local_log"],
+            "sort_intersecting_mirna_by_feat_tag_{sample}.log",
+        ),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
@@ -412,29 +436,27 @@ rule sort_intersectd_mirna_by_feat_tag:
 ###############################################################################
 
 
-rule quant_mirna:
+rule quantify_mirna:
     input:
         alignments=os.path.join(
             config["output_dir"],
             "{sample}",
-            "mirna_intersecting_sort_tag.sam",
+            "alignments_intersecting_mirna_sorted_tag.sam",
         ),
-        script=os.path.join(
-            config["scripts_dir"], "mirna_quantification.py"
-        ),
+        script=os.path.join(config["scripts_dir"], "mirna_quantification.py"),
     output:
         table=os.path.join(
             config["output_dir"], "TABLES", "mirna_counts_{sample}"
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "quant_mir_{sample}.log"
+            config["cluster_log"], "quantify_mirna_{sample}.log"
         ),
         mir_list=config["mir_list"],
         library="{sample}",
         out_dir=lambda wildcards, output: Path(output[0]).parent,
     log:
-        os.path.join(config["local_log"], "quant_mir_{sample}.log"),
+        os.path.join(config["local_log"], "quantify_mirna_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
     shell:
@@ -454,12 +476,12 @@ rule quant_mirna:
 ################################################################################
 
 
-rule quant_mirna_pri:
+rule quantify_primir:
     input:
         intersect=os.path.join(
             config["output_dir"],
             "{sample}",
-            "intersection_extended_primir.bed",
+            "intersected_extended_primir.bed",
         ),
         script=os.path.join(config["scripts_dir"], "primir_quantification.py"),
     output:
@@ -471,12 +493,12 @@ rule quant_mirna_pri:
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
-            "quant_miRNA_primary_transcript_{sample}.log",
+            "quantify_primir_{sample}.log",
         ),
     log:
         os.path.join(
             config["local_log"],
-            "quant_miRNA_primary_transcript_{sample}.log",
+            "quantify_primir_{sample}.log",
         ),
     container:
         "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
@@ -502,11 +524,13 @@ rule merge_tables:
                 config["output_dir"], "TABLES", "{mir}_counts_{sample}"
             ),
             sample=pd.unique(samples_table.index.values),
-            mir=[mir for mir in config["mir_list"] if mir != 'isomir'],
+            mir=[mir for mir in config["mir_list"] if mir != "isomir"],
         ),
         script=os.path.join(config["scripts_dir"], "merge_tables.R"),
     output:
-        table=os.path.join(config["output_dir"], "TABLES", "counts.{mirna}.tab"),
+        table=os.path.join(
+            config["output_dir"], "TABLES", "all_{mirna}_counts.tab"
+        ),
     params:
         cluster_log=os.path.join(
             config["cluster_log"], "merge_tables_{mirna}.log"
@@ -535,12 +559,16 @@ rule merge_tables:
 rule uncollapse_reads:
     input:
         maps=os.path.join(
-            config["output_dir"], "{sample}", "mirna_intersectedAlignments.sam"
+            config["output_dir"],
+            "{sample}",
+            "alignments_intersecting_mirna.sam",
         ),
         script=os.path.join(config["scripts_dir"], "sam_uncollapse.pl"),
     output:
         maps=os.path.join(
-            config["output_dir"], "{sample}", "uncollapsedMappings.sam"
+            config["output_dir"],
+            "{sample}",
+            "alignments_intersecting_mirna_uncollapsed.sam",
         ),
     params:
         cluster_log=os.path.join(
@@ -563,22 +591,28 @@ rule uncollapse_reads:
 ###############################################################################
 
 
-rule uncollpased_sam_to_bam:
+rule convert_uncollpased_reads_sam_to_bam:
     input:
         maps=os.path.join(
-            config["output_dir"], "{sample}", "uncollapsedMappings.sam"
+            config["output_dir"],
+            "{sample}",
+            "alignments_intersecting_mirna_uncollapsed.sam",
         ),
     output:
         maps=os.path.join(
-            config["output_dir"], "{sample}", "uncollapsedMappings.bam"
+            config["output_dir"],
+            "{sample}",
+            "alignments_intersecting_mirna_uncollapsed.bam",
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "convert_uncollpased_to_bam_{sample}.log"
+            config["cluster_log"],
+            "convert_uncollapsed_reads_sam_to_bam_{sample}.log",
         ),
     log:
         os.path.join(
-            config["local_log"], "convert_uncollapsed_to_bam_{sample}.log"
+            config["local_log"],
+            "convert_uncollapsed_reads_sam_to_bam_{sample}.log",
         ),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
@@ -591,24 +625,28 @@ rule uncollpased_sam_to_bam:
 ###############################################################################
 
 
-rule sort_uncollpased_by_position:
+rule sort_uncollpased_reads_bam_by_position:
     input:
         maps=os.path.join(
-            config["output_dir"], "{sample}", "uncollapsedMappings.bam"
+            config["output_dir"],
+            "{sample}",
+            "alignments_intersecting_mirna_uncollapsed.bam",
         ),
     output:
         maps=os.path.join(
             config["output_dir"],
             "{sample}",
-            "uncollapsedSortedMappings_{sample}.bam",
+            "alignments_intersecting_mirna_uncollapsed_sorted.bam",
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "sort_uncollapsed_by_position_{sample}.log"
+            config["cluster_log"],
+            "sort_uncollapsed_reads_bam_by_position_{sample}.log",
         ),
     log:
         os.path.join(
-            config["local_log"], "sort_uncollapsed_by_position_{sample}.log"
+            config["local_log"],
+            "sort_uncollapsed_reads_bam_by_position_{sample}.log",
         ),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
@@ -621,25 +659,27 @@ rule sort_uncollpased_by_position:
 ###############################################################################
 
 
-rule uncollapsed_index_bam:
+rule index_uncollapsed_reads_bam:
     input:
         maps=os.path.join(
             config["output_dir"],
             "{sample}",
-            "uncollapsedSortedMappings_{sample}.bam",
+            "alignments_intersecting_mirna_uncollapsed_sorted.bam",
         ),
     output:
         maps=os.path.join(
             config["output_dir"],
             "{sample}",
-            "uncollapsedSortedMappings_{sample}.bam.bai",
+            "alignments_intersecting_mirna_uncollapsed_sorted.bam.bai",
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "uncollapsed_index_bam_{sample}.log"
+            config["cluster_log"], "index_uncollapsed_reads_bam_{sample}.log"
         ),
     log:
-        os.path.join(config["local_log"], "uncollapsed_index_bam_{sample}.log"),
+        os.path.join(
+            config["local_log"], "index_uncollapsed_reads_bam_{sample}.log"
+        ),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
