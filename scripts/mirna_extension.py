@@ -177,8 +177,8 @@ def main(args):
     outdir = Path(args.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
 
-    primir_out = outdir/f"mirna_annotation_extended_{args.extension}_nt_primir.gff3"
-    mir_out = outdir/f"mirna_annotation_extended_{args.extension}_nt_mir.gff3"
+    primir_out = outdir/f"extended_primir_annotation_{args.extension}_nt.gff3"
+    mir_out = outdir/f"extended_mirna_annotation_{args.extension}_nt.gff3"
     
     with open(args.input, 'r') as input:
         if len(input.read()) == 0:
