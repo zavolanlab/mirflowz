@@ -12,22 +12,22 @@
     "threads":"{resources.threads}"
   },
 
-  "mapping_genome_segemehl":
+  "map_genome_segemehl":
   {
     "mem":"{resources.mem}G"
   },
 
-  "mapping_transcriptome_segemehl":
+  "map_transcriptome_segemehl":
   {
     "mem":"{resources.mem}G"
   },
 
-  "mapping_genome_oligomap":
+  "map_genome_oligomap":
   {
     "mem":"{resources.mem}G"
   },
 
-  "mapping_transcriptome_oligomap":
+  "map_transcriptome_oligomap":
   {
     "mem":"{resources.mem}G"
   },
