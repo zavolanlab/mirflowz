@@ -46,50 +46,11 @@ include: os.path.join("rules", "quantify.smk")
 
 rule finish:
     input:
-        idx_transcriptome=os.path.join(
-            config["output_dir"],
-            "transcriptome_index_segemehl.idx",
-        ),
-        idx_genome=os.path.join(
-            config["output_dir"],
-            "genome_index_segemehl.idx",
-        ),
-        exons=os.path.join(
-            config["output_dir"],
-            "exons.bed",
-        ),
-        header=os.path.join(
-            config["output_dir"],
-            "headerOfCollapsedFasta.sam",
-        ),
-        chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
-        exteneded_mir=expand(
-            os.path.join(
-                config["output_dir"],
-                "mirna_annotation_extended_{extension}_nt_mir.gff3",
-            ),
-            extension=config["extension"],
-        ),
-        exteneded_premir=expand(
-            os.path.join(
-                config["output_dir"],
-                "mirna_annotation_extended_{extension}_nt_premir.gff3",
-            ),
-            extension=config["extension"],
-        ),
-        maps=expand(
+        primir_intersect_sam=expand(
             os.path.join(
                 config["output_dir"],
                 "{sample}",
-                "convertedSortedMappings_{sample}.bam.bai",
-            ),
-            sample=pd.unique(samples_table.index.values),
-        ),
-        premir_intersect_sam=expand(
-            os.path.join(
-                config["output_dir"],
-                "{sample}",
-                "premir_intersectedAlignments.sam",
+                "alignments_intersecting_primir.sam",
             ),
             sample=pd.unique(samples_table.index.values),
         ),
@@ -97,7 +58,7 @@ rule finish:
             os.path.join(
                 config["output_dir"],
                 "{sample}",
-                "mirna_intersectedAlignments.sam",
+                "alignments_intersecting_mirna.sam",
             ),
             sample=pd.unique(samples_table.index.values),
         ),
@@ -105,19 +66,21 @@ rule finish:
             os.path.join(
                 config["output_dir"],
                 "{sample}",
-                "mirna_intersecting_sort_tag.sam",
+                "alignments_intersecting_mirna_sorted_tag.sam",
             ),
             sample=pd.unique(samples_table.index.values),
         ),
         table=expand(
-            os.path.join(config["output_dir"], "TABLES", "counts.{mir}.tab"),
-            mir=[mir for mir in config["mir_list"] if mir != 'isomir'],
+            os.path.join(
+                config["output_dir"], "TABLES", "all_{mir}_counts.tab"
+            ),
+            mir=[mir for mir in config["mir_list"] if mir != "isomir"],
         ),
         uncollapsed_bam=expand(
             os.path.join(
                 config["output_dir"],
                 "{sample}",
-                "uncollapsedSortedMappings_{sample}.bam",
+                "alignments_intersecting_mirna_uncollapsed_sorted.bam",
             ),
             sample=pd.unique(samples_table.index.values),
         ),
@@ -125,7 +88,7 @@ rule finish:
             os.path.join(
                 config["output_dir"],
                 "{sample}",
-                "uncollapsedSortedMappings_{sample}.bam.bai",
+                "alignments_intersecting_mirna_uncollapsed_sorted.bam.bai",
             ),
             sample=pd.unique(samples_table.index.values),
         ),
