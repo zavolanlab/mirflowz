@@ -1,0 +1,6 @@
+---
+channels:
+  - bioconda
+dependencies:
+  - cufflinks=2.2.1
+...
