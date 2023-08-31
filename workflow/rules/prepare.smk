@@ -63,7 +63,7 @@ rule finish_prepare:
 ###############################################################################
 
 
-rule trim_genome_seq_id:
+rule trim_genome_seq_ids:
     input:
         genome=config["genome_file"],
         script=os.path.join(config["scripts_dir"], "trim_id_fasta.sh"),
@@ -114,7 +114,7 @@ rule extract_transcriptome_seqs:
 ###############################################################################
 
 
-rule trim_fasta_seq_ids:
+rule trim_transcriptome_seq_ids:
     input:
         fasta=os.path.join(config["output_dir"], "transcriptome.fa"),
         script=os.path.join(config["scripts_dir"], "trim_id_fasta.sh"),
