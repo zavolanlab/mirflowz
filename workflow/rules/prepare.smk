@@ -227,7 +227,7 @@ rule get_exons_gtf:
 ###############################################################################
 
 
-rule exons_gtf_to_bed:
+rule convert_exons_gtf_to_bed:
     input:
         exons=os.path.join(config["output_dir"], "exons.gtf"),
         script=os.path.join(config["scripts_dir"], "gtf_exons_bed.1.1.2.R"),
