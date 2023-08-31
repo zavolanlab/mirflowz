@@ -1,7 +1,7 @@
 name: mirflowz
 channels:
+  - conda-forge
   - bioconda
-  - defaults
 dependencies: 
   - coverage>=7.2
   - gffutils>=0.11.1
