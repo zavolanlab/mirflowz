@@ -117,6 +117,8 @@ rule fastq_quality_filter:
         os.path.join(config["local_log"], "fastq_quality_filter_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--H87F3376_10"
+    conda:
+        os.path.join(workflow.basedir, "envs", "fastx_toolkit.yaml")
     shell:
         "(fastq_quality_filter \
         -v \
@@ -149,6 +151,8 @@ rule fastq_to_fasta:
         os.path.join(config["local_log"], "fastq_to_fasta_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--H87F3376_10"
+    conda:
+        os.path.join(workflow.basedir, "envs", "fastx_toolkit.yaml")
     shell:
         "(fastq_to_fasta -r -n -i {input.reads} > {output.reads}) &> {log}"
 
@@ -176,6 +180,8 @@ rule fasta_formatter:
         os.path.join(config["local_log"], "fasta_formatter_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--H87F3376_10"
+    conda:
+        os.path.join(workflow.basedir, "envs", "fastx_toolkit.yaml")
     shell:
         "(fasta_formatter -w 0 -i {input.reads} > {output.reads}) &> {log}"
 
@@ -203,6 +209,8 @@ rule cutadapt:
         threads=8,
     container:
         "docker://quay.io/biocontainers/cutadapt:4.3--py310h1425a21_0"
+    conda:
+        os.path.join(workflow.basedir, "envs", "cutadapt.yaml")
     shell:
         "(cutadapt \
         -a {params.adapter} \
@@ -233,6 +241,8 @@ rule fastx_collapser:
         os.path.join(config["local_log"], "fastx_collapser_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--H87F3376_10"
+    conda:
+        os.path.join(workflow.basedir, "envs", "fastx_toolkit.yaml")
     shell:
         "(fastx_collapser -i {input.reads} > {output.reads}) &> {log}"
 
@@ -267,6 +277,8 @@ rule mapping_genome_segemehl:
         threads=8,
     container:
         "docker://quay.io/biocontainers/segemehl:0.3.4--hf7d323f_8"
+    conda:
+        os.path.join(workflow.basedir, "envs", "segemehl.yaml")
     shell:
         "(segemehl.x \
         -i {input.genome_index_segemehl} \
@@ -311,6 +323,8 @@ rule mapping_transcriptome_segemehl:
         threads=8,
     container:
         "docker://quay.io/biocontainers/segemehl:0.3.4--hf7d323f_8"
+    conda:
+        os.path.join(workflow.basedir, "envs", "segemehl.yaml")
     shell:
         "(segemehl.x \
         -i {input.transcriptome_index_segemehl} \
@@ -346,6 +360,8 @@ rule filter_fasta_for_oligomap:
         ),
     container:
         "docker://python:3.9.16"
+    conda:
+        os.path.join(workflow.basedir, "envs", "python.yaml")
     shell:
         "(python {input.script} \
         -r {params.max_length_reads} \
@@ -386,6 +402,8 @@ rule mapping_genome_oligomap:
         threads=8,
     container:
         "docker://quay.io/biocontainers/oligomap:1.0.1--hdcf5f25_0"
+    conda:
+        os.path.join(workflow.basedir, "envs", "oligomap.yaml")
     shell:
         "(oligomap \
         {input.target} \
@@ -466,6 +484,8 @@ rule oligomap_genome_toSAM:
         queue=1,
     container:
         "docker://python:3.9.16"
+    conda:
+        os.path.join(workflow.basedir, "envs", "python.yaml")
     shell:
         "(python {input.script} \
         -i {input.sort} \
@@ -505,7 +525,9 @@ rule mapping_transcriptome_oligomap:
         time=6,
         threads=8,
     container:
-        "docker://quay.io/biocontainers/oligomap:1.0.1--hdcf5f25_0"
+       "docker://quay.io/biocontainers/oligomap:1.0.1--hdcf5f25_0"
+    conda:
+        os.path.join(workflow.basedir, "envs", "oligomap.yaml")
     shell:
         "(oligomap \
         {input.target} \
@@ -588,6 +610,8 @@ rule oligomap_transcriptome_toSAM:
         ),
     container:
         "docker://python:3.9.16"
+    conda:
+        os.path.join(workflow.basedir, "envs", "python.yaml")
     shell:
         "(python {input.script} \
         -i {input.sort} \
@@ -682,6 +706,8 @@ rule nh_filter_genome:
         os.path.join(config["local_log"], "nh_filter_genome_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
+    conda:
+        os.path.join(workflow.basedir, "envs", "pysam.yaml")
     shell:
         "(python {input.script} \
         {input.gmaps} \
@@ -718,6 +744,8 @@ rule filter_nh_transcriptome:
         ),
     container:
         "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
+    conda:
+        os.path.join(workflow.basedir, "envs", "pysam.yaml")
     shell:
         "(python {input.script} \
         {input.tmaps} \
@@ -748,6 +776,8 @@ rule remove_headers_genome:
         os.path.join(config["local_log"], "remove_headers_genome_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "samtools.yaml")
     shell:
         "samtools view {input.gmap} > {output.gmap}"
 
@@ -780,6 +810,8 @@ rule remove_headers_transcriptome:
         ),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "samtools.yaml")
     shell:
         "samtools view {input.tmap} > {output.tmap}"
 
@@ -808,6 +840,8 @@ rule trans_to_gen:
         os.path.join(config["local_log"], "trans_to_gen_{sample}.log"),
     container:
         "docker://perl:5.37.10"
+    conda:
+        os.path.join(workflow.basedir, "envs", "perl.yaml")
     shell:
         "(perl {input.script} \
         --in {input.tmap} \
@@ -894,6 +928,8 @@ rule sort_id:
         os.path.join(config["local_log"], "sort_id_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "samtools.yaml")
     shell:
         "(samtools sort -n -o {output.sort} {input.concatenate}) &> {log}"
 
@@ -927,6 +963,8 @@ rule remove_inferiors:
         threads=4,
     container:
         "docker://perl:5.37.10"
+    conda:
+        os.path.join(workflow.basedir, "envs", "perl.yaml")
     shell:
         "(perl {input.script} \
         --print-header \
@@ -965,13 +1003,14 @@ rule filter_by_indels:
         threads=4,
     container:
         "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
+    conda:
+        os.path.join(workflow.basedir, "envs", "pysam.yaml")
     shell:
         "(python {input.script} \
         {input.sam} \
         --nh \
         > {output.sam} \
         ) &> {log}"
-
 
 
 ###############################################################################
@@ -996,6 +1035,8 @@ rule convert_to_bam:
         os.path.join(config["local_log"], "convert_to_bam_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "samtools.yaml")
     shell:
         "(samtools view -b {input.maps} > {output.maps}) &> {log}"
 
@@ -1024,6 +1065,8 @@ rule sort_by_position:
         os.path.join(config["local_log"], "sort_by_position_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "samtools.yaml")
     shell:
         "(samtools sort {input.maps} > {output.maps}) &> {log}"
 
@@ -1054,5 +1097,7 @@ rule index_bam:
         os.path.join(config["local_log"], "index_bam_{sample}.log"),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "samtools.yaml")
     shell:
         "(samtools index -b {input.maps} > {output.maps}) &> {log}"

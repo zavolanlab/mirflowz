@@ -44,17 +44,17 @@ rule finish_prepare:
         chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
         exteneded_mir=expand(
             os.path.join(
-                config["output_dir"], 
-                "mirna_annotation_extended_{extension}_nt_mir.gff3"
+                config["output_dir"],
+                "mirna_annotation_extended_{extension}_nt_mir.gff3",
             ),
-            extension=config["extension"]
+            extension=config["extension"],
         ),
         exteneded_premir=expand(
             os.path.join(
-                config["output_dir"], 
-                "mirna_annotation_extended_{extension}_nt_premir.gff3"
+                config["output_dir"],
+                "mirna_annotation_extended_{extension}_nt_premir.gff3",
             ),
-            extension=config["extension"]
+            extension=config["extension"],
         ),
 
 
@@ -105,6 +105,8 @@ rule extract_transcriptome_seqs:
         ),
     container:
         "docker://quay.io/biocontainers/cufflinks:2.2.1--py27_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "cufflinks.yaml")
     shell:
         "(zcat {input.gtf} | gffread -w {output.fasta} -g {input.genome}) &> {log}"
 
@@ -159,6 +161,8 @@ rule generate_segemehl_index_transcriptome:
         time=6,
     container:
         "docker://quay.io/biocontainers/segemehl:0.3.4--hf7d323f_8"
+    conda:
+        os.path.join(workflow.basedir, "envs", "segemehl.yaml")
     shell:
         "(segemehl.x -x {output.idx} -d {input.fasta}) &> {log}"
 
@@ -189,6 +193,8 @@ rule generate_segemehl_index_genome:
         time=6,
     container:
         "docker://quay.io/biocontainers/segemehl:0.3.4--hf7d323f_8"
+    conda:
+        os.path.join(workflow.basedir, "envs", "segemehl.yaml")
     shell:
         "(segemehl.x -x {output.idx} -d {input.genome}) &> {log}"
 
@@ -237,6 +243,8 @@ rule gtftobed:
         os.path.join(config["local_log"], "gtftobed.log"),
     container:
         "docker://zavolab/r-zavolab:3.5.1"
+    conda:
+        os.path.join(workflow.basedir, "envs", "r.yaml")
     shell:
         "(Rscript \
         {input.script} \
@@ -263,6 +271,8 @@ rule create_header_genome:
         os.path.join(config["local_log"], "create_header_genome.log"),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "samtools.yaml")
     shell:
         "(samtools dict -o {output.header} --uri=NA {input.genome}) &> {log}"
 
@@ -287,6 +297,8 @@ rule map_chr_names:
         os.path.join(config["local_log"], "map_chr_names.log"),
     container:
         "docker://perl:5.37.10"
+    conda:
+        os.path.join(workflow.basedir, "envs", "perl.yaml")
     shell:
         "(perl {input.script} \
         {input.anno} \
@@ -315,6 +327,8 @@ rule create_index_fasta:
         os.path.join(config["local_log"], "create_index_fasta.log"),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "samtools.yaml")
     shell:
         "(samtools faidx {input.genome}) &> {log}"
 
@@ -352,17 +366,17 @@ rule extend_mirs_annotations:
     output:
         exteneded_mir=expand(
             os.path.join(
-                config["output_dir"], 
-                "mirna_annotation_extended_{extension}_nt_mir.gff3"
+                config["output_dir"],
+                "mirna_annotation_extended_{extension}_nt_mir.gff3",
             ),
-            extension=config["extension"]
+            extension=config["extension"],
         ),
         exteneded_premir=expand(
             os.path.join(
-                config["output_dir"], 
-                "mirna_annotation_extended_{extension}_nt_premir.gff3"
+                config["output_dir"],
+                "mirna_annotation_extended_{extension}_nt_premir.gff3",
             ),
-            extension=config["extension"]
+            extension=config["extension"],
         ),
     params:
         cluster_log=os.path.join(config["cluster_log"], "extend_mirnas.log"),
@@ -372,6 +386,8 @@ rule extend_mirs_annotations:
         os.path.join(config["local_log"], "extended_mirnas.log"),
     container:
         "docker://quay.io/biocontainers/gffutils:0.11.1--pyh7cba7a3_0"
+    conda:
+        os.path.join(workflow.basedir, "envs", "gffutils.yaml")
     shell:
         "(python {input.script} \
         {input.gff3} \
@@ -379,4 +395,3 @@ rule extend_mirs_annotations:
         --extension {params.extension} \
         --outdir {params.out_dir} \
         ) &> {log}"
-
