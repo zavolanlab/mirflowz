@@ -105,6 +105,8 @@ rule extract_transcriptome_seqs:
         ),
     container:
         "docker://quay.io/biocontainers/cufflinks:2.2.1--py27_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "cufflinks.yaml")
     shell:
         "(zcat {input.gtf} | gffread -w {output.fasta} -g {input.genome}) &> {log}"
 
@@ -161,6 +163,8 @@ rule generate_segemehl_index_transcriptome:
         time=6,
     container:
         "docker://quay.io/biocontainers/segemehl:0.3.4--hf7d323f_8"
+    conda:
+        os.path.join(workflow.basedir, "envs", "segemehl.yaml")
     shell:
         "(segemehl.x -x {output.idx} -d {input.fasta}) &> {log}"
 
@@ -191,6 +195,8 @@ rule generate_segemehl_index_genome:
         time=6,
     container:
         "docker://quay.io/biocontainers/segemehl:0.3.4--hf7d323f_8"
+    conda:
+        os.path.join(workflow.basedir, "envs", "segemehl.yaml")
     shell:
         "(segemehl.x -x {output.idx} -d {input.genome}) &> {log}"
 
@@ -239,6 +245,8 @@ rule convert_exons_gtf_to_bed:
         os.path.join(config["local_log"], "exons_gtf_to_bed.log"),
     container:
         "docker://zavolab/r-zavolab:3.5.1"
+    conda:
+        os.path.join(workflow.basedir, "envs", "r.yaml")
     shell:
         "(Rscript \
         {input.script} \
@@ -265,6 +273,8 @@ rule create_genome_header:
         os.path.join(config["local_log"], "create_genome_header.log"),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "samtools.yaml")
     shell:
         "(samtools dict -o {output.header} --uri=NA {input.genome}) &> {log}"
 
@@ -289,6 +299,8 @@ rule map_chr_names:
         os.path.join(config["local_log"], "map_chr_names.log"),
     container:
         "docker://perl:5.37.10"
+    conda:
+        os.path.join(workflow.basedir, "envs", "perl.yaml")
     shell:
         "(perl {input.script} \
         {input.anno} \
@@ -317,6 +329,8 @@ rule create_index_genome_fasta:
         os.path.join(config["local_log"], "create_index_genome_fasta.log"),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    conda:
+        os.path.join(workflow.basedir, "envs", "samtools.yaml")
     shell:
         "(samtools faidx {input.genome}) &> {log}"
 
@@ -376,6 +390,8 @@ rule extend_mirs_annotations:
         os.path.join(config["local_log"], "extend_mirs_annotations.log"),
     container:
         "docker://quay.io/biocontainers/gffutils:0.11.1--pyh7cba7a3_0"
+    conda:
+        os.path.join(workflow.basedir, "envs", "gffutils.yaml")
     shell:
         "(python {input.script} \
         {input.gff3} \
