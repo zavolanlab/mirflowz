@@ -239,7 +239,7 @@ rule collapse_identical_reads:
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "collapse__identical_reads_{sample}.log"
+            config["cluster_log"], "collapse_identical_reads_{sample}.log"
         ),
     log:
         os.path.join(
@@ -459,7 +459,7 @@ rule sort_genome_oligomap:
 ###############################################################################
 
 
-rule oligomap_genome_to_sam:
+rule convert_genome_to_sam_oligomap:
     input:
         report=os.path.join(
             config["output_dir"], "{sample}", "oligomap_genome_report.txt"
@@ -592,7 +592,7 @@ rule sort_transcriptome_oligomap:
 ###############################################################################
 
 
-rule oligomap_transcriptome_to_sam:
+rule convert_transcriptome_to_sam_oligomap:
     input:
         report=os.path.join(
             config["output_dir"],
