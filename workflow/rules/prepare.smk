@@ -27,11 +27,11 @@ rule finish_prepare:
     input:
         idx_transcriptome=os.path.join(
             config["output_dir"],
-            "transcriptome_index_segemehl.idx",
+            "segemehl_transcriptome_index.idx",
         ),
         idx_genome=os.path.join(
             config["output_dir"],
-            "genome_index_segemehl.idx",
+            "segemehl_genome_index.idx",
         ),
         exons=os.path.join(
             config["output_dir"],
@@ -39,22 +39,22 @@ rule finish_prepare:
         ),
         header=os.path.join(
             config["output_dir"],
-            "headerOfCollapsedFasta.sam",
+            "genome_header.sam",
         ),
         chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
-        exteneded_mir=expand(
+        extended_mir=expand(
             os.path.join(
-                config["output_dir"], 
-                "mirna_annotation_extended_{extension}_nt_mir.gff3"
+                config["output_dir"],
+                "extended_mirna_annotation_{extension}_nt.gff3",
             ),
-            extension=config["extension"]
+            extension=config["extension"],
         ),
-        exteneded_primir=expand(
+        extended_primir=expand(
             os.path.join(
-                config["output_dir"], 
-                "mirna_annotation_extended_{extension}_nt_primir.gff3"
+                config["output_dir"],
+                "extended_primir_annotation_{extension}_nt.gff3",
             ),
-            extension=config["extension"]
+            extension=config["extension"],
         ),
 
 
@@ -68,7 +68,7 @@ rule trim_genome_seq_id:
         genome=config["genome_file"],
         script=os.path.join(config["scripts_dir"], "trim_id_fasta.sh"),
     output:
-        genome=os.path.join(config["output_dir"], "genome.processed.fa"),
+        genome=os.path.join(config["output_dir"], "genome_processed.fa"),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
@@ -89,7 +89,7 @@ rule trim_genome_seq_id:
 
 rule extract_transcriptome_seqs:
     input:
-        genome=os.path.join(config["output_dir"], "genome.processed.fa"),
+        genome=os.path.join(config["output_dir"], "genome_processed.fa"),
         gtf=config["gtf_file"],
     output:
         fasta=os.path.join(config["output_dir"], "transcriptome.fa"),
@@ -114,16 +114,18 @@ rule extract_transcriptome_seqs:
 ###############################################################################
 
 
-rule trim_fasta_seqs_id:
+rule trim_fasta_seq_ids:
     input:
         fasta=os.path.join(config["output_dir"], "transcriptome.fa"),
         script=os.path.join(config["scripts_dir"], "trim_id_fasta.sh"),
     output:
-        fasta=os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
+        fasta=os.path.join(config["output_dir"], "transcriptome_trimmed_id.fa"),
     params:
-        cluster_log=os.path.join(config["cluster_log"], "trim_fasta.log"),
+        cluster_log=os.path.join(
+            config["cluster_log"], "trim_transcriptome.log"
+        ),
     log:
-        os.path.join(config["local_log"], "trim_fasta.log"),
+        os.path.join(config["local_log"], "trim_transcriptome.log"),
     container:
         "docker://ubuntu:lunar-20221207"
     shell:
@@ -137,11 +139,11 @@ rule trim_fasta_seqs_id:
 
 rule generate_segemehl_index_transcriptome:
     input:
-        fasta=os.path.join(config["output_dir"], "transcriptome_idtrim.fa"),
+        fasta=os.path.join(config["output_dir"], "transcriptome_trimmed_id.fa"),
     output:
         idx=os.path.join(
             config["output_dir"],
-            "transcriptome_index_segemehl.idx",
+            "segemehl_transcriptome_index.idx",
         ),
     params:
         cluster_log=os.path.join(
@@ -170,9 +172,9 @@ rule generate_segemehl_index_transcriptome:
 
 rule generate_segemehl_index_genome:
     input:
-        genome=os.path.join(config["output_dir"], "genome.processed.fa"),
+        genome=os.path.join(config["output_dir"], "genome_processed.fa"),
     output:
-        idx=os.path.join(config["output_dir"], "genome_index_segemehl.idx"),
+        idx=os.path.join(config["output_dir"], "segemehl_genome_index.idx"),
     params:
         cluster_log=os.path.join(
             config["cluster_log"],
@@ -232,9 +234,9 @@ rule exons_gtf_to_bed:
     output:
         exons=os.path.join(config["output_dir"], "exons.bed"),
     params:
-        cluster_log=os.path.join(config["cluster_log"], "gtftobed.log"),
+        cluster_log=os.path.join(config["cluster_log"], "exons_gtf_to_bed.log"),
     log:
-        os.path.join(config["local_log"], "gtftobed.log"),
+        os.path.join(config["local_log"], "exons_gtf_to_bed.log"),
     container:
         "docker://zavolab/r-zavolab:3.5.1"
     shell:
@@ -252,15 +254,15 @@ rule exons_gtf_to_bed:
 
 rule create_genome_header:
     input:
-        genome=os.path.join(config["output_dir"], "genome.processed.fa"),
+        genome=os.path.join(config["output_dir"], "genome_processed.fa"),
     output:
-        header=os.path.join(config["output_dir"], "headerOfCollapsedFasta.sam"),
+        header=os.path.join(config["output_dir"], "genome_header.sam"),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "create_header_genome.log"
+            config["cluster_log"], "create_genome_header.log"
         ),
     log:
-        os.path.join(config["local_log"], "create_header_genome.log"),
+        os.path.join(config["local_log"], "create_genome_header.log"),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
@@ -302,17 +304,17 @@ rule map_chr_names:
 ###############################################################################
 
 
-rule create_index_fasta:
+rule create_index_genome_fasta:
     input:
-        genome=os.path.join(config["output_dir"], "genome.processed.fa"),
+        genome=os.path.join(config["output_dir"], "genome_processed.fa"),
     output:
-        genome=os.path.join(config["output_dir"], "genome.processed.fa.fai"),
+        genome=os.path.join(config["output_dir"], "genome_processed.fa.fai"),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "create_index_fasta.log"
+            config["cluster_log"], "create_index_genome_fasta.log"
         ),
     log:
-        os.path.join(config["local_log"], "create_index_fasta.log"),
+        os.path.join(config["local_log"], "create_index_genome_fasta.log"),
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
     shell:
@@ -326,7 +328,7 @@ rule create_index_fasta:
 
 rule extract_chr_len:
     input:
-        genome=os.path.join(config["output_dir"], "genome.processed.fa.fai"),
+        genome=os.path.join(config["output_dir"], "genome_processed.fa.fai"),
     output:
         chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
     params:
@@ -350,26 +352,28 @@ rule extend_mirs_annotations:
         chrsize=os.path.join(config["output_dir"], "chr_size.txt"),
         script=os.path.join(config["scripts_dir"], "mirna_extension.py"),
     output:
-        exteneded_mir=expand(
+        extended_mir=expand(
             os.path.join(
-                config["output_dir"], 
-                "mirna_annotation_extended_{extension}_nt_mir.gff3"
+                config["output_dir"],
+                "extended_mirna_annotation_{extension}_nt.gff3",
             ),
-            extension=config["extension"]
+            extension=config["extension"],
         ),
-        exteneded_primir=expand(
+        extended_primir=expand(
             os.path.join(
-                config["output_dir"], 
-                "mirna_annotation_extended_{extension}_nt_primir.gff3"
+                config["output_dir"],
+                "extended_primir_annotation_{extension}_nt.gff3",
             ),
-            extension=config["extension"]
+            extension=config["extension"],
         ),
     params:
-        cluster_log=os.path.join(config["cluster_log"], "extend_mirnas.log"),
+        cluster_log=os.path.join(
+            config["cluster_log"], "extend_mirs_annotations.log"
+        ),
         out_dir=lambda wildcards, input: Path(input[0]).parent,
         extension=config["extension"],
     log:
-        os.path.join(config["local_log"], "extended_mirnas.log"),
+        os.path.join(config["local_log"], "extend_mirs_annotations.log"),
     container:
         "docker://quay.io/biocontainers/gffutils:0.11.1--pyh7cba7a3_0"
     shell:
@@ -379,4 +383,3 @@ rule extend_mirs_annotations:
         --extension {params.extension} \
         --outdir {params.out_dir} \
         ) &> {log}"
-
