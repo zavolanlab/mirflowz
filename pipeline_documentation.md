@@ -57,9 +57,9 @@ Visual representation of the workflow. Automatically prepared with
 ##### Requirements
 
 - tab-separated values (`.tsv` and `.csv`) file
-- first row has to contain parameter names as in 
+- First row has to contain parameter names as in 
 [`samples_table.csv`](test/test_files/samples_table.csv) 
-- first column used as sample identifiers
+- First column used as sample identifiers
 
 Parameter name | Description | Data type(s)
  --- | --- | --- 
@@ -71,10 +71,187 @@ format | There are two allowed values, `fa` and `fastq` according to the library
 
 #### Configuration file
 
-COMING SOON (maybe)
+Some parameters within the workflow can be modified. Refer to the
+[configuration template](#config/config_template.yaml) for a detailed
+explanation of each option.
 
 ### Prepare workflow
 
+#### `trim_genome_seq_ids`
+
+Trim genome sequence IDs.
+
+- **Input**
+  - Genome sequence file (`.fasta`)
+- **Output**
+  - Genome sequence file with trim IDs (`.fasta`); used in
+  [**extract_transcriptome_seqs**](#extract-transcriptome-seqs),
+  [**create_genome_header**](#create-genome-header),
+  [**create_index_genome_fasta**](#create-index-genome),
+  [**generate_segemehl_index_genome**](#generate-segemehl-index-genome),
+  [**mapping_genome_segemehl**](#mapping-genome-segemehl) and
+  [**mapping_genome_oligomap**](#mapping-genome-oligomap)
+
+
+#### `extract_transcriptome_seqs`
+
+Create transcriptome from genome and genome annotations with 
+[**cufflinks**](#third-party-software-used).
+
+- **Input**
+  - Genome sequence file (`.fasta`)
+  - Genome annotation file (.`gtf`)
+- **Output**
+  - Transcriptome sequence file (`.fasta`); used in 
+  [**trim_transcriptome_seq_ids**](#trim_transcriptome_seq_ids)
+
+
+#### `trim_transcriptome_seq_ids`
+
+Trim transcriptome sequence IDs.
+
+- **Input**
+  - Transcriptome sequence file (`.fasta`)
+- **Output**
+  - Transcriptome sequence file with trim IDs (`.fasta`); used in
+  [**generate_segemehl_index_transcriptome**](#generate-segemehl-index-transcriptome),
+  [**mapping_transcriptome_segemehl**](#mapping-transcriptome-segemehl) and
+  [**mapping_transcriptome_oligomap**](#mapping-transcriptome-oligomap)
+
+
+#### `generate_segemehl_index_transcriptome`
+
+Generate transcriptome index for [**segemehl**](#third-party-software-used)
+short read aligner.
+
+> The transcriptome index only needs to be generated once for each combination
+of genome and annotations and sample sets.
+
+- **Input**
+  - Transcriptome sequence file with trim IDs (`.fasta`); from
+  [**trim_transcriptome_seq_ids**](#trim-transcriptome-seq-ids)
+- **Output**
+  - segemehl index (`.idx`); used in 
+  [**mapping_genome_segemehl**](#mapping-genome-segemehl)
+
+
+#### `generate_segemehl_index_genome`
+
+Generate genome index for [**segemehl**](#third-party-software-used)
+short read aligner.
+
+> The genome index only needs to be generated once for each combination
+of annotations and sample sets.
+
+- **Input**
+  - Genome sequence file with trim IDs (`.fasta`); from
+  [**trim_genome_seq_ids**](#trim-genome-seq-ids)
+- **Output**
+  - segemehl index (`.idx`); used in 
+  [**mapping_genome_segemehl**](#mapping-genome-segemehl)
+
+
+#### `get_exons_gtf`
+
+Retrieve exon annotations from genome annotations.
+
+- **Input**
+  - Genomic annotations (`.gtf`)
+- **Output**
+  - Exon annotations (`.gtf`); used in 
+  [**exons_gtf_to_bed**](#exons-gtf-to-bed)
+
+#### `exons_gtf_to_bed`
+
+Convert the 
+
+#### `create_genome_header`
+
+Create `SAM` header for the genome with 
+[**samtools**](#third-party-software-used).
+
+> Required by [samtools](#third-party-software-used) to work with the alignment
+file.
+
+- **Input**
+  - Genome sequence file with trim IDs (`.fasta`); from
+  [**trim_genome_seq_ids**](#trim-genome-seq-ids)
+- **Output**
+  - Genome header (`.sam`); used in [add_header_all_maps](#add-header-all-maps)
+
+
+#### `map_chr_names`
+
+Map UCSC-like chromosome names with Ensembl-like ones in miRNA annotation.
+
+> Required by [bedtools](#third-party-software) to intersect alignments with
+miRNA annotations. Several mapping tables are available [here][chr-maps].
+
+- **Input**
+  - miRNA annotations (`.gff3`)
+  - Tab-separated mappings table (`.txt`)
+- **Output**
+  - miRNA annotations with mapped genes(`.gff3`); used in 
+  [**extend_mirs_annotations**](#extend-mirs-annotations)
+
+
+#### `create_index_genome_fasta`
+
+Create a `FASTA` index for the genome with 
+[**samtools**](#third-party-software-used).
+
+- **Input**
+  - Genome sequence file with trim IDs (`.fasta`); from
+  [**trim_genome_seq_ids**](#trim-genome-seq-ids)
+- **Output**
+  - `FASTA` genome index (`.fa.fai`); used in
+  [**extract_chr_len**](#extract-chr-len)
+
+
+#### `extract-chr-len`
+
+Extract chromosome(s) length from the genome sequence.
+
+- **Input**
+  - `FASTA` genome index (`.fa.fai`); from
+  [**create_index_genome_fasta**](#create-index-genome-fasta)
+- **Output**
+  - Tab-separated table mapping chromosome name(s) and length(s) (`.txt`); used
+  in [**extend_mirs_annotations**](#extend-mirs-annotations)
+
+
+#### `extend-mirs-annotations`
+
+Extend miRNA annotations and split the file by feature.
+
+> Mature miRNA regions are extended on both sides to account for isomiR species
+with shifted start and/or end positions. If required, pri-miR loci are also 
+extended to accommodate the new miRNA coordinates. 
+
+- **Input**
+  - miRNA annotations with mapped genes(`.gff3`); from
+  [**map_chr_names**](#map-chr-names)
+- **Parameters**
+  - **config_schema.json**
+    - `extension`: Number of nucleotides by which mature miRNA annotated
+    regions are extended (default: 6)
+- **Output**
+  - Primary miRNA transcript (pri-mir) extended annotation (`.gff3`); used in
+  [**intersect_extended_primir**](#intersect-extended-primir)
+  - Mature miRNA (miRNA) extended annotation (`.gff3`); used in
+  [**intersect_extended_mirna**](#intersect-extended-mirna)
+
+#### `finish_prepare`
+
+Target rule as required by [Snakemake][docs-snakemake].
+
+> Local rule
+
+- **Input**
+  - Genome sequence file with trim IDs (`.fasta`); from
+  [**trim_genome_seq_ids**](#trim-genome-seq-ids)
+  - Transcriptome sequence file with trim IDs (`.fasta`); from
+  [**trim_transcriptome_seq_ids**](#trim-transcriptome-seq-ids)
 
 ### Map workflow
 
@@ -83,7 +260,7 @@ COMING SOON (maybe)
 
 
 
-
+[chr-maps]: <https://github.com/dpryan79/ChromosomeMappings>
 [code-bedtools]: <https://github.com/arq5x/bedtools2>
 [code-cufflinks]: <https://github.com/cole-trapnell-lab/cufflinks>
 [code-cutadapt]: <https://github.com/marcelm/cutadapt>
