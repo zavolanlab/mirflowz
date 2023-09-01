@@ -159,11 +159,18 @@ Retrieve exon annotations from genome annotations.
   - Genomic annotations (`.gtf`)
 - **Output**
   - Exon annotations (`.gtf`); used in 
-  [**exons_gtf_to_bed**](#exons-gtf-to-bed)
+  [**convert_exons_gtf_to_bed**](#convert-exons-gtf-to-bed)
 
-#### `exons_gtf_to_bed`
+#### `convert_exons_gtf_to_bed`
 
-Convert the 
+Convert exon annotations `.gtf` to `.bed`.
+
+- **Input**
+  - Exon annotations (`.gtf`); from [**get_exons_gtf**](#get-exons-gtf)
+- **Output**
+  - Exon annotations (`.bed`); used in
+  [**transcriptome_to_genome_maps**](#transcriptome-to-genome-maps)
+
 
 #### `create_genome_header`
 
@@ -241,24 +248,286 @@ extended to accommodate the new miRNA coordinates.
   - Mature miRNA (miRNA) extended annotation (`.gff3`); used in
   [**intersect_extended_mirna**](#intersect-extended-mirna)
 
-#### `finish_prepare`
-
-Target rule as required by [Snakemake][docs-snakemake].
-
-> Local rule
-
-- **Input**
-  - Genome sequence file with trim IDs (`.fasta`); from
-  [**trim_genome_seq_ids**](#trim-genome-seq-ids)
-  - Transcriptome sequence file with trim IDs (`.fasta`); from
-  [**trim_transcriptome_seq_ids**](#trim-transcriptome-seq-ids)
-
 ### Map workflow
 
+#### `start`
+
+Copy and rename read files.
+
+> Local rule.
+Depending on the read files format, the output files undergo a quality filter
+(`.fastq`) or are directly formatted (`.fa`).
+
+- **Input**
+  - Reads file (`.fa.gz`, `.fastq.gz`)
+- **Output**
+  - Reads file, copied, renamed (`.fa`, `.fastq`); used in
+  [**fastq_quality_filter**](#fastq-quality-filter) or 
+  [**format_fasta**](#format-fasta)
+
+
+#### `fastq_quality_filter`
+
+Conduct quality control for reads library with 
+[**fastx_toolkit**](#third-party-software-used).
+
+- **Input**
+  - Reads file (`.fastq`); from [**start**](#start)
+- **Parameters**
+  - **config_schema.json**
+    - `q_value`: Minimum Q (Phred) score to keep (default 10)
+    - `p_value`: Minimum % of bases that must have a Q (Phred) quality
+    (default 50)
+- **Output**
+  - Reads file filtered (`.fastq`); used in
+  [**fastq_to_fasta**](#fastq-to-fasta)
+
+
+#### `fastq_to_fasta`
+
+Convert reads file from `.fastq` to `.fa` with 
+[**fastx_toolkit**](#third-party-software-used).
+
+- **Input**
+  - Reads file (`.fastq`); from
+  [**fastq_quality_filter**](#fastq-quality-filter)
+- **Output**
+  - Reads file (`.fa`); used in [**format_fasta**](#format-fasta)
+
+#### `format_fasta`
+
+Format reads to appear on a single line with
+[**fastx_toolkit**](#third-party-software-used).
+
+- **Input**
+  - Reads file (`.fa`); from [**start**](#start) or 
+  [**fastq_to_fasta**](#fastq-to-fasta)
+- **Output**
+  - Reads file (`.fa`); used in
+  [**remove_adapters**](#remove-adapters)
+
+
+#### `remove_adapters`
+
+Trim adapters and `N` bases at either end. Filter reads by minimum length and
+number of inner `N` bases with [**cutadapt**](#third-party-software-used).
+
+- **Input**
+  - Reads file (`.fa`); from [**format_fasta**](#format-fasta)
+- **Parameters**
+  - **samples.csv**
+    - Adapter to be removed; specify in sample table column `adapter`
+  - **config_schema.json**
+    - `error_rate`: Fraction of allowed errors in the matched adapters
+    (default 0.1)
+    - `overlap`: Minimum overlap length between adapter and read to trim the
+    bases (default 3)
+    - `minimum_length`: Minimum length for a processed read to be kept
+    (default 15)
+    - `max_n`:  Maximum number of `N` bases for a processed read to be kept
+    (default 0)
+- **Output**
+  - Reads file (`.fa`; used in 
+  [**collapse_identical_reads**](#collapse-identical-reads)
+
+
+#### `collapse_identical_reads`
+
+Collapse and rename identical reads
+[**fastx_toolkit**](#third-party-software-used).
+
+- **Input**
+  - Reads file (`.fa`); from [**remove_adapters**](#remove-adapters)
+- **Output**
+  - Collapsed and rename reads file; used in
+  [**filter_fasta_for_oligomap**](#filter-fasta-for-oligomap),
+  [**map_genome_segemehl**](#map-genome-segemehl) and
+  [**map_transcriptome_segemehl**](#map-transcriptome-segemehl)
+
+
+#### `map_genome_segemehl`
+
+Align short reads to reference genome with 
+[**segemehl**](#third-party-software-used).
+
+- **Input**
+  - Reads file (`.fa`); from
+  [**collapse_identical_reads**](#collapse-identical-reads)
+  - Genome sequence (`.fa`); from 
+  [**trim_genome_seq_ids**](#trim-genome-seq-ids)
+  - segemehl index (`idx`); from
+  [**generate_segemehl_index_genome**](#generate-segemehl-index-genome)
+- **Output**
+  - Aligned reads file (`.sam`); used in
+  [**merge_genome_maps**](#merge-genome-maps)
+
+
+#### `map_transcriptome_segemehl`
+
+Align short reads to reference transcriptome with 
+[**segemehl**](#third-party-software-used).
+
+- **Input**
+  - Reads file (`.fa`); from
+  [**collapse_identical_reads**](#collapse-identical-reads)
+  - Transcriptome sequence (`.fa`); from 
+  [**trim_transcriptome_seq_ids**](#trim-transcriptome-seq-ids)
+  - segemehl index (`idx`); from
+  [**generate_segemehl_index_transcriptome**](#generate-segemehl-index-transcriptome)
+- **Output**
+  - Aligned reads file (`.sam`); used in
+  [**merge_transcriptome_maps**](#merge-transcriptome-maps)
+
+
+#### `filter_fasta_for_oligomap`
+
+Filter reads by length.
+
+- **Input**
+  - Reads file (`.fa`); from
+  [**collapse_identical_reads**](#collapse-identical-reads)
+- **Parameters**
+  - **config_schema.json**
+    - `max_length_reads`: Maximum length of processed reads to map with
+    [**oligomap**](#third-party-software-used)
+- **Output**
+  - Reads file (`.fa`); used in [**map_genome_oligomap**](#map-genome-oligomap)
+  and [**map_transcriptome_oligomap**](#map-transcriptome-oligomap)
+
+
+#### `map_genome_oligomap`
+
+Align short reads to reference genome with
+[**oligomap**](#third-party-software.used).
+
+- **Input**
+  - Reads file (`.fa`); from
+  [**filter_fasta_for_oligomap**](#filter-fasta-for-oligomap)
+  - Genome sequence (`.fa`); from 
+  [**trim_genome_seq_ids**](#trim-genome-seq-ids)
+- **Output**
+  - Aligned reads file (`.fa`); used in
+  [**sort_genome_oligomap**](#sort-genome-oligomap)
+  - Alignment report (`.txt`); used in
+  [**sort_genome_oligomap**](#sort-genome-oligomap)
+
+
+#### `sort_genome_oligomap`
+
+Sort [**oligomap**](#third-party-software-used) alignments by query name.
+
+- **Input**
+  - Aligned reads file (`.fa`); from
+  [**map_genome_oligomap**](#map-genome-oligomap)
+  - Alignment report (`.txt`); from
+  [**map_genome_oligomap**](#map-genome-oligomap)
+- **Output**
+  - Aligned sorted reads file (`.fa`); used in
+  [**convert_genome_to_sam_oligomap](#convert-genome-to-sam-oligomap)
+  - Alignment sorted report (`.txt`); used in
+  [**convert_genome_to_sam_oligomap](#convert-genome-to-sam-oligomap)
+
+
+#### `convert_genome_to_sam_oligomap`
+
+Convert aligned reads `.fa` to `.sam` and filter alignments by number of hits.
+
+- **Input**
+  - Aligned reads file (`.fa`); from
+  [**sort_genome_oligomap**](#sort-genome-oligomap)
+  - Alignment report (`.txt`); from
+  [**sort_genome_oligomap**](#sort-genome-oligomap)
+- **Parameters**
+  - **config_schema.json**
+    - `nh`: Maximum number of hits an alignment can have to be kept
+- **Output**
+  - Aligned reads (`.sam`); used in [**merge_genome_maps**](#merge-genome-maps)
+
+
+#### `map_transcriptome_oligomap`
+
+Align short reads to reference transcriptome with
+[**oligomap**](#third-party-software.used).
+
+- **Input**
+  - Reads file (`.fa`); from
+  [**filter_fasta_for_oligomap**](#filter-fasta-for-oligomap)
+  - Transcriptome sequence (`.fa`); from 
+  [**trim_transcriptome_seq_ids**](#trim-transcriptome-seq-ids)
+- **Output**
+  - Aligned reads file (`.fa`); used in
+  [**sort_transcriptome_oligomap**](#sort-transcriptome-oligomap)
+  - Alignment report (`.txt`); used in
+  [**sort_transcriptome_oligomap**](#sort-transcriptome-oligomap)
+
+
+#### `sort_transcriptome_oligomap`
+
+Sort [**oligomap**](#third-party-software-used) alignments by query name.
+
+- **Input**
+  - Aligned reads file (`.fa`); from
+  [**map_transcriptome_oligomap**](#map-transcriptome-oligomap)
+  - Alignment report (`.txt`); from
+  [**map_transcriptome_oligomap**](#map-transcriptome-oligomap)
+- **Output**
+  - Aligned sorted reads file (`.fa`); used in
+  [**convert_transcriptome_to_sam_oligomap](#convert-transcriptome-to-sam-oligomap)
+  - Alignment sorted report (`.txt`); used in
+  [**convert_transcriptome_to_sam_oligomap](#convert-transcriptme-to-sam-oligomap)
+
+
+#### `convert_transcriptome_to_sam_oligomap`
+
+Convert aligned reads `.fa` to `.sam` and filter alignments by number of hits.
+
+- **Input**
+  - Aligned reads file (`.fa`); from
+  [**sort_transcriptome_oligomap**](#sort-transcriptome-oligomap)
+  - Alignment report (`.txt`); from
+  [**sort_transcriptome_oligomap**](#sort-transcriptome-oligomap)
+- **Parameters**
+  - **config_schema.json**
+    - `nh`: Maximum number of hits an alignment can have to be kept
+- **Output**
+  - Aligned reads (`.sam`); used in
+  [**merge_transcriptome_maps**](#merge-transcriptome-maps)
+
+
+#### `merge_genome_maps`
+
+Concatenate [**segemehl**](#third-party-software-used) and
+[**oligomap**](#third-party-software-used) genome alignments.
+
+- **Input**
+  - Aligned reads (`.sam`); from
+  [**map_genome_segemehl**](#map-genome-segemehl)
+  - Aligned reads (`.sam`); from
+  [**convert_genome_to_sam_oligomap**](#convert-genome-to-sam-oligomap)
+- **Output**
+  - Aligned reads (`.sam`); used in
+  [**filter_genome_by_nh**](#filter-genome-by-nh)
+
+
+#### `merge_transcriptome_maps`
+
+Concatenate [**segemehl**](#third-party-software-used) and
+[**oligomap**](#third-party-software-used) transcriptome alignments.
+
+- **Input**
+  - Aligned reads (`.sam`); from
+  [**map_transcriptome_segemehl**](#map-transcriptome-segemehl)
+  - Aligned reads (`.sam`); from
+  [**convert_transcriptome_to_sam_oligomap**](#convert-transcriptome-to-sam-oligomap)
+- **Output**
+  - Aligned reads (`.sam`); used in
+  [**filter_transcriptome_by_nh**](#filter-transcriptome-by-nh)
+
+EXPANDING SOON.
 
 ### Quantify workflow
 
-
+COMING SOON.
 
 [chr-maps]: <https://github.com/dpryan79/ChromosomeMappings>
 [code-bedtools]: <https://github.com/arq5x/bedtools2>
