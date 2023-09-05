@@ -36,7 +36,7 @@ def bed_sam():
 @pytest.fixture
 def bed_sam_extension():
     """Import path to BED and SAM files with miRNA extension."""
-    bed_file = Path("files/in_intersection_mirna.bed")
+    bed_file = Path("files/in_intersection_extended_mirna.bed")
     sam_file = Path("files/in_alignments_mirna.sam")
     output_file = Path("files/mirna_tag_extension.sam")
 

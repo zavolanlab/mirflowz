@@ -58,6 +58,8 @@ nh: 100 # discard reads with more mappings than the indicated number
 #### QUANTIFICATION PARAMETERS ####
 
 # Types of miRNAs to quantify
-# Remove miRNA types you are not interested in
-mir_list: ["miRNA", "miRNA_primary_transcript", "isomirs"]
+# Remove miRNA types you are not interested in.
+# If 'isomir' and 'mirna' are both in the list, a single table with both types
+# is made.
+mir_list: ['isomir', 'mirna', 'pri-mir']
 ...
