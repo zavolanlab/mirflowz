@@ -23,7 +23,7 @@ on installation and usage please see [here](README.md).
 
 | Name | License | Tag line | More info |
 | --- | --- | --- | --- |
-| **bedtools** | [GPLv2][license-gpl2] | _"[...] intersect, merge, count, complement, and shuffle genomic intervals from multiple files in widely-used genomic file formats such as BAM, BED, GFF/GTF, VCF"_ | [code][code-bedtools] / [manual][code-bedtools] |
+| **BEDTools** | [GPLv2][license-gpl2] | _"[...] intersect, merge, count, complement, and shuffle genomic intervals from multiple files in widely-used genomic file formats such as BAM, BED, GFF/GTF, VCF"_ | [code][code-bedtools] / [manual][manual-bedtools] / [publication][pub-bedtools] |
 | **cufflinks** | [BSL-1.0][license-bsl1] | _"[...] assembles transcripts, estimates their abundances, and tests for differential expression and regulation in RNA-Seq samples"_ | [code][code-cufflinks] / [manual][docs-cufflinks] / [publication][pub-cufflinks] |
 | **cutadapt** | [MIT][license-mit] | _"[...] finds and removes adapter sequences, primers, poly-A tails and other types of unwanted sequence from your high-throughput sequencing reads"_ | [code][code-cutadapt] / [manual][docs-cutadapt] / [publication][pub-cutadapt] |
 | **FASTX-Toolkit** | [AGPL-3.0][license-agpl3] | _"[...] collection of command line tools for Short-Reads FASTA/FASTQ files preprocessing"_ | [code][code-fastx] / [manual][docs-fastx] |
@@ -191,7 +191,7 @@ file.
 
 Map UCSC-like chromosome names with Ensembl-like ones in miRNA annotation.
 
-> Required by [bedtools](#third-party-software) to intersect alignments with
+> Required by [BEDTools](#third-party-software) to intersect alignments with
 miRNA annotations. Several mapping tables are available [here][chr-maps].
 
 - **Input**
@@ -215,7 +215,7 @@ Create a `FASTA` index for the genome with
   [**extract_chr_len**](#extract-chr-len)
 
 
-#### `extract-chr-len`
+#### `extract_chr_len`
 
 Extract chromosome(s) length from the genome sequence.
 
@@ -227,7 +227,7 @@ Extract chromosome(s) length from the genome sequence.
   in [**extend_mirs_annotations**](#extend-mirs-annotations)
 
 
-#### `extend-mirs-annotations`
+#### `extend_mirs_annotations`
 
 Extend miRNA annotations and split the file by feature.
 
@@ -523,7 +523,41 @@ Concatenate [**segemehl**](#third-party-software-used) and
   - Aligned reads (`.sam`); used in
   [**filter_transcriptome_by_nh**](#filter-transcriptome-by-nh)
 
-EXPANDING SOON.
+
+### `filter_genome_by_nh`
+
+Filter merged genome alignments by the number of hits.
+
+- **Input**
+  - Aligned reads (`.sam`); from
+  [**merge_genome_maps**](#merge-genome-maps)
+- **Parameters**
+  - **config_schema.json**
+    - `nh`: Maximum number of mappings per read to be kept
+- **Output**
+  - Aligned reads(`.sam`); used in
+  [**remove_header_genome**](#remove-header-genome)
+
+### `filter_genome_by_nh`
+
+Filter merged genome alignments by the number of hits.
+
+- **Input**
+  - Aligned reads (`.sam`); from
+  [**merge_genome_maps**](#merge-genome-maps)
+- **Parameters**
+  - **config_schema.json**
+    - `nh`: Maximum number of mappings per read to be kept
+- **Output**
+  - Aligned reads(`.sam`); used in
+  [**remove_header_genome**](#remove-header-genome)
+
+
+
+- **Input**
+  - 
+- **Output**
+  -
 
 ### Quantify workflow
 
@@ -551,6 +585,7 @@ COMING SOON.
 [license-gpl2]: <https://opensource.org/licenses/GPL-2.0>
 [license-gpl3]: <https://opensource.org/license/gpl-3-0/>
 [license-mit]: <https://opensource.org/licenses/MIT>
+[pub-bedtools]: <https://academic.oup.com/bioinformatics/article/26/6/841/244688>
 [pub-cufflinks]: <https://doi.org/10.1038/nprot.2012.016>
 [pub-cutadapt]: <https://doi.org/10.14806/ej.17.1.200>
 [pub-oligomap]: <https://doi.org/10.1016/j.ymeth.2007.10.002 >
