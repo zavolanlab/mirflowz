@@ -29,20 +29,20 @@ def gff_empty():
 def gff_no_extremes():
     """Import path to miRNA annotation files."""
     in_no_extreme = Path("files/in_mirna_anno.gff3")
-    out_premir = Path("files/premir_anno.gff3")
+    out_primir = Path("files/primir_anno.gff3")
     out_mir = Path("files/mir_anno.gff3")
 
-    return in_no_extreme, out_premir, out_mir
+    return in_no_extreme, out_primir, out_mir
 
 
 @pytest.fixture
 def gff_extremes():
     """Import path to mirna annotation files with extreme miRNA coords."""
     in_extremes = Path("files/in_mirna_extreme_mirs.gff3")
-    out_premir = Path("files/extreme_premir_anno.gff3")
+    out_primir = Path("files/extreme_primir_anno.gff3")
     out_mir = Path("files/extreme_mir_anno.gff3")
     
-    return in_extremes, out_premir, out_mir
+    return in_extremes, out_primir, out_mir
 
 
 @pytest.fixture
@@ -50,10 +50,10 @@ def gff_extremes_chr():
     """Import path to mirna annotation files and chr size."""
     chr_size = Path("files/chr_size.txt")
     in_chr_extremes = Path("files/in_mirna_extreme_chr_mirs.gff3")
-    out_premir = Path("files/extreme_chr_premir_anno.gff3")
+    out_primir = Path("files/extreme_chr_primir_anno.gff3")
     out_mir = Path("files/extreme_chr_mir_anno.gff3")
     
-    return chr_size, in_chr_extremes, out_premir, out_mir
+    return chr_size, in_chr_extremes, out_primir, out_mir
 
 
 class TestParseArguments:
@@ -109,8 +109,8 @@ class TestMain:
         """Test main function with an empty file."""
         gff_empty = gff_empty
 
-        premir_out = tmp_path/"mirna_annotation_extended_6_nt_premir.gff3"
-        mir_out = tmp_path/"mirna_annotation_extended_6_nt_mir.gff3"
+        primir_out = tmp_path/"extended_primir_annotation_6_nt.gff3"
+        mir_out = tmp_path/"extended_mirna_annotation_6_nt.gff3"
         
         monkeypatch.setattr(
             sys, 'argv',
@@ -122,7 +122,7 @@ class TestMain:
         args = parse_arguments().parse_args()
         main(args)
 
-        with open(gff_empty, 'r') as expected, open(premir_out, 'r') as output:
+        with open(gff_empty, 'r') as expected, open(primir_out, 'r') as output:
             assert output.read() == expected.read() 
         
         with open(gff_empty, 'r') as expected, open(mir_out, 'r') as output:
@@ -134,8 +134,8 @@ class TestMain:
         """Test main function with no extreme coords."""
         in_gff, pre_gff, mir_gff = gff_no_extremes
 
-        premir_out = tmp_path/"mirna_annotation_extended_6_nt_premir.gff3"
-        mir_out = tmp_path/"mirna_annotation_extended_6_nt_mir.gff3"
+        primir_out = tmp_path/"extended_primir_annotation_6_nt.gff3"
+        mir_out = tmp_path/"extended_mirna_annotation_6_nt.gff3"
 
         monkeypatch.setattr(
             sys, 'argv',
@@ -147,7 +147,7 @@ class TestMain:
         args = parse_arguments().parse_args()
         main(args)
 
-        with open(pre_gff, 'r') as expected, open(premir_out, 'r') as output:
+        with open(pre_gff, 'r') as expected, open(primir_out, 'r') as output:
             assert output.read() == expected.read() 
         
         with open(mir_gff, 'r') as expected, open(mir_out, 'r') as output:
@@ -157,8 +157,8 @@ class TestMain:
         """Test main function with extreme coords."""
         in_gff, pre_gff, mir_gff = gff_extremes
 
-        premir_out = tmp_path/"mirna_annotation_extended_6_nt_premir.gff3"
-        mir_out = tmp_path/"mirna_annotation_extended_6_nt_mir.gff3"
+        primir_out = tmp_path/"extended_primir_annotation_6_nt.gff3"
+        mir_out = tmp_path/"extended_mirna_annotation_6_nt.gff3"
 
         monkeypatch.setattr(
             sys, 'argv',
@@ -170,7 +170,7 @@ class TestMain:
         args = parse_arguments().parse_args()
         main(args)
 
-        with open(pre_gff, 'r') as expected, open(premir_out, 'r') as output:
+        with open(pre_gff, 'r') as expected, open(primir_out, 'r') as output:
             assert output.read() == expected.read() 
 
         with open(mir_gff, 'r') as expected, open(mir_out, 'r') as output:
@@ -180,8 +180,8 @@ class TestMain:
         """Test main function with extreme coords and limited by chr size."""
         chr_size, in_gff, pre_gff, mir_gff = gff_extremes_chr
 
-        premir_out = tmp_path/"mirna_annotation_extended_6_nt_premir.gff3"
-        mir_out = tmp_path/"mirna_annotation_extended_6_nt_mir.gff3"
+        primir_out = tmp_path/"extended_primir_annotation_6_nt.gff3"
+        mir_out = tmp_path/"extended_mirna_annotation_6_nt.gff3"
 
         monkeypatch.setattr(
             sys, 'argv',
@@ -194,7 +194,7 @@ class TestMain:
         args = parse_arguments().parse_args()
         main(args)
 
-        with open(pre_gff, 'r') as expected, open(premir_out, 'r') as output:
+        with open(pre_gff, 'r') as expected, open(primir_out, 'r') as output:
             assert output.read() == expected.read() 
 
         with open(mir_gff, 'r') as expected, open(mir_out, 'r') as output:
@@ -236,14 +236,14 @@ class TestExtendMirnas:
         """Test miRNA extension with no extreme coordinates."""
         in_file, pre_exp, mir_exp = gff_no_extremes
 
-        premir_out = tmp_path/"mirna_annotation_extended_6_nt_premir.gff3"
-        mir_out = tmp_path/"mirna_annotation_extended_6_nt_mir.gff3"
+        primir_out = tmp_path/"extended_primir_annotation_6_nt.gff3"
+        mir_out = tmp_path/"extended_mirna_annotation_6_nt.gff3"
 
         mirnaObject = MirnaExtension()
         mirnaObject.load_gff_file(str(in_file))
-        mirnaObject.extend_mirnas(premir_out=premir_out, mir_out=mir_out)
+        mirnaObject.extend_mirnas(primir_out=primir_out, mir_out=mir_out)
 
-        with open(premir_out, 'r') as output, open(pre_exp, 'r') as expected:
+        with open(primir_out, 'r') as output, open(pre_exp, 'r') as expected:
             assert output.read() == expected.read() 
         
         with open(mir_out, 'r') as output, open(mir_exp, 'r') as expected:
@@ -253,14 +253,14 @@ class TestExtendMirnas:
         """Test miRNA extension with miRNAs having extreme coordinates."""
         in_file, pre_exp, mir_exp = gff_extremes
 
-        premir_out = tmp_path/"mirna_annotation_extended_6_nt_premir.gff3"
-        mir_out = tmp_path/"mirna_annotation_extended_6_nt_mir.gff3"
+        primir_out = tmp_path/"extended_primir_annotation_6_nt.gff3"
+        mir_out = tmp_path/"extended_mirna_annotation_6_nt.gff3"
 
         mirnaObject = MirnaExtension()
         mirnaObject.load_gff_file(str(in_file))
-        mirnaObject.extend_mirnas(premir_out=premir_out, mir_out=mir_out)
+        mirnaObject.extend_mirnas(primir_out=primir_out, mir_out=mir_out)
 
-        with open(premir_out, 'r') as output, open(pre_exp, 'r') as expected:
+        with open(primir_out, 'r') as output, open(pre_exp, 'r') as expected:
             assert output.read() == expected.read() 
         
         with open(mir_out, 'r') as output, open(mir_exp, 'r') as expected:
@@ -270,8 +270,8 @@ class TestExtendMirnas:
         """Test miRNA extension with extreme coordinates and chr boundaries."""
         chr_size, in_file, pre_exp, mir_exp = gff_extremes_chr
 
-        premir_out = tmp_path/"mirna_annotation_extended_6_nt_premir.gff3"
-        mir_out = tmp_path/"mirna_annotation_extended_6_nt_mir.gff3"
+        primir_out = tmp_path/"extended_primir_annotation_6_nt.gff3"
+        mir_out = tmp_path/"extended_mirna_annotation_6_nt.gff3"
 
         len_dict = {}
         with open(chr_size, 'r') as f:
@@ -281,11 +281,11 @@ class TestExtendMirnas:
 
         mirnaObject = MirnaExtension()
         mirnaObject.load_gff_file(str(in_file))
-        mirnaObject.extend_mirnas(premir_out=premir_out,
+        mirnaObject.extend_mirnas(primir_out=primir_out,
                                   mir_out=mir_out,
                                   seq_lengths=len_dict)
 
-        with open(premir_out, 'r') as output, open(pre_exp, 'r') as expected:
+        with open(primir_out, 'r') as output, open(pre_exp, 'r') as expected:
             assert output.read() == expected.read() 
         
         with open(mir_out, 'r') as output, open(mir_exp, 'r') as expected:
