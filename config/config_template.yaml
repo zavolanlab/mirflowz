@@ -5,7 +5,7 @@
 
 # All paths are relative to the current working directory unless noted otherwise
 
-samples: path/to/samples_table.csv
+samples: path/to/samples_table.tsv
 
 #### GENOME RESOURCES #####
 
