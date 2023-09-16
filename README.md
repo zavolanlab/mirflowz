@@ -37,12 +37,13 @@ cd mirflowz
 
 For improved reproducibility and reusability of the workflow, as well as an
 easy means to run it on a high performance computing (HPC) cluster managed,
-e.g., by [Slurm][slurm], all steps of the workflow run inside their own
-containers. As a consequence, running this workflow has only a few individual
-dependencies. These are managed by the package manager [Conda][conda], which 
+e.g., by [Slurm][slurm], all steps of the workflow run inside isolated
+environments ([Singularity][singularity] containers or [Conda][conda]
+environments). As a consequence, running this workflow has only a few individual
+dependencies. These are managed by the package manager Conda, which 
 needs to be installed on your system before proceeding.
 
-If you do not already have [Conda][conda] installed globally on your system,
+If you do not already have Conda installed globally on your system,
 we recommend that you install [Miniconda][miniconda-installation]. For faster
 creation of the environment (and Conda environments in general), you can also
 install [Mamba][mamba] on top of Conda. In that case, replace `conda` with
@@ -57,8 +58,16 @@ conda env create -f environment.yml
 conda activate mirflowz
 ```
 
-If you plan to run _MIRFLOWZ_ via Singularity and do not already have it
-installed globally on your system, you must further update the Conda
+If you plan to run _MIRFLOWZ_ via Conda, we recommend to use the following
+command for a faster environment creation specially if it you will run it on a
+HPC cluster.
+
+```bash
+conda config --set channel_priority strict
+```
+
+If you plan to run _MIRFLOWZ_ via Singularity and do not already
+have it installed globally on your system, you must further update the Conda
 environment using the `environment.root.yml` with the command below.
 Mind that you must have the environment activated to update it.
 
@@ -103,7 +112,7 @@ bash test/test_workflow_local_with_conda.sh
 #### Run test workflow on a cluster via SLURM
 
 Execute one of the following commands to run the test workflow on a
-[Slurm][slurm]-managed high-performance computing (HPC) cluster:
+slurm-managed high-performance computing (HPC) cluster:
 
 - Test workflow with **Singularity**:
 
@@ -153,8 +162,11 @@ reproduce an analysis and set up Singularity access to them.
 
 #### 1. Prepare a sample table
 
+Refer to `test/test_files/sample_table.tsv` to know what this file 
+must look like, or use it as a template. 
+
 ```bash
-touch path/to/your/sample/table.csv
+touch path/to/your/sample/table.tsv
 ```
 > Fill the sample table according to the following requirements:  
 >
@@ -162,11 +174,9 @@ touch path/to/your/sample/table.csv
 > - `sample_file`. In this column, you must provide the path to the library file.
 > The path must be relative to the working directory.  
 > - `adapter`.  This field must contain the adapter sequence in capital letters.  
-> - `format`. In this field you mast state the library format. It can either be 
+> - `format`. In this field you must state the library format. It can either be 
 > `fa` if providing a FASTA file or `fastq` if the library is a FASTQ file.  
 > 
-> You can look at the `test/test_files/sample_table.csv` to know what this file 
-> must look like, or use it as a template.
 
 #### 2. Prepare genome resources
 
@@ -204,10 +214,11 @@ There are 4 files you must provide:
 
 #### 3. Prepare a configuration file
 
-We recommend creating a copy of the configuration file template:
+We recommend creating a copy of the
+[configuration file template](config/config_template.yaml):
 
 ```bash
-cp  path/to/config_template.yaml  path/to/config.yaml
+cp  config/config_template.yaml  path/to/config.yaml
 ```
 
 Open the new copy in your editor of choice and adjust the configuration
@@ -217,7 +228,7 @@ parameters means and how you can meaningfully adjust them.
 ### Running the workflow
 
 With all the required files in place, you can now run the workflow locally
-with the following command:  
+via Singularity with the following command:  
 
 ```bash
 snakemake \
@@ -259,14 +270,14 @@ snakemake \
 ## Workflow description
 
 The _MIRFLOWZ_ workflow first processes and indexes the user-provided genome 
-resources. Afterwards, the user-provided short read smallRNA-seq libraries will
-be aligned seperately against the genome and transcriptome. For increased 
-fidelity, two seperated aligners, [Segemehl][segemehl] and our in-house tool 
+resources. Afterwards, the user-provided short read small-RNA-seq libraries will
+be aligned separately against the genome and transcriptome. For increased 
+fidelity, two separated aligners, [Segemehl][segemehl] and our in-house tool 
 [Oligomap][oligomap], are used. All the resulting alignments are merged such 
 that only the best alignments of each read are kept (smallest edit distance).
 Finally, alignments are intersected with the user-provided, pre-processed
-miRNA annotation file using [`bedtools`][bedtools]. Counts are tabulated 
-seperately for reads consistent with either miRNA precursors, mature miRNA
+miRNA annotation file using [BEDTools][bedtools]. Counts are tabulated 
+separately for reads consistent with either miRNA precursors, mature miRNA
 and/or isomiRs.
 
 The schema below is a visual representation of the individual workflow steps
@@ -278,7 +289,9 @@ and how they are related:
 
 _MIRFLOWZ_ is an open-source project which relies on community contributions.
 You are welcome to participate by submitting bug reports or feature requests,
-taking part in discussions, or proposing fixes and other code changes.
+taking part in discussions, or proposing fixes and other code changes. Please
+refer to the [contributing guidelines](CONTRIBUTING.md) if you are interested in
+contribute.
 
 ## License
 
@@ -286,8 +299,9 @@ This project is covered by the [MIT License](LICENSE).
 
 ## Contact
 
-Do not hesitate on contacting us via [email][email] for any inquiries on
-_MIRFLOWZ_. Please mention the name of the tool.
+For questions or suggestions regarding the code, please use the [issue tracker][issue-tracker]. Do not hesitate on contacting us via [email][email] for any other inquiries.
+
+&copy; 2023 [Zavolab, Biozentrum, University of Basel][zavolab]
 
 [bedtools]: <https://github.com/arq5x/bedtools2>
 [chrMap]: <https://github.com/dpryan79/ChromosomeMappings>
@@ -295,13 +309,15 @@ _MIRFLOWZ_. Please mention the name of the tool.
 [cluster execution]: <https://snakemake.readthedocs.io/en/stable/executing/cluster.html>
 [email]: <zavolab-biozentrum@unibas.ch>
 [ensembl]: <https://ensembl.org/>
+[issue-tracker]: <https://github.com/zavolanlab/mirflowz/issues>
 [mamba]: <https://github.com/mamba-org/mamba>
 [miniconda-installation]: <https://docs.conda.io/en/latest/miniconda.html>
 [mirbase]: <https://mirbase.org/>
 [oligomap]: <https://bio.tools/oligomap>
 [rule-graph]: images/rule_graph.svg
 [segemehl]: <https://www.bioinf.uni-leipzig.de/Software/segemehl/>
-[singularity]: <https://sylabs.io/singularity/>
+[singularity]: <https://apptainer.org/admin-docs/3.8/index.html>
 [slurm]: <https://slurm.schedmd.com/documentation.html>
 [snakemake]: <https://snakemake.readthedocs.io/en/stable/>
 [snakemakeDocu]: <https://snakemake.readthedocs.io/en/stable/executing/cli.html>
+[zavolab]: <https://www.biozentrum.unibas.ch/research/researchgroups/overview/unit/zavolan/research-group-mihaela-zavolan/>
