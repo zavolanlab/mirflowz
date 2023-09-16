@@ -79,7 +79,7 @@ explanation of each option.
 
 #### `trim_genome_seq_ids`
 
-Trim genome sequence IDs.
+Trim genome sequence IDs with a [custom-script][custom-script].
 
 - **Input**
   - Genome sequence file (`.fasta`)
@@ -175,9 +175,9 @@ Convert exon annotations `.gtf` to `.bed`.
 #### `create_genome_header`
 
 Create `SAM` header for the genome with 
-[**samtools**](#third-party-software-used).
+[**SAMtools**](#third-party-software-used).
 
-> Required by [samtools](#third-party-software-used) to work with the alignment
+> Required by [SAMtools](#third-party-software-used) to work with the alignment
 file.
 
 - **Input**
@@ -205,7 +205,7 @@ miRNA annotations. Several mapping tables are available [here][chr-maps].
 #### `create_index_genome_fasta`
 
 Create a `FASTA` index for the genome with 
-[**samtools**](#third-party-software-used).
+[**SAMtools**](#third-party-software-used).
 
 - **Input**
   - Genome sequence file with trim IDs (`.fasta`); from
@@ -241,7 +241,7 @@ extended to accommodate the new miRNA coordinates.
 - **Parameters**
   - **config_schema.json**
     - `extension`: Number of nucleotides by which mature miRNA annotated
-    regions are extended (default: 6)
+    regions are extended (default 6)
 - **Output**
   - Primary miRNA transcript (pri-mir) extended annotation (`.gff3`); used in
   [**intersect_extended_primir**](#intersect-extended-primir)
@@ -358,7 +358,7 @@ Align short reads to reference genome with
   - segemehl index (`idx`); from
   [**generate_segemehl_index_genome**](#generate-segemehl-index-genome)
 - **Output**
-  - Aligned reads file (`.sam`); used in
+  - Alignments file (`.sam`); used in
   [**merge_genome_maps**](#merge-genome-maps)
 
 
@@ -375,7 +375,7 @@ Align short reads to reference transcriptome with
   - segemehl index (`idx`); from
   [**generate_segemehl_index_transcriptome**](#generate-segemehl-index-transcriptome)
 - **Output**
-  - Aligned reads file (`.sam`); used in
+  - Alignments file (`.sam`); used in
   [**merge_transcriptome_maps**](#merge-transcriptome-maps)
 
 
@@ -406,7 +406,7 @@ Align short reads to reference genome with
   - Genome sequence (`.fa`); from 
   [**trim_genome_seq_ids**](#trim-genome-seq-ids)
 - **Output**
-  - Aligned reads file (`.fa`); used in
+  - Alignments file (`.fa`); used in
   [**sort_genome_oligomap**](#sort-genome-oligomap)
   - Alignment report (`.txt`); used in
   [**sort_genome_oligomap**](#sort-genome-oligomap)
@@ -417,7 +417,7 @@ Align short reads to reference genome with
 Sort [**oligomap**](#third-party-software-used) alignments by query name.
 
 - **Input**
-  - Aligned reads file (`.fa`); from
+  - Alignments file (`.fa`); from
   [**map_genome_oligomap**](#map-genome-oligomap)
   - Alignment report (`.txt`); from
   [**map_genome_oligomap**](#map-genome-oligomap)
@@ -433,7 +433,7 @@ Sort [**oligomap**](#third-party-software-used) alignments by query name.
 Convert aligned reads `.fa` to `.sam` and filter alignments by number of hits.
 
 - **Input**
-  - Aligned reads file (`.fa`); from
+  - Alignments file (`.fa`); from
   [**sort_genome_oligomap**](#sort-genome-oligomap)
   - Alignment report (`.txt`); from
   [**sort_genome_oligomap**](#sort-genome-oligomap)
@@ -441,7 +441,7 @@ Convert aligned reads `.fa` to `.sam` and filter alignments by number of hits.
   - **config_schema.json**
     - `nh`: Maximum number of hits an alignment can have to be kept
 - **Output**
-  - Aligned reads (`.sam`); used in [**merge_genome_maps**](#merge-genome-maps)
+  - Alignments file (`.sam`); used in [**merge_genome_maps**](#merge-genome-maps)
 
 
 #### `map_transcriptome_oligomap`
@@ -455,7 +455,7 @@ Align short reads to reference transcriptome with
   - Transcriptome sequence (`.fa`); from 
   [**trim_transcriptome_seq_ids**](#trim-transcriptome-seq-ids)
 - **Output**
-  - Aligned reads file (`.fa`); used in
+  - Alignments file (`.fa`); used in
   [**sort_transcriptome_oligomap**](#sort-transcriptome-oligomap)
   - Alignment report (`.txt`); used in
   [**sort_transcriptome_oligomap**](#sort-transcriptome-oligomap)
@@ -466,7 +466,7 @@ Align short reads to reference transcriptome with
 Sort [**oligomap**](#third-party-software-used) alignments by query name.
 
 - **Input**
-  - Aligned reads file (`.fa`); from
+  - Alignments file (`.fa`); from
   [**map_transcriptome_oligomap**](#map-transcriptome-oligomap)
   - Alignment report (`.txt`); from
   [**map_transcriptome_oligomap**](#map-transcriptome-oligomap)
@@ -482,7 +482,7 @@ Sort [**oligomap**](#third-party-software-used) alignments by query name.
 Convert aligned reads `.fa` to `.sam` and filter alignments by number of hits.
 
 - **Input**
-  - Aligned reads file (`.fa`); from
+  - Alignments file (`.fa`); from
   [**sort_transcriptome_oligomap**](#sort-transcriptome-oligomap)
   - Alignment report (`.txt`); from
   [**sort_transcriptome_oligomap**](#sort-transcriptome-oligomap)
@@ -490,7 +490,7 @@ Convert aligned reads `.fa` to `.sam` and filter alignments by number of hits.
   - **config_schema.json**
     - `nh`: Maximum number of hits an alignment can have to be kept
 - **Output**
-  - Aligned reads (`.sam`); used in
+  - Alignments file (`.sam`); used in
   [**merge_transcriptome_maps**](#merge-transcriptome-maps)
 
 
@@ -500,12 +500,12 @@ Concatenate [**segemehl**](#third-party-software-used) and
 [**oligomap**](#third-party-software-used) genome alignments.
 
 - **Input**
-  - Aligned reads (`.sam`); from
+  - Alignments file (`.sam`); from
   [**map_genome_segemehl**](#map-genome-segemehl)
-  - Aligned reads (`.sam`); from
+  - Alignments file (`.sam`); from
   [**convert_genome_to_sam_oligomap**](#convert-genome-to-sam-oligomap)
 - **Output**
-  - Aligned reads (`.sam`); used in
+  - Alignments file (`.sam`); used in
   [**filter_genome_by_nh**](#filter-genome-by-nh)
 
 
@@ -515,55 +515,493 @@ Concatenate [**segemehl**](#third-party-software-used) and
 [**oligomap**](#third-party-software-used) transcriptome alignments.
 
 - **Input**
-  - Aligned reads (`.sam`); from
+  - Alignments file (`.sam`); from
   [**map_transcriptome_segemehl**](#map-transcriptome-segemehl)
-  - Aligned reads (`.sam`); from
+  - Alignments file (`.sam`); from
   [**convert_transcriptome_to_sam_oligomap**](#convert-transcriptome-to-sam-oligomap)
 - **Output**
-  - Aligned reads (`.sam`); used in
+  - Alignments file (`.sam`); used in
   [**filter_transcriptome_by_nh**](#filter-transcriptome-by-nh)
 
 
-### `filter_genome_by_nh`
+#### `filter_genome_by_nh`
 
 Filter merged genome alignments by the number of hits.
 
 - **Input**
-  - Aligned reads (`.sam`); from
+  - Alignments file (`.sam`); from
   [**merge_genome_maps**](#merge-genome-maps)
 - **Parameters**
   - **config_schema.json**
-    - `nh`: Maximum number of mappings per read to be kept
+    - `nh`: Maximum number of mappings per read to be kept (default 100)
 - **Output**
-  - Aligned reads(`.sam`); used in
-  [**remove_header_genome**](#remove-header-genome)
+  - Alignments file(`.sam`); used in
+  [**remove_header_genome_mappings**](#remove-header-genome-mappings)
 
-### `filter_genome_by_nh`
+#### `filter_transcriptome_by_nh`
 
-Filter merged genome alignments by the number of hits.
+Filter merged transcriptome alignments by the number of hits.
 
 - **Input**
-  - Aligned reads (`.sam`); from
-  [**merge_genome_maps**](#merge-genome-maps)
+  - Alignments file (`.sam`); from
+  [**merge_transcriptome_maps**](#merge-transcriptme-maps)
 - **Parameters**
   - **config_schema.json**
-    - `nh`: Maximum number of mappings per read to be kept
+    - `nh`: Maximum number of mappings per read to be kept (default 100)
 - **Output**
-  - Aligned reads(`.sam`); used in
-  [**remove_header_genome**](#remove-header-genome)
+  - Alignments file(`.sam`); used in
+  [**remove_header_transcriptome_mappings**](#remove-header-transcriptome-mappings)
 
+
+#### `remove_header_genome_mappings`
+
+Remove the `SAM` header of the genome alignments file with
+[**SAMtools**](#third-party-software-used).
+
+- **Input**
+  - Alignments file (`.sam`); from
+  [**filter_genome_by_nh**](#filter-genome-by-nh)
+- **Output**
+  - Alignments file (`.sam`); used in [**merge_all_maps**](#merge-all-maps)
+
+
+#### `remove_header_transcriptome_mappings`
+
+Remove the `SAM` header of the transcriptome alignments file with
+[**SAMtools**](#third-party-software-used).
+
+- **Input**
+  - Alignments file (`.sam`); from
+  [**filter_transcriptome_by_nh**](#filter-transcriptome-by-nh)
+- **Output**
+  - Alignments file (`.sam`); used in 
+  [**transcriptome_to_genome_maps**](#transcriptome-to-genome--maps)
+
+
+#### `transcriptome_to_genome_maps`
+
+Convert the alignments transcriptome coordinates to genomic ones.
+
+- **Input**
+  - Alignments file (`.sam`); from 
+  [**remove_header_transcriptome_mappings**](#remove-header-transcriptome-mappings)
+  - Exon annotations (`.bed`); from
+  [**convert_exons_gtf_to_bed**](#convert-exons-gtf-to-bed)
+- **Output**
+  - Alignments file (`.sam`); used in [**merge_all_maps**](#merge-all-maps)
+
+
+#### `merge_all_maps`
+
+Concatenate the four alignments files into a single file.
+
+- **Input**
+  - Alignments file (`.sam`); from
+  [**remove_header_genome_mappings**](#remove-header-genome-mappings) and
+  [**transcriptome_to_genome_maps**](#transcriptome-to-genome-maps)
+- **Output**
+  - Alignments file (`.sam`); used in
+  [**add_header_all_maps**](#add-header-all-maps)
+
+
+#### `add_header_all_maps`
+
+Add the `SAM` header to the aligned reads with
+[**SAMtools**](#third-party-software-used).
+
+- **Input**
+  - Alignments file (`.sam`); from [**merge_all_maps**](#merge-all-maps)
+- **Output**
+  - Alignments file (`.sam`); used in [**sort_maps_by_id**](#sort-maps-by-id)
+
+
+#### `sort_maps_by_id`
+
+Sort alignments by reads ID with [**SAMtools**](#third-party-software-used).
+
+- **Input**
+  - Alignments file (`.sam`); from
+  [**add_header_all_maps**](#add-header-all-maps)
+- **Output**
+  - Alignments file, sorted (`.sam`); used in
+  [**remove_inferiors**](#remove-inferiors)
+
+
+#### `remove_inferiors`
+
+Remove duplicate and inferior alignments.
+
+> Alignments are considered to be duplicates if having identical entries for
+the fields `QNAME`, `FLAG`, `RNAME`, `POS` and `CIGAR`. 
+Alignments are considered to be inferiors if having the same `QNAME` and
+a bigger edit distance than the minimum one within the group.
 
 
 - **Input**
-  - 
+  - Alignments file, sorted (`.sam`); from [**sort_maps_by_id**](#sort-maps-by-id)
 - **Output**
-  -
+  - Alignments file (`.sam`); used in
+  [**filter_by_indels**](#filter-by-indels)
+
+
+#### `filter_by_indels`
+
+Remove multimappers favoring mismatches over indels.
+
+- **Input**
+  - Alignments file, sorted (`.sam`); from
+  [**remove_inferiors**](#remove-inferiors)
+- **Output**
+  - Alignments file (`.sam`); used in
+  [**convert_all_alns_sam_to_bam**](#convert-all-alns-sam-to-bam) and
+  [**filter_sam_by_intersecting_primir**](#filter-sam-by-intersecting-primr)
+
+
+#### `convert_all_alns_sam_to_bam`
+
+Convert alignments `.sam` file to `.bam` with
+[**SAMtools**](#third-party-software-used).
+
+> Required by [BEDTools](#third-party-software-used) to intersect alignments
+with pri-miR annotations.
+
+- **Input**
+  - Alignments file (`.sam`); from [**filter_by_indels**](#filter-by-indels)
+- **Output**
+  - Alignments file (`.bam`); used in
+  [**sort_all_alns_bam_by_position**](#sort-all-alns-bam-by-position)
+
+
+#### `sort_all_alns_bam_by_position`
+
+Sort alignments by position with [**SAMtools**](#third-party-software-used).
+
+> Required by [BEDTools](#third-party-software-used) to intersect alignments
+with pri-miR annotations more efficiently.
+
+- **Input**
+  - Alignments file (`.bam`); from
+  [**convert_all_alns_sam_to_bam**](#convert-all-alns-sam-to-bam)
+- **Output**
+  - Alignments file, sorted (`.bam`); used in
+  [**index_all_alns_bam**](#index-all-alns-bam) and
+  [**intersect_extended_primir**](#intersect-extended-primir)
+
+
+#### `index_all_alns_bam`
+
+Create index `BAM` file with [**SAMtools**](#third-party-software-used).
+
+> Indexing is required by genome viewers such as IGV to quickly display
+alignments in a genomic region of interest.
+
+- **Input**
+  - Alignments file (`.bam`); from
+  [**sort_all_alns_bam_by_position**](#sort-all-alns-bam-by-position)
+- **Output**
+  - `BAM` index file (`.bam.bai`); used in
+  [**intersect_extended_primir**](#intersect-extended-primir)
+
 
 ### Quantify workflow
 
-COMING SOON.
+#### `intersect_extendend_primir`
+
+Intersect the aligned reads with the extended pri-miR annotations with
+[**BEDTools**](#third-party-software-used).
+
+- **Input**
+  - Alignments file (`.bam`); from
+  [**sort_all_alns_bam_by_position**](#sort-all-alns-bam-by-position)
+  - pri-miR extended annotations (`.gff3`); from
+  [**extend_mirs_annotations**](#extend-mirs-annotations)
+- **Output**
+  - pri-miR intersections file (`.bed`); used in
+  [**filter_sam_by_intersecting_primir**](#filter-sam-by-intersecting-primir)
+  and [**quantify_primir**](#quantify-primir)
+
+
+#### `filter_sam_by_intersecting_primir`
+
+Remove alignments that do not intersect with any pri-miR with
+[**SAMtools**](#third-party-software-used).
+
+> Required to only intersect alignments within a pri-miR locus.
+
+- **Input**
+  - Alignments file (`.sam`); from [**filter_by_indels**](#filter-by-indels) 
+  - pri-miR intersections file (`.bed`); from
+  [**intersect_extended_primir**](#intersect-extended-primir)
+- **Output**
+  - Alignments file, filtered (`.sam`); used in
+  [**convert_intersecting_primir_sam_to_bam**](#convert-intersecting-primir-sam-to-bam)
+  and [**filter_sam_by_intersecting_mirna**](#filter-sam-by-intersecting-mirna)
+
+
+#### `convert_intersecting_primir_sam_to_bam`
+
+Convert alignments `.sam` file to `.bam` with
+[**SAMtools**](#third-party-software-used).
+
+> Required by [BEDTools](#third-party-software-used) to intersect alignments
+with miRNA annotations.
+
+- **Input**
+  - Alignments file (`.sam`); from
+  [**filter_sam_by_intersecting_primir**](#filter-sam-by-intersecting-primir)
+- **Output**
+  - Alignments file (`.bam`); used in
+  [**sort_intersecting_primir_bam_by_position**](#sort-intersecting-primir-bam-by-position)
+
+
+#### `sort_intersecting_primir_bam_by_position`
+
+Sort alignments by position with [**SAMtools**](#third-party-software-used).
+
+> Required by [BEDTools](#third-party-software-used) to intersect alignments
+with miRNA annotations more efficiently.
+
+- **Input**
+  - Alignments file (`.bam`); from
+  [**convert_intersecting_primir_sam_to_bam**](#convert-intersecting-primir-sam-to-bam)
+- **Output**
+  - Alignments file, sorted (`.bam`); used in
+  [**index_intersecting_primir_bam**](#index-intersecting-primir-bam) and
+  [**intersect_extended_mirna**](#intersect-extended-mirna)
+
+
+#### `index_intersecting_primir_bam`
+
+Create index `BAM` file with [**SAMtools**](#third-party-software-used).
+
+> Indexing is required by genome viewers such as IGV to quickly display
+alignments in a genomic region of interest.
+
+- **Input**
+  - Alignments file (`.bam`); from
+  [**sort_intersecting_primir_bam_by_position**](#sort-intersecting-primir-bam-by-position)
+- **Output**
+  - `BAM` index file (`.bam.bai`); used in
+  [**intersect_extended_mirna**](#intersect-extended-mirna)
+
+
+#### `intersect_extended_mirna`
+
+Intersect the aligned reads with the extended miRNA annotations with
+[**BEDTools**](#third-party-software-used).
+
+- **Input**
+  - Alignments file (`.bam`); from
+  [**sort_intersecting_primir_bam_by_position**](#sort-intersecting-primir-bam-by-position)
+  - miRNA extended annotations (`.gff3`); from
+  [**extend_mirs_annotations**](#extend-mirs-annotations)
+- **Output**
+  - miRNA intersections file (`.bed`); used in
+  [**filter_sam_by_intersecting_mirna**](#filter-sam-by-intersecting-mirna)
+  and [**add_intersecting_mirna_tag**](#add-intersecting-mirna-tag)
+
+
+#### `filter_sam_by_intersecting_mirna`
+
+Remove alignments that do not intersect with any miRNA with
+[**SAMtools**](#third-party-software-used).
+
+> Required to efficiently classify the alignments.
+
+- **Input**
+  - Alignments file (`.sam`); from
+  [**filter_sam_by_intersecting_primir**](#filter-sam-by-intersecting-primir) 
+  - miRNA intersections file (`.bed`); from
+  [**intersect_extended_mirna**](#intersect-extended-mirna)
+- **Output**
+  - Alignments file, filtered (`.sam`); used in 
+  [**add_intersecting_mirna_tag**](#add-intersecting-mirna-tag) and
+  [**uncollapse_reads**](#uncollapse-reads)
+
+
+#### `add_intersecting_mirna_tag`
+
+Classify and add the intersecting (iso)miR to each alignment as a tag.
+
+> To classify the reads, miRNA annotations are turned into the original ones.
+The alignment start and end shifts relative to the annotations are computed
+and append along with the `CIGAR` and `MD` strings to the intersecting miRNA.
+If the read is classified as a canonical miRNA, the name will not include
+the star and end shift, nor the `CIGAR` and `MD` strings.
+
+- **Input**
+  - Alignments file (`.sam`); from
+  [**filter_sam_by_intersecting_mirna**](#filter-sam-by-intersecting-mirna)
+  - miRNA intersections file (`.bed`); from
+  [**intersect_extended_mirna**](#intersect-extended-mirna)
+- **Parameters**
+  - **config_schema.json**
+    - `extension`: Number of nucleotides by which mature miRNA annotated
+    regions are extended (default 6)
+- **Output**
+  - Alignments file, tagged (`.sam`); used in
+  [**sort_intersecting_mirna_by_feat_tag**](#sort-intersecting-mirna-by-feat-tag)
+
+
+#### `sort_intersecting_mirna_by_feat_tag`
+
+Sort the alignments by the tag containing the classified intersecting miRNA.
+
+> Required for an efficient quantification.
+
+- **Input**
+  - Alignments file, tagged (`.sam`); from
+  [**add_intersecting_mirna_tag**](#add-intersecting-mirna-tag)
+- **Output**
+  - Alignments file, tagged and sorted (`.sam`); used in
+  [**quantify_mirna**](#quantify-mirna)
+
+
+#### `quantify_mirna`
+
+Tabulate [...]
+
+> Quantification is done with partial counts (_i.e._ each alignment contributes
+by the number of collapsed reads divided by the number of hits).
+
+- **Input**
+  - Alignments file, sorted and tagged (`.sam`); from
+  [**sort_intersecting_mirna_by_feat_tag**](#sort-intersecting-mirna-by-feat-tag)
+- **Parameters**
+  - **samples.csv**
+    - Library name; specify in sample table column `sample`
+  - **config_schema.json**
+    - `mir_list`: miRNA features to be quantified (default isomir, mirna
+    pri-mir)
+- **Output**
+  - (iso)miR counts tab-delimited file; used in
+  [**merge_tables**](#merge-tables)
+
+
+#### `quantify_primir`
+
+Tabulate [...]
+
+> Quantification is done with partial counts (_i.e._ each alignment contributes
+by the number of collapsed reads divided by the number of hits).
+
+- **Input**
+  - pri-miR intersections file (`.bed`); from
+  [**intersecti_extended_primir**](#intersect-extended-pri-mir)
+- **Output**
+  - pri-miR counts tab-delimited file; used in
+  [**merge_tables**](#merge-tables)
+
+
+#### `merge_tables`
+
+Merge all the tables from the different libraries into a single one.
+
+- **Input**
+  - counts tab-delimited file; from [**quantify_mirna**](#quantify-mirna)
+  and/or [**quantify_primir**](#quantify-primir)
+- **Parameters**
+  - **cluster_schema.json**
+    - `mir_list`: miRNA features to be quantified (default isomir, mirna
+    pri-mir)
+- **Output**
+  - (iso)miR and/or pri-miR counts table (`.tab`)
+
+
+#### `uncollapse_reads`
+
+Reverse the collapsing of reads with identical sequences as done with
+[**FASTX-Toolkit**](#third-party-software-used).
+
+- **Input**
+  - Alignments file (`.sam`); from
+  [**filter_sam_by_intersecting_mirna**](#filter-sam-by-intersecting-mirna)
+- **Output**
+  - Uncollapsed aligned reads (`.sam`); used in
+  [**convert_uncollapsed_reads_sam_to_bam**](#convert-uncollapsed-reads-sam-to-bam)
+
+
+#### `convert_uncollapsed_reads_sam_to_bam`
+
+Convert alignments `.sam` file to `.bam` with
+[**SAMtools**](#third-party-software-used).
+
+- **Input**
+  - Alignments file (`.sam`); from
+  [**filter_sam_by_intersecting_mirna**](#filter-sam-by-intersecting-mirna)
+- **Output**
+  - Alignments file (`.bam`); used in
+  [**sort_uncollapsed_reads_bam_by_position**](#sort-uncollapsed-reads-bam-by-position)
+
+
+#### `sort_uncollapsed_reaads_bam_by_position`
+
+Sort alignments by position with [**SAMtools**](#third-party-software-used).
+
+- **Input**
+  - Alignments file (`.bam`); from
+  [**convert_uncollapsed_reads_sam_to_bam**](#convert-uncollapsed_reads-sam-to-bam)
+- **Output**
+  - Alignments file, sorted (`.bam`); used in
+  [**index_uncollapsed_reads_bam**](#index-uncollapsed-reads-bam)
+
+
+#### `index_uncollapsed_reads_bam`
+
+Create index `BAM` file with [**SAMtools**](#third-party-software-used).
+
+> Indexing is required by genome viewers such as IGV to quickly display
+alignments in a genomic region of interest.
+
+- **Input**
+  - Alignments file (`.bam`); from
+  [**sort_uncollapsed_reads_bam_by_position**](#sort-uncollapsed-reads-bam-by-position)
+- **Output**
+  - `BAM` index file (`.bam.bai`)
+
+
+#### `finish`
+
+Target rule as required by [Snakemake][docs-snakemake].
+
+> Local rule
+
+- **Input**
+  - pri-miR intersections file (`.bed`); from
+  [**intersect_extended_primir**](#intersect-extended-primir)
+  - miRNA intersections file (`.bed`); from
+  [**intersect_extended_mirna**](#intersect-extended-mirna)
+  - Alignments file, sorted and tagged (`.sam`); from
+  [**sort_intersecting_mirna_by_feat_tag**](#sort-intersecting-mirna-by-feat-tag)
+  - (iso)miR and/or pri-miR counts table (`.tab`); from
+  [**merge_tables**](#merge-tables)
+  - Alignments file (`.bam`); from
+  [**sort_uncollapsed_reads_bam_by_position**](#sort-uncollapsed-reads-bam-by-position)
+  - `BAM` index file (`.bam.bai`); from
+  [**index_uncollapsed_reads_bam**](#index-uncollapsed-reads-bam)
+
 
 [chr-maps]: <https://github.com/dpryan79/ChromosomeMappings>
+[custom-script]: <https://github.com/zavolanlab/mirflowz/scripts/blocksort.sh>
+[custom-script]: <https://github.com/zavolanlab/mirflowz/scripts/filter_multimappers.py>
+[custom-script]: <https://github.com/zavolanlab/mirflowz/scripts/get_lines_w_pattern.sh>
+[custom-script]: <https://github.com/zavolanlab/mirflowz/scripts/gtf_exons_bed.1.1.2.R>
+[custom-script]: <https://github.com/zavolanlab/mirflowz/scripts/iso_name_tagging.py>
+[custom-script]: <https://github.com/zavolanlab/mirflowz/scripts/map_chromosomes.pl>
+[custom-script]: <https://github.com/zavolanlab/mirflowz/scripts/merge_tables.R>
+[custom-script]: <https://github.com/zavolanlab/mirflowz/scripts/mirna_extension.py>
+[custom-script]: <https://github.com/zavolanlab/mirflowz/scripts/merge_tables.R>
+[custom-script]: <https://github.com/zavolanlab/mirflowz/scripts/mirna_quantification.py>
+[custom-script]: <https://github.com/zavolanlab/mirflowz/scripts/nh_filter.py>
+[custom-script]: <https://github.com/zavolanlab/mirflowz/scripts/oligomapOutputToSam_nhfiltered.py>
+[custom-script]: <https://github.com/zavolanlab/mirflowz/scripts/>
+[custom-script]: <https://github.com/zavolanlab/mirflowz/scripts/>
+[custom-script]: <https://github.com/zavolanlab/mirflowz/scripts/>
+[custom-script]: <https://github.com/zavolanlab/mirflowz/scripts/>
+[custom-script]: <https://github.com/zavolanlab/mirflowz/scripts/>
+[custom-script]: <https://github.com/zavolanlab/mirflowz/scripts/>
+[custom-script]: <https://github.com/zavolanlab/mirflowz/scripts/>
+[custom-script]: <https://github.com/zavolanlab/mirflowz/scripts/>
 [code-bedtools]: <https://github.com/arq5x/bedtools2>
 [code-cufflinks]: <https://github.com/cole-trapnell-lab/cufflinks>
 [code-cutadapt]: <https://github.com/marcelm/cutadapt>
