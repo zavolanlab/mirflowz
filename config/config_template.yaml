@@ -5,7 +5,7 @@
 
 # All paths are relative to the current working directory unless noted otherwise
 
-samples: path/to/samples_table.csv
+samples: path/to/samples_table.tsv
 
 #### GENOME RESOURCES #####
 
@@ -19,7 +19,7 @@ mirna_file: path/to/unzipped/mirbase/mirna_annotations.gff3
 # Tab-separated mappings table between UCSC (column 1)
 # and Ensembl (coulm 2) chromosome names 
 # Available at: https://github.com/dpryan79/ChromosomeMappings
-map_chr_file: path/to/ucsc_ensembl_mappings.txt
+map_chr_file: path/to/ucsc_ensembl_mappings.tsv
 
 
 ###############################
