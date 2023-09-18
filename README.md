@@ -280,6 +280,9 @@ miRNA annotation file using [BEDTools][bedtools]. Counts are tabulated
 separately for reads consistent with either miRNA precursors, mature miRNA
 and/or isomiRs.
 
+> **NOTE:** For a detailed description of each rule, please, refer to the
+> [workflow documentation](pipeline_documentation.md)
+
 The schema below is a visual representation of the individual workflow steps
 and how they are related:
 
