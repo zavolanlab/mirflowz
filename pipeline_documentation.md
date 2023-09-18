@@ -14,70 +14,70 @@ on installation and usage please see [here](README.md).
     - [Configuration file](#configuration-file)
   - [Snakefile](#snakefile)
     - [`finish`](#finish)
-  - [Prepare workflow](#prepare-workflow)
-    - [`finish_prepare`](#finish-prepare)
-    - [`trim_genome_seq_ids`](#trim-genome-seq-ids)
-    - [`extract_transcriptome_seqs`](#extract-transcriptome-seqs)
-    - [`trim_transcriptome_seq_ids`](#trim-transcriptome-seq-ids)
-    - [`generate_segemehl_index_transcriptome`](#generate-segemehl-index-transcriptome)
-    - [`generate_segemehl_index_genome`](#generate-segemehl-index-genome)
-    - [`get_exons_gtf`](#get-exons-gtf)
-    - [`convert_exons_gtf_to_bed`](#convert-exons-gtf-to-bed)
-    - [`create_genome_header`](#create-genome-header)
-    - [`map_chr_names`](#create-chr-names)
-    - [`create_index_genome_fasta`](#create-index-genome-fasta)
-    - [`extract_chr_len`](#extract-chr-len)
-    - [`extend_mirs_annotations`](#extend-mirs-annotations)
-  - [Map workflow](#map-workflow)
-    - [`finish_map`](#finish-map)
+  - [Prepare workflow](#prepare_workflow)
+    - [`finish_prepare`](#finish_prepare)
+    - [`trim_genome_seq_ids`](#trim_genome_seq_ids)
+    - [`extract_transcriptome_seqs`](#extract_transcriptome_seqs)
+    - [`trim_transcriptome_seq_ids`](#trim_transcriptome_seq_ids)
+    - [`generate_segemehl_index_transcriptome`](#generate_segemehl_index_transcriptome)
+    - [`generate_segemehl_index_genome`](#generate_segemehl_index_genome)
+    - [`get_exons_gtf`](#get_exons_gtf)
+    - [`convert_exons_gtf_to_bed`](#convert_exons_gtf_to_bed)
+    - [`create_genome_header`](#create_genome_header)
+    - [`map_chr_names`](#create_chr_names)
+    - [`create_index_genome_fasta`](#create_index_genome_fasta)
+    - [`extract_chr_len`](#extract_chr_len)
+    - [`extend_mirs_annotations`](#extend_mirs_annotations)
+  - [Map workflow](#map_workflow)
+    - [`finish_map`](#finish_map)
     - [`start`](#start)
-    - [`fastq_quality_filter`](#fastq-quality-filter)
-    - [`fastq_to_fasta`](#fastq-to-fasta)
-    - [`format_fasta`](#format-fasta)
-    - [`remove_adapters`](#remove-adapters)
-    - [`collapse_indentical_reads`](#collapse-indentical-reads)
-    - [`map_genome_segemehl`](#map-genome-segemehl)
-    - [`map_transcriptome_segemehl`](#map-transcriptome-segemehl)
-    - [`filter_fasta_for_oligomap`](#filter-fasta-for-oligomap)
-    - [`map_genome_oligomap`](#map-genome-oligomap)
-    - [`sort_genome_oligomap`](#sort-genome-oligomap)
-    - [`convert_genome_to_sam_oligomap`](#convert-genome-to-sam-oligomap)
-    - [`map_transcriptome_oligomap`](#map-transcriptome-oligomap)
-    - [`sort_transcriptome_oligomap`](#sort-transcriptome-oligomap)
-    - [`convert_transcriptome_to_sam_oligomap`](#convert-transcriptome-to-sam-oligomap)
-    - [`merge_genome_maps`](#merge-genome-maps)
-    - [`merge_transcriptome_maps`](#merge-transcriptome-maps)
-    - [`filter_genome_by_nh`](#filter-genome-by-nh)
-    - [`filter_transcriptome_by_nh`](#filter-transcriptome-by-nh)
-    - [`remove_header_genome_mappings`](#remove-header-genome-mappings)
-    - [`remove_header_transcriptome_mappings`](#remove-header-transcriptome-mappings)
-    - [`transcriptome_to_genome_maps`](#transcriptome-to-genome-maps)
-    - [`merge_all_maps`](#merge-all-maps)
-    - [`add_header_all_maps`](#add-header-all-maps)
-    - [`sort_maps_by_id`](#sort-maps-by-id)
-    - [`remove_inferiors`](#remove-inferiors)
-    - [`filter_by_indels`](#filter-by-indels)
-    - [`convert_all_alns_sam_to_bam`](#convert-all-alns-sam-to-bam)
-    - [`sort_all_alns_bam_by_position`](#sort-all-alns-bam-by-position)
-    - [`index_all_alns_bam`](#index-all-alns-bam)
-  - [Quantify workflow](#quantify-workflow)
-    - [`finish_quantify`](#finish-quantify)
-    - [`intersect_extended_primir`](#intersect-extended-primir)
-    - [`filter_sam_by_intersecting_primir`](#filter-sam-by-intersecting-primir)
-    - [`convert_intersecting_primir_sam_to_bam`](#convert-intersecting-primir-sam-to-bam)
-    - [`sort_intersecting_primir_bam_by_position`](#sort-intersecting-primir-bam-by-position)
-    - [`index_intersecting_primir_bam`](#index-intersecting-primir-bam)
-    - [`intersect_extended_mirna`](#intersect-extended-mirna)
-    - [`filter_sam_by_intersecting_mirna`](#filter-sam-by-intersecting-mirna)
-    - [`add_intersecting_mirna_tag`](#add-intersecting-mirna-tag)
-    - [`sort_intersecting_mirna_by_feat_tag`](#sort-intersecting-mirna-by-feat-tag)
-    - [`quantify_mirna`](#quantify-mirna)
-    - [`quantify_primir`](#quantify-primir)
-    - [`merge_tables`](#merge-tables)
-    - [`uncollapse_reads`](#uncollapse-reads)
-    - [`convert_uncollapse_reads_sam_to_bam`](#convert-uncollapse-reads-sam-to-bam)
-    - [`sort_uncollapse_reads_bam_by_position`](#sort-uncollapse-reads-bam-by-position)
-    - [`index_uncollapse_reads_bam`](#index-uncollapse-reads-bam)
+    - [`fastq_quality_filter`](#fastq_quality_filter)
+    - [`fastq_to_fasta`](#fastq_to_fasta)
+    - [`format_fasta`](#format_fasta)
+    - [`remove_adapters`](#remove_adapters)
+    - [`collapse_indentical_reads`](#collapse_indentical_reads)
+    - [`map_genome_segemehl`](#map_genome_segemehl)
+    - [`map_transcriptome_segemehl`](#map_transcriptome_segemehl)
+    - [`filter_fasta_for_oligomap`](#filter_fasta_for_oligomap)
+    - [`map_genome_oligomap`](#map_genome_oligomap)
+    - [`sort_genome_oligomap`](#sort_genome_oligomap)
+    - [`convert_genome_to_sam_oligomap`](#convert_genome_to_sam_oligomap)
+    - [`map_transcriptome_oligomap`](#map_transcriptome_oligomap)
+    - [`sort_transcriptome_oligomap`](#sort_transcriptome_oligomap)
+    - [`convert_transcriptome_to_sam_oligomap`](#convert_transcriptome_to_sam_oligomap)
+    - [`merge_genome_maps`](#merge_genome_maps)
+    - [`merge_transcriptome_maps`](#merge_transcriptome_maps)
+    - [`filter_genome_by_nh`](#filter_genome_by_nh)
+    - [`filter_transcriptome_by_nh`](#filter_transcriptome_by_nh)
+    - [`remove_header_genome_mappings`](#remove_header_genome_mappings)
+    - [`remove_header_transcriptome_mappings`](#remove_header_transcriptome_mappings)
+    - [`transcriptome_to_genome_maps`](#transcriptome_to_genome_maps)
+    - [`merge_all_maps`](#merge_all_maps)
+    - [`add_header_all_maps`](#add_header_all_maps)
+    - [`sort_maps_by_id`](#sort_maps_by_id)
+    - [`remove_inferiors`](#remove_inferiors)
+    - [`filter_by_indels`](#filter_by_indels)
+    - [`convert_all_alns_sam_to_bam`](#convert_all_alns_sam_to_bam)
+    - [`sort_all_alns_bam_by_position`](#sort_all_alns_bam_by_position)
+    - [`index_all_alns_bam`](#index_all_alns_bam)
+  - [Quantify workflow](#quantify_workflow)
+    - [`finish_quantify`](#finish_quantify)
+    - [`intersect_extended_primir`](#intersect_extended_primir)
+    - [`filter_sam_by_intersecting_primir`](#filter_sam_by_intersecting_primir)
+    - [`convert_intersecting_primir_sam_to_bam`](#convert_intersecting_primir_sam_to_bam)
+    - [`sort_intersecting_primir_bam_by_position`](#sort_intersecting_primir_bam_by_position)
+    - [`index_intersecting_primir_bam`](#index_intersecting_primir_bam)
+    - [`intersect_extended_mirna`](#intersect_extended_mirna)
+    - [`filter_sam_by_intersecting_mirna`](#filter_sam_by_intersecting_mirna)
+    - [`add_intersecting_mirna_tag`](#add_intersecting_mirna_tag)
+    - [`sort_intersecting_mirna_by_feat_tag`](#sort_intersecting_mirna_by_feat_tag)
+    - [`quantify_mirna`](#quantify_mirna)
+    - [`quantify_primir`](#quantify_primir)
+    - [`merge_tables`](#merge_tables)
+    - [`uncollapse_reads`](#uncollapse_reads)
+    - [`convert_uncollapse_reads_sam_to_bam`](#convert_uncollapse_reads_sam_to_bam)
+    - [`sort_uncollapse_reads_bam_by_position`](#sort_uncollapse_reads_bam_by_position)
+    - [`index_uncollapse_reads_bam`](#index_uncollapse_reads_bam)
 
 
 
@@ -149,17 +149,17 @@ Target rule as required by [Snakemake][docs-snakemake].
 
 - **Input**
   - pri-miR intersections file (`.bed`); from
-  [**intersect_extended_primir**](#intersect-extended-primir)
+  [**intersect_extended_primir**](#intersect_extended_primir)
   - miRNA intersections file (`.bed`); from
-  [**intersect_extended_mirna**](#intersect-extended-mirna)
+  [**intersect_extended_mirna**](#intersect_extended_mirna)
   - Alignments file, sorted and tagged (`.sam`); from
-  [**sort_intersecting_mirna_by_feat_tag**](#sort-intersecting-mirna-by-feat-tag)
+  [**sort_intersecting_mirna_by_feat_tag**](#sort_intersecting_mirna_by_feat_tag)
   - (iso)miR and/or pri-miR counts table (`.tab`); from
-  [**merge_tables**](#merge-tables)
+  [**merge_tables**](#merge_tables)
   - Alignments file (`.bam`); from
-  [**sort_uncollapsed_reads_bam_by_position**](#sort-uncollapsed-reads-bam-by-position)
+  [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
   - `BAM` index file (`.bam.bai`); from
-  [**index_uncollapsed_reads_bam**](#index-uncollapsed-reads-bam)
+  [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
 
 
 ### Prepare workflow
@@ -172,19 +172,19 @@ Target rule as required by [Snakemake][docs-snakemake].
 
 - **Input**
   - segemehl genome index (`idx`); from
-  [**generate_segemehl_index_genome**](#generate-segemehl-index-genome)
+  [**generate_segemehl_index_genome**](#generate_segemehl_index_genome)
   - segemehl transcriptome index (`idx`); from
-  [**generate_segemehl_index_transcriptome**](#generate-segemehl-index-transcriptome)
+  [**generate_segemehl_index_transcriptome**](#generate_segemehl_index_transcriptome)
   - Exon annotations (`.bed`); from
-  [**convert_exons_gtf_to_bed**](#convert-exons-gtf-to-bed)
+  [**convert_exons_gtf_to_bed**](#convert_exons_gtf_to_bed)
   - Genome header (`.sam`); from
-  [**create_genome_header**](#create-genome-header)
+  [**create_genome_header**](#create_genome_header)
   - Tab-separated table mapping chromosome name(s) and length(s) (`.tsv`);
-  from [**extract_chr_len**](#extract-chr-len)
+  from [**extract_chr_len**](#extract_chr_len)
   - Primary miRNA transcript (pri-miR) extended annotation (`.gff3`);
-  from [**extend_mirs_annotations**](#extend-mirs-annotations)
+  from [**extend_mirs_annotations**](#extend_mirs_annotations)
   - Mature miRNA (miRNA) extended annotation (`.gff3`);
-  from [**extend_mirs_annotations**](#extend-mirs-annotations)
+  from [**extend_mirs_annotations**](#extend_mirs_annotations)
 
 
 #### `trim_genome_seq_ids`
@@ -195,12 +195,12 @@ Trim genome sequence IDs with a [**custom script**][custom-script-trim-id].
   - Genome sequence file (`.fasta`)
 - **Output**
   - Genome sequence file, trimmed IDs (`.fasta`); used in
-  [**extract_transcriptome_seqs**](#extract-transcriptome-seqs),
-  [**create_genome_header**](#create-genome-header),
-  [**create_index_genome_fasta**](#create-index-genome),
-  [**generate_segemehl_index_genome**](#generate-segemehl-index-genome),
-  [**mapping_genome_segemehl**](#mapping-genome-segemehl) and
-  [**mapping_genome_oligomap**](#mapping-genome-oligomap)
+  [**extract_transcriptome_seqs**](#extract_transcriptome_seqs),
+  [**create_genome_header**](#create_genome_header),
+  [**create_index_genome_fasta**](#create_index_genome),
+  [**generate_segemehl_index_genome**](#generate_segemehl_index_genome),
+  [**mapping_genome_segemehl**](#mapping_genome_segemehl) and
+  [**mapping_genome_oligomap**](#mapping_genome_oligomap)
 
 
 #### `extract_transcriptome_seqs`
@@ -224,9 +224,9 @@ Trim transcriptome sequence IDs with a [**custom script**][custom-script-trim-id
   - Transcriptome sequence file (`.fasta`)
 - **Output**
   - Transcriptome sequence, trimmed IDs (`.fasta`); used in
-  [**generate_segemehl_index_transcriptome**](#generate-segemehl-index-transcriptome),
-  [**mapping_transcriptome_segemehl**](#mapping-transcriptome-segemehl) and
-  [**mapping_transcriptome_oligomap**](#mapping-transcriptome-oligomap)
+  [**generate_segemehl_index_transcriptome**](#generate_segemehl_index_transcriptome),
+  [**mapping_transcriptome_segemehl**](#mapping_transcriptome_segemehl) and
+  [**mapping_transcriptome_oligomap**](#mapping_transcriptome_oligomap)
 
 
 #### `generate_segemehl_index_transcriptome`
@@ -239,10 +239,10 @@ of genome and annotations and sample sets.
 
 - **Input**
   - Transcriptome sequence file, trimmed IDs (`.fasta`); from
-  [**trim_transcriptome_seq_ids**](#trim-transcriptome-seq-ids)
+  [**trim_transcriptome_seq_ids**](#trim_transcriptome_seq_ids)
 - **Output**
   - segemehl transcriptome index (`.idx`); used in 
-  [**mapping_genome_segemehl**](#mapping-genome-segemehl)
+  [**mapping_genome_segemehl**](#mapping_genome_segemehl)
 
 
 #### `generate_segemehl_index_genome`
@@ -255,10 +255,10 @@ of annotations and sample sets.
 
 - **Input**
   - Genome sequence file with trim IDs (`.fasta`); from
-  [**trim_genome_seq_ids**](#trim-genome-seq-ids)
+  [**trim_genome_seq_ids**](#trim_genome_seq_ids)
 - **Output**
   - segemehl genome index (`.idx`); used in 
-  [**mapping_genome_segemehl**](#mapping-genome-segemehl)
+  [**mapping_genome_segemehl**](#mapping_genome_segemehl)
 
 
 #### `get_exons_gtf`
@@ -270,7 +270,7 @@ Retrieve exon annotations from genome annotations with a
   - Genomic annotations (`.gtf`)
 - **Output**
   - Exon annotations (`.gtf`); used in 
-  [**convert_exons_gtf_to_bed**](#convert-exons-gtf-to-bed)
+  [**convert_exons_gtf_to_bed**](#convert_exons_gtf_to_bed)
 
 #### `convert_exons_gtf_to_bed`
 
@@ -278,10 +278,10 @@ Convert exon annotations `.gtf` to `.bed` with a
 [**custom script**][custom-script-gtf-bed].
 
 - **Input**
-  - Exon annotations (`.gtf`); from [**get_exons_gtf**](#get-exons-gtf)
+  - Exon annotations (`.gtf`); from [**get_exons_gtf**](#get_exons_gtf)
 - **Output**
   - Exon annotations (`.bed`); used in
-  [**transcriptome_to_genome_maps**](#transcriptome-to-genome-maps)
+  [**transcriptome_to_genome_maps**](#transcriptome_to_genome_maps)
 
 
 #### `create_genome_header`
@@ -294,9 +294,9 @@ file.
 
 - **Input**
   - Genome sequence file, trimmed IDs (`.fasta`); from
-  [**trim_genome_seq_ids**](#trim-genome-seq-ids)
+  [**trim_genome_seq_ids**](#trim_genome_seq_ids)
 - **Output**
-  - Genome header (`.sam`); used in [add_header_all_maps](#add-header-all-maps)
+  - Genome header (`.sam`); used in [add_header_all_maps](#add_header_all_maps)
 
 
 #### `map_chr_names`
@@ -312,7 +312,7 @@ miRNA annotations. Several mapping tables are available [here][chr-maps].
   - Tab-separated mappings table (`.tsv`)
 - **Output**
   - miRNA annotations with mapped genes(`.gff3`); used in 
-  [**extend_mirs_annotations**](#extend-mirs-annotations)
+  [**extend_mirs_annotations**](#extend_mirs_annotations)
 
 
 #### `create_index_genome_fasta`
@@ -322,10 +322,10 @@ Create a `FASTA` index for the genome with
 
 - **Input**
   - Genome sequence file, trimmed IDs (`.fasta`); from
-  [**trim_genome_seq_ids**](#trim-genome-seq-ids)
+  [**trim_genome_seq_ids**](#trim_genome_seq_ids)
 - **Output**
   - `FASTA` genome index (`.fa.fai`); used in
-  [**extract_chr_len**](#extract-chr-len)
+  [**extract_chr_len**](#extract_chr_len)
 
 
 #### `extract_chr_len`
@@ -334,10 +334,10 @@ Extract chromosome(s) length from the genome sequence.
 
 - **Input**
   - `FASTA` genome index (`.fa.fai`); from
-  [**create_index_genome_fasta**](#create-index-genome-fasta)
+  [**create_index_genome_fasta**](#create_index_genome_fasta)
 - **Output**
   - Tab-separated table mapping chromosome name(s) and length(s) (`.tsv`); used
-  in [**extend_mirs_annotations**](#extend-mirs-annotations)
+  in [**extend_mirs_annotations**](#extend_mirs_annotations)
 
 
 #### `extend_mirs_annotations`
@@ -351,16 +351,16 @@ extended to accommodate the new miRNA coordinates.
 
 - **Input**
   - miRNA annotations with mapped chromosomes(`.gff3`); from
-  [**map_chr_names**](#map-chr-names)
+  [**map_chr_names**](#map_chr_names)
 - **Parameters**
   - **config_template.yaml**
     - `extension`: Number of nucleotides by which mature miRNA annotated
     regions are extended (default 6)
 - **Output**
   - Primary miRNA transcript (pri-miR) extended annotation (`.gff3`); used in
-  [**intersect_extended_primir**](#intersect-extended-primir)
+  [**intersect_extended_primir**](#intersect_extended_primir)
   - Mature miRNA (miRNA) extended annotation (`.gff3`); used in
-  [**intersect_extended_mirna**](#intersect-extended-mirna)
+  [**intersect_extended_mirna**](#intersect_extended_mirna)
 
 ### Map workflow
 
@@ -372,7 +372,7 @@ Target rule as required by [Snakemake][docs-snakemake].
 
 - **Input**
   - `BAM` index file (`.bam.bai`); from
-  [**index_all_alns_bam**](#index-all-alns-bam)
+  [**index_all_alns_bam**](#index_all_alns_bam)
 
 
 
@@ -388,8 +388,8 @@ Depending on the read files format, the output files undergo a quality filter
   - Reads file (`.fa.gz`, `.fastq.gz`)
 - **Output**
   - Reads file, copied, renamed (`.fa`, `.fastq`); used in
-  [**fastq_quality_filter**](#fastq-quality-filter) or 
-  [**format_fasta**](#format-fasta)
+  [**fastq_quality_filter**](#fastq_quality_filter) or 
+  [**format_fasta**](#format_fasta)
 
 
 #### `fastq_quality_filter`
@@ -406,7 +406,7 @@ Conduct quality control for reads library with
     (default 50)
 - **Output**
   - Reads file, filtered (`.fastq`); used in
-  [**fastq_to_fasta**](#fastq-to-fasta)
+  [**fastq_to_fasta**](#fastq_to_fasta)
 
 
 #### `fastq_to_fasta`
@@ -418,7 +418,7 @@ Convert reads file from `.fastq` to `.fa` with
   - Reads file, filtered (`.fastq`); from
   [**fastq_quality_filter**](#fastq-quality-filter)
 - **Output**
-  - Reads file (`.fa`); used in [**format_fasta**](#format-fasta)
+  - Reads file (`.fa`); used in [**format_fasta**](#format_fasta)
 
 #### `format_fasta`
 
@@ -427,10 +427,10 @@ Format reads to appear on a single line with
 
 - **Input**
   - Reads file (`.fa`); from [**start**](#start) or 
-  [**fastq_to_fasta**](#fastq-to-fasta)
+  [**fastq_to_fasta**](#fastq_to_fasta)
 - **Output**
   - Reads file, formatted (`.fa`); used in
-  [**remove_adapters**](#remove-adapters)
+  [**remove_adapters**](#remove_adapters)
 
 
 #### `remove_adapters`
@@ -439,7 +439,7 @@ Trim adapters and `N` bases at either end. Filter reads by minimum length and
 number of inner `N` bases with [**cutadapt**](#third-party-software-used).
 
 - **Input**
-  - Reads file (`.fa`); from [**format_fasta**](#format-fasta)
+  - Reads file (`.fa`); from [**format_fasta**](#format_fasta)
 - **Parameters**
   - **samples.tsv**
     - Adapter to be removed; specify in sample table column `adapter`
@@ -454,7 +454,7 @@ number of inner `N` bases with [**cutadapt**](#third-party-software-used).
     (default 0)
 - **Output**
   - Reads file (`.fa`; used in 
-  [**collapse_identical_reads**](#collapse-identical-reads)
+  [**collapse_identical_reads**](#collapse_identical_reads)
 
 
 #### `collapse_identical_reads`
@@ -463,12 +463,12 @@ Collapse and rename identical reads
 [**fastx_toolkit**](#third-party-software-used).
 
 - **Input**
-  - Reads file (`.fa`); from [**remove_adapters**](#remove-adapters)
+  - Reads file (`.fa`); from [**remove_adapters**](#remove_adapters)
 - **Output**
   - Reads file, collapsed, rename; used in
-  [**filter_fasta_for_oligomap**](#filter-fasta-for-oligomap),
-  [**map_genome_segemehl**](#map-genome-segemehl) and
-  [**map_transcriptome_segemehl**](#map-transcriptome-segemehl)
+  [**filter_fasta_for_oligomap**](#filter_fasta_for_oligomap),
+  [**map_genome_segemehl**](#map_genome_segemehl) and
+  [**map_transcriptome_segemehl**](#map_transcriptome_segemehl)
 
 
 #### `map_genome_segemehl`
@@ -478,14 +478,14 @@ Align short reads to reference genome with
 
 - **Input**
   - Reads file, collapsed (`.fa`); from
-  [**collapse_identical_reads**](#collapse-identical-reads)
+  [**collapse_identical_reads**](#collapse_identical_reads)
   - Genome sequence (`.fa`); from 
-  [**trim_genome_seq_ids**](#trim-genome-seq-ids)
+  [**trim_genome_seq_ids**](#trim_genome_seq_ids)
   - segemehl genome index (`idx`); from
-  [**generate_segemehl_index_genome**](#generate-segemehl-index-genome)
+  [**generate_segemehl_index_genome**](#generate_segemehl_index_genome)
 - **Output**
   - Alignments file (`.sam`); used in
-  [**merge_genome_maps**](#merge-genome-maps)
+  [**merge_genome_maps**](#merge_genome_maps)
 
 
 #### `map_transcriptome_segemehl`
@@ -495,14 +495,14 @@ Align short reads to reference transcriptome with
 
 - **Input**
   - Reads file, collapsed (`.fa`); from
-  [**collapse_identical_reads**](#collapse-identical-reads)
+  [**collapse_identical_reads**](#collapse_identical_reads)
   - Transcriptome sequence (`.fa`); from 
-  [**trim_transcriptome_seq_ids**](#trim-transcriptome-seq-ids)
+  [**trim_transcriptome_seq_ids**](#trim_transcriptome_seq_ids)
   - segemehl transcriptome index (`idx`); from
-  [**generate_segemehl_index_transcriptome**](#generate-segemehl-index-transcriptome)
+  [**generate_segemehl_index_transcriptome**](#generate_segemehl_index_transcriptome)
 - **Output**
   - Alignments file (`.sam`); used in
-  [**merge_transcriptome_maps**](#merge-transcriptome-maps)
+  [**merge_transcriptome_maps**](#merge_transcriptome_maps)
 
 
 #### `filter_fasta_for_oligomap`
@@ -511,31 +511,31 @@ Filter reads by length with a [**custom script**][custom-script-validation].
 
 - **Input**
   - Reads file, collapsed (`.fa`); from
-  [**collapse_identical_reads**](#collapse-identical-reads)
+  [**collapse_identical_reads**](#collapse_identical_reads)
 - **Parameters**
   - **config_template.yaml**
     - `max_length_reads`: Maximum length of processed reads to map with
     [**oligomap**](#third-party-software-used)
 - **Output**
-  - Reads file (`.fa`); used in [**map_genome_oligomap**](#map-genome-oligomap)
-  and [**map_transcriptome_oligomap**](#map-transcriptome-oligomap)
+  - Reads file (`.fa`); used in [**map_genome_oligomap**](#map_genome_oligomap)
+  and [**map_transcriptome_oligomap**](#map_transcriptome_oligomap)
 
 
 #### `map_genome_oligomap`
 
 Align short reads to reference genome with
-[**oligomap**](#third-party-software.used).
+[**oligomap**](#third-party-software-used).
 
 - **Input**
   - Reads file, collapsed (`.fa`); from
-  [**filter_fasta_for_oligomap**](#filter-fasta-for-oligomap)
+  [**filter_fasta_for_oligomap**](#filter_fasta_for_oligomap)
   - Genome sequence (`.fa`); from 
-  [**trim_genome_seq_ids**](#trim-genome-seq-ids)
+  [**trim_genome_seq_ids**](#trim_genome_seq_ids)
 - **Output**
   - Alignments file (`.fa`); used in
-  [**sort_genome_oligomap**](#sort-genome-oligomap)
+  [**sort_genome_oligomap**](#sort_genome_oligomap)
   - Alignment report (`.txt`); used in
-  [**sort_genome_oligomap**](#sort-genome-oligomap)
+  [**sort_genome_oligomap**](#sort_genome_oligomap)
 
 
 #### `sort_genome_oligomap`
@@ -545,14 +545,14 @@ with a [**custom script**][custom-script-blocksort].
 
 - **Input**
   - Alignments file (`.fa`); from
-  [**map_genome_oligomap**](#map-genome-oligomap)
+  [**map_genome_oligomap**](#map_genome_oligomap)
   - Alignment report (`.txt`); from
-  [**map_genome_oligomap**](#map-genome-oligomap)
+  [**map_genome_oligomap**](#map_genome_oligomap)
 - **Output**
   - Alignments file, sorted (`.fa`); used in
-  [**convert_genome_to_sam_oligomap**](#convert-genome-to-sam-oligomap)
+  [**convert_genome_to_sam_oligomap**](#convert_genome_to_sam_oligomap)
   - Alignment report, sorted (`.txt`); used in
-  [**convert_genome_to_sam_oligomap**](#convert-genome-to-sam-oligomap)
+  [**convert_genome_to_sam_oligomap**](#convert_genome_to_sam_oligomap)
 
 
 #### `convert_genome_to_sam_oligomap`
@@ -562,31 +562,31 @@ with a [**custom script**][custom-script-oligo-sam].
 
 - **Input**
   - Alignments file, sorted (`.fa`); from
-  [**sort_genome_oligomap**](#sort-genome-oligomap)
+  [**sort_genome_oligomap**](#sort_genome_oligomap)
   - Alignment report, sorted (`.txt`); from
-  [**sort_genome_oligomap**](#sort-genome-oligomap)
+  [**sort_genome_oligomap**](#sort_genome_oligomap)
 - **Parameters**
   - **config_template.yaml**
     - `nh`: Maximum number of hits an alignment can have to be kept
 - **Output**
-  - Alignments file (`.sam`); used in [**merge_genome_maps**](#merge-genome-maps)
+  - Alignments file (`.sam`); used in [**merge_genome_maps**](#merge_genome_maps)
 
 
 #### `map_transcriptome_oligomap`
 
 Align short reads to reference transcriptome with
-[**oligomap**](#third-party-software.used).
+[**oligomap**](#third-party-software-used).
 
 - **Input**
   - Reads file (`.fa`); from
-  [**filter_fasta_for_oligomap**](#filter-fasta-for-oligomap)
+  [**filter_fasta_for_oligomap**](#filter_fasta_for_oligomap)
   - Transcriptome sequence (`.fa`); from 
-  [**trim_transcriptome_seq_ids**](#trim-transcriptome-seq-ids)
+  [**trim_transcriptome_seq_ids**](#trim_transcriptome_seq_ids)
 - **Output**
   - Alignments file (`.fa`); used in
-  [**sort_transcriptome_oligomap**](#sort-transcriptome-oligomap)
+  [**sort_transcriptome_oligomap**](#sort_transcriptome_oligomap)
   - Alignment report (`.txt`); used in
-  [**sort_transcriptome_oligomap**](#sort-transcriptome-oligomap)
+  [**sort_transcriptome_oligomap**](#sort_transcriptome_oligomap)
 
 
 #### `sort_transcriptome_oligomap`
@@ -596,14 +596,14 @@ with a [**custom script**][custom-script-blocksort].
 
 - **Input**
   - Alignments file (`.fa`); from
-  [**map_transcriptome_oligomap**](#map-transcriptome-oligomap)
+  [**map_transcriptome_oligomap**](#map_transcriptome_oligomap)
   - Alignment report (`.txt`); from
-  [**map_transcriptome_oligomap**](#map-transcriptome-oligomap)
+  [**map_transcriptome_oligomap**](#map_transcriptome_oligomap)
 - **Output**
   - Aligned file, sorted (`.fa`); used in
-  [**convert_transcriptome_to_sam_oligomap**](#convert-transcriptome-to-sam-oligomap)
+  [**convert_transcriptome_to_sam_oligomap**](#convert_transcriptome_to_sam_oligomap)
   - Alignment report, sorted (`.txt`); used in
-  [**convert_transcriptome_to_sam_oligomap**](#convert-transcriptme-to-sam-oligomap)
+  [**convert_transcriptome_to_sam_oligomap**](#convert_transcriptme_to_sam_oligomap)
 
 
 #### `convert_transcriptome_to_sam_oligomap`
@@ -613,15 +613,15 @@ with a [**custom script**][custom-script-oligo-sam].
 
 - **Input**
   - Alignments file, sorted (`.fa`); from
-  [**sort_transcriptome_oligomap**](#sort-transcriptome-oligomap)
+  [**sort_transcriptome_oligomap**](#sort_transcriptome_oligomap)
   - Alignment report, sorted (`.txt`); from
-  [**sort_transcriptome_oligomap**](#sort-transcriptome-oligomap)
+  [**sort_transcriptome_oligomap**](#sort_transcriptome_oligomap)
 - **Parameters**
   - **config_template.yaml**
     - `nh`: Maximum number of hits an alignment can have to be kept
 - **Output**
   - Alignments file (`.sam`); used in
-  [**merge_transcriptome_maps**](#merge-transcriptome-maps)
+  [**merge_transcriptome_maps**](#merge_transcriptome_maps)
 
 
 #### `merge_genome_maps`
@@ -631,12 +631,12 @@ Concatenate [**segemehl**](#third-party-software-used) and
 
 - **Input**
   - Alignments file (`.sam`); from
-  [**map_genome_segemehl**](#map-genome-segemehl)
+  [**map_genome_segemehl**](#map_genome_segemehl)
   - Alignments file (`.sam`); from
-  [**convert_genome_to_sam_oligomap**](#convert-genome-to-sam-oligomap)
+  [**convert_genome_to_sam_oligomap**](#convert_genome_to_sam_oligomap)
 - **Output**
   - Alignments file (`.sam`); used in
-  [**filter_genome_by_nh**](#filter-genome-by-nh)
+  [**filter_genome_by_nh**](#filter_genome_by_nh)
 
 
 #### `merge_transcriptome_maps`
@@ -646,12 +646,12 @@ Concatenate [**segemehl**](#third-party-software-used) and
 
 - **Input**
   - Alignments file (`.sam`); from
-  [**map_transcriptome_segemehl**](#map-transcriptome-segemehl)
+  [**map_transcriptome_segemehl**](#map_transcriptome_segemehl)
   - Alignments file (`.sam`); from
-  [**convert_transcriptome_to_sam_oligomap**](#convert-transcriptome-to-sam-oligomap)
+  [**convert_transcriptome_to_sam_oligomap**](#convert_transcriptome_to_sam_oligomap)
 - **Output**
   - Alignments file (`.sam`); used in
-  [**filter_transcriptome_by_nh**](#filter-transcriptome-by-nh)
+  [**filter_transcriptome_by_nh**](#filter_transcriptome_by_nh)
 
 
 #### `filter_genome_by_nh`
@@ -661,13 +661,13 @@ Filter merged genome alignments by the number of hits with a
 
 - **Input**
   - Alignments file (`.sam`); from
-  [**merge_genome_maps**](#merge-genome-maps)
+  [**merge_genome_maps**](#merge_genome_maps)
 - **Parameters**
   - **config_template.yaml**
     - `nh`: Maximum number of mappings per read to be kept (default 100)
 - **Output**
   - Alignments file, filtered (`.sam`); used in
-  [**remove_header_genome_mappings**](#remove-header-genome-mappings)
+  [**remove_header_genome_mappings**](#remove_header_genome_mappings)
 
 #### `filter_transcriptome_by_nh`
 
@@ -676,13 +676,13 @@ Filter merged transcriptome alignments by the number of hits with a
 
 - **Input**
   - Alignments file (`.sam`); from
-  [**merge_transcriptome_maps**](#merge-transcriptme-maps)
+  [**merge_transcriptome_maps**](#merge_transcriptme_maps)
 - **Parameters**
   - **config_template.yaml**
     - `nh`: Maximum number of mappings per read to be kept (default 100)
 - **Output**
   - Alignments file, filtered (`.sam`); used in
-  [**remove_header_transcriptome_mappings**](#remove-header-transcriptome-mappings)
+  [**remove_header_transcriptome_mappings**](#remove_header_transcriptome_mappings)
 
 
 #### `remove_header_genome_mappings`
@@ -692,9 +692,9 @@ Remove the `SAM` header of the genome alignments file with
 
 - **Input**
   - Alignments file (`.sam`); from
-  [**filter_genome_by_nh**](#filter-genome-by-nh)
+  [**filter_genome_by_nh**](#filter_genome_by_nh)
 - **Output**
-  - Alignments file (`.sam`); used in [**merge_all_maps**](#merge-all-maps)
+  - Alignments file (`.sam`); used in [**merge_all_maps**](#merge_all_maps)
 
 
 #### `remove_header_transcriptome_mappings`
@@ -704,10 +704,10 @@ Remove the `SAM` header of the transcriptome alignments file with
 
 - **Input**
   - Alignments file (`.sam`); from
-  [**filter_transcriptome_by_nh**](#filter-transcriptome-by-nh)
+  [**filter_transcriptome_by_nh**](#filter_transcriptome_by_nh)
 - **Output**
   - Alignments file (`.sam`); used in 
-  [**transcriptome_to_genome_maps**](#transcriptome-to-genome--maps)
+  [**transcriptome_to_genome_maps**](#transcriptome_to_genome_maps)
 
 
 #### `transcriptome_to_genome_maps`
@@ -717,11 +717,11 @@ Convert the alignments transcriptome coordinates to genomic ones with a
 
 - **Input**
   - Alignments file (`.sam`); from 
-  [**remove_header_transcriptome_mappings**](#remove-header-transcriptome-mappings)
+  [**remove_header_transcriptome_mappings**](#remove_header_transcriptome_mappings)
   - Exon annotations (`.bed`); from
-  [**convert_exons_gtf_to_bed**](#convert-exons-gtf-to-bed)
+  [**convert_exons_gtf_to_bed**](#convert_exons_gtf_to_bed)
 - **Output**
-  - Alignments file (`.sam`); used in [**merge_all_maps**](#merge-all-maps)
+  - Alignments file (`.sam`); used in [**merge_all_maps**](#merge_all_maps)
 
 
 #### `merge_all_maps`
@@ -730,11 +730,11 @@ Concatenate the four alignments files into a single file.
 
 - **Input**
   - Alignments file (`.sam`); from
-  [**remove_header_genome_mappings**](#remove-header-genome-mappings) and
-  [**transcriptome_to_genome_maps**](#transcriptome-to-genome-maps)
+  [**remove_header_genome_mappings**](#remove_header_genome_mappings) and
+  [**transcriptome_to_genome_maps**](#transcriptome_to_genome_maps)
 - **Output**
   - Alignments file (`.sam`); used in
-  [**add_header_all_maps**](#add-header-all-maps)
+  [**add_header_all_maps**](#add_header_all_maps)
 
 
 #### `add_header_all_maps`
@@ -743,9 +743,9 @@ Add the `SAM` header to the aligned reads with
 [**SAMtools**](#third-party-software-used).
 
 - **Input**
-  - Alignments file (`.sam`); from [**merge_all_maps**](#merge-all-maps)
+  - Alignments file (`.sam`); from [**merge_all_maps**](#merge_all_maps)
 - **Output**
-  - Alignments file (`.sam`); used in [**sort_maps_by_id**](#sort-maps-by-id)
+  - Alignments file (`.sam`); used in [**sort_maps_by_id**](#sort_maps_by_id)
 
 
 #### `sort_maps_by_id`
@@ -754,10 +754,10 @@ Sort alignments by reads ID with [**SAMtools**](#third-party-software-used).
 
 - **Input**
   - Alignments file (`.sam`); from
-  [**add_header_all_maps**](#add-header-all-maps)
+  [**add_header_all_maps**](#add_header_all_maps)
 - **Output**
   - Alignments file, sorted (`.sam`); used in
-  [**remove_inferiors**](#remove-inferiors)
+  [**remove_inferiors**](#remove_inferiors)
 
 
 #### `remove_inferiors`
@@ -772,10 +772,10 @@ a bigger edit distance than the minimum one within the group.
 
 
 - **Input**
-  - Alignments file, sorted (`.sam`); from [**sort_maps_by_id**](#sort-maps-by-id)
+  - Alignments file, sorted (`.sam`); from [**sort_maps_by_id**](#sort_maps_by_id)
 - **Output**
   - Alignments file (`.sam`); used in
-  [**filter_by_indels**](#filter-by-indels)
+  [**filter_by_indels**](#filter_by_indels)
 
 
 #### `filter_by_indels`
@@ -785,11 +785,11 @@ Remove multimappers favoring mismatches over indels with a
 
 - **Input**
   - Alignments file, sorted (`.sam`); from
-  [**remove_inferiors**](#remove-inferiors)
+  [**remove_inferiors**](#remove_inferiors)
 - **Output**
   - Alignments file (`.sam`); used in
-  [**convert_all_alns_sam_to_bam**](#convert-all-alns-sam-to-bam) and
-  [**filter_sam_by_intersecting_primir**](#filter-sam-by-intersecting-primr)
+  [**convert_all_alns_sam_to_bam**](#convert_all_alns_sam_to_bam) and
+  [**filter_sam_by_intersecting_primir**](#filter_sam_by_intersecting_primr)
 
 
 #### `convert_all_alns_sam_to_bam`
@@ -801,10 +801,10 @@ Convert alignments `.sam` file to `.bam` with
 with pri-miR annotations.
 
 - **Input**
-  - Alignments file (`.sam`); from [**filter_by_indels**](#filter-by-indels)
+  - Alignments file (`.sam`); from [**filter_by_indels**](#filter_by_indels)
 - **Output**
   - Alignments file (`.bam`); used in
-  [**sort_all_alns_bam_by_position**](#sort-all-alns-bam-by-position)
+  [**sort_all_alns_bam_by_position**](#sort_all_alns_bam_by_position)
 
 
 #### `sort_all_alns_bam_by_position`
@@ -816,11 +816,11 @@ with pri-miR annotations more efficiently.
 
 - **Input**
   - Alignments file (`.bam`); from
-  [**convert_all_alns_sam_to_bam**](#convert-all-alns-sam-to-bam)
+  [**convert_all_alns_sam_to_bam**](#convert_all_alns_sam_to_bam)
 - **Output**
   - Alignments file, sorted (`.bam`); used in
-  [**index_all_alns_bam**](#index-all-alns-bam) and
-  [**intersect_extended_primir**](#intersect-extended-primir)
+  [**index_all_alns_bam**](#index_all_alns_bam) and
+  [**intersect_extended_primir**](#intersect_extended_primir)
 
 
 #### `index_all_alns_bam`
@@ -832,10 +832,10 @@ alignments in a genomic region of interest.
 
 - **Input**
   - Alignments file (`.bam`); from
-  [**sort_all_alns_bam_by_position**](#sort-all-alns-bam-by-position)
+  [**sort_all_alns_bam_by_position**](#sort_all_alns_bam_by_position)
 - **Output**
   - `BAM` index file (`.bam.bai`); used in
-  [**intersect_extended_primir**](#intersect-extended-primir)
+  [**intersect_extended_primir**](#intersect_extended_primir)
 
 
 ### Quantify workflow
@@ -848,17 +848,17 @@ Target rule as required by [Snakemake][docs-snakemake].
 
 - **Input**
   - Alignments file, filtered (`.sam`); from
-  [**filter_sam_by_intersecting_primir**](#filter-sam-by-intersecting-primir)
+  [**filter_sam_by_intersecting_primir**](#filter_sam_by_intersecting_primir)
   - Alignments file, filtered (`.sam`); from
-  [**filter_sam_by_intersecting_mirna**](#filter-sam-by-intersecting-mirna)
+  [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
   - Alignments file, sorted, tagged (`.sam`); from
-  [**sort_intersecting_mirna_by_feat_tag**](#sort-intersecting-mirna-by-feat-tag)
+  [**sort_intersecting_mirna_by_feat_tag**](#sort_intersecting_mirna_by_feat_tag)
   - (iso)miR and/or pri-miR counts table (`.tab`); from
-  [**merge_tables**](#merge-tables)
+  [**merge_tables**](#merge_tables)
   - Alignments file (`.bam`); from
-  [**sort_uncollapsed_reads_bam_by_position**](#sort-uncollapsed-reads-bam-by-position)
+  [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
   - `BAM` index file (`.bam.bai`); from
-  [**index_uncollapsed_reads_bam**](#index-uncollapsed-reads-bam)
+  [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
 
 #### `intersect_extendend_primir`
 
@@ -867,13 +867,13 @@ Intersect the aligned reads with the extended pri-miR annotations with
 
 - **Input**
   - Alignments file (`.bam`); from
-  [**sort_all_alns_bam_by_position**](#sort-all-alns-bam-by-position)
+  [**sort_all_alns_bam_by_position**](#sort_all_alns_bam_by_position)
   - pri-miR extended annotations (`.gff3`); from
-  [**extend_mirs_annotations**](#extend-mirs-annotations)
+  [**extend_mirs_annotations**](#extend_mirs_annotations)
 - **Output**
   - pri-miR intersections file (`.bed`); used in
-  [**filter_sam_by_intersecting_primir**](#filter-sam-by-intersecting-primir)
-  and [**quantify_primir**](#quantify-primir)
+  [**filter_sam_by_intersecting_primir**](#filter_sam_by_intersecting_primir)
+  and [**quantify_primir**](#quantify_primir)
 
 
 #### `filter_sam_by_intersecting_primir`
@@ -884,13 +884,13 @@ Remove alignments that do not intersect with any pri-miR with
 > Required to only intersect alignments within a pri-miR locus.
 
 - **Input**
-  - Alignments file (`.sam`); from [**filter_by_indels**](#filter-by-indels) 
+  - Alignments file (`.sam`); from [**filter_by_indels**](#filter_by_indels) 
   - pri-miR intersections file (`.bed`); from
-  [**intersect_extended_primir**](#intersect-extended-primir)
+  [**intersect_extended_primir**](#intersect_extended_primir)
 - **Output**
   - Alignments file, filtered (`.sam`); used in
-  [**convert_intersecting_primir_sam_to_bam**](#convert-intersecting-primir-sam-to-bam)
-  and [**filter_sam_by_intersecting_mirna**](#filter-sam-by-intersecting-mirna)
+  [**convert_intersecting_primir_sam_to_bam**](#convert_intersecting_primir_sam_to_bam)
+  and [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
 
 
 #### `convert_intersecting_primir_sam_to_bam`
@@ -903,10 +903,10 @@ with miRNA annotations.
 
 - **Input**
   - Alignments file (`.sam`); from
-  [**filter_sam_by_intersecting_primir**](#filter-sam-by-intersecting-primir)
+  [**filter_sam_by_intersecting_primir**](#filter_sam_by_intersecting_primir)
 - **Output**
   - Alignments file (`.bam`); used in
-  [**sort_intersecting_primir_bam_by_position**](#sort-intersecting-primir-bam-by-position)
+  [**sort_intersecting_primir_bam_by_position**](#sort_intersecting_primir_bam_by_position)
 
 
 #### `sort_intersecting_primir_bam_by_position`
@@ -918,11 +918,11 @@ with miRNA annotations more efficiently.
 
 - **Input**
   - Alignments file (`.bam`); from
-  [**convert_intersecting_primir_sam_to_bam**](#convert-intersecting-primir-sam-to-bam)
+  [**convert_intersecting_primir_sam_to_bam**](#convert_intersecting_primir_sam_to_bam)
 - **Output**
   - Alignments file, sorted (`.bam`); used in
-  [**index_intersecting_primir_bam**](#index-intersecting-primir-bam) and
-  [**intersect_extended_mirna**](#intersect-extended-mirna)
+  [**index_intersecting_primir_bam**](#index_intersecting_primir_bam) and
+  [**intersect_extended_mirna**](#intersect_extended_mirna)
 
 
 #### `index_intersecting_primir_bam`
@@ -934,10 +934,10 @@ alignments in a genomic region of interest.
 
 - **Input**
   - Alignments file (`.bam`); from
-  [**sort_intersecting_primir_bam_by_position**](#sort-intersecting-primir-bam-by-position)
+  [**sort_intersecting_primir_bam_by_position**](#sort_intersecting_primir_bam_by_position)
 - **Output**
   - `BAM` index file (`.bam.bai`); used in
-  [**intersect_extended_mirna**](#intersect-extended-mirna)
+  [**intersect_extended_mirna**](#intersect_extended_mirna)
 
 
 #### `intersect_extended_mirna`
@@ -947,13 +947,13 @@ Intersect the aligned reads with the extended miRNA annotations with
 
 - **Input**
   - Alignments file (`.bam`); from
-  [**sort_intersecting_primir_bam_by_position**](#sort-intersecting-primir-bam-by-position)
+  [**sort_intersecting_primir_bam_by_position**](#sort_intersecting_primir_bam_by_position)
   - miRNA extended annotations (`.gff3`); from
-  [**extend_mirs_annotations**](#extend-mirs-annotations)
+  [**extend_mirs_annotations**](#extend_mirs_annotations)
 - **Output**
   - miRNA intersections file (`.bed`); used in
-  [**filter_sam_by_intersecting_mirna**](#filter-sam-by-intersecting-mirna)
-  and [**add_intersecting_mirna_tag**](#add-intersecting-mirna-tag)
+  [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
+  and [**add_intersecting_mirna_tag**](#add_intersecting_mirna_tag)
 
 
 #### `filter_sam_by_intersecting_mirna`
@@ -965,13 +965,13 @@ Remove alignments that do not intersect with any miRNA with
 
 - **Input**
   - Alignments file (`.sam`); from
-  [**filter_sam_by_intersecting_primir**](#filter-sam-by-intersecting-primir) 
+  [**filter_sam_by_intersecting_primir**](#filter_sam_by_intersecting_primir) 
   - miRNA intersections file (`.bed`); from
-  [**intersect_extended_mirna**](#intersect-extended-mirna)
+  [**intersect_extended_mirna**](#intersect_extended_mirna)
 - **Output**
   - Alignments file, filtered (`.sam`); used in 
-  [**add_intersecting_mirna_tag**](#add-intersecting-mirna-tag) and
-  [**uncollapse_reads**](#uncollapse-reads)
+  [**add_intersecting_mirna_tag**](#add_intersecting_mirna_tag) and
+  [**uncollapse_reads**](#uncollapse_reads)
 
 
 #### `add_intersecting_mirna_tag`
@@ -987,16 +987,16 @@ the star and end shift, nor the `CIGAR` and `MD` strings.
 
 - **Input**
   - Alignments file (`.sam`); from
-  [**filter_sam_by_intersecting_mirna**](#filter-sam-by-intersecting-mirna)
+  [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
   - miRNA intersections file (`.bed`); from
-  [**intersect_extended_mirna**](#intersect-extended-mirna)
+  [**intersect_extended_mirna**](#intersect_extended_mirna)
 - **Parameters**
   - **config_template.yaml**
     - `extension`: Number of nucleotides by which mature miRNA annotated
     regions are extended (default 6)
 - **Output**
   - Alignments file, tagged (`.sam`); used in
-  [**sort_intersecting_mirna_by_feat_tag**](#sort-intersecting-mirna-by-feat-tag)
+  [**sort_intersecting_mirna_by_feat_tag**](#sort_intersecting_mirna_by_feat_tag)
 
 
 #### `sort_intersecting_mirna_by_feat_tag`
@@ -1008,10 +1008,10 @@ with [**SAMtools**](#third-party-software-used).
 
 - **Input**
   - Alignments file, tagged (`.sam`); from
-  [**add_intersecting_mirna_tag**](#add-intersecting-mirna-tag)
+  [**add_intersecting_mirna_tag**](#add_intersecting_mirna_tag)
 - **Output**
   - Alignments file, tagged, sorted (`.sam`); used in
-  [**quantify_mirna**](#quantify-mirna)
+  [**quantify_mirna**](#quantify_mirna)
 
 
 #### `quantify_mirna`
@@ -1024,7 +1024,7 @@ by the number of collapsed reads divided by the number of hits).
 
 - **Input**
   - Alignments file, sorted, tagged (`.sam`); from
-  [**sort_intersecting_mirna_by_feat_tag**](#sort-intersecting-mirna-by-feat-tag)
+  [**sort_intersecting_mirna_by_feat_tag**](#sort_intersecting_mirna_by_feat_tag)
 - **Parameters**
   - **samples.tsv**
     - Library name; specify in sample table column `sample`
@@ -1033,7 +1033,7 @@ by the number of collapsed reads divided by the number of hits).
     pri-miR)
 - **Output**
   - (iso)miR counts tab-delimited file; used in
-  [**merge_tables**](#merge-tables)
+  [**merge_tables**](#merge_tables)
 
 
 #### `quantify_primir`
@@ -1046,10 +1046,10 @@ by the number of collapsed reads divided by the number of hits).
 
 - **Input**
   - pri-miR intersections file (`.bed`); from
-  [**intersecti_extended_primir**](#intersect-extended-primir)
+  [**intersecti_extended_primir**](#intersect_extended_primir)
 - **Output**
   - pri-miR counts tab-delimited file; used in
-  [**merge_tables**](#merge-tables)
+  [**merge_tables**](#merge_tables)
 
 
 #### `merge_tables`
@@ -1058,8 +1058,8 @@ Merge all the tables from the different libraries into a single one with a
 [**custom script**][custom-script-merge-tab].
 
 - **Input**
-  - counts tab-delimited file; from [**quantify_mirna**](#quantify-mirna)
-  and/or [**quantify_primir**](#quantify-primir)
+  - counts tab-delimited file; from [**quantify_mirna**](#quantify_mirna)
+  and/or [**quantify_primir**](#quantify_primir)
 - **Parameters**
   - **cluster_schema.json**
     - `mir_list`: miRNA features to be quantified (default isomir, mirna
@@ -1075,10 +1075,10 @@ Reverse the collapsing of reads with identical sequences as done with
 
 - **Input**
   - Alignments file (`.sam`); from
-  [**filter_sam_by_intersecting_mirna**](#filter-sam-by-intersecting-mirna)
+  [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
 - **Output**
   - Uncollapsed aligned reads (`.sam`); used in
-  [**convert_uncollapsed_reads_sam_to_bam**](#convert-uncollapsed-reads-sam-to-bam)
+  [**convert_uncollapsed_reads_sam_to_bam**](#convert_uncollapsed_reads_sam_to_bam)
 
 
 #### `convert_uncollapsed_reads_sam_to_bam`
@@ -1088,10 +1088,10 @@ Convert alignments `.sam` file to `.bam` with
 
 - **Input**
   - Alignments file (`.sam`); from
-  [**filter_sam_by_intersecting_mirna**](#filter-sam-by-intersecting-mirna)
+  [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
 - **Output**
   - Alignments file (`.bam`); used in
-  [**sort_uncollapsed_reads_bam_by_position**](#sort-uncollapsed-reads-bam-by-position)
+  [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
 
 
 #### `sort_uncollapsed_reads_bam_by_position`
@@ -1100,10 +1100,10 @@ Sort alignments by position with [**SAMtools**](#third-party-software-used).
 
 - **Input**
   - Alignments file (`.bam`); from
-  [**convert_uncollapsed_reads_sam_to_bam**](#convert-uncollapsed_reads-sam-to-bam)
+  [**convert_uncollapsed_reads_sam_to_bam**](#convert_uncollapsed_reads_sam_to_bam)
 - **Output**
   - Alignments file, sorted (`.bam`); used in
-  [**index_uncollapsed_reads_bam**](#index-uncollapsed-reads-bam)
+  [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
 
 
 #### `index_uncollapsed_reads_bam`
@@ -1115,28 +1115,28 @@ alignments in a genomic region of interest.
 
 - **Input**
   - Alignments file (`.bam`); from
-  [**sort_uncollapsed_reads_bam_by_position**](#sort-uncollapsed-reads-bam-by-position)
+  [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
 - **Output**
   - `BAM` index file (`.bam.bai`)
 
 [chr-maps]: <https://github.com/dpryan79/ChromosomeMappings>
-[custom-script-blocksort]: <https://github.com/zavolanlab/mirflowz/scripts/blocksort.sh>
-[custom-script-filter-mm]: <https://github.com/zavolanlab/mirflowz/scripts/filter_multimappers.py>
-[custom-script-get-lines]: <https://github.com/zavolanlab/mirflowz/scripts/get_lines_w_pattern.sh>
-[custom-script-gtf-bed]: <https://github.com/zavolanlab/mirflowz/scripts/gtf_exons_bed.1.1.2.R>
-[custom-script-iso-tag]: <https://github.com/zavolanlab/mirflowz/scripts/iso_name_tagging.py>
-[custom-script-map-chr]: <https://github.com/zavolanlab/mirflowz/scripts/map_chromosomes.pl>
-[custom-script-merge-tab]: <https://github.com/zavolanlab/mirflowz/scripts/merge_tables.R>
-[custom-script-mir-ext]: <https://github.com/zavolanlab/mirflowz/scripts/mirna_extension.py>
-[custom-script-mir-quant]: <https://github.com/zavolanlab/mirflowz/scripts/mirna_quantification.py>
-[custom-script-nh-filter]: <https://github.com/zavolanlab/mirflowz/scripts/nh_filter.py>
-[custom-script-oligo-sam]: <https://github.com/zavolanlab/mirflowz/scripts/oligomapOutputToSam_nhfiltered.py>
-[custom-script-pri-quant]: <https://github.com/zavolanlab/mirflowz/scripts/primir_quantification.py>
-[custom-script-remove-dup]: <https://github.com/zavolanlab/mirflowz/scripts/sam_remove_duplicates_inferior_alignments_multimappers.pl>
-[custom-script-sam-trx]: <https://github.com/zavolanlab/mirflowz/scripts/sam_trx_to_sam_gen.pl>
-[custom-script-trim-id]: <https://github.com/zavolanlab/mirflowz/scripts/trim_id_fasta.sh>
-[custom-script-uncollapse]: <https://github.com/zavolanlab/mirflowz/scripts/sam_uncollapse.pl>
-[custom-script-validation]: <https://github.com/zavolanlab/mirflowz/scripts/validation_fasta.py>
+[custom-script-blocksort]: scripts/blocksort.sh
+[custom-script-filter-mm]: scripts/filter_multimappers.py
+[custom-script-get-lines]: scripts/get_lines_w_pattern.sh
+[custom-script-gtf-bed]: scripts/gtf_exons_bed.1.1.2.R
+[custom-script-iso-tag]: scripts/iso_name_tagging.py
+[custom-script-map-chr]: scripts/map_chromosomes.pl
+[custom-script-merge-tab]: scripts/merge_tables.R
+[custom-script-mir-ext]: scripts/mirna_extension.py
+[custom-script-mir-quant]: scripts/mirna_quantification.py
+[custom-script-nh-filter]: scripts/nh_filter.py
+[custom-script-oligo-sam]: scripts/oligomapOutputToSam_nhfiltered.py
+[custom-script-pri-quant]: scripts/primir_quantification.py
+[custom-script-remove-dup]: scripts/sam_remove_duplicates_inferior_alignments_multimappers.pl
+[custom-script-sam-trx]: scripts/sam_trx_to_sam_gen.pl
+[custom-script-trim-id]: scripts/trim_id_fasta.sh
+[custom-script-uncollapse]: scripts/sam_uncollapse.pl
+[custom-script-validation]: scripts/validation_fasta.py
 [code-bedtools]: <https://github.com/arq5x/bedtools2>
 [code-cufflinks]: <https://github.com/cole-trapnell-lab/cufflinks>
 [code-cutadapt]: <https://github.com/marcelm/cutadapt>
