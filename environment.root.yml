@@ -1,5 +1,5 @@
 name: mirflowz
 channels:
-  - bioconda
+  - conda-forge
 dependencies:
   - singularity>=3.5.2
