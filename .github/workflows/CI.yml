@@ -10,7 +10,7 @@ on:
  
 jobs:
 
-  snakemake-test:
+  snakemake-test-via-singularity:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -26,14 +26,8 @@ jobs:
         with:
           mamba-version: "*"
           activate-environment: mirflowz
-          environment-file: environment.yml
+          environment-file: install/environment.root.yml
           auto-activate-base: false
-      
-      - name: Update mirflowz env with root packages
-        run: mamba env update -n mirflowz -f environment.root.yml
-      
-      - name: Update mirflowz env with dev packages
-        run: mamba env update -n mirflowz -f environment.dev.yml
         
       - name: Run test for rule graph
         run: bash test/test_rule_graph.sh
@@ -45,9 +39,37 @@ jobs:
       - name: Run local test with Singularity
         run: bash test/test_workflow_local_with_singularity.sh
 
+
+  snakemake-test-via-conda:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+  
+    steps:
+    
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+         
+      - name: Setup environment
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          mamba-version: "*"
+          activate-environment: mirflowz
+          environment-file: install/environment.yml
+          auto-activate-base: false
+        
+      - name: Run test for rule graph
+        run: bash test/test_rule_graph.sh
+      
+      - name: Check workflow descriptor files for lints
+        working-directory: ./test
+        run: snakemake --snakefile="../workflow/Snakefile" --configfile="config.yaml" --lint
+        
       - name: Run local test with Conda
         run: bash test/test_workflow_local_with_conda.sh
 
+      
   unit-testing:
     runs-on: ubuntu-latest
     defaults:
@@ -64,14 +86,8 @@ jobs:
         with:
           mamba-version: "*"
           activate-environment: mirflowz
-          environment-file: environment.yml
+          environment-file: install/environment.dev.yml
           auto-activate-base: false
-      
-      - name: Update mirflowz env with root packages
-        run: mamba env update -n mirflowz -f environment.root.yml
-      
-      - name: Update mirflowz env with dev packages
-        run: mamba env update -n mirflowz -f environment.dev.yml
 
       - name: run unit tests
         working-directory: ./scripts/tests
