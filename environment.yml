@@ -1,8 +1,0 @@
-name: mirflowz
-channels:
-  - conda-forge
-  - bioconda
-dependencies:
-  - graphviz=7.1.0
-  - python=3.9.16
-  - snakemake=7.24.0

@@ -29,6 +29,11 @@ jobs:
           environment-file: install/environment.root.yml
           auto-activate-base: false
         
+      - name: Display environment info
+        run: |
+          conda info -a
+          conda list
+
       - name: Run test for rule graph
         run: bash test/test_rule_graph.sh
       
@@ -58,7 +63,12 @@ jobs:
           activate-environment: mirflowz
           environment-file: install/environment.yml
           auto-activate-base: false
-        
+      
+      - name: Display environment info
+        run: |
+          conda info -a
+          conda list
+
       - name: Run test for rule graph
         run: bash test/test_rule_graph.sh
       
@@ -88,6 +98,11 @@ jobs:
           activate-environment: mirflowz
           environment-file: install/environment.dev.yml
           auto-activate-base: false
+
+      - name: Display environment info
+        run: |
+          conda info -a
+          conda list
 
       - name: run unit tests
         working-directory: ./scripts/tests
