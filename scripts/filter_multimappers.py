@@ -94,7 +94,7 @@ def count_indels(aln: pysam.libcalignedsegment.AlignedSegment) -> int:
     Returns:
         int: The sum of insertions and deletions in the alignment.
     """
-    return sum(op[1] for op in aln.cigartuples if op[0] == 1 or op[0] == 2)
+    return sum(op[1] for op in aln.cigartuples if op[0] == 1 or op[0] == 2) # type: ignore
 
 
 def find_best_alignments(
