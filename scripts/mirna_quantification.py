@@ -194,10 +194,11 @@ def parse_arguments():
     parser.add_argument(
         '--nh',
         help=(
-            "Indicate that the SAM file has the NH value at the end of the read"
-            " query name. In that case, SAM query names are expected to follow"
-            " the format NAME_NH where NAME is an aribitrary unique name and "
-            "NH is the NH value, i.e my_query_name_4. Default: %(default)s."
+            "Indicate that the SAM file has the NH value at the end of the"
+            " read query name. In that case, SAM query names are expected to"
+            " follow the format NAME_NH where NAME is an aribitrary unique"
+            " name and NH is the NH value, i.e my_query_name_4. Default:"
+            " %(default)s."
         ),
         action='store_true',
         default=False
@@ -205,8 +206,8 @@ def parse_arguments():
     parser.add_argument(
         '--count',
         help=(
-        "If set, the amount of best alignments for each miRNA is included in "
-        "the output table. Default: %(default)s"
+            "If set, the amount of best alignments for each miRNA is included"
+            " in the output table. Default: %(default)s"
         ),
         action='store_true',
         default=False
@@ -248,9 +249,11 @@ def collapsed_nh_contribution(aln: pysam.AlignedSegment) -> float:
     Returns:
         the conrtibution of the alignment to the overall count
     """
-    name = aln.query_name
+    name = str(aln.query_name)
     try:
-        values = re.search(r'\d+_\d+$', name).group().split('_')
+        if (val := re.search(r'\d+_\d+$', name)):
+            values = val.group().split('_')
+
         return float(values[0]) / float(values[1])
 
     except AttributeError:
@@ -276,9 +279,10 @@ def collapsed_contribution(aln: pysam.AlignedSegment) -> float:
     Returns:
         the conrtibution of the alignment to the overall count
     """
-    name = aln.query_name
+    name = str(aln.query_name)
     try:
-        collapsed = float(re.search(r'\d+$', name).group())
+        if (coll := re.search(r'\d+$', name)):
+            collapsed = float(coll.group())
 
     except AttributeError:
         sys.stdout.write(f"Invalid query name: '{aln.query_name}'.\n" +
@@ -289,7 +293,7 @@ def collapsed_contribution(aln: pysam.AlignedSegment) -> float:
         raise
 
     try:
-        nh_value = aln.get_tag("NH")
+        nh_value = float(aln.get_tag("NH"))
         return collapsed/nh_value
 
     except KeyError:
@@ -311,9 +315,12 @@ def nh_contribution(aln: pysam.AlignedSegment) -> float:
     Returns:
         the conrtibution of the alignment to the overall count
     """
-    name = aln.query_name
+    name = str(aln.query_name)
     try:
-        return 1/float(re.search(r'\d+$', name).group())
+        if (cont := re.search(r'\d+$', name)):
+            nh_val = float(cont.group())
+
+        return 1/nh_val
 
     except AttributeError:
         sys.stdout.write(f"Invalid query name: '{aln.query_name}'.\n" +
@@ -339,7 +346,7 @@ def contribution(aln: pysam.AlignedSegment) -> float:
         the conrtibution of the alignment to the overall count
     """
     try:
-        return 1/aln.get_tag("NH")
+        return 1/float(aln.get_tag("NH"))
 
     except KeyError:
         return 1.0
@@ -370,48 +377,47 @@ def get_name(pre_name: str) -> list[str]:
     return ['isomir', pre_name]
 
 
-def write_output(name: str, species: list[str], mir_list: list[str], mirna_out: Path) -> None:
+def write_output(
+        name: str,
+        species: list[str],
+        mir_list: list[str],
+        mirna_out: Path) -> None:
     """Write to the output the correct miRNA type."""
-    with open(mirna_out, 'a') as mirna:
+    with open(mirna_out, 'a', encoding="utf-8") as mirna:
         if name in mir_list:
             mirna.write('\t'.join(species) + '\n')
         else:
             mirna.write('')
 
 
-def main(args) -> None:
+def main(arguments) -> None:
     """Quantify miRNAs and corresponding isomiRs."""
-    outdir = Path(args.outdir)
+    outdir = Path(arguments.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
-    outfile = outdir/f'mirna_counts_{args.lib}'
+    outfile = outdir/f'mirna_counts_{arguments.lib}'
 
-    if args.collapsed and args.nh:
-        get_contribution = collapsed_nh_contribution
-    elif args.collapsed:
-        get_contribution = collapsed_contribution
-    elif args.nh:
-        get_contribution = nh_contribution
-    else:
-        get_contribution = contribution
+    contribution_type = {
+            (True, True): collapsed_nh_contribution,
+            (True, False): collapsed_contribution,
+            (False, True): nh_contribution,
+            (False, False): contribution}
 
-    read_ID = []
-    count = 0
-    alns_count = 0
+    get_contribution = contribution_type[arguments.collapsed, arguments.nh]
 
-    with pysam.AlignmentFile(args.samfile, 'r') as samfile:
+    with pysam.AlignmentFile(arguments.samfile, 'r') as samfile:
 
         try:
-            first_aln = next(samfile)
-            current_species = first_aln.get_tag(args.tag)
+            alignment = next(samfile)
+            current_species = alignment.get_tag(arguments.tag)
             if current_species:
-                read_ID.append(first_aln.query_name)
-                count = get_contribution(first_aln)
-                alns_count += 1
+                read_ID = [alignment.query_name]
+                count = get_contribution(alignment)
+                alns_count = 1
 
         except StopIteration:
             write_output(name="",
                          species=[],
-                         mir_list=args.mir_list,
+                         mir_list=arguments.mir_list,
                          mirna_out=outfile)
 
             return
@@ -419,53 +425,52 @@ def main(args) -> None:
         for alignment in samfile:
 
             if current_species == '':
-                current_species = alignment.get_tag(args.tag)
+                current_species = alignment.get_tag(arguments.tag)
                 count = get_contribution(alignment)
                 alns_count = 1
-
-                if args.read_ids:
-                    read_ID = [alignment.query_name]
+                read_ID = [alignment.query_name]
 
                 continue
 
-            if current_species == alignment.get_tag(args.tag):
+            if current_species == alignment.get_tag(arguments.tag):
                 count += get_contribution(alignment)
                 alns_count += 1
-                if args.read_ids:
-                    read_ID.append(alignment.query_name)
+                read_ID.append(alignment.query_name)
 
             else:
                 name = get_name(current_species)
                 species = [name[1], str(count)]
-                if args.count:
+
+                if arguments.count:
                     species.append(str(alns_count))
-                if args.len:
+                if arguments.len:
                     species.append(str(alignment.query_alignment_length))
-                if args.read_ids:
+                if arguments.read_ids:
                     species.append(';'.join(read_ID))
 
                 write_output(name=name[0],
                              species=species,
-                             mir_list=args.mir_list,
+                             mir_list=arguments.mir_list,
                              mirna_out=outfile)
 
-                current_species = alignment.get_tag(args.tag)
+                current_species = alignment.get_tag(arguments.tag)
                 count = get_contribution(alignment)
                 alns_count = 1
                 read_ID = [alignment.query_name]
 
         name = get_name(current_species)
         species = [name[1], str(count)]
-        if args.count:
+
+        if arguments.count:
             species.append(str(alns_count))
-        if args.len:
+        if arguments.len:
             species.append(str(alignment.query_alignment_length))
-        if args.read_ids:
+        if arguments.read_ids:
             species.append(';'.join(read_ID))
 
         write_output(name=name[0],
                      species=species,
-                     mir_list=args.mir_list,
+                     mir_list=arguments.mir_list,
                      mirna_out=outfile)
 
 
