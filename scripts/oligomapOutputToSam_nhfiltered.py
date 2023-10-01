@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# type: ignore
+
 #################################################
 # Transforms oligomap output to SAM format and	
 # keeps only best alignments.			
