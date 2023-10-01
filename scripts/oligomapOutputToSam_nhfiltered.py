@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # type: ignore
+# pylint: skip-file
 
 #################################################
 # Transforms oligomap output to SAM format and	
