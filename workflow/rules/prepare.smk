@@ -8,7 +8,7 @@
 ###############################################################################
 
 import os
-from snakemake.utils improt validate
+from snakemake.utils import validate
 
 from pathlib import Path
 
