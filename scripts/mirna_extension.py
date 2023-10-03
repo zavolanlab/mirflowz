@@ -19,10 +19,11 @@ Usage:
 """
 
 import argparse
-import gffutils
 from pathlib import Path
 import sys
 from typing import Dict, Optional
+import gffutils  # type: ignore
+
 
 class MirnaExtension():
     """Class to extend miRNAs start and end coordinates.
@@ -47,22 +48,27 @@ class MirnaExtension():
 
         This method uses the gffutils package to create and in-memory database
         of the GFF3 file.
-        
+
         Args:
             gff_file:
                 path to the input GFF3 file. If None, input is taken from the
                 standard input (stdin).
         """
         if gff_file is None:
-            self.db = gffutils.create_db(sys.stdin, dbfn=':memory:', 
+            self.db = gffutils.create_db(sys.stdin, dbfn=':memory:',
                                          force=True, keep_order=True)
         else:
-            self.db = gffutils.create_db(str(gff_file), dbfn=':memory:', 
+            self.db = gffutils.create_db(str(gff_file), dbfn=':memory:',
                                          force=True, keep_order=True)
-    
-    def extend_mirnas(self, primir_out: Path, mir_out: Path, n: int = 6, seq_lengths: Optional[dict[str, int]] = None) -> None:
+
+    def extend_mirnas(
+            self,
+            primir_out: Path,
+            mir_out: Path,
+            n: int = 6,
+            seq_lengths: Optional[dict[str, int]] = None) -> None:
         """Extend miRNAs start and end coordinates.
-        
+
         This method elongates the start and end coordinates of mature miRNAs
         by n nucleotides. In the case that this extension makes the start/end
         coordinates to exceed the corresponding primary miRNA boundaries,
@@ -81,17 +87,22 @@ class MirnaExtension():
                 (in  nucleotides). If None, sequence lengths are inferred from
                 the input GFF3 file.
         """
+        assert isinstance(self.db, gffutils.interface.FeatureDB)
+
         # Set end boundary
         if seq_lengths is None:
             seq_lengths = {}
             for seqid in self.db.seqids():
-                seq_lengths[seqid] = max(rec.end for rec in self.db.region(seqid))
+                seq_lengths[seqid] = max(
+                        rec.end
+                        for rec in self.db.region(seqid))
 
-        with open(primir_out, 'w') as primir, open(mir_out, 'w') as mirna:
+        with (open(primir_out, 'w', encoding="utf-8") as primir,
+             open(mir_out, 'w', encoding="utf-8") as mirna):
 
-            for primary_mirna in self.db.features_of_type('miRNA_primary_transcript'):
+            for primary_mirna in (
+                    self.db.features_of_type('miRNA_primary_transcript')):
                 seqid = primary_mirna.seqid
-                seq_len = seq_lengths[seqid]
                 start = int(primary_mirna.start)
                 end = int(primary_mirna.end)
 
@@ -109,14 +120,14 @@ class MirnaExtension():
                         else:
                             mir.start = 0
 
-                        if mir.end + n < seq_len:
+                        if mir.end + n < seq_lengths[seqid]:
                             mir.end += n
                         else:
-                            mir.end = seq_len
+                            mir.end = seq_lengths[seqid]
 
                         if mir.start < start:
                             primary_mirna.start = mir.start
-                            
+
                         if mir.end > end:
                             primary_mirna.end = mir.end
 
@@ -126,9 +137,8 @@ class MirnaExtension():
                     end_diff = primary_mirna.end - end
                     primary_mirna.attributes["Name"][0] += f"_-{start_diff}"
                     primary_mirna.attributes["Name"][0] += f"_+{end_diff}"
-                    
-                primir.write(str(primary_mirna) + '\n')
 
+                primir.write(str(primary_mirna) + '\n')
 
 
 def parse_arguments():
@@ -144,8 +154,8 @@ def parse_arguments():
     )
     parser.add_argument(
         'input',
-        help="Path to the GFF3 annotation file. If not provided, the input will\
-             be read from the standard input.",
+        help="Path to the GFF3 annotation file. If not provided, the input \
+             will be read from the standard input.",
         type=Path
     )
     parser.add_argument(
@@ -156,7 +166,8 @@ def parse_arguments():
     )
     parser.add_argument(
         '-e', '--extension',
-        help="Number of nucleotides to extend the coordinates. Default: %(default)d.",
+        help="Number of nucleotides to extend the coordinates. Default: \
+                %(default)d.",
         default=6,
         type=int
     )
@@ -172,36 +183,39 @@ def parse_arguments():
     return parser
 
 
-def main(args):
+def main(arguments) -> None:
     """Extend miRNAs start/end coordinates."""
-    outdir = Path(args.outdir)
+    outdir = Path(arguments.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
 
-    primir_out = outdir/f"extended_primir_annotation_{args.extension}_nt.gff3"
-    mir_out = outdir/f"extended_mirna_annotation_{args.extension}_nt.gff3"
-    
-    with open(args.input, 'r') as input:
-        if len(input.read()) == 0:
-            with open(primir_out, 'w') as primir, open(mir_out, 'w') as mir:
+    primir_out = outdir/(
+            f"extended_primir_annotation_{arguments.extension}_nt.gff3"
+            )
+    mir_out = outdir/f"extended_mirna_annotation_{arguments.extension}_nt.gff3"
+
+    with open(arguments.input, encoding="utf-8") as in_file:
+        if len(in_file.read()) == 0:
+            with (open(primir_out, 'w', encoding="utf-8") as primir,
+                  open(mir_out, 'w', encoding="utf-8") as mir):
                 primir.write("")
                 mir.write("")
                 return
 
     # Create dictionary with the ref. sequence length
     seq_lengths: Optional[Dict] = None
-    if args.chr:
+    if arguments.chr:
         seq_lengths = {}
-        with open(args.chr, 'r') as f:
+        with open(arguments.chr, encoding="utf-8") as f:
             for line in f:
                 ref_seq, length = line.strip().split("\t")
                 seq_lengths[ref_seq] = int(length)
 
     m = MirnaExtension()
-    m.load_gff_file(args.input)
-    m.extend_mirnas(n = args.extension, 
-                    seq_lengths = seq_lengths, 
+    m.load_gff_file(arguments.input)
+    m.extend_mirnas(n=arguments.extension,
+                    seq_lengths=seq_lengths,
                     primir_out=primir_out,
-                    mir_out = mir_out)
+                    mir_out=mir_out)
 
 
 if __name__ == "__main__":

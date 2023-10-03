@@ -1,0 +1,118 @@
+name: tests
+
+on:
+  pull_request:
+    branches:
+     - dev
+  push:
+    branches:
+      - '*'
+ 
+jobs:
+
+  static-code-analysis:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: check out repository
+        uses: actions/checkout@v4
+         
+      - name: Setup Conda/Mamba
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          mamba-version: "*"
+          activate-environment: mirflowz
+          environment-file: install/environment.dev.yml
+          auto-activate-base: false
+      
+      - name: display environment info
+        run: |
+          conda info -a
+          conda list
+
+      - name: flake8
+        working-directory: ./scripts
+        run: flake8 ./*.py --exclude oligomapOutputToSam_nhfiltered.py
+
+      - name: mypy
+        working-directory: ./scripts
+        run: mypy ./*.py
+
+      - name: pylint
+        working-directory: ./scripts
+        run: pylint --rcfile=../pylint.cfg ./*.py
+
+      - name: Check workflow descriptor files for lints
+        working-directory: ./test
+        run: |
+          snakemake --snakefile="../workflow/Snakefile" --configfile="config.yaml" --lint
+          snakemake --snakefile="../workflow/rules/common.smk" --configfile="config.yaml" --lint
+          snakemake --snakefile="../workflow/rules/prepare.smk" --configfile="config.yaml" --lint
+          snakemake --snakefile="../workflow/rules/map.smk" --configfile="config.yaml" --lint
+          snakemake --snakefile="../workflow/rules/quantify.smk" --configfile="config.yaml" --lint
+        
+
+  snakemake-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+  
+    steps:
+    
+      - name: check out repository
+        uses: actions/checkout@v4
+         
+      - name: setup Conda/Mamba
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          mamba-version: "*"
+          activate-environment: mirflowz
+          environment-file: install/environment.root.yml
+          auto-activate-base: false
+      
+      - name: display environment info
+        run: |
+          conda info -a
+          conda list   
+
+      - name: run test for rule graph
+        run: bash test/test_rule_graph.sh
+      
+      - name: run local test with Singularity
+        run: bash test/test_workflow_local_with_singularity.sh
+
+      - name: run local test with Conda
+        run: bash test/test_workflow_local_with_conda.sh
+
+
+  unit-testing:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+    
+      - name: checkout repository
+        uses: actions/checkout@v4
+         
+      - name: setup Conda/Mamba
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          mamba-version: "*"
+          activate-environment: mirflowz
+          environment-file: install/environment.dev.yml
+          auto-activate-base: false
+      
+      - name: display environment info
+        run: |
+          conda info -a
+          conda list
+      
+      - name: run unit tests
+        working-directory: ./scripts/tests
+        run: pytest --cov=scripts --cov-branch --cov-report=term-missing

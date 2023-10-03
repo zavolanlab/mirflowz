@@ -8,7 +8,7 @@ feature is determined by the value of the --id argument, which must match one
 of the fields in the attributes column of the original GFF/GTF file used in
 the bedtools intersect command. The appropriate contribution is based on the
 --collapsed and the --nh flags. If --collapsed and --nh are set, the
-contribution of each alignment is computed as # of reads/NH. If only 
+contribution of each alignment is computed as # of reads/NH. If only
 --collapsed is set, the contribution is # of reads/1. If only --nh is set,
 the contribution is 1/NH. Otherwise, the contribution is 1. If the BED file is
 empty, no output is produced. The output columns are also determined by the
@@ -25,7 +25,7 @@ import argparse
 from collections import namedtuple
 from pathlib import Path
 import sys
-from typing import Dict, Optional
+from typing import Dict
 
 
 def parse_arguments():
@@ -86,7 +86,7 @@ def parse_arguments():
             "the output table. Default: %(default)s."
         ),
         action='store_true',
-        default= False
+        default=False
     )
     parser.add_argument(
         '--feat-extension',
@@ -102,24 +102,31 @@ def parse_arguments():
 
     return parser
 
-def attributes_dictionary(attr: str) -> Optional[Dict[str, str]]:
+
+def attributes_dictionary(attr: str) -> Dict[str, str]:
     """Create attributes dicctionary."""
     pairs = attr.split(';')
 
     if len(pairs[0].split('=')) == 2:
         attr_dict = {p.split('=')[0].lower(): p.split('=')[1] for p in pairs}
     else:
-        attr_dict = {p.split('"')[0].strip().lower(): p.split('"')[1] for p in pairs}
+        attr_dict = {
+                p.split('"')[0].strip().lower(): p.split('"')[1]
+                for p in pairs
+                }
 
     return attr_dict
 
-def get_contribution(query_id:str, collapsed: bool = False, nh: bool = False) -> float:
+
+def get_contribution(query_id: str,
+                     collapsed: bool = False,
+                     nh: bool = False) -> float:
     """Get contribution of an alignment to the overall count."""
     if collapsed and nh:
         num_reads = int(query_id.split('-')[1].split('_')[0])
         nh_value = int(query_id.split('-')[1].split('_')[1])
 
-    elif not collapsed and nh :
+    elif not collapsed and nh:
         num_reads = 1
         nh_value = int(query_id.split('_')[1])
 
@@ -130,20 +137,47 @@ def get_contribution(query_id:str, collapsed: bool = False, nh: bool = False) ->
     else:
         num_reads = 1
         nh_value = 1
-    
+
     return num_reads/nh_value
 
-def main(args) -> None:
+
+def get_initial_data(name: str, feat_extension: bool) -> list[str]:
+    """Get the feature name and its extension.
+
+    Args:
+        name:
+            string with the feature name that can or not include its
+            annotation extension in the format name_5-extension_3-extension
+        feat_extension:
+            specify whether the feature annotation extension has to be a field
+            on the final output
+
+    Returns:
+        list with the feature name to be found in the final table and the
+        number of extended positions (if asked for)
+    """
+    if feat_extension:
+        feat_data = name.split('_')
+
+        if len(feat_data) == 1:
+            feat_data.extend(['NA', 'NA'])
+    else:
+        feat_data = [name]
+
+    return feat_data
+
+
+def main(arguments) -> None:
     """Tabulate a bedtools intersect BED file."""
+    with open(arguments.bedfile, 'r', encoding="utf-8") as bedfile:
 
-    with open(args.bedfile, 'r') as bedfile:
-
-        Fields = namedtuple('Fields',("feat_chr", "source", "feat_type",
-                                      "feat_start", "feat_end", "feat_score", 
-                                      "strand", "phase", "feat_attributes", 
-                                      "read_chr", "read_start", "read_end", 
-                                      "read_name", "read_score", "read_strand"))
-        count = 0
+        Fields = namedtuple('Fields',
+                            ("feat_chr", "source", "feat_type",
+                             "feat_start", "feat_end", "feat_score",
+                             "strand", "phase", "feat_attributes",
+                             "read_chr", "read_start", "read_end",
+                             "read_name", "read_score", "read_strand"))
+        count = 0.0
         current_name = None
         read_ID = []
 
@@ -151,18 +185,14 @@ def main(args) -> None:
 
             fields = Fields(*line.strip().split('\t'))
 
-            name = attributes_dictionary(fields.feat_attributes)[args.id]
-            contribution = get_contribution(fields.read_name, args.collapsed, args.nh)
-            
+            name = attributes_dictionary(fields.feat_attributes)[arguments.id]
+            contribution = get_contribution(fields.read_name,
+                                            arguments.collapsed,
+                                            arguments.nh)
 
             if current_name is None:
                 current_name = name
-                if args.feat_extension:
-                    feat_data = name.split('_')
-                    if len(feat_data) == 1:
-                        feat_data.extend(['NA', 'NA'])
-                else:
-                    feat_data = [name]
+                feat_data = get_initial_data(name, arguments.feat_extension)
 
             if current_name == name:
                 count += contribution
@@ -171,31 +201,25 @@ def main(args) -> None:
             else:
                 feat_data.insert(1, str(count))
 
-                if args.read_ids:
+                if arguments.read_ids:
                     feat_data.append(';'.join(sorted(read_ID)))
-                    
+
                 sys.stdout.write('\t'.join(feat_data) + '\n')
 
-                if args.feat_extension:
-                    feat_data = name.split('_')
-                    if len(feat_data) == 1:
-                        feat_data.extend(['NA', 'NA'])
-                else:
-                    feat_data = [name]
+                feat_data = get_initial_data(name, arguments.feat_extension)
 
                 current_name = name
                 count = contribution
                 read_ID = [fields.read_name]
- 
+
         if current_name is not None:
             feat_data.insert(1, str(count))
 
-            if args.read_ids:
+            if arguments.read_ids:
                 feat_data.append(';'.join(sorted(read_ID)))
 
             sys.stdout.write('\t'.join(feat_data) + '\n')
-        else:
-            return
+
 
 if __name__ == "__main__":
 
