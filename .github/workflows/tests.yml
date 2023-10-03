@@ -55,7 +55,38 @@ jobs:
           snakemake --snakefile="../workflow/rules/quantify.smk" --configfile="config.yaml" --lint
         
 
-  snakemake-test:
+  snakemake-conda-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+  
+    steps:
+    
+      - name: check out repository
+        uses: actions/checkout@v4
+         
+      - name: setup Conda/Mamba
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          mamba-version: "*"
+          activate-environment: mirflowz
+          environment-file: install/environment.yml
+          auto-activate-base: false
+      
+      - name: display environment info
+        run: |
+          conda info -a
+          conda list   
+
+      - name: run test for rule graph
+        run: bash test/test_rule_graph.sh
+      
+      - name: run local test with Conda
+        run: bash test/test_workflow_local_with_conda.sh
+
+
+  snakemake-singularity-test:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -84,9 +115,6 @@ jobs:
       
       - name: run local test with Singularity
         run: bash test/test_workflow_local_with_singularity.sh
-
-      - name: run local test with Conda
-        run: bash test/test_workflow_local_with_conda.sh
 
 
   unit-testing:
