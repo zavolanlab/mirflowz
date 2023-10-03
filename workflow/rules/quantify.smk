@@ -7,8 +7,17 @@
 
 import os
 import pandas as pd
+from snakemake.utils import validate
 
 from pathlib import Path
+
+
+###############################################################################
+### Configuration validation
+###############################################################################
+
+validate(config, os.path.join("../..", "config", "config_schema.json"))
+
 
 ###############################################################################
 ### Reading samples table
@@ -263,7 +272,8 @@ rule index_intersecting_primir_bam:
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "index_intersecting_primir_bam_{sample}.log"
+            config["cluster_log"],
+            "index_intersecting_primir_bam_{sample}.log",
         ),
     log:
         os.path.join(

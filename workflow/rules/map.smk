@@ -7,6 +7,14 @@
 
 import os
 import pandas as pd
+from snakemake.utils import validate
+
+
+###############################################################################
+### Configuration validation
+###############################################################################
+
+validate(config, os.path.join("../..", "config", "config_schema.json"))
 
 
 ###############################################################################
@@ -498,7 +506,9 @@ rule convert_genome_to_sam_oligomap:
         ),
         nh=config["nh"],
     log:
-        os.path.join(config["local_log"], "oligomap_genome_to_sam_{sample}.log"),
+        os.path.join(
+            config["local_log"], "oligomap_genome_to_sam_{sample}.log"
+        ),
     resources:
         time=1,
         queue=1,
@@ -525,7 +535,9 @@ rule map_transcriptome_oligomap:
             "{sample}",
             "reads_filtered_for_oligomap.fasta",
         ),
-        target=os.path.join(config["output_dir"], "transcriptome_trimmed_id.fa"),
+        target=os.path.join(
+            config["output_dir"], "transcriptome_trimmed_id.fa"
+        ),
     output:
         tmap=os.path.join(
             config["output_dir"],
@@ -551,7 +563,7 @@ rule map_transcriptome_oligomap:
         time=6,
         threads=8,
     container:
-       "docker://quay.io/biocontainers/oligomap:1.0.1--hdcf5f25_0"
+        "docker://quay.io/biocontainers/oligomap:1.0.1--hdcf5f25_0"
     conda:
         os.path.join(workflow.basedir, "envs", "oligomap.yaml")
     shell:
@@ -637,7 +649,8 @@ rule convert_transcriptome_to_sam_oligomap:
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "oligomap_transcriptome_to_sam_{sample}.log"
+            config["cluster_log"],
+            "oligomap_transcriptome_to_sam_{sample}.log",
         ),
         nh=config["nh"],
     log:
@@ -733,7 +746,9 @@ rule filter_genome_by_nh:
         script=os.path.join(config["scripts_dir"], "nh_filter.py"),
     output:
         gmaps=os.path.join(
-            config["output_dir"], "{sample}", "genome_mappings_filtered_nh.sam"
+            config["output_dir"],
+            "{sample}",
+            "genome_mappings_filtered_nh.sam",
         ),
     params:
         cluster_log=os.path.join(
@@ -800,7 +815,9 @@ rule filter_transcriptome_by_nh:
 rule remove_header_genome_mappings:
     input:
         gmap=os.path.join(
-            config["output_dir"], "{sample}", "genome_mappings_filtered_nh.sam"
+            config["output_dir"],
+            "{sample}",
+            "genome_mappings_filtered_nh.sam",
         ),
     output:
         gmap=os.path.join(
@@ -808,7 +825,8 @@ rule remove_header_genome_mappings:
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "remove_header_genome_mappings_{sample}.log"
+            config["cluster_log"],
+            "remove_header_genome_mappings_{sample}.log",
         ),
     log:
         os.path.join(
@@ -1047,7 +1065,9 @@ rule filter_by_indels:
             "filter_multimappers.py",
         ),
     output:
-        sam=os.path.join(config["output_dir"], "{sample}", "alignments_all.sam"),
+        sam=os.path.join(
+            config["output_dir"], "{sample}", "alignments_all.sam"
+        ),
     params:
         cluster_log=os.path.join(
             config["cluster_log"], "remove_multimappers_{sample}.log"
@@ -1117,7 +1137,8 @@ rule sort_all_alns_bam_by_position:
         ),
     params:
         cluster_log=os.path.join(
-            config["cluster_log"], "sort_all_alns_bam_by_position_{sample}.log"
+            config["cluster_log"],
+            "sort_all_alns_bam_by_position_{sample}.log",
         ),
     log:
         os.path.join(
