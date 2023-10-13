@@ -41,7 +41,8 @@ optional fields, edit distance, MD string, and number of hits are also
 included. Only the best alignments per read (i.e. either all the alignments
 have 0 or 1 error) are written to the output file. Moreover, if the
 `--nh-filter` CLI argument is given, reads with more htis than the provided
-value are discarded.
+value are discarded. If none of the alignments meet the criteria, an empty
+file is created.
 
 EXAMPLES
     input format:
@@ -403,6 +404,9 @@ def main(arguments) -> None:
     outdir.mkdir(parents=True, exist_ok=True)
     outfile = outdir/f"oligomap_{arguments.ref}_mappings.sam"
 
+    with open(outfile, 'a', encoding="utf-8") as out_file:
+        out_file.write('')
+
     read_seqs: Dict[str, list] = {}
     seq_minError_nh: Dict[str, list] = {}
 
@@ -438,7 +442,6 @@ def main(arguments) -> None:
                     out_file.write('\t'.join(aln) +
                                    f"\tNH:i:{seq_minError_nh[read_name][1]}" +
                                    '\n')
-
     sys.stderr.write("SUCCESSFULLY FINISHED.")
 
 
