@@ -487,14 +487,11 @@ rule sort_genome_oligomap:
 
 rule convert_genome_to_sam_oligomap:
     input:
-        report=os.path.join(
-            config["output_dir"], "{sample}", "oligomap_genome_report.txt"
-        ),
         sort=os.path.join(
             config["output_dir"], "{sample}", "oligomap_genome_sorted.fasta"
         ),
         script=os.path.join(
-            config["scripts_dir"], "oligomapOutputToSam_nhfiltered.py"
+            config["scripts_dir"], "oligomap_output_to_sam_nh_filtered.py"
         ),
     output:
         gmap=os.path.join(
@@ -505,6 +502,8 @@ rule convert_genome_to_sam_oligomap:
             config["cluster_log"], "oligomap_genome_to_sam_{sample}.log"
         ),
         nh=config["nh"],
+        out_dir=lambda wildcards, output: Path(output[0]).parent,
+        ref="genome",
     log:
         os.path.join(
             config["local_log"], "oligomap_genome_to_sam_{sample}.log"
@@ -518,9 +517,11 @@ rule convert_genome_to_sam_oligomap:
         os.path.join(workflow.basedir, "envs", "python.yaml")
     shell:
         "(python {input.script} \
-        -i {input.sort} \
+        {input.sort} \
         -n {params.nh} \
-        > {output.gmap}) &> {log}"
+        --ref {params.ref} \
+        --outdir {params.out_dir} \
+        ) &> {log}"
 
 
 ###############################################################################
@@ -628,18 +629,13 @@ rule sort_transcriptome_oligomap:
 
 rule convert_transcriptome_to_sam_oligomap:
     input:
-        report=os.path.join(
-            config["output_dir"],
-            "{sample}",
-            "oligomap_transcriptome_report.txt",
-        ),
         sort=os.path.join(
             config["output_dir"],
             "{sample}",
             "oligomap_transcriptome_sorted.fasta",
         ),
         script=os.path.join(
-            config["scripts_dir"], "oligomapOutputToSam_nhfiltered.py"
+            config["scripts_dir"], "oligomap_output_to_sam_nh_filtered.py"
         ),
     output:
         tmap=os.path.join(
@@ -653,6 +649,8 @@ rule convert_transcriptome_to_sam_oligomap:
             "oligomap_transcriptome_to_sam_{sample}.log",
         ),
         nh=config["nh"],
+        out_dir=lambda wildcards, output: Path(output[0]).parent,
+        ref="transcriptome",
     log:
         os.path.join(
             config["local_log"], "oligomap_transcriptome_to_sam_{sample}.log"
@@ -663,10 +661,12 @@ rule convert_transcriptome_to_sam_oligomap:
         os.path.join(workflow.basedir, "envs", "python.yaml")
     shell:
         "(python {input.script} \
-        -i {input.sort} \
+        {input.sort} \
         -n {params.nh} \
-        > {output.tmap} \
+        --ref {params.ref} \
+        --outdir {params.out_dir} \
         ) &> {log}"
+
 
 
 ###############################################################################
