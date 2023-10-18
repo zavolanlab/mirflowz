@@ -23,7 +23,9 @@ jobs:
       - name: Setup Conda/Mamba
         uses: conda-incubator/setup-miniconda@v2
         with:
+          use-mamba: true
           mamba-version: "*"
+          channel-priority: true
           activate-environment: mirflowz
           environment-file: install/environment.dev.yml
           auto-activate-base: false
@@ -69,7 +71,9 @@ jobs:
       - name: setup Conda/Mamba
         uses: conda-incubator/setup-miniconda@v2
         with:
+          use-mamba: true
           mamba-version: "*"
+          channel-priority: true
           activate-environment: mirflowz
           environment-file: install/environment.yml
           auto-activate-base: false
@@ -100,7 +104,9 @@ jobs:
       - name: setup Conda/Mamba
         uses: conda-incubator/setup-miniconda@v2
         with:
+          use-mamba: true
           mamba-version: "*"
+          channel-priority: true
           activate-environment: mirflowz
           environment-file: install/environment.root.yml
           auto-activate-base: false
@@ -131,7 +137,9 @@ jobs:
       - name: setup Conda/Mamba
         uses: conda-incubator/setup-miniconda@v2
         with:
+          use-mamba: true
           mamba-version: "*"
+          channel-priority: true
           activate-environment: mirflowz
           environment-file: install/environment.dev.yml
           auto-activate-base: false
