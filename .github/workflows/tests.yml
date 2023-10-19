@@ -24,6 +24,7 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2
         with:
           mamba-version: "*"
+          miniforge-variant: Mambaforge
           channels: conda-forge,bioconda
           channel-priority: true
           activate-environment: mirflowz
@@ -72,6 +73,7 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2
         with:
           mamba-version: "*"
+          miniforge-variant: Mambaforge
           channels: conda-forge,bioconda
           channel-priority: true
           activate-environment: mirflowz
@@ -105,6 +107,7 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2
         with:
           mamba-version: "*"
+          miniforge-variant: Mambaforge
           channels: conda-forge,bioconda
           channel-priority: true
           activate-environment: mirflowz
@@ -138,6 +141,7 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2
         with:
           mamba-version: "*"
+          miniforge-variant: Mambaforge
           channels: conda-forge,bioconda
           channel-priority: true
           activate-environment: mirflowz
