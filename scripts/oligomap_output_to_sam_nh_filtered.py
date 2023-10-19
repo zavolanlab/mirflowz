@@ -228,7 +228,7 @@ def get_cigar_md(errors: str, sequence: str, bars_line: str,
 
         else:
             idx = bars_line.index(' ')
-            cigarStr = f"{idx}M{indelerr}{bars_line.count('|') - idx + 1}M"
+            cigarStr = f"{idx}M{indelerr}{bars_line.count('|') - idx}M"
             matchingString = f"MD:Z:{idx}^{ref_seq[idx]}{seq_len - idx -1}"
 
         return cigarStr, matchingString
@@ -245,7 +245,7 @@ def get_cigar_md(errors: str, sequence: str, bars_line: str,
 
         else:
             idx = bars_line.index(' ')
-            cigarStr = f"{idx}M{indelerr}{bars_line.count('|') - idx + 1}M"
+            cigarStr = f"{idx}M{indelerr}{bars_line.count('|') - idx}M"
 
         return cigarStr, f"MD:Z:{seq_len}"
 
@@ -293,7 +293,7 @@ def get_sam_fields(aln: list[str]) -> Fields:
     seq_name_pos = aln[0].split()
     errors = aln[2].split()[1]
     seq = aln[3].strip()
-
+    
     cigar, md = get_cigar_md(errors, seq, aln[4][:-1], aln[5].strip())
 
     fields = Fields(seq_name_pos[0],
@@ -428,7 +428,7 @@ def main(arguments) -> None:
             i += 1
 
             in_file.readline()
-            lines = [in_file.readline().strip() for _ in range(6)]
+            lines = [in_file.readline() for _ in range(6)]
 
     if len(read_seqs) > 0:
         with open(outfile, 'a', encoding="utf-8") as out_file:
