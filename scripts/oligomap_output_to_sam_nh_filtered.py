@@ -293,7 +293,7 @@ def get_sam_fields(aln: list[str]) -> Fields:
     seq_name_pos = aln[0].split()
     errors = aln[2].split()[1]
     seq = aln[3].strip()
-    
+
     cigar, md = get_cigar_md(errors, seq, aln[4][:-1], aln[5].strip())
 
     fields = Fields(seq_name_pos[0],
@@ -446,5 +446,5 @@ def main(arguments) -> None:
 
 
 if __name__ == "__main__":
-    args = parse_arguments().parse_args()
-    main(args)
+    args = parse_arguments().parse_args()  # pragma: no cover
+    main(args)  # pragma: no cover
