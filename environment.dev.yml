@@ -3,14 +3,14 @@ channels:
   - conda-forge
   - bioconda
 dependencies: 
-  - coverage==7.3
-  - flake8==6.1
-  - flake8-docstrings==1.7
-  - gffutils==0.12
-  - mypy==1.6
-  - pylint==3.0
-  - pysam==0.22
-  - pytest==7.4
+  - coverage>=7.3.2
+  - flake8>=6.1.0
+  - flake8-docstrings>=1.7.0
+  - gffutils>=0.12
+  - mypy>=1.6.1
+  - pylint>=3.0.1
+  - pysam>=0.22.0
+  - pytest>=7.4.2
   - pytest-cov
   - snakefmt
-  - snakemake==7.24.0
+  - snakemake=7.24.0
