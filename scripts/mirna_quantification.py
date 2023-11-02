@@ -410,7 +410,7 @@ def main(arguments) -> None:
             alignment = next(samfile)
             current_species = alignment.get_tag(arguments.tag)
             if current_species:
-                read_ID = [alignment.query_name]
+                read_ID = [str(alignment.query_name)]
                 count = get_contribution(alignment)
                 alns_count = 1
 
@@ -428,17 +428,17 @@ def main(arguments) -> None:
                 current_species = alignment.get_tag(arguments.tag)
                 count = get_contribution(alignment)
                 alns_count = 1
-                read_ID = [alignment.query_name]
+                read_ID = [str(alignment.query_name)]
 
                 continue
 
             if current_species == alignment.get_tag(arguments.tag):
                 count += get_contribution(alignment)
                 alns_count += 1
-                read_ID.append(alignment.query_name)
+                read_ID.append(str(alignment.query_name))
 
             else:
-                name = get_name(current_species)
+                name = get_name(str(current_species))
                 species = [name[1], str(count)]
 
                 if arguments.count:
@@ -456,9 +456,9 @@ def main(arguments) -> None:
                 current_species = alignment.get_tag(arguments.tag)
                 count = get_contribution(alignment)
                 alns_count = 1
-                read_ID = [alignment.query_name]
+                read_ID = [str(alignment.query_name)]
 
-        name = get_name(current_species)
+        name = get_name(str(current_species))
         species = [name[1], str(count)]
 
         if arguments.count:
