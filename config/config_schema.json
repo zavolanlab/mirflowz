@@ -42,7 +42,7 @@
         },
         "scripts_dir":{
             "type": "string",
-            "default": "../scripts/",
+            "default": "../../scripts/",
             "description": "Path to the scripts directory."
         },
         "extension":{
