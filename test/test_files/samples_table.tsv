@@ -1,2 +1,2 @@
 sample	sample_file	adapter	format
-test_lib	../test/test_files/test_lib.fa.gz	AACTGTAGGCACCATCAAT	fa
+test_lib	../../test/test_files/test_lib.fa.gz	AACTGTAGGCACCATCAAT	fa
