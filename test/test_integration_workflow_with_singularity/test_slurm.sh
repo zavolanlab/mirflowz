@@ -39,7 +39,7 @@ snakemake \
     --jobscript="../../jobscript.sh" \
     --jobs=20 \
     --use-singularity \
-    --singularity-args="--bind ${PWD}/../" \
+    --singularity-args="--bind ${PWD}/../../" \
     --printshellcmds \
     --rerun-incomplete \
     --verbose
