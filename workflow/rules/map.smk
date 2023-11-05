@@ -506,9 +506,7 @@ rule convert_genome_to_sam_oligomap:
         ),
         nh=config["nh"],
     log:
-        os.path.join(
-            config["local_log"], "oligomap_genome_to_sam_{sample}.log"
-        ),
+        os.path.join(config["local_log"], "oligomap_genome_to_sam_{sample}.log"),
     resources:
         time=1,
         queue=1,
@@ -535,9 +533,7 @@ rule map_transcriptome_oligomap:
             "{sample}",
             "reads_filtered_for_oligomap.fasta",
         ),
-        target=os.path.join(
-            config["output_dir"], "transcriptome_trimmed_id.fa"
-        ),
+        target=os.path.join(config["output_dir"], "transcriptome_trimmed_id.fa"),
     output:
         tmap=os.path.join(
             config["output_dir"],
@@ -1065,9 +1061,7 @@ rule filter_by_indels:
             "filter_multimappers.py",
         ),
     output:
-        sam=os.path.join(
-            config["output_dir"], "{sample}", "alignments_all.sam"
-        ),
+        sam=os.path.join(config["output_dir"], "{sample}", "alignments_all.sam"),
     params:
         cluster_log=os.path.join(
             config["cluster_log"], "remove_multimappers_{sample}.log"
