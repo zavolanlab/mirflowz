@@ -21,6 +21,6 @@ cd $script_dir
 
 # Run tests
 snakemake \
-    --snakefile="../../workflow/Snakefile" \
-    --configfile="../test_files/config.yaml" \
+    --snakefile="../workflow/Snakefile" \
+    --configfile="config.yaml" \
     --lint
