@@ -77,13 +77,13 @@ jobs:
           conda list   
 
       - name: run test for snakemake format
-        run: bash test/test_format/test_snakefmt.sh
+        run: bash test/test_snakefmt.sh
 
       - name: run test for snakemate lint
-        run: bash test/test_format/test_snakemake_lint.sh 
+        run: bash test/test_snakemake_lint.sh 
 
       - name: run test for rule graph
-        run: bash test/test_rule_graph/rule_graph.sh
+        run: bash test/rule_graph.sh
 
 
   snakemake-integration-test:
@@ -114,10 +114,10 @@ jobs:
           conda list   
       
       - name: run local test with Conda
-        run: bash test/test_integration_workflow_with_conda/test_local.sh
+        run: bash test/test_workflow_local_with_conda.sh
 
       - name: run local test with Singularity
-        run: bash test/test_integration_workflow_with_singularity/test_local.sh
+        run: bash test/test_workflow_local_with_singularity.sh
 
 
   unit-testing:
