@@ -83,7 +83,7 @@ jobs:
         run: bash test/test_snakemake_lint.sh 
 
       - name: run test for rule graph
-        run: bash test/rule_graph.sh
+        run: bash test/test_rule_graph.sh
 
 
   snakemake-integration-test:
