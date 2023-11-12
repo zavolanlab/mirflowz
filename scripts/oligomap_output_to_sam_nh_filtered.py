@@ -2,47 +2,44 @@
 
 """Transform oligomap output FASTA file to SAM keeping the best alignments.
 
-Read the input FASTA file, pick the best alignment(s) for each read (i.e. all
+Read the input file, pick the best alignment(s) for each read (i.e. all
 of the alignments have either 0 or 1 error). In addition, if the `--nh-filter`
 CLI argument is set, filter the reads with more hits than the number provided.
-The following sections will cover what the FASTA file must be like and how the
+The following sections will cover what the input file must be like and how the
 output can look like.
 
 EXPECTED INPUT
 The FASTA file must be the output of mapping your library with the tool
-oligomap: "https://github.com/zavolanlab/oligomap". The alignment
-representation has to have 6 lines with the following content:
-- The first line must contain the read's name, its length, the start and end
-mapped positions in the read's sequence, the reference sequence name and, the
-start and end mapped positions in the reference sequence in this order.
-- The second line, must contain the reference sequence name.
-- The third line, must contain the fields "errors:" and "orientation:" with
-the alignment number of errors and reference sequence strand.
-- The fourth and sixth lines must be the read and reference sequence
-respectively.
-- The fifth line must contain a vertical bar for each match between the
-sequences base pairs and a space otherwise.
-
-Alignments must be separated with a blank line.
-In addition, alignments have to be sorted by the read name and separated
-with a blank line. An example of how an entry would look like in the EXAMPLES
-section.
+oligomap: "https://github.com/zavolanlab/oligomap". Refer to the "Output
+format" seccion in its main README.md for more information.
+In addition, alignments have to be sorted by the read name. An example of how
+an entry would look like in the EXAMPLES section.
 
 OUTPUT FORMAT
-The output is a SAM file named 'oligomap_REF_mappings.sam', where REF is
-origin of the reference sequence(s) set in the CLI argument `--ref`. Regarding
-the mandatory fields in the SAM file, the bitwise flag, `flag`, is set to 0 if
-the reference sequence is found in the poisitive strand, and to 16 otherwise.
-The mapping quality, `map_q`, is set to 255. Both, the position of the next
-read, `p_next`. and the observed template length,`t_len`, are set to 0.
-Both, the reference name of the next read, `r_next`, and the ASCII of
-Phred-scaled base quality, `qual`, are set to '*'. In addition, the
-optional fields, edit distance, MD string, and number of hits are also
-included. Only the best alignments per read (i.e. either all the alignments
-have 0 or 1 error) are written to the output file. Moreover, if the
+The output consist on the filtered set of alignments from the input file in
+SAM format. Only the best alignments per read (i.e. either all the alignments
+have 0 or 1 error) are written to the standard output. Moreover, if the
 `--nh-filter` CLI argument is given, reads with more htis than the provided
-value are discarded. If none of the alignments meet the criteria, an empty
-file is created.
+value are discarded. If none of the alignments meet the criteria, nothing is
+returned. The fields in the SAM entry are:
+
+field | value
+--------------
+QNAME | Read's name
+FLAG  | Set to 0 if the reference sequence is found in the poisitive strand,
+      | and to 16 otherwise.
+RNAME | Refernce sequence name
+POS   | Alignment's first position in the reference sequence
+MAPQ  | Value set to 255 (mapping quality not available)
+CIGAR | Alignment's CIGAR string
+RNEXT | Value set to * (unavailable information)
+PNEXT | Value set to 0 (unavailable information)
+TLEN  | Value set to 0 (unavailable information)
+SEQ   | Mapped sequence
+QUAL  | Value set to * (Phred-scaled base quality not stored)
+NM:i: | Alignment's edit distance (Optional field)
+MD:Z: | Alignment's MD string (Optional field)
+NH:i: | Alignment's NH (Optional field)
 
 EXAMPLES
     input format:
@@ -110,24 +107,9 @@ def parse_arguments():
         help="Show program's version number and exit"
     )
     parser.add_argument(
-        'fasta_file',
+        'infile',
         help="Path to the FASTA file resulting from the oligomap mapping.",
         type=Path,
-    )
-    parser.add_argument(
-        '--outdir',
-        help="Path to the output directory. Default: %(default)s.",
-        default=Path.cwd(),
-        type=Path
-    )
-    parser.add_argument(
-        '--ref',
-        help=(
-            "Molecular collection where the reference sequence(s) belong to. "
-            "Default: %(default)s."
-        ),
-        default="genome",
-        type=str,
     )
     parser.add_argument(
         '-n', '--nh-filter',
@@ -270,16 +252,23 @@ def get_sam_fields(aln: list[str]) -> Fields:
     representation, this function returns a Fields class object with the
     mandatory fields in a SAM file and three optional ones.
 
-    The bitwise flag, `flag`, is set to 0 if the reference sequence is found
-    in the poisitive strand, and to 16 otherwise.
-    The mapping quality, `map_q`, is set to 255.
-    Both, the position of the next read, `p_next`. and the observed template
-    length,`t_len`, are set to 0.
-    Both, the reference name of the next read, `r_next`, and the ASCII of
-    Phred-scaled base quality, `qual`, are set to '*'.
-
-    The three optional fields are the edit distance, the MD string and the
-    number of hits.
+    field | value
+    --------------
+    QNAME | Read's name
+    FLAG  | Set to 0 if the reference sequence is found in the poisitive
+          | strand, and to 16 otherwise.
+    RNAME | Refernce sequence name
+    POS   | Alignment's first position in the reference sequence
+    MAPQ  | Value set to 255 (mapping quality not available)
+    CIGAR | Alignment's CIGAR string
+    RNEXT | Value set to * (unavailable information)
+    PNEXT | Value set to 0 (unavailable information)
+    TLEN  | Value set to 0 (unavailable information)
+    SEQ   | Mapped sequence
+    QUAL  | Value set to * (Phred-scaled base quality not stored)
+    NM:i: | Alignment's edit distance (Optional field)
+    MD:Z: | Alignment's MD string (Optional field)
+    NH:i: | Alignment's NH (Optional field)
 
     Args:
         aln:
@@ -307,9 +296,9 @@ def get_sam_fields(aln: list[str]) -> Fields:
     return fields
 
 
-def eval_aln(outfile: Path, nhfilter: int, d: Dict[str, list],
-             minErr_nh: Dict[str, list], fields: Fields) -> None:
-    """Evaluate an alignment to add, discard or write it in the output file.
+def eval_aln(nhfilter: int, d: Dict[str, list], minErr_nh: Dict[str, list],
+             fields: Fields) -> None:
+    """Evaluate an alignment to add, discard or write it to the STDOUT.
 
     Given a read's alignment, this function first checks if the dictionary
     storing the read alignments is empty. If it is, the function checks if the
@@ -330,13 +319,11 @@ def eval_aln(outfile: Path, nhfilter: int, d: Dict[str, list],
     current alignment.
 
     If the read is not the first in the dictionary, the function writes all
-    the alignments for the read in the first position in the output file,
+    the alignments for the read in the first position to the standard output,
     and both dictionaries are reset to only include the data for the
     alignments under evaluation.
 
     Args:
-        outfile:
-            Path to the ouput file
         nhfilter:
             maximum number of hits an read can have to be kept
         d:
@@ -382,14 +369,13 @@ def eval_aln(outfile: Path, nhfilter: int, d: Dict[str, list],
                 minErr_nh[seq_name] = [min(errors, minErr_nh[seq_name][0]), 1]
                 d[seq_name] = [fields]
         else:
-            with open(outfile, 'a', encoding="utf-8") as out_file:
-                for seq, aln in d.items():
-                    sys.stderr.write(f"Written read {seq} | " +
-                                     f"Errors = {minErr_nh[seq][0]} | " +
-                                     f"NH = {minErr_nh[seq][1]}\n")
-                    for field in aln:
-                        out_file.write('\t'.join(field) +
-                                       f"\tNH:i:{minErr_nh[seq][1]}" + '\n')
+            for seq, aln in d.items():
+                sys.stderr.write(f"Written read {seq} | " +
+                                 f"Errors = {minErr_nh[seq][0]} | " +
+                                 f"NH = {minErr_nh[seq][1]}\n")
+                for field in aln:
+                    sys.stdout.write('\t'.join(field) +
+                                     f"\tNH:i:{minErr_nh[seq][1]}" + '\n')
 
             d.clear()
             minErr_nh.clear()
@@ -399,18 +385,11 @@ def eval_aln(outfile: Path, nhfilter: int, d: Dict[str, list],
 
 
 def main(arguments) -> None:
-    """Convert oligomap alignments FASTA file to SAM file."""
-    outdir = Path(arguments.outdir)
-    outdir.mkdir(parents=True, exist_ok=True)
-    outfile = outdir/f"oligomap_{arguments.ref}_mappings.sam"
-
-    with open(outfile, 'a', encoding="utf-8") as out_file:
-        out_file.write('')
-
+    """Convert the alignments in the oligomap output file to its SAM format."""
     read_seqs: Dict[str, list] = {}
     seq_minError_nh: Dict[str, list] = {}
 
-    with open(arguments.fasta_file, 'r', encoding="utf-8") as in_file:
+    with open(arguments.infile, 'r', encoding="utf-8") as in_file:
 
         sys.stderr.write("##############\nSTART READING...\n##############\n")
 
@@ -423,7 +402,7 @@ def main(arguments) -> None:
 
             sys.stderr.write(f"Record:{i} | Sequence:{fields.read_name}\n")
 
-            eval_aln(outfile, arguments.nh_filter, read_seqs, seq_minError_nh,
+            eval_aln(arguments.nh_filter, read_seqs, seq_minError_nh,
                      fields)
             i += 1
 
@@ -431,17 +410,17 @@ def main(arguments) -> None:
             lines = [in_file.readline() for _ in range(6)]
 
     if len(read_seqs) > 0:
-        with open(outfile, 'a', encoding="utf-8") as out_file:
 
-            for read_name, alignments in read_seqs.items():
-                sys.stderr.write(f"Printed read {read_name} | Errors = " +
-                                 f"{seq_minError_nh[read_name][0]} | " +
-                                 f"NH = {seq_minError_nh[read_name][1]}\n")
+        for read_name, alignments in read_seqs.items():
+            sys.stderr.write(f"Printed read {read_name} | Errors = " +
+                             f"{seq_minError_nh[read_name][0]} | " +
+                             f"NH = {seq_minError_nh[read_name][1]}\n")
 
-                for aln in alignments:
-                    out_file.write('\t'.join(aln) +
-                                   f"\tNH:i:{seq_minError_nh[read_name][1]}" +
-                                   '\n')
+            for aln in alignments:
+                sys.stdout.write('\t'.join(aln) +
+                                 f"\tNH:i:{seq_minError_nh[read_name][1]}" +
+                                 '\n')
+
     sys.stderr.write("SUCCESSFULLY FINISHED.")
 
 
