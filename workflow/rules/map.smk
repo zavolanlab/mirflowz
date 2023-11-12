@@ -405,16 +405,13 @@ rule sort_genome_oligomap:
 
 rule convert_genome_to_sam_oligomap:
     input:
-        report=OUT_DIR / "{sample}" / "oligomap_genome_report.txt",
         sort=OUT_DIR / "{sample}" / "oligomap_genome_sorted.fasta",
-        script=SCRIPTS_DIR / "oligomapOutputToSam_nhfiltered.py",
+        script=SCRIPTS_DIR / "oligomap_output_to_sam_nh_filtered.py",
     output:
         gmap=OUT_DIR / "{sample}" / "oligomap_genome_mappings.sam",
     params:
         cluster_log=CLUSTER_LOG / "oligomap_genome_to_sam_{sample}.log",
         nh=config["nh"],
-        out_dir=lambda wildcards, output: Path(output[0]).parent,
-        ref="genome",
     log:
         LOCAL_LOG / "oligomap_genome_to_sam_{sample}.log",
     resources:
@@ -428,9 +425,7 @@ rule convert_genome_to_sam_oligomap:
         "(python {input.script} \
         {input.sort} \
         -n {params.nh} \
-        --ref {params.ref} \
-        --outdir {params.out_dir} \
-        ) &> {log}"
+        > {output.gmap}) &> {log}"
 
 
 ###############################################################################
@@ -502,16 +497,13 @@ rule sort_transcriptome_oligomap:
 
 rule convert_transcriptome_to_sam_oligomap:
     input:
-        report=OUT_DIR / "{sample}" / "oligomap_transcriptome_report.txt",
         sort=OUT_DIR / "{sample}" / "oligomap_transcriptome_sorted.fasta",
-        script=SCRIPTS_DIR / "oligomapOutputToSam_nhfiltered.py",
+        script=SCRIPTS_DIR / "oligomap_output_to_sam_nh_filtered.py",
     output:
         tmap=OUT_DIR / "{sample}" / "oligomap_transcriptome_mappings.sam",
     params:
         cluster_log=CLUSTER_LOG / "oligomap_transcriptome_to_sam_{sample}.log",
         nh=config["nh"],
-        out_dir=lambda wildcards, output: Path(output[0]).parent,
-        ref="transcriptome",
     log:
         LOCAL_LOG / "oligomap_transcriptome_to_sam_{sample}.log",
     container:
@@ -522,9 +514,7 @@ rule convert_transcriptome_to_sam_oligomap:
         "(python {input.script} \
         {input.sort} \
         -n {params.nh} \
-        --ref {params.ref} \
-        --outdir {params.out_dir} \
-        ) &> {log}"
+        > {output.tmap}) &> {log}"
 
 
 
