@@ -19,11 +19,11 @@ cd $script_dir
 
 # Run test
 snakemake \
-    --snakefile="../../workflow/Snakefile" \
+    --snakefile="../workflow/Snakefile" \
     --cores 4  \
-    --configfile="../test_files/config.yaml" \
+    --configfile="config.yaml" \
     --use-singularity \
-    --singularity-args "--bind ${PWD}/../../" \
+    --singularity-args "--bind ${PWD}/../" \
     --printshellcmds \
     --rerun-incomplete \
     --verbose
@@ -31,8 +31,8 @@ snakemake \
 
 # Snakemake report
 snakemake \
-    --snakefile="../../workflow/Snakefile" \
-    --configfile="../test_files/config.yaml" \
+    --snakefile="../workflow/Snakefile" \
+    --configfile="config.yaml" \
     --report="snakemake_report.html"
 
 # Check md5 sum of some output files

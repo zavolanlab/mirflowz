@@ -23,10 +23,10 @@ mkdir -p results
 
 # Run test
 snakemake \
-    --snakefile="../../workflow/Snakefile" \
+    --snakefile="../workflow/Snakefile" \
     --cores=256 \
-    --configfile="../test_files/config.yaml" \
-    --cluster-config="../test_files/cluster.json" \
+    --configfile="config.yaml" \
+    --cluster-config="cluster.json" \
     --cluster "sbatch \
         --cpus-per-task={cluster.threads} \
         --mem={cluster.mem} \
@@ -36,7 +36,7 @@ snakemake \
         -o {params.cluster_log} \
         -p scicore \
         --open-mode=append" \
-    --jobscript="../../jobscript.sh" \
+    --jobscript="../jobscript.sh" \
     --jobs=20 \
     --use-conda \
     --printshellcmds \
@@ -45,8 +45,8 @@ snakemake \
 
 # Snakemake report
 snakemake \
-    --snakefile="../../workflow/Snakefile" \
-    --configfile="../test_files/config.yaml" \
+    --snakefile="../workflow/Snakefile" \
+    --configfile="config.yaml" \
     --report="snakemake_report.html"
 
 # Check md5 sum of some output files
