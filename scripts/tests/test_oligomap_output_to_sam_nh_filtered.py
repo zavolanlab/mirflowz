@@ -31,7 +31,7 @@ def empty_file():
 @pytest.fixture
 def genome_nh_2():
     """Import path to test files with maximum NH set to 2."""
-    oligo_in = Path("files/in_oligomap_output.fa")
+    oligo_in = Path("files/in_oligomap_output.oligomap")
     oligo_out = Path("files/oligomap_genome_2_nh.sam")
 
     return oligo_in, oligo_out
@@ -40,7 +40,7 @@ def genome_nh_2():
 @pytest.fixture
 def transcriptome_no_nh():
     """Import path to test files with reference set to transcriptome."""
-    oligo_in = Path("files/in_oligomap_output.fa")
+    oligo_in = Path("files/in_oligomap_output.oligomap")
     oligo_out = Path("files/oligomap_transcriptome_no_nh.sam")
 
     return oligo_in, oligo_out
@@ -176,22 +176,21 @@ class TestParseArguments:
             parse_arguments().parse_args()
         assert sysex.value.code == 2
 
-    def test_in_files(self, monkeypatch, empty_file, tmp_path):
-        """Call with in and output files."""
+    def test_in_files(self, monkeypatch, empty_file):
+        """Call with in file."""
         empty_in = empty_file
 
         monkeypatch.setattr(
             sys, 'argv',
             ['oligomap_output_to_sam_nh_filtered',
               str(empty_in),
-              '--outdir', str(tmp_path),
              ]
         )
         
         args = parse_arguments().parse_args()
         assert isinstance(args, argparse.Namespace)
 
-    def test_all_arguments(self, monkeypatch, genome_nh_2, tmp_path):
+    def test_all_arguments(self, monkeypatch, genome_nh_2):
         """Call with all the arguments."""
         fa_in, sam_out = genome_nh_2
 
@@ -199,8 +198,6 @@ class TestParseArguments:
             sys, 'argv',
             ['oligomap_output_to_sam_nh_filtered',
              str(fa_in),
-             '--outdir', str(tmp_path),
-             '--ref', "genome",
              '-n', '100',
              ]
         )
@@ -308,88 +305,76 @@ class TestGetSAMFields():
 class TestEvalAln:
     """Test ''eval_aln()' function."""
 
-    def test_eval_empty_dict_new_read(self, tmp_path, aln_fields):
+    def test_eval_empty_dict_new_read(self, aln_fields):
         """Test evaluation with a new read and an empty dictionary."""
-        output = tmp_path/"oligomap_genome_mappings.sam"
-
         d = dict()
         minerr_nh = {"read_0" : ['0', 1]}
         aln = aln_fields[0]
         nhfilter = None
 
-        eval_aln(output, nhfilter, d, minerr_nh, aln)
+        eval_aln(nhfilter, d, minerr_nh, aln)
 
         assert list(d.keys())[0] == aln.read_name
         assert minerr_nh[aln.read_name] == ['0', 1]
         
-    def test_eval_empty_dict_smaller_error(self, tmp_path, aln_fields):
+    def test_eval_empty_dict_smaller_error(self, aln_fields):
         """Test evaluation with a smaller error and an empty dictionary."""
-        output = tmp_path/"oligomap_genome_mappings.sam"
-
         d = dict()
         minerr_nh = {"read_1" : ['1', 1]}
         aln = aln_fields[0]
         nhfilter = None
 
-        eval_aln(output, nhfilter, d, minerr_nh, aln)
+        eval_aln(nhfilter, d, minerr_nh, aln)
 
         assert list(d.keys())[0] == aln.read_name
         assert minerr_nh[aln.read_name] == ['0', 1]
 
-    def test_increase_nh_no_filter(self, tmp_path, aln_fields):
+    def test_increase_nh_no_filter(self, aln_fields):
         """Test evaluation when increasing NH without a maximum value."""
-        output = tmp_path/"oligomap_genome_mappings.sam"
-
         d = {"read_1": [aln_fields[1], aln_fields[2]]}
         minerr_nh = {"read_1" : ['1', 2]}
         aln = aln_fields[3]
         nhfilter = None
 
-        eval_aln(output, nhfilter, d, minerr_nh, aln)
+        eval_aln(nhfilter, d, minerr_nh, aln)
 
         assert len(d[aln.read_name]) == 3
         assert minerr_nh[aln.read_name] == ['1', 3]
 
-    def test_exceed_nh_filter_2(self, capsys, tmp_path, aln_fields):
+    def test_exceed_nh_filter_2(self, capsys, aln_fields):
         """Test evaluation when exceeding the maximum NH set to 2."""
-        output = tmp_path/"oligomap_genome_mappings.sam"
-
         d = {"read_1": [aln_fields[1], aln_fields[2]]}
         minerr_nh = {"read_1" : ['1', 2]}
         aln = aln_fields[3]
         nhfilter = 2
 
-        eval_aln(output, nhfilter, d, minerr_nh, aln)
+        eval_aln(nhfilter, d, minerr_nh, aln)
         captured = capsys.readouterr()
 
         assert len(d) == 0
         assert minerr_nh[aln.read_name] == ['1', 3]
         assert captured.err == "Filtered by NH | Read read_1 | Errors = 1\n"
         
-    def test_no_exceed_nh_filter_2(self, tmp_path, aln_fields):
+    def test_no_exceed_nh_filter_2(self, aln_fields):
         """Test evaluation when increasing NH with maximum value of 2."""
-        output = tmp_path/"oligomap_genome_mappings.sam"
-
         d = {"read_1": [aln_fields[1]]}
         minerr_nh = {"read_1" : ['1', 1]}
         aln = aln_fields[2]
         nhfilter = 2
 
-        eval_aln(output, nhfilter, d, minerr_nh, aln)
+        eval_aln(nhfilter, d, minerr_nh, aln)
 
         assert len(d[aln.read_name]) == 2
         assert minerr_nh[aln.read_name] == ['1', 2]
         
-    def test_smaller_min_error(self, capsys, tmp_path, aln_fields):
+    def test_smaller_min_error(self, capsys, aln_fields):
         """Test evaluation when having a smaller minimumm error."""
-        output = tmp_path/"oligomap_genome_mappings.sam"
-
         d = {"read_1": [aln_fields[1], aln_fields[2]]}
         minerr_nh = {"read_1" : ['1', 2]}
         aln = aln_fields[0]
         nhfilter = None 
 
-        eval_aln(output, nhfilter, d, minerr_nh, aln)
+        eval_aln(nhfilter, d, minerr_nh, aln)
         captured = capsys.readouterr()
 
         assert len(d[aln.read_name]) == 1
@@ -406,74 +391,70 @@ class TestEvalAln:
         aln = aln_fields[4]
         nhfilter = None 
 
-        eval_aln(output, nhfilter, d, minerr_nh, aln)
+        eval_aln(nhfilter, d, minerr_nh, aln)
         captured = capsys.readouterr()
 
         assert list(d.keys())[0] == aln.read_name
         assert len(minerr_nh) == 1
         assert captured.err == "Written read read_1 | Errors = 1 | NH = 2\n"
 
-        with open(out_file, 'r') as expected, open(output, 'r') as output:
-            assert output.read() == expected.read()
+        with open(out_file, 'r') as expected:
+            assert captured.out == expected.read()
         
 
 class TestMain:
     """Test 'main()' function."""
 
-    def test_main_empty_file(self, monkeypatch, tmp_path, empty_file):
-        """Test main function with an empty FASTA file."""
+    def test_main_empty_file(self, monkeypatch, capsys, empty_file):
+        """Test main function with an empty file."""
         empty_in = empty_file
-        output = tmp_path/"oligomap_genome_mappings.sam"
 
         monkeypatch.setattr(
             sys, 'argv',
             ['oligomap_output_to_sam_nh_filtered',
              str(empty_in),
-             '--outdir', str(tmp_path),
              ]
         )
         args = parse_arguments().parse_args()
         main(args)
+        captured = capsys.readouterr()
 
-        with open(empty_in, 'r') as expected, open(output, 'r') as out_file:
-            assert out_file.read() == expected.read()
+        with open(empty_in, 'r') as expected:
+            assert captured.out == expected.read()
 
-    def test_main_max_nh_2(self, monkeypatch, tmp_path, genome_nh_2):
+    def test_main_max_nh_2(self, monkeypatch, capsys, genome_nh_2):
         """Test main function with NH set to 2."""
         in_file, out_file = genome_nh_2
-        output = tmp_path/"oligomap_genome_mappings.sam"
 
         monkeypatch.setattr(
             sys, 'argv',
             ['oligomap_output_to_sam_nh_filtered',
              str(in_file),
              '-n', '2',
-             '--outdir', str(tmp_path),
              ]
         )
         args = parse_arguments().parse_args()
         main(args)
+        captured = capsys.readouterr()
 
-        with open(out_file, 'r') as expected, open(out_file, 'r') as output:
-            assert output.read() == expected.read()
+        with open(out_file, 'r') as expected:
+            assert captured.out == expected.read()
 
-    def test_main_no_nh_transcriptome(self, monkeypatch, tmp_path,
+    def test_main_no_nh_transcriptome(self, monkeypatch, capsys,
                                       transcriptome_no_nh):
         """Test main function with no NH set for transcriptome mappings."""
         in_file, out_file = transcriptome_no_nh
-        output = tmp_path/"oligomap_transcriptome_mappings.sam"
 
         monkeypatch.setattr(
             sys, 'argv',
             ['oligomap_output_to_sam_nh_filtered',
              str(in_file),
-             '--ref', "transcriptome",
-             '--outdir', str(tmp_path),
              ]
         )
         args = parse_arguments().parse_args()
         main(args)
+        captured = capsys.readouterr()
 
-        with open(out_file, 'r') as expected, open(out_file, 'r') as output:
-            assert output.read() == expected.read()
+        with open(out_file, 'r') as expected:
+            assert captured.out == expected.read()
 
