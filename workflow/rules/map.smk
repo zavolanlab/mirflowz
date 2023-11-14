@@ -189,7 +189,9 @@ rule remove_adapters:
     output:
         reads=OUT_DIR / "{sample}" / "reads_trimmed_adapters.fasta",
     params:
-        adapter=lambda wildcards: get_sample("adapter", wildcards.sample),
+        adapter=lambda wildcards: get_sample(
+            "adapter", wildcards.sample
+        ).upper(),
         error_rate=config["error_rate"],
         minimum_length=config["minimum_length"],
         overlap=config["overlap"],
