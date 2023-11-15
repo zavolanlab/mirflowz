@@ -296,7 +296,7 @@ def get_sam_fields(aln: list[str]) -> Fields:
     return fields
 
 
-def eval_aln(nhfilter: int, d: Dict[str, list], minErr_nh: Dict[str, list],
+def eval_aln(nhfilter: int, d: Dict[str, list], min_err_nh: Dict[str, list],
              fields: Fields) -> None:
     """Evaluate an alignment to add, discard or write it to the STDOUT.
 
@@ -329,7 +329,7 @@ def eval_aln(nhfilter: int, d: Dict[str, list], minErr_nh: Dict[str, list],
         d:
             dictionary with read names as keys and a list with Fields class
             NamedTuples as values
-        minErr_nh:
+        min_err_nh:
             dictionary with read names as keys and a list with the current
             minimum error and the number of hits in this order as values
         fields:
@@ -339,19 +339,19 @@ def eval_aln(nhfilter: int, d: Dict[str, list], minErr_nh: Dict[str, list],
     errors = fields.edit_dist[-1]
 
     if len(d) == 0:
-        if (seq_name not in list(minErr_nh.keys()) or
-           errors < minErr_nh[seq_name][0]):
+        if (seq_name not in list(min_err_nh.keys()) or
+           errors < min_err_nh[seq_name][0]):
 
-            minErr_nh[seq_name] = [errors, 1]
+            min_err_nh[seq_name] = [errors, 1]
             d[seq_name] = [fields]
     else:
         if seq_name == list(d.keys())[0]:
-            if errors == minErr_nh[seq_name][0]:
-                minErr_nh[seq_name][1] += 1
+            if errors == min_err_nh[seq_name][0]:
+                min_err_nh[seq_name][1] += 1
 
                 if nhfilter:
 
-                    if minErr_nh[seq_name][1] <= nhfilter:
+                    if min_err_nh[seq_name][1] <= nhfilter:
                         d[seq_name].append(fields)
 
                     else:
@@ -362,32 +362,33 @@ def eval_aln(nhfilter: int, d: Dict[str, list], minErr_nh: Dict[str, list],
                 else:
                     d[seq_name].append(fields)
 
-            elif errors < minErr_nh[seq_name][0]:
+            elif errors < min_err_nh[seq_name][0]:
                 sys.stderr.write(f"Filtered by ERROR | Read {seq_name}" +
-                                 f" | Errors = {minErr_nh[seq_name][0]}\n")
+                                 f" | Errors = {min_err_nh[seq_name][0]}\n")
 
-                minErr_nh[seq_name] = [min(errors, minErr_nh[seq_name][0]), 1]
+                min_err_nh[seq_name] = [min(errors, min_err_nh[seq_name][0]),
+                                        1]
                 d[seq_name] = [fields]
         else:
             for seq, aln in d.items():
                 sys.stderr.write(f"Written read {seq} | " +
-                                 f"Errors = {minErr_nh[seq][0]} | " +
-                                 f"NH = {minErr_nh[seq][1]}\n")
+                                 f"Errors = {min_err_nh[seq][0]} | " +
+                                 f"NH = {min_err_nh[seq][1]}\n")
                 for field in aln:
                     sys.stdout.write('\t'.join(field) +
-                                     f"\tNH:i:{minErr_nh[seq][1]}" + '\n')
+                                     f"\tNH:i:{min_err_nh[seq][1]}" + '\n')
 
             d.clear()
-            minErr_nh.clear()
+            min_err_nh.clear()
 
             d[seq_name] = [fields]
-            minErr_nh[seq_name] = [errors, 1]
+            min_err_nh[seq_name] = [errors, 1]
 
 
 def main(arguments) -> None:
-    """Convert the alignments in the oligomap output file to its SAM format."""
+    """Convert the alignments in the oligomap output file to SAM format."""
     read_seqs: Dict[str, list] = {}
-    seq_minError_nh: Dict[str, list] = {}
+    seq_min_error_nh: Dict[str, list] = {}
 
     with open(arguments.infile, 'r', encoding="utf-8") as in_file:
 
@@ -402,7 +403,7 @@ def main(arguments) -> None:
 
             sys.stderr.write(f"Record:{i} | Sequence:{fields.read_name}\n")
 
-            eval_aln(arguments.nh_filter, read_seqs, seq_minError_nh,
+            eval_aln(arguments.nh_filter, read_seqs, seq_min_error_nh,
                      fields)
             i += 1
 
@@ -413,12 +414,12 @@ def main(arguments) -> None:
 
         for read_name, alignments in read_seqs.items():
             sys.stderr.write(f"Printed read {read_name} | Errors = " +
-                             f"{seq_minError_nh[read_name][0]} | " +
-                             f"NH = {seq_minError_nh[read_name][1]}\n")
+                             f"{seq_min_error_nh[read_name][0]} | " +
+                             f"NH = {seq_min_error_nh[read_name][1]}\n")
 
             for aln in alignments:
                 sys.stdout.write('\t'.join(aln) +
-                                 f"\tNH:i:{seq_minError_nh[read_name][1]}" +
+                                 f"\tNH:i:{seq_min_error_nh[read_name][1]}" +
                                  '\n')
 
     sys.stderr.write("SUCCESSFULLY FINISHED.")
