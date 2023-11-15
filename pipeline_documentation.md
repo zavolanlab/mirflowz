@@ -1130,7 +1130,7 @@ alignments in a genomic region of interest.
 [custom-script-mir-ext]: scripts/mirna_extension.py
 [custom-script-mir-quant]: scripts/mirna_quantification.py
 [custom-script-nh-filter]: scripts/nh_filter.py
-[custom-script-oligo-sam]: scripts/oligomapOutputToSam_nhfiltered.py
+[custom-script-oligo-sam]: scripts/oligomap_output_to_sam_nh_filtered.py
 [custom-script-pri-quant]: scripts/primir_quantification.py
 [custom-script-remove-dup]: scripts/sam_remove_duplicates_inferior_alignments_multimappers.pl
 [custom-script-sam-trx]: scripts/sam_trx_to_sam_gen.pl

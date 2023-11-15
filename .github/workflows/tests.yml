@@ -38,7 +38,7 @@ jobs:
 
       - name: flake8
         working-directory: ./scripts
-        run: flake8 ./*.py --exclude oligomapOutputToSam_nhfiltered.py
+        run: flake8 ./*.py
 
       - name: mypy
         working-directory: ./scripts
