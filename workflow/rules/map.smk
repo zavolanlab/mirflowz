@@ -86,7 +86,7 @@ rule start:
             pd.Series(
                 samples_table.loc[wildcards.sample, "sample_file"]
             ).values,
-            format=get_sample("format"),
+            format=convert_lib_format(get_sample("format")),
         ),
     output:
         reads=OUT_DIR / "{sample}" / "{format}" / "reads.{format}",
@@ -162,7 +162,7 @@ rule format_fasta:
     input:
         reads=lambda wildcards: OUT_DIR
         / wildcards.sample
-        / get_sample("format", wildcards.sample)
+        / convert_lib_format(get_sample("format", wildcards.sample))
         / "reads.fa",
     output:
         reads=OUT_DIR / "{sample}" / "reads_formatted.fasta",
