@@ -14,7 +14,7 @@ def get_sample(column_id: str, sample_id: int = None) -> str:
 
 
 def convert_lib_format(lib_format: str) -> str:
-    """Convert library format to..."""
+    """Convert library file format."""
     formats = {
         "fa": "fa",
         "fasta": "fa",
