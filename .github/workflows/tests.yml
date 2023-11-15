@@ -112,12 +112,12 @@ jobs:
         run: |
           conda info -a
           conda list   
-      
-      - name: run local test with Conda
-        run: bash test/test_workflow_local_with_conda.sh
 
       - name: run local test with Singularity
         run: bash test/test_workflow_local_with_singularity.sh
+
+      - name: run local test with Conda
+        run: bash test/test_workflow_local_with_conda.sh
 
 
   unit-testing:
