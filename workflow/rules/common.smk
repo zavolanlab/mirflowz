@@ -11,3 +11,16 @@ def get_sample(column_id: str, sample_id: int = None) -> str:
         )
     else:
         return str(samples_table[column_id].iloc[0])
+
+
+def convert_lib_format(lib_format: str) -> str:
+    """Convert library format to..."""
+    formats = {
+        "fa": "fa",
+        "fasta": "fa",
+        "FASTA": "fa",
+        "fq": "fastq",
+        "fastq": "fastq",
+        "FASTQ": "fastq",
+    }
+    return formats[lib_format]
