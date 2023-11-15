@@ -405,9 +405,8 @@ rule sort_genome_oligomap:
 
 rule convert_genome_to_sam_oligomap:
     input:
-        report=OUT_DIR / "{sample}" / "oligomap_genome_report.txt",
         sort=OUT_DIR / "{sample}" / "oligomap_genome_sorted.fasta",
-        script=SCRIPTS_DIR / "oligomapOutputToSam_nhfiltered.py",
+        script=SCRIPTS_DIR / "oligomap_output_to_sam_nh_filtered.py",
     output:
         gmap=OUT_DIR / "{sample}" / "oligomap_genome_mappings.sam",
     params:
@@ -424,7 +423,7 @@ rule convert_genome_to_sam_oligomap:
         ENV_DIR / "python.yaml"
     shell:
         "(python {input.script} \
-        -i {input.sort} \
+        {input.sort} \
         -n {params.nh} \
         > {output.gmap}) &> {log}"
 
@@ -498,9 +497,8 @@ rule sort_transcriptome_oligomap:
 
 rule convert_transcriptome_to_sam_oligomap:
     input:
-        report=OUT_DIR / "{sample}" / "oligomap_transcriptome_report.txt",
         sort=OUT_DIR / "{sample}" / "oligomap_transcriptome_sorted.fasta",
-        script=SCRIPTS_DIR / "oligomapOutputToSam_nhfiltered.py",
+        script=SCRIPTS_DIR / "oligomap_output_to_sam_nh_filtered.py",
     output:
         tmap=OUT_DIR / "{sample}" / "oligomap_transcriptome_mappings.sam",
     params:
@@ -514,10 +512,10 @@ rule convert_transcriptome_to_sam_oligomap:
         ENV_DIR / "python.yaml"
     shell:
         "(python {input.script} \
-        -i {input.sort} \
+        {input.sort} \
         -n {params.nh} \
-        > {output.tmap} \
-        ) &> {log}"
+        > {output.tmap}) &> {log}"
+
 
 
 ###############################################################################

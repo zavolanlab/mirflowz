@@ -1,0 +1,69 @@
+read_1 (19 nc) 1..19	19	44278..44297
+19
+errors: 1 orientation: +
+CTACAAAGGGAAGCACTTT
+ ||||||||||||||||||
+GTACAAAGGGAAGCCCTTT
+
+read_1 (19 nc) 1..19	19	44377..44395
+19
+errors: 1 orientation: +
+CTACAAAGGGAAGCACTTT
+|||||||||||||| ||||
+CTACAAAGGGAAGCCCTTT
+
+read_1 (19 nc) 1..19	19	50971..50989
+19
+errors: 1 orientation: +
+CTACAAAGGGAAGCACTTT
+||||||||||||||||||  
+CTACAAAGGGAAGCACTTC
+
+read_1 (19 nc) 1..19	19	53471..53489
+19
+errors: 0 orientation: +
+CTACAAAGGGAAGCACTTT
+|||||||||||||||||||
+CTACAAAGGGAAGCACTTT
+
+read_2 (23 nc) 1..23	19	7627..7648
+19
+errors: 1 orientation: -
+AAAGCACCTCCAGAGCTTGAAGC
+ ||||||||||||||||||||||
+-AAGCACCTCCAGAGCTTGAAGC
+
+read_2 (23 nc) 1..23	19	7886..7908
+19
+errors: 1 orientation: -
+AAAGCACCTCCAGAGCTTGAAGC
+||||||||| |||||||||||||
+AAAGCACCT-CAGAGCTTGAAGC
+
+read_2 (23 nc) 1..23	19	9524..7545
+19
+errors: 1 orientation: -
+AAAGCACCTCCAGAGCTTGAAGC
+|||||||||||||||||||||| 
+AAAGCACCTCCAGAGCTTGAAG-
+
+read_3 (22 nc) 1..22	19	44414..44434
+19
+errors: 1 orientation: +
+-GAAGGCGCTTCACCTTTGGAGT
+ ||||||||||||||||||||||
+TGAAGGCGCTTCACCTTTGGAGT
+
+read_3 (22 nc) 1..22	19	54316..54336
+19
+errors: 1 orientation: +
+GAAGGCGCTTC-CCTTTGGAGT
+||||||||||| ||||||||||
+GAAGGCGCTTCGCCTTTGGAGT
+
+read_3 (22 nc) 1..22	19	55718..55738
+19
+errors: 1 orientation: +
+GAAGGCGCTTCACCTTTGGAGT-
+|||||||||||||||||||||| 
+GAAGGCGCTTCACCTTTGGAGTA
