@@ -18,6 +18,8 @@ from pathlib import Path
 ### Configuration validation
 ###############################################################################
 
+
+configfile: Path("./test/config_lint.yaml")
 validate(config, Path("../config/config_schema.json"))
 
 
