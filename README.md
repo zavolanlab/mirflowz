@@ -5,8 +5,8 @@ _MIRFLOWZ_ is a [Snakemake][snakemake] workflow for mapping miRNAs and isomiRs.
 ## Table of Contents
 
 1. [Installation](#installation)
+    - [Requirements](#requirements)
     - [Cloning the repository](#cloning-the-repository)
-    - [Dependencies](#dependencies)
     - [Setting up the virtual environment](#setting-up-the-virtual-environment)
     - [Testing your installation](#testing-your-installation)
 2. [Usage](#usage)
@@ -23,17 +23,7 @@ _MIRFLOWZ_ is a [Snakemake][snakemake] workflow for mapping miRNAs and isomiRs.
 The workflow lives inside this repository and will be available for you to run
 after following the installation instructions laid out in this section.
 
-### Cloning the repository
-
-Traverse to the desired path on your file system, then clone the repository and
-change into it with:
-
-```bash
-git clone https://github.com/zavolanlab/mirflowz.git
-cd mirflowz
-```
-
-### Dependencies
+### Requirements
 
 For improved reproducibility and reusability of the workflow, as well as an
 easy means to run it on a high performance computing (HPC) cluster managed,
@@ -43,21 +33,51 @@ environments). As a consequence, running this workflow has only a few individual
 dependencies. These are managed by the package manager Conda, which 
 needs to be installed on your system before proceeding.
 
-If you do not already have Conda installed globally on your system,
-we recommend that you install [Miniconda][miniconda-installation]. For faster
-creation of the environment (and Conda environments in general), you can also
-install [Mamba][mamba] on top of Conda. In that case, replace `conda` with
-`mamba` in the commands below (particularly in `conda env create`).
+The installation requires the following:
+
+- Linux (tested with Ubuntu `20.04` and `22.04`; macOS has not been tested yet)
+- [Conda][conda] (tested with `conda 23.1.0`)
+- [Mamba][mamba] (tested with `mamba 1.4.1`)
+
+> Other versions, especially older ones, are not guaranteed to work.
+
+### Cloning the repository
+
+Traverse to the desired path on your file system, then clone the repository and
+change into it with:
+
+```bash
+git clone https://github.com/zavolanlab/mirflowz.git
+# or git clone git@github.com:zavolanlab/mirflowz
+cd mirflowz
+```
+
 
 ### Setting up the virtual environment
 
-Create and activate the environment with necessary dependencies with Conda:
+You now need to create and activate the environment with necessary
+dependencies. For that purpose, there exist four different environment files.
+Use the decision matrix to pick the most suitable one for you:
+
+| I have root privileges on the machine/ I want to run _MIRFLOWZ_ via Singularity | I want to run pre-packaged tests | Environment file to use &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; |
+|:---:|:---:| --- |
+| | | `install/environment.yml` |
+| :check_mark: | | `install/environment.root.yml` |
+| | :check_mark: | `install/environment.dev.yml` |
+| :check_mark: | :check_mark: | `install/environment.dev.root.yml` |
+
+To set up the environment, execute the call below, but do not forget to replace
+the placeholder `ENVIRONMENT` with the appropriate file from the table above:
 
 ```bash
-conda env create -f environment.yml
-conda activate mirflowz
+mamba env create -f ENVIRONMENT
 ```
 
+Finally, activate the Conda environment with:
+
+```bash
+mamba activate mirflowz
+```
 If you plan to run _MIRFLOWZ_ via Conda, we recommend using the following
 command for a faster environment creation, specially if you will run it on an
 HPC cluster.
@@ -65,28 +85,6 @@ HPC cluster.
 ```bash
 conda config --set channel_priority strict
 ```
-
-If you plan to run _MIRFLOWZ_ via Singularity and do not already
-have it installed globally on your system, you must further update the Conda
-environment using the `environment.root.yml` with the command below.
-Mind that you must have the environment activated to update it.
-
-```bash
-conda env update -f environment.root.yml
-```
-
-> Note that you will need to have root permissions on your system to be able
-> to install Singularity. If you want to run _MIRFLOWZ_ on an HPC cluster
-> (recommended in almost all cases), ask your systems administrator about
-> Singularity.
-
-If you would like to contribute to _MIRFLOWZ_ development, you may find it 
-useful to further update your environment with the development dependencies:
-
-```bash
-conda env update -f environment.dev.yml
-```
-
 ### Testing your installation
 
 Several tests are provided to check the integrity of the installation. Follow

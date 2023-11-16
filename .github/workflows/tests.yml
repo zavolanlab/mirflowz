@@ -24,12 +24,12 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2
         with:
           mamba-version: "*"
+          miniforge-variant: Mambaforge
+          channels: conda-forge,bioconda
+          channel-priority: true
           activate-environment: mirflowz
-          environment-file: environment.yml
+          environment-file: install/environment.dev.yml
           auto-activate-base: false
-      
-      - name: Update mirflowz env with dev packages
-        run: mamba env update -n mirflowz -f environment.dev.yml
       
       - name: display environment info
         run: |
@@ -65,11 +65,8 @@ jobs:
         with:
           mamba-version: "*"
           activate-environment: mirflowz
-          environment-file: environment.yml
+          environment-file: install/environment.dev.root.yml
           auto-activate-base: false
-      
-      - name: update mirflowz env with dev packages
-        run: mamba env update -n mirflowz -f environment.dev.yml
       
       - name: display environment info
         run: |
@@ -86,7 +83,7 @@ jobs:
         run: bash test/test_rule_graph.sh
 
 
-  snakemake-integration-test:
+  snakemake-singularity-integration-test:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -101,12 +98,12 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2
         with:
           mamba-version: "*"
+          miniforge-variant: Mambaforge
+          channels: conda-forge,bioconda
+          channel-priority: true
           activate-environment: mirflowz
-          environment-file: environment.yml
+          environment-file: install/environment.root.yml
           auto-activate-base: false
-      
-      - name: update mirflowz env with root packages
-        run: mamba env update -n mirflowz -f environment.root.yml
       
       - name: display environment info
         run: |
@@ -115,6 +112,34 @@ jobs:
 
       - name: run local test with Singularity
         run: bash test/test_workflow_local_with_singularity.sh
+
+
+  snakemake-conda-integration-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+  
+    steps:
+    
+      - name: check out repository
+        uses: actions/checkout@v4
+         
+      - name: setup Conda/Mamba
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          mamba-version: "*"
+          miniforge-variant: Mambaforge
+          channels: conda-forge,bioconda
+          channel-priority: true
+          activate-environment: mirflowz
+          environment-file: install/environment.yml
+          auto-activate-base: false
+      
+      - name: display environment info
+        run: |
+          conda info -a
+          conda list   
 
       - name: run local test with Conda
         run: bash test/test_workflow_local_with_conda.sh
@@ -135,12 +160,12 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2
         with:
           mamba-version: "*"
+          miniforge-variant: Mambaforge
+          channels: conda-forge,bioconda
+          channel-priority: true
           activate-environment: mirflowz
-          environment-file: environment.yml
+          environment-file: install/environment.dev.yml
           auto-activate-base: false
-      
-      - name: update mirflowz env with dev packages
-        run: mamba env update -n mirflowz -f environment.dev.yml
       
       - name: display environment info
         run: |

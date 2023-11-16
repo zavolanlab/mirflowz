@@ -1,0 +1,17 @@
+name: mirflowz
+channels:
+  - conda-forge
+  - bioconda
+dependencies: 
+  - coverage==7.3
+  - flake8==6.1
+  - flake8-docstrings==1.7
+  - gffutils==0.12
+  - mypy==1.6
+  - pylint==3.0
+  - pysam==0.22
+  - pytest==7.4
+  - pytest-cov
+  - python==3.9.16
+  - snakefmt
+  - snakemake==7.24.0
