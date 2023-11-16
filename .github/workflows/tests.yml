@@ -38,7 +38,7 @@ jobs:
 
       - name: flake8
         working-directory: ./scripts
-        run: flake8 ./*.py --exclude oligomapOutputToSam_nhfiltered.py
+        run: flake8 ./*.py
 
       - name: mypy
         working-directory: ./scripts
@@ -48,17 +48,8 @@ jobs:
         working-directory: ./scripts
         run: pylint --rcfile=../pylint.cfg ./*.py
 
-      - name: Check workflow descriptor files for lints
-        working-directory: ./test
-        run: |
-          snakemake --snakefile="../workflow/Snakefile" --configfile="config.yaml" --lint
-          snakemake --snakefile="../workflow/rules/common.smk" --configfile="config.yaml" --lint
-          snakemake --snakefile="../workflow/rules/prepare.smk" --configfile="config.yaml" --lint
-          snakemake --snakefile="../workflow/rules/map.smk" --configfile="config.yaml" --lint
-          snakemake --snakefile="../workflow/rules/quantify.smk" --configfile="config.yaml" --lint
-        
 
-  snakemake-conda-test:
+  snakemake-format-graph-test:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -73,11 +64,8 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2
         with:
           mamba-version: "*"
-          miniforge-variant: Mambaforge
-          channels: conda-forge,bioconda
-          channel-priority: true
           activate-environment: mirflowz
-          environment-file: install/environment.yml
+          environment-file: install/environment.dev.root.yml
           auto-activate-base: false
       
       - name: display environment info
@@ -85,14 +73,17 @@ jobs:
           conda info -a
           conda list   
 
+      - name: run test for snakemake format
+        run: bash test/test_snakefmt.sh
+
+      - name: run test for snakemate lint
+        run: bash test/test_snakemake_lint.sh 
+
       - name: run test for rule graph
         run: bash test/test_rule_graph.sh
-      
-      - name: run local test with Conda
-        run: bash test/test_workflow_local_with_conda.sh
 
 
-  snakemake-singularity-test:
+  snakemake-singularity-integration-test:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -119,11 +110,39 @@ jobs:
           conda info -a
           conda list   
 
-      - name: run test for rule graph
-        run: bash test/test_rule_graph.sh
-      
       - name: run local test with Singularity
         run: bash test/test_workflow_local_with_singularity.sh
+
+
+  snakemake-conda-integration-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+  
+    steps:
+    
+      - name: check out repository
+        uses: actions/checkout@v4
+         
+      - name: setup Conda/Mamba
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          mamba-version: "*"
+          miniforge-variant: Mambaforge
+          channels: conda-forge,bioconda
+          channel-priority: true
+          activate-environment: mirflowz
+          environment-file: install/environment.yml
+          auto-activate-base: false
+      
+      - name: display environment info
+        run: |
+          conda info -a
+          conda list   
+
+      - name: run local test with Conda
+        run: bash test/test_workflow_local_with_conda.sh
 
 
   unit-testing:
