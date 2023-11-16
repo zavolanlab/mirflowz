@@ -86,7 +86,7 @@ rule start:
             pd.Series(
                 samples_table.loc[wildcards.sample, "sample_file"]
             ).values,
-            format=get_sample("format"),
+            format=convert_lib_format(get_sample("format")),
         ),
     output:
         reads=OUT_DIR / "{sample}" / "{format}" / "reads.{format}",
@@ -162,7 +162,7 @@ rule format_fasta:
     input:
         reads=lambda wildcards: OUT_DIR
         / wildcards.sample
-        / get_sample("format", wildcards.sample)
+        / convert_lib_format(get_sample("format", wildcards.sample))
         / "reads.fa",
     output:
         reads=OUT_DIR / "{sample}" / "reads_formatted.fasta",
@@ -189,7 +189,9 @@ rule remove_adapters:
     output:
         reads=OUT_DIR / "{sample}" / "reads_trimmed_adapters.fasta",
     params:
-        adapter=lambda wildcards: get_sample("adapter", wildcards.sample),
+        adapter=lambda wildcards: get_sample(
+            "adapter", wildcards.sample
+        ).upper(),
         error_rate=config["error_rate"],
         minimum_length=config["minimum_length"],
         overlap=config["overlap"],
@@ -515,7 +517,6 @@ rule convert_transcriptome_to_sam_oligomap:
         {input.sort} \
         -n {params.nh} \
         > {output.tmap}) &> {log}"
-
 
 
 ###############################################################################

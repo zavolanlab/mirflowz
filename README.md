@@ -21,7 +21,7 @@ _MIRFLOWZ_ is a [Snakemake][snakemake] workflow for mapping miRNAs and isomiRs.
 ## Installation
 
 The workflow lives inside this repository and will be available for you to run
-after following the installation instructions layed out in this section.
+after following the installation instructions laid out in this section.
 
 ### Cloning the repository
 
@@ -58,8 +58,8 @@ conda env create -f environment.yml
 conda activate mirflowz
 ```
 
-If you plan to run _MIRFLOWZ_ via Conda, we recommend to use the following
-command for a faster environment creation specially if it you will run it on a
+If you plan to run _MIRFLOWZ_ via Conda, we recommend using the following
+command for a faster environment creation, specially if you will run it on an
 HPC cluster.
 
 ```bash
@@ -157,7 +157,7 @@ tested, you can go ahead and run the workflow on your samples.
 
 It is suggested to have all the input files for a given run (or hard links 
 pointing to them) inside a dedicated directory, for instance under the 
-_MIRFLOWZ_ root directory. This way it is easier to keep the data together, 
+_MIRFLOWZ_ root directory. This way, it is easier to keep the data together,
 reproduce an analysis and set up Singularity access to them.  
 
 #### 1. Prepare a sample table
@@ -170,13 +170,12 @@ touch path/to/your/sample/table.tsv
 ```
 > Fill the sample table according to the following requirements:  
 >
-> - `sample`. This column contains the library name.  
-> - `sample_file`. In this column, you must provide the path to the library file.
-> The path must be relative to the working directory.  
-> - `adapter`.  This field must contain the adapter sequence in capital letters.  
-> - `format`. In this field you must state the library format. It can either be 
-> `fa` if providing a FASTA file or `fastq` if the library is a FASTQ file.  
-> 
+> - `sample`. Arbitrary name for the miRNA sequencing library.
+> - `sample_file`. Path to the miRNA sequencing library file. The path must be
+> relative to the directory where the workflow will be run.
+> - `adapter`. Sequence of the 3'-end adapter used during library preparation.
+> - `format`. One of `fa`/`fasta` or `fq`/`fastq`, if the library file is in
+> FASTA or FASTQ format, respectively.
 
 #### 2. Prepare genome resources
 
@@ -190,15 +189,16 @@ There are 4 files you must provide:
 
 > _MIRFLOWZ_ expects both the reference sequence and gene annotation files to
 > follow [Ensembl][ensembl] style/formatting. If you obtained these files from
-> a source other than Ensembl, you may first need to convert them to the
-> expected style to avoid issues!
+> a source other than Ensembl, you must ensure that they adhere to the
+> expected format by converting them, if necessary.
 
 3. An **uncompressed GFF3** file with **microRNA annotations** for the reference
    sequences above.
 
 > _MIRFLOWZ_ expects the miRNA annotations to follow [miRBase][mirbase]
 > style/formatting. If you obtained this file from a source other than miRBase,
-> you may first need to convert it to the expected style to avoid issues!
+> you must ensure that it adheres to the expected format by converting it, if
+> necessary.
 
 4. An **uncompressed tab-separated file** with a **mapping between the
    reference names** used in the miRNA annotation file (column 1; "UCSC style")
@@ -223,7 +223,7 @@ cp  config/config_template.yaml  path/to/config.yaml
 
 Open the new copy in your editor of choice and adjust the configuration
 parameters to your liking. The template explains what each of the
-parameters means and how you can meaningfully adjust them. 
+parameters mean and how you can meaningfully adjust them. 
 
 ### Running the workflow
 
@@ -243,7 +243,7 @@ snakemake \
 ```
 
 > **NOTE:** Depending on your working directory, you do not need to use the 
-> parameters  `--snakefile` and `--configfile`. For instance, if the `Snakefile`
+> parameters `--snakefile` and `--configfile`. For instance, if the `Snakefile`
 > is in the same directory or the `workflow/` directory is beneath the current
 > working directory, there's no need for the `--snakefile` directory. Refer to 
 > the [Snakemake documentation][snakemakeDocu] for more information.
