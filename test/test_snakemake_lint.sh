@@ -19,14 +19,8 @@ user_dir=$PWD
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 cd $script_dir
 
-# Run test via singularity
+# Run tests
 snakemake \
     --snakefile="../workflow/Snakefile" \
-    --cores 4  \
     --configfile="config.yaml" \
-    --use-singularity \
-    --singularity-args "--bind ${PWD}/../" \
-    --printshellcmds \
-    --rerun-incomplete \
-    --verbose \
     --lint
