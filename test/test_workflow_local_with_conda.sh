@@ -25,7 +25,8 @@ snakemake \
     --use-conda \
     --printshellcmds \
     --rerun-incomplete \
-    --verbose
+    --verbose \
+    --notemp
 
 
 # Snakemake report

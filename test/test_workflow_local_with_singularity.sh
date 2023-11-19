@@ -26,7 +26,8 @@ snakemake \
     --singularity-args "--bind ${PWD}/../" \
     --printshellcmds \
     --rerun-incomplete \
-    --verbose
+    --verbose \
+    --notemp
 
 
 # Snakemake report
