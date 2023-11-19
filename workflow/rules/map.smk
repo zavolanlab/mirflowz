@@ -89,7 +89,7 @@ rule start:
             format=convert_lib_format(get_sample("format")),
         ),
     output:
-        reads=OUT_DIR / "{sample}" / "{format}" / "reads.{format}",
+        reads=temp(OUT_DIR / "{sample}" / "{format}" / "reads.{format}"),
     params:
         cluster_log=CLUSTER_LOG
         / "uncompress_zipped_files_{sample}_{format}.log",
@@ -110,7 +110,7 @@ rule fastq_quality_filter:
     input:
         reads=OUT_DIR / "{sample}" / "fastq" / "reads.fastq",
     output:
-        reads=OUT_DIR / "{sample}" / "fastq" / "filtered_reads.fastq",
+        reads=temp(OUT_DIR / "{sample}" / "fastq" / "filtered_reads.fastq"),
     params:
         cluster_log=CLUSTER_LOG / "fastq_quality_filter_{sample}.log",
         p=config["p_value"],
@@ -140,7 +140,7 @@ rule fastq_to_fasta:
     input:
         reads=OUT_DIR / "{sample}" / "fastq" / "filtered_reads.fastq",
     output:
-        reads=OUT_DIR / "{sample}" / "fastq" / "reads.fa",
+        reads=temp(OUT_DIR / "{sample}" / "fastq" / "reads.fa"),
     params:
         cluster_log=CLUSTER_LOG / "fastq_to_fasta_{sample}.log",
     log:
@@ -165,7 +165,7 @@ rule format_fasta:
         / convert_lib_format(get_sample("format", wildcards.sample))
         / "reads.fa",
     output:
-        reads=OUT_DIR / "{sample}" / "reads_formatted.fasta",
+        reads=temp(OUT_DIR / "{sample}" / "reads_formatted.fasta"),
     params:
         cluster_log=CLUSTER_LOG / "format_fasta_{sample}.log",
     log:
@@ -187,7 +187,7 @@ rule remove_adapters:
     input:
         reads=OUT_DIR / "{sample}" / "reads_formatted.fasta",
     output:
-        reads=OUT_DIR / "{sample}" / "reads_trimmed_adapters.fasta",
+        reads=temp(OUT_DIR / "{sample}" / "reads_trimmed_adapters.fasta"),
     params:
         adapter=lambda wildcards: get_sample(
             "adapter", wildcards.sample
@@ -226,7 +226,7 @@ rule collapse_identical_reads:
     input:
         reads=OUT_DIR / "{sample}" / "reads_trimmed_adapters.fasta",
     output:
-        reads=OUT_DIR / "{sample}" / "reads_collapsed.fasta",
+        reads=temp(OUT_DIR / "{sample}" / "reads_collapsed.fasta"),
     params:
         cluster_log=CLUSTER_LOG / "collapse_identical_reads_{sample}.log",
     log:
@@ -250,7 +250,7 @@ rule map_genome_segemehl:
         genome=OUT_DIR / "genome_processed.fa",
         genome_index_segemehl=OUT_DIR / "segemehl_genome_index.idx",
     output:
-        gmap=OUT_DIR / "{sample}" / "segemehl_genome_mappings.sam",
+        gmap=temp(OUT_DIR / "{sample}" / "segemehl_genome_mappings.sam"),
     params:
         cluster_log=CLUSTER_LOG / "map_genome_segemehl_{sample}.log",
     log:
@@ -286,7 +286,7 @@ rule map_transcriptome_segemehl:
         transcriptome_index_segemehl=OUT_DIR
         / "segemehl_transcriptome_index.idx",
     output:
-        tmap=OUT_DIR / "{sample}" / "segemehl_transcriptome_mappings.sam",
+        tmap=temp(OUT_DIR / "{sample}" / "segemehl_transcriptome_mappings.sam"),
     params:
         cluster_log=CLUSTER_LOG / "map_transcriptome_segemehl_{sample}.log",
     log:
@@ -320,7 +320,7 @@ rule filter_fasta_for_oligomap:
         reads=OUT_DIR / "{sample}" / "reads_collapsed.fasta",
         script=SCRIPTS_DIR / "validation_fasta.py",
     output:
-        reads=OUT_DIR / "{sample}" / "reads_filtered_for_oligomap.fasta",
+        reads=temp(OUT_DIR / "{sample}" / "reads_filtered_for_oligomap.fasta"),
     params:
         cluster_log=CLUSTER_LOG / "filter_fasta_for_oligomap_{sample}.log",
         max_length_reads=config["max_length_reads"],
@@ -348,8 +348,8 @@ rule map_genome_oligomap:
         reads=OUT_DIR / "{sample}" / "reads_filtered_for_oligomap.fasta",
         target=OUT_DIR / "genome_processed.fa",
     output:
-        gmap=OUT_DIR / "{sample}" / "oligomap_genome_mappings.fasta",
-        report=OUT_DIR / "{sample}" / "oligomap_genome_report.txt",
+        gmap=temp(OUT_DIR / "{sample}" / "oligomap_genome_mappings.fasta"),
+        report=temp(OUT_DIR / "{sample}" / "oligomap_genome_report.txt"),
     params:
         cluster_log=CLUSTER_LOG / "map_genome_oligomap_{sample}.log",
     log:
@@ -382,7 +382,7 @@ rule sort_genome_oligomap:
         report=OUT_DIR / "{sample}" / "oligomap_genome_report.txt",
         script=SCRIPTS_DIR / "blocksort.sh",
     output:
-        sort=OUT_DIR / "{sample}" / "oligomap_genome_sorted.fasta",
+        sort=temp(OUT_DIR / "{sample}" / "oligomap_genome_sorted.fasta"),
     params:
         cluster_log=CLUSTER_LOG / "sort_genome_oligomap_{sample}.log",
     log:
@@ -410,7 +410,7 @@ rule convert_genome_to_sam_oligomap:
         sort=OUT_DIR / "{sample}" / "oligomap_genome_sorted.fasta",
         script=SCRIPTS_DIR / "oligomap_output_to_sam_nh_filtered.py",
     output:
-        gmap=OUT_DIR / "{sample}" / "oligomap_genome_mappings.sam",
+        gmap=temp(OUT_DIR / "{sample}" / "oligomap_genome_mappings.sam"),
     params:
         cluster_log=CLUSTER_LOG / "oligomap_genome_to_sam_{sample}.log",
         nh=config["nh"],
@@ -440,8 +440,8 @@ rule map_transcriptome_oligomap:
         reads=OUT_DIR / "{sample}" / "reads_filtered_for_oligomap.fasta",
         target=OUT_DIR / "transcriptome_trimmed_id.fa",
     output:
-        tmap=OUT_DIR / "{sample}" / "oligomap_transcriptome_mappings.fasta",
-        report=OUT_DIR / "{sample}" / "oligomap_transcriptome_report.txt",
+        tmap=temp(OUT_DIR / "{sample}" / "oligomap_transcriptome_mappings.fasta"),
+        report=temp(OUT_DIR / "{sample}" / "oligomap_transcriptome_report.txt"),
     params:
         cluster_log=CLUSTER_LOG / "map_transcriptome_oligomap_{sample}.log",
     log:
@@ -475,7 +475,7 @@ rule sort_transcriptome_oligomap:
         report=OUT_DIR / "{sample}" / "oligomap_transcriptome_report.txt",
         script=SCRIPTS_DIR / "blocksort.sh",
     output:
-        sort=OUT_DIR / "{sample}" / "oligomap_transcriptome_sorted.fasta",
+        sort=temp(OUT_DIR / "{sample}" / "oligomap_transcriptome_sorted.fasta"),
     params:
         cluster_log=CLUSTER_LOG / "sort_transcriptome_oligomap_{sample}.log",
     log:
@@ -502,7 +502,7 @@ rule convert_transcriptome_to_sam_oligomap:
         sort=OUT_DIR / "{sample}" / "oligomap_transcriptome_sorted.fasta",
         script=SCRIPTS_DIR / "oligomap_output_to_sam_nh_filtered.py",
     output:
-        tmap=OUT_DIR / "{sample}" / "oligomap_transcriptome_mappings.sam",
+        tmap=temp(OUT_DIR / "{sample}" / "oligomap_transcriptome_mappings.sam"),
     params:
         cluster_log=CLUSTER_LOG / "oligomap_transcriptome_to_sam_{sample}.log",
         nh=config["nh"],
@@ -529,7 +529,7 @@ rule merge_genome_maps:
         gmap1=OUT_DIR / "{sample}" / "segemehl_genome_mappings.sam",
         gmap2=OUT_DIR / "{sample}" / "oligomap_genome_mappings.sam",
     output:
-        gmaps=OUT_DIR / "{sample}" / "genome_mappings.sam",
+        gmaps=temp(OUT_DIR / "{sample}" / "genome_mappings.sam"),
     params:
         cluster_log=CLUSTER_LOG / "merge_genome_maps_{sample}.log",
     log:
@@ -550,7 +550,7 @@ rule merge_transcriptome_maps:
         tmap1=OUT_DIR / "{sample}" / "segemehl_transcriptome_mappings.sam",
         tmap2=OUT_DIR / "{sample}" / "oligomap_transcriptome_mappings.sam",
     output:
-        tmaps=OUT_DIR / "{sample}" / "transcriptome_mappings.sam",
+        tmaps=temp(OUT_DIR / "{sample}" / "transcriptome_mappings.sam"),
     params:
         cluster_log=CLUSTER_LOG / "merge_transcriptome_maps_{sample}.log",
     log:
@@ -571,7 +571,7 @@ rule filter_genome_by_nh:
         gmaps=OUT_DIR / "{sample}" / "genome_mappings.sam",
         script=SCRIPTS_DIR / "nh_filter.py",
     output:
-        gmaps=OUT_DIR / "{sample}" / "genome_mappings_filtered_nh.sam",
+        gmaps=temp(OUT_DIR / "{sample}" / "genome_mappings_filtered_nh.sam"),
     params:
         cluster_log=CLUSTER_LOG / "filter_genome_by_nh_{sample}.log",
         nh=config["nh"],
@@ -599,7 +599,7 @@ rule filter_transcriptome_by_nh:
         tmaps=OUT_DIR / "{sample}" / "transcriptome_mappings.sam",
         script=SCRIPTS_DIR / "nh_filter.py",
     output:
-        tmaps=OUT_DIR / "{sample}" / "transcriptome_mappings_filtered_nh.sam",
+        tmaps=temp(OUT_DIR / "{sample}" / "transcriptome_mappings_filtered_nh.sam"),
     params:
         cluster_log=CLUSTER_LOG / "filter_transcriptome_by_nh_{sample}.log",
         nh=config["nh"],
@@ -626,7 +626,7 @@ rule remove_header_genome_mappings:
     input:
         gmap=OUT_DIR / "{sample}" / "genome_mappings_filtered_nh.sam",
     output:
-        gmap=OUT_DIR / "{sample}" / "genome_mappings_no_header.sam",
+        gmap=temp(OUT_DIR / "{sample}" / "genome_mappings_no_header.sam"),
     params:
         cluster_log=CLUSTER_LOG / "remove_header_genome_mappings_{sample}.log",
     log:
@@ -648,7 +648,7 @@ rule remove_header_transcriptome_mappings:
     input:
         tmap=OUT_DIR / "{sample}" / "transcriptome_mappings_filtered_nh.sam",
     output:
-        tmap=OUT_DIR / "{sample}" / "transcriptome_mappings_no_header.sam",
+        tmap=temp(OUT_DIR / "{sample}" / "transcriptome_mappings_no_header.sam"),
     params:
         cluster_log=CLUSTER_LOG
         / "remove_header_transcriptome_mappings_{sample}.log",
@@ -673,7 +673,7 @@ rule transcriptome_to_genome_maps:
         script=SCRIPTS_DIR / "sam_trx_to_sam_gen.pl",
         exons=OUT_DIR / "exons.bed",
     output:
-        genout=OUT_DIR / "{sample}" / "transcriptome_mappings_to_genome.sam",
+        genout=temp(OUT_DIR / "{sample}" / "transcriptome_mappings_to_genome.sam"),
     params:
         cluster_log=CLUSTER_LOG / "transcriptome_to_genome_maps_{sample}.log",
     log:
@@ -700,7 +700,7 @@ rule merge_all_maps:
         gmap1=OUT_DIR / "{sample}" / "transcriptome_mappings_to_genome.sam",
         gmap2=OUT_DIR / "{sample}" / "genome_mappings_no_header.sam",
     output:
-        catmaps=OUT_DIR / "{sample}" / "mappings_all_no_header.sam",
+        catmaps=temp(OUT_DIR / "{sample}" / "mappings_all_no_header.sam"),
     params:
         cluster_log=CLUSTER_LOG / "merge_all_mappings_{sample}.log",
     log:
@@ -721,7 +721,7 @@ rule add_header_all_maps:
         header=OUT_DIR / "genome_header.sam",
         catmaps=OUT_DIR / "{sample}" / "mappings_all_no_header.sam",
     output:
-        concatenate=OUT_DIR / "{sample}" / "mappings_all.sam",
+        concatenate=temp(OUT_DIR / "{sample}" / "mappings_all.sam"),
     params:
         cluster_log=CLUSTER_LOG / "add_header_{sample}.log",
     log:
@@ -741,7 +741,7 @@ rule sort_maps_by_id:
     input:
         concatenate=OUT_DIR / "{sample}" / "mappings_all.sam",
     output:
-        sort=OUT_DIR / "{sample}" / "mappings_all_sorted_by_id.sam",
+        sort=temp(OUT_DIR / "{sample}" / "mappings_all_sorted_by_id.sam"),
     params:
         cluster_log=CLUSTER_LOG / "sort_maps_by_id_{sample}.log",
     log:
@@ -765,7 +765,7 @@ rule remove_inferiors:
         script=SCRIPTS_DIR
         / "sam_remove_duplicates_inferior_alignments_multimappers.pl",
     output:
-        remove_inf=OUT_DIR / "{sample}" / "mappings_all_removed_inferiors.sam",
+        remove_inf=temp(OUT_DIR / "{sample}" / "mappings_all_removed_inferiors.sam"),
     params:
         cluster_log=CLUSTER_LOG / "remove_inferiors_{sample}.log",
     log:
