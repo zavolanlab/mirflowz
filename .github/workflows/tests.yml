@@ -38,7 +38,7 @@ jobs:
 
       - name: flake8
         working-directory: ./scripts
-        run: flake8 --ignore=E402
+        run: flake8 --ignore E402,W504
 
       - name: mypy
         working-directory: ./scripts
