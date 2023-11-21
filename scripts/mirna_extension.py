@@ -93,9 +93,8 @@ class MirnaExtension():
         if seq_lengths is None:
             seq_lengths = {}
             for seqid in self.db.seqids():
-                seq_lengths[seqid] = max(
-                        rec.end
-                        for rec in self.db.region(seqid))
+                seq_lengths[seqid] = max(rec.end
+                                         for rec in self.db.region(seqid))
 
         with (open(primir_out, 'w', encoding="utf-8") as primir,
              open(mir_out, 'w', encoding="utf-8") as mirna):
@@ -145,7 +144,7 @@ def parse_arguments():
     """Command-line arguments parser."""
     parser = argparse.ArgumentParser(
         description="Script to extend miRNAs start and end coordinates."
-        )
+    )
     parser.add_argument(
         '-v', '--version',
         action='version',
@@ -188,10 +187,12 @@ def main(arguments) -> None:
     outdir = Path(arguments.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
 
-    primir_out = outdir/(
-            f"extended_primir_annotation_{arguments.extension}_nt.gff3"
-            )
-    mir_out = outdir/f"extended_mirna_annotation_{arguments.extension}_nt.gff3"
+    primir_out = outdir / (
+        f"extended_primir_annotation_{arguments.extension}_nt.gff3"
+    )
+    mir_out = outdir / (
+        f"extended_mirna_annotation_{arguments.extension}_nt.gff3"
+    )
 
     with open(arguments.input, encoding="utf-8") as in_file:
         if len(in_file.read()) == 0:
