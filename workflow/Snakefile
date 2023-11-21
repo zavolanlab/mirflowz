@@ -18,6 +18,10 @@ from pathlib import Path
 ### Configuration validation
 ###############################################################################
 
+
+configfile: Path(f"{workflow.basedir}/../test/config_lint.yaml")
+
+
 validate(config, Path("../config/config_schema.json"))
 
 
@@ -64,9 +68,7 @@ rule finish:
             sample=pd.unique(samples_table.index.values),
         ),
         intersect_sam=expand(
-            OUT_DIR
-            / "{sample}"
-            / "alignments_intersecting_mirna_sorted_tag.sam",
+            OUT_DIR / "{sample}" / "alignments_intersecting_mirna_sorted_tag.sam",
             sample=pd.unique(samples_table.index.values),
         ),
         table=expand(

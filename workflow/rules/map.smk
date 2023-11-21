@@ -83,16 +83,13 @@ rule finish_map:
 rule start:
     input:
         reads=lambda wildcards: expand(
-            pd.Series(
-                samples_table.loc[wildcards.sample, "sample_file"]
-            ).values,
+            pd.Series(samples_table.loc[wildcards.sample, "sample_file"]).values,
             format=convert_lib_format(get_sample("format")),
         ),
     output:
         reads=temp(OUT_DIR / "{sample}" / "{format}" / "reads.{format}"),
     params:
-        cluster_log=CLUSTER_LOG
-        / "uncompress_zipped_files_{sample}_{format}.log",
+        cluster_log=CLUSTER_LOG / "uncompress_zipped_files_{sample}_{format}.log",
     log:
         LOCAL_LOG / "uncompress_zipped_files_{sample}_{format}.log",
     container:
@@ -189,9 +186,7 @@ rule remove_adapters:
     output:
         reads=temp(OUT_DIR / "{sample}" / "reads_trimmed_adapters.fasta"),
     params:
-        adapter=lambda wildcards: get_sample(
-            "adapter", wildcards.sample
-        ).upper(),
+        adapter=lambda wildcards: get_sample("adapter", wildcards.sample).upper(),
         error_rate=config["error_rate"],
         minimum_length=config["minimum_length"],
         overlap=config["overlap"],
@@ -283,8 +278,7 @@ rule map_transcriptome_segemehl:
     input:
         reads=OUT_DIR / "{sample}" / "reads_collapsed.fasta",
         transcriptome=OUT_DIR / "transcriptome_trimmed_id.fa",
-        transcriptome_index_segemehl=OUT_DIR
-        / "segemehl_transcriptome_index.idx",
+        transcriptome_index_segemehl=OUT_DIR / "segemehl_transcriptome_index.idx",
     output:
         tmap=temp(OUT_DIR / "{sample}" / "segemehl_transcriptome_mappings.sam"),
     params:
@@ -650,8 +644,7 @@ rule remove_header_transcriptome_mappings:
     output:
         tmap=temp(OUT_DIR / "{sample}" / "transcriptome_mappings_no_header.sam"),
     params:
-        cluster_log=CLUSTER_LOG
-        / "remove_header_transcriptome_mappings_{sample}.log",
+        cluster_log=CLUSTER_LOG / "remove_header_transcriptome_mappings_{sample}.log",
     log:
         LOCAL_LOG / "remove_header_transcriptome_mappings_{sample}.log",
     container:
@@ -762,8 +755,7 @@ rule sort_maps_by_id:
 rule remove_inferiors:
     input:
         sort=OUT_DIR / "{sample}" / "mappings_all_sorted_by_id.sam",
-        script=SCRIPTS_DIR
-        / "sam_remove_duplicates_inferior_alignments_multimappers.pl",
+        script=SCRIPTS_DIR / "sam_remove_duplicates_inferior_alignments_multimappers.pl",
     output:
         remove_inf=temp(OUT_DIR / "{sample}" / "mappings_all_removed_inferiors.sam"),
     params:
