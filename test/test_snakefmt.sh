@@ -17,4 +17,4 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 cd $script_dir
 
 # Run tests
-snakefmt  --check -l 80 ../workflow
+snakefmt  --check ../workflow
