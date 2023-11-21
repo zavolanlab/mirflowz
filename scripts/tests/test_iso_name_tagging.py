@@ -69,7 +69,7 @@ class TestParseArguments:
             )
             parse_arguments().parse_args()
         assert sysex.value.code == 2
-    
+
     def test_no_sam(self, monkeypatch, bed_sam):
         """Call without bed file."""
         in_bed, in_sam, output = bed_sam
@@ -97,7 +97,7 @@ class TestParseArguments:
         )
         args = parse_arguments().parse_args()
         assert isinstance(args, argparse.Namespace)
-    
+
     def test_all_input(self, monkeypatch, bed_sam):
         """Call with all the options."""
         in_bed, in_sam, output = bed_sam
@@ -118,7 +118,8 @@ class TestParseArguments:
 class TestMain:
     """Test 'main()' function."""
 
-    def test_main_empty_bed_file(self, monkeypatch, capsys, empty_files, bed_sam):
+    def test_main_empty_bed_file(self, monkeypatch, capsys, empty_files,
+                                 bed_sam):
         """Test main function with an empty bed file."""
         empty_bed, empty_sam = empty_files
 
@@ -136,7 +137,8 @@ class TestMain:
         with open(empty_sam, 'r') as out_file:
             assert captured.out == out_file.read()
 
-    def test_main_empty_sam_file(self, monkeypatch, capsys, empty_files, bed_sam):
+    def test_main_empty_sam_file(self, monkeypatch, capsys, empty_files,
+                                 bed_sam):
         """Test main function with an empty sam file."""
         empty_bed, empty_sam = empty_files
         in_bed, in_sam, output = bed_sam
@@ -154,7 +156,6 @@ class TestMain:
 
         with open(empty_sam, 'r') as out_file:
             assert captured.out == out_file.read()
-    
 
     def test_main_bed_sam_file(self, monkeypatch, capsys, bed_sam):
         """Test main function without options."""
@@ -173,8 +174,9 @@ class TestMain:
 
         with open(output, 'r') as out_file:
             assert captured.out == out_file.read()
-    
-    def test_main_bed_sam_extension_file(self, monkeypatch, capsys, bed_sam_extension):
+
+    def test_main_bed_sam_extension_file(self, monkeypatch, capsys,
+                                         bed_sam_extension):
         """Test main function with extension equals 6."""
         in_bed, in_sam, output = bed_sam_extension
 
@@ -193,7 +195,7 @@ class TestMain:
         with open(output, 'r') as out_file:
             assert captured.out == out_file.read()
 
-    def test_main_bed_sam_file(self, monkeypatch, capsys, bed_sam_id):
+    def test_main_bed_sam_file_id(self, monkeypatch, capsys, bed_sam_id):
         """Test main function with id equals id."""
         in_bed, in_sam, output = bed_sam_id
 

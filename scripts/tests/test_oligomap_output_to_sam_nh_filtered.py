@@ -3,14 +3,12 @@
 import argparse
 from pathlib import Path
 import sys
-from typing import NamedTuple
 
 import pytest
 
 sys.path.append("../../")
 
-
-from scripts.oligomap_output_to_sam_nh_filtered import(
+from scripts.oligomap_output_to_sam_nh_filtered import (
     eval_aln,
     Fields,
     get_cigar_md,
@@ -45,12 +43,14 @@ def transcriptome_no_nh():
 
     return oligo_in, oligo_out
 
+
 @pytest.fixture
 def single_read():
     """Import path to test file with a single read."""
     oligo_out = Path("files/oligomap_single_read.sam")
-    
+
     return oligo_out
+
 
 @pytest.fixture
 def aln_fields():
@@ -66,18 +66,18 @@ def aln_fields():
     # Alignment with a mismatch in the last position
     field_3 = Fields("read_1", "0", "19", "44278", "255", "19M", '*', '0', '0',
                      "CTACAAAGGGAAGCACTTT", '*', "NM:i:1", "MD:Z:18C")
-        
+
     # Alignment with a mismatch in the middle of the read sequence
     field_4 = Fields("read_1", "0", "19", "50971", "255", "19M", '*', '0', '0',
                      "CTACAAAGGGAAGCACTTT", '*', "NM:i:1", "MD:Z:14C4")
-        
+
     # Alignment with an insertion at read's first position
-    field_5 = Fields("read_2", "16", "19", "7627", "255", "1I22M", '*', '0', '0',
-                     "AAAGCACCTCCAGAGCTTGAAGC", '*', "NM:i:1", "MD:Z:23")
-        
+    field_5 = Fields("read_2", "16", "19", "7627", "255", "1I22M", '*', '0',
+                     '0', "AAAGCACCTCCAGAGCTTGAAGC", '*', "NM:i:1", "MD:Z:23")
+
     # Alignment with an insertion in the middle of the read sequence
-    field_6 = Fields("read_2", "16", "19", "7886", "255", "9M1I12M", '*', '0', '0',
-                     "AAAGCACCTCCAGAGCTTGAAGC", '*', "NM:i:1", "MD:Z:23")
+    field_6 = Fields("read_2", "16", "19", "7886", "255", "9M1I12M", '*', '0',
+                     '0', "AAAGCACCTCCAGAGCTTGAAGC", '*', "NM:i:1", "MD:Z:23")
 
     return [field_1, field_2, field_3, field_4, field_5, field_6]
 
@@ -183,10 +183,10 @@ class TestParseArguments:
         monkeypatch.setattr(
             sys, 'argv',
             ['oligomap_output_to_sam_nh_filtered',
-              str(empty_in),
+             str(empty_in),
              ]
         )
-        
+
         args = parse_arguments().parse_args()
         assert isinstance(args, argparse.Namespace)
 
@@ -201,7 +201,7 @@ class TestParseArguments:
              '-n', '100',
              ]
         )
-        
+
         args = parse_arguments().parse_args()
         assert isinstance(args, argparse.Namespace)
 
@@ -283,7 +283,7 @@ class TestGetCigarMd:
 class TestGetSAMFields():
     """Test 'get_sam_fields()' function."""
 
-    def test_pos_strand_no_err(self,alns, aln_fields):
+    def test_pos_strand_no_err(self, alns, aln_fields):
         """Test perfect alignment in the positive strand."""
         line1 = "read_1 (19 nc) 1...19 19 44377...44395"
         line2 = "19"
@@ -292,7 +292,7 @@ class TestGetSAMFields():
         assert get_sam_fields([line1, line2, line3, alns[0][1],
                               alns[0][2], alns[0][3]]) == aln_fields[0]
 
-    def test_neg_strand_one_err(self,alns, aln_fields):
+    def test_neg_strand_one_err(self, alns, aln_fields):
         """Test alignment with an insertion in the negative strand."""
         line1 = "read_2 (23 nc) 1...23 19 7886...7908"
         line2 = "19"
@@ -308,7 +308,7 @@ class TestEvalAln:
     def test_eval_empty_dict_new_read(self, aln_fields):
         """Test evaluation with a new read and an empty dictionary."""
         d = dict()
-        minerr_nh = {"read_0" : ['0', 1]}
+        minerr_nh = {"read_0": ['0', 1]}
         aln = aln_fields[0]
         nhfilter = None
 
@@ -316,11 +316,11 @@ class TestEvalAln:
 
         assert list(d.keys())[0] == aln.read_name
         assert minerr_nh[aln.read_name] == ['0', 1]
-        
+
     def test_eval_empty_dict_smaller_error(self, aln_fields):
         """Test evaluation with a smaller error and an empty dictionary."""
         d = dict()
-        minerr_nh = {"read_1" : ['1', 1]}
+        minerr_nh = {"read_1": ['1', 1]}
         aln = aln_fields[0]
         nhfilter = None
 
@@ -332,7 +332,7 @@ class TestEvalAln:
     def test_increase_nh_no_filter(self, aln_fields):
         """Test evaluation when increasing NH without a maximum value."""
         d = {"read_1": [aln_fields[1], aln_fields[2]]}
-        minerr_nh = {"read_1" : ['1', 2]}
+        minerr_nh = {"read_1": ['1', 2]}
         aln = aln_fields[3]
         nhfilter = None
 
@@ -344,7 +344,7 @@ class TestEvalAln:
     def test_exceed_nh_filter_2(self, capsys, aln_fields):
         """Test evaluation when exceeding the maximum NH set to 2."""
         d = {"read_1": [aln_fields[1], aln_fields[2]]}
-        minerr_nh = {"read_1" : ['1', 2]}
+        minerr_nh = {"read_1": ['1', 2]}
         aln = aln_fields[3]
         nhfilter = 2
 
@@ -354,11 +354,11 @@ class TestEvalAln:
         assert len(d) == 0
         assert minerr_nh[aln.read_name] == ['1', 3]
         assert captured.err == "Filtered by NH | Read read_1 | Errors = 1\n"
-        
+
     def test_no_exceed_nh_filter_2(self, aln_fields):
         """Test evaluation when increasing NH with maximum value of 2."""
         d = {"read_1": [aln_fields[1]]}
-        minerr_nh = {"read_1" : ['1', 1]}
+        minerr_nh = {"read_1": ['1', 1]}
         aln = aln_fields[2]
         nhfilter = 2
 
@@ -366,13 +366,13 @@ class TestEvalAln:
 
         assert len(d[aln.read_name]) == 2
         assert minerr_nh[aln.read_name] == ['1', 2]
-        
+
     def test_smaller_min_error(self, capsys, aln_fields):
         """Test evaluation when having a smaller minimumm error."""
         d = {"read_1": [aln_fields[1], aln_fields[2]]}
-        minerr_nh = {"read_1" : ['1', 2]}
+        minerr_nh = {"read_1": ['1', 2]}
         aln = aln_fields[0]
-        nhfilter = None 
+        nhfilter = None
 
         eval_aln(nhfilter, d, minerr_nh, aln)
         captured = capsys.readouterr()
@@ -383,13 +383,12 @@ class TestEvalAln:
 
     def test_different_read(self, capsys, tmp_path, aln_fields, single_read):
         """Test evaluation when having to write due to a different read."""
-        output = tmp_path/"oligomap_genome_mappings.sam"
         out_file = single_read
 
         d = {"read_1": [aln_fields[1], aln_fields[2]]}
-        minerr_nh = {"read_1" : ['1', 2]}
+        minerr_nh = {"read_1": ['1', 2]}
         aln = aln_fields[4]
-        nhfilter = None 
+        nhfilter = None
 
         eval_aln(nhfilter, d, minerr_nh, aln)
         captured = capsys.readouterr()
@@ -400,7 +399,7 @@ class TestEvalAln:
 
         with open(out_file, 'r') as expected:
             assert captured.out == expected.read()
-        
+
 
 class TestMain:
     """Test 'main()' function."""
@@ -457,4 +456,3 @@ class TestMain:
 
         with open(out_file, 'r') as expected:
             assert captured.out == expected.read()
-

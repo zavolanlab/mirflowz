@@ -56,7 +56,7 @@ def bed_id_files():
     out_table = Path("files/id_primir_quantification")
 
     return in_bed, out_table
-    
+
 
 @pytest.fixture
 def bed_some_extension_files():
@@ -65,6 +65,7 @@ def bed_some_extension_files():
     out_table = Path("files/some_extension_primir_quantification")
 
     return in_bed, out_table
+
 
 @pytest.fixture
 def bed_collapsed_file():
@@ -110,11 +111,11 @@ class TestParseArguments:
         )
         args = parse_arguments().parse_args()
         assert isinstance(args, argparse.Namespace)
-    
+
     def test_too_many_input_files(self, monkeypatch, bed_file):
         """Call with too many input file."""
         in_bed, out_table = bed_file
-        
+
         with pytest.raises(SystemExit) as sysex:
             monkeypatch.setattr(
                 sys, 'argv',
@@ -124,7 +125,7 @@ class TestParseArguments:
             )
             parse_arguments().parse_args()
         assert sysex.value.code == 2
-    
+
     def test_all_input(self, monkeypatch, bed_file):
         """Call with all the options."""
         in_bed, out_table = bed_file
@@ -164,7 +165,8 @@ class TestMain:
         with open(empty_file, 'r') as out_file:
             assert captured.out == out_file.read()
 
-    def test_main_no_extension(self, monkeypatch, capsys, bed_no_extension_files):
+    def test_main_no_extension(self, monkeypatch, capsys,
+                               bed_no_extension_files):
         """Test main function with no extension in features names."""
         in_bed, expected_out = bed_no_extension_files
 
@@ -181,7 +183,8 @@ class TestMain:
         with open(expected_out, 'r') as out_file:
             assert captured.out == out_file.read()
 
-    def test_main_id_extension(self, monkeypatch, capsys, bed_extension_id_files):
+    def test_main_id_extension(self, monkeypatch, capsys,
+                               bed_extension_id_files):
         """Test main function with extension in feature name and read names."""
         in_bed, expected_out = bed_extension_id_files
 
@@ -218,7 +221,8 @@ class TestMain:
         with open(expected_out, 'r') as out_file:
             assert captured.out == out_file.read()
 
-    def test_main_some_extension_file(self, monkeypatch, capsys, bed_some_extension_files):
+    def test_main_some_extension_file(self, monkeypatch, capsys,
+                                      bed_some_extension_files):
         """Test main function with read names."""
         in_bed, expected_out = bed_some_extension_files
 
@@ -255,7 +259,8 @@ class TestMain:
         with open(expected_out, 'r') as out_file:
             assert captured.out == out_file.read()
 
-    def test_main_collpased_file(self, monkeypatch, capsys, bed_collapsed_file):
+    def test_main_collpased_file(self, monkeypatch, capsys,
+                                 bed_collapsed_file):
         """Test main function with collapsed alignments."""
         in_bed, expected_out = bed_collapsed_file
 
@@ -289,4 +294,4 @@ class TestMain:
         captured = capsys.readouterr()
 
         with open(expected_out, 'r') as out_file:
-            assert captured.out == out_file.read()            
+            assert captured.out == out_file.read()
