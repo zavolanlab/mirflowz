@@ -19,7 +19,7 @@ from pathlib import Path
 ###############################################################################
 
 
-configfile: Path("./test/config_lint.yaml")
+configfile: Path(f"{workflow.basedir}/../test/config_lint.yaml")
 
 
 validate(config, Path("../config/config_schema.json"))
