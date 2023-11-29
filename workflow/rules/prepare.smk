@@ -27,6 +27,7 @@ validate(config, Path("../../config/config_schema.json"))
 
 ENV_DIR = Path(f"{workflow.basedir}/envs")
 OUT_DIR = Path(config["output_dir"])
+TMP_DIR = Path(config["tmp_dir"])
 SCRIPTS_DIR = Path(config["scripts_dir"])
 
 CLUSTER_LOG = Path(config["cluster_log"])
@@ -74,7 +75,7 @@ rule trim_genome_seq_ids:
         genome=config["genome_file"],
         script=SCRIPTS_DIR / "trim_id_fasta.sh",
     output:
-        genome=temp(OUT_DIR / "genome_processed.fa"),
+        genome=OUT_DIR / "genome_processed.fa",
     params:
         cluster_log=CLUSTER_LOG / "genome_process.log",
     log:
@@ -95,7 +96,7 @@ rule extract_transcriptome_seqs:
         genome=OUT_DIR / "genome_processed.fa",
         gtf=config["gtf_file"],
     output:
-        fasta=temp(OUT_DIR / "transcriptome.fa"),
+        fasta=OUT_DIR / "transcriptome.fa",
     params:
         cluster_log=CLUSTER_LOG / "extract_transcriptome_seqs.log",
     log:
@@ -118,7 +119,7 @@ rule trim_transcriptome_seq_ids:
         fasta=OUT_DIR / "transcriptome.fa",
         script=SCRIPTS_DIR / "trim_id_fasta.sh",
     output:
-        fasta=temp(OUT_DIR / "transcriptome_trimmed_id.fa"),
+        fasta=OUT_DIR / "transcriptome_trimmed_id.fa",
     params:
         cluster_log=CLUSTER_LOG / "trim_transcriptome.log",
     log:
@@ -138,7 +139,7 @@ rule generate_segemehl_index_transcriptome:
     input:
         fasta=OUT_DIR / "transcriptome_trimmed_id.fa",
     output:
-        idx=temp(OUT_DIR / "segemehl_transcriptome_index.idx"),
+        idx=OUT_DIR / "segemehl_transcriptome_index.idx",
     params:
         cluster_log=CLUSTER_LOG / "generate_segemehl_index_transcriptome.log",
     log:
@@ -164,7 +165,7 @@ rule generate_segemehl_index_genome:
     input:
         genome=OUT_DIR / "genome_processed.fa",
     output:
-        idx=temp(OUT_DIR / "segemehl_genome_index.idx"),
+        idx=OUT_DIR / "segemehl_genome_index.idx",
     params:
         cluster_log=CLUSTER_LOG / "generate_segemehl_index_genome.log",
     log:
@@ -191,7 +192,7 @@ rule get_exons_gtf:
         gtf=config["gtf_file"],
         script=SCRIPTS_DIR / "get_lines_w_pattern.sh",
     output:
-        exons=temp(OUT_DIR / "exons.gtf"),
+        exons=OUT_DIR / "exons.gtf",
     params:
         cluster_log=CLUSTER_LOG / "get_exons_gtf.log",
     log:
@@ -218,7 +219,7 @@ rule convert_exons_gtf_to_bed:
         exons=OUT_DIR / "exons.gtf",
         script=SCRIPTS_DIR / "gtf_exons_bed.1.1.2.R",
     output:
-        exons=temp(OUT_DIR / "exons.bed"),
+        exons=OUT_DIR / "exons.bed",
     params:
         cluster_log=CLUSTER_LOG / "exons_gtf_to_bed.log",
     log:
@@ -244,7 +245,7 @@ rule create_genome_header:
     input:
         genome=OUT_DIR / "genome_processed.fa",
     output:
-        header=temp(OUT_DIR / "genome_header.sam"),
+        header=OUT_DIR / "genome_header.sam",
     params:
         cluster_log=CLUSTER_LOG / "create_genome_header.log",
     log:
@@ -268,7 +269,7 @@ rule map_chr_names:
         script=SCRIPTS_DIR / "map_chromosomes.pl",
         map_chr=config["map_chr_file"],
     output:
-        gff=temp(OUT_DIR / "mirna_annotations.gff3"),
+        gff=OUT_DIR / "mirna_annotations.gff3",
     params:
         cluster_log=CLUSTER_LOG / "map_chr_names.log",
         column="1",
@@ -298,7 +299,7 @@ rule create_index_genome_fasta:
     input:
         genome=OUT_DIR / "genome_processed.fa",
     output:
-        genome=temp(OUT_DIR / "genome_processed.fa.fai"),
+        genome=OUT_DIR / "genome_processed.fa.fai",
     params:
         cluster_log=CLUSTER_LOG / "create_index_genome_fasta.log",
     log:
@@ -320,7 +321,7 @@ rule extract_chr_len:
     input:
         genome=OUT_DIR / "genome_processed.fa.fai",
     output:
-        chrsize=temp(OUT_DIR / "chr_size.txt"),
+        chrsize=OUT_DIR / "chr_size.txt",
     params:
         cluster_log=CLUSTER_LOG / "extract_chr_len.log",
     log:
@@ -342,14 +343,14 @@ rule extend_mirs_annotations:
         chrsize=OUT_DIR / "chr_size.txt",
         script=SCRIPTS_DIR / "mirna_extension.py",
     output:
-        extended_mir=temp(expand(
+        extended_mir=expand(
             OUT_DIR / "extended_mirna_annotation_{extension}_nt.gff3",
             extension=config["extension"],
-        )),
-        extended_primir=temp(expand(
+        ),
+        extended_primir=expand(
             OUT_DIR / "extended_primir_annotation_{extension}_nt.gff3",
             extension=config["extension"],
-        )),
+        ),
     params:
         cluster_log=CLUSTER_LOG / "extend_mirs_annotations.log",
         out_dir=OUT_DIR,

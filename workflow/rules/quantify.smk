@@ -25,6 +25,7 @@ validate(config, Path("../../config/config_schema.json"))
 
 ENV_DIR = Path(f"{workflow.basedir}/envs")
 OUT_DIR = Path(config["output_dir"])
+TMP_DIR = Path(config["tmp_dir"])
 SCRIPTS_DIR = Path(config["scripts_dir"])
 
 CLUSTER_LOG = Path(config["cluster_log"])
@@ -152,7 +153,7 @@ rule convert_intersecting_primir_sam_to_bam:
     input:
         maps=OUT_DIR / "{sample}" / "alignments_intersecting_primir.sam",
     output:
-        maps=temp(OUT_DIR / "{sample}" / "alignments_intersecting_primir.bam"),
+        maps=OUT_DIR / "{sample}" / "alignments_intersecting_primir.bam",
     params:
         cluster_log=CLUSTER_LOG / "convert_intersecting_primir_sam_to_bam_{sample}.log",
     log:
@@ -174,7 +175,7 @@ rule sort_intersecting_primir_bam_by_position:
     input:
         maps=OUT_DIR / "{sample}" / "alignments_intersecting_primir.bam",
     output:
-        maps=temp(OUT_DIR / "{sample}" / "alignments_intersecting_primir_sorted.bam"),
+        maps=OUT_DIR / "{sample}" / "alignments_intersecting_primir_sorted.bam",
     params:
         cluster_log=CLUSTER_LOG
         / "sort_intersecting_primir_bam_by_position_{sample}.log",
@@ -197,9 +198,9 @@ rule index_intersecting_primir_bam:
     input:
         maps=OUT_DIR / "{sample}" / "alignments_intersecting_primir_sorted.bam",
     output:
-        maps=temp(OUT_DIR
+        maps=OUT_DIR
         / "{sample}"
-        / "alignments_intersecting_primir_sorted.bam.bai"),
+        / "alignments_intersecting_primir_sorted.bam.bai",
     params:
         cluster_log=CLUSTER_LOG / "index_intersecting_primir_bam_{sample}.log",
     log:
@@ -336,7 +337,7 @@ rule quantify_mirna:
         alignments=OUT_DIR / "{sample}" / "alignments_intersecting_mirna_sorted_tag.sam",
         script=SCRIPTS_DIR / "mirna_quantification.py",
     output:
-        table=temp(OUT_DIR / "TABLES" / "mirna_counts_{sample}"),
+        table=OUT_DIR / "TABLES" / "mirna_counts_{sample}",
     params:
         cluster_log=CLUSTER_LOG / "quantify_mirna_{sample}.log",
         mir_list=config["mir_list"],
@@ -370,7 +371,7 @@ rule quantify_primir:
         intersect=OUT_DIR / "{sample}" / "intersected_extended_primir.bed",
         script=SCRIPTS_DIR / "primir_quantification.py",
     output:
-        table=temp(OUT_DIR / "TABLES" / "pri-mir_counts_{sample}"),
+        table=OUT_DIR / "TABLES" / "pri-mir_counts_{sample}",
     params:
         cluster_log=CLUSTER_LOG / "quantify_primir_{sample}.log",
     log:
@@ -460,9 +461,9 @@ rule convert_uncollpased_reads_sam_to_bam:
     input:
         maps=OUT_DIR / "{sample}" / "alignments_intersecting_mirna_uncollapsed.sam",
     output:
-        maps=temp(OUT_DIR
+        maps=OUT_DIR
         / "{sample}"
-        / "alignments_intersecting_mirna_uncollapsed.bam"),
+        / "alignments_intersecting_mirna_uncollapsed.bam",
     params:
         cluster_log=CLUSTER_LOG / "convert_uncollapsed_reads_sam_to_bam_{sample}.log",
     log:
