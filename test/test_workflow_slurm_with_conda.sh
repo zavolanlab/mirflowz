@@ -41,8 +41,8 @@ snakemake \
     --use-conda \
     --printshellcmds \
     --rerun-incomplete \
-    --verbose \
-    --notemp
+    --no-hooks \
+    --verbose
 
 # Snakemake report
 snakemake \
