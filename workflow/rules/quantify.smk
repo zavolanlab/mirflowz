@@ -64,10 +64,11 @@ rule finish_quantify:
     input:
         primir_intersect_sam=OUT_DIR / "{sample}" / "alignments_intersecting_primir.sam",
         mirna_intersect_sam=OUT_DIR / "{sample}" / "alignments_intersecting_mirna.sam",
-        intersect_sam=OUT_DIR
-        / "{sample}"
-        / "alignments_intersecting_mirna_sorted_tag.sam",
         table=OUT_DIR / "TABLES" / "all_{mir}_counts.tab",
+        uncollapsed_sam=expand(
+            OUT_DIR / "{sample}" / "alignments_intersecting_mirna_uncollapsed.sam",
+            sample=pd.unique(samples_table.index.values),
+        ),
         uncollapsed_bam=expand(
             OUT_DIR
             / "{sample}"
@@ -89,13 +90,13 @@ rule finish_quantify:
 
 rule intersect_extended_primir:
     input:
-        alignment=OUT_DIR / "{sample}" / "alignments_all_sorted_{sample}.bam",
+        alignment=TMP_DIR / "{sample}" / "alignments_all_sorted_{sample}.bam",
         primir=expand(
-            OUT_DIR / "extended_primir_annotation_{extension}_nt.gff3",
+            TMP_DIR / "extended_primir_annotation_{extension}_nt.gff3",
             extension=config["extension"],
         ),
     output:
-        intersect=OUT_DIR / "{sample}" / "intersected_extended_primir.bed",
+        intersect=TMP_DIR / "{sample}" / "intersected_extended_primir.bed",
     params:
         cluster_log=CLUSTER_LOG / "intersect_extended_primir_{sample}.log",
     log:
@@ -123,8 +124,8 @@ rule intersect_extended_primir:
 
 rule filter_sam_by_intersecting_primir:
     input:
-        alignments=OUT_DIR / "{sample}" / "alignments_all.sam",
-        intersect=OUT_DIR / "{sample}" / "intersected_extended_primir.bed",
+        alignments=TMP_DIR / "{sample}" / "alignments_all.sam",
+        intersect=TMP_DIR / "{sample}" / "intersected_extended_primir.bed",
     output:
         sam=OUT_DIR / "{sample}" / "alignments_intersecting_primir.sam",
     params:
@@ -153,7 +154,7 @@ rule convert_intersecting_primir_sam_to_bam:
     input:
         maps=OUT_DIR / "{sample}" / "alignments_intersecting_primir.sam",
     output:
-        maps=OUT_DIR / "{sample}" / "alignments_intersecting_primir.bam",
+        maps=TMP_DIR / "{sample}" / "alignments_intersecting_primir.bam",
     params:
         cluster_log=CLUSTER_LOG / "convert_intersecting_primir_sam_to_bam_{sample}.log",
     log:
@@ -173,9 +174,9 @@ rule convert_intersecting_primir_sam_to_bam:
 
 rule sort_intersecting_primir_bam_by_position:
     input:
-        maps=OUT_DIR / "{sample}" / "alignments_intersecting_primir.bam",
+        maps=TMP_DIR / "{sample}" / "alignments_intersecting_primir.bam",
     output:
-        maps=OUT_DIR / "{sample}" / "alignments_intersecting_primir_sorted.bam",
+        maps=TMP_DIR / "{sample}" / "alignments_intersecting_primir_sorted.bam",
     params:
         cluster_log=CLUSTER_LOG
         / "sort_intersecting_primir_bam_by_position_{sample}.log",
@@ -196,9 +197,9 @@ rule sort_intersecting_primir_bam_by_position:
 
 rule index_intersecting_primir_bam:
     input:
-        maps=OUT_DIR / "{sample}" / "alignments_intersecting_primir_sorted.bam",
+        maps=TMP_DIR / "{sample}" / "alignments_intersecting_primir_sorted.bam",
     output:
-        maps=OUT_DIR
+        maps=TMP_DIR
         / "{sample}"
         / "alignments_intersecting_primir_sorted.bam.bai",
     params:
@@ -220,13 +221,13 @@ rule index_intersecting_primir_bam:
 
 rule intersect_extended_mirna:
     input:
-        alignment=OUT_DIR / "{sample}" / "alignments_intersecting_primir_sorted.bam",
+        alignment=TMP_DIR / "{sample}" / "alignments_intersecting_primir_sorted.bam",
         mirna=expand(
-            OUT_DIR / "extended_mirna_annotation_{extension}_nt.gff3",
+            TMP_DIR / "extended_mirna_annotation_{extension}_nt.gff3",
             extension=config["extension"],
         ),
     output:
-        intersect=OUT_DIR / "{sample}" / "intersected_extended_mirna.bed",
+        intersect=TMP_DIR / "{sample}" / "intersected_extended_mirna.bed",
     params:
         cluster_log=CLUSTER_LOG / "intersect_extended_mirna_{sample}.log",
     log:
@@ -255,7 +256,7 @@ rule intersect_extended_mirna:
 rule filter_sam_by_intersecting_mirna:
     input:
         alignments=OUT_DIR / "{sample}" / "alignments_intersecting_primir.sam",
-        intersect=OUT_DIR / "{sample}" / "intersected_extended_mirna.bed",
+        intersect=TMP_DIR / "{sample}" / "intersected_extended_mirna.bed",
     output:
         sam=OUT_DIR / "{sample}" / "alignments_intersecting_mirna.sam",
     params:
@@ -283,10 +284,10 @@ rule filter_sam_by_intersecting_mirna:
 rule add_intersecting_mirna_tag:
     input:
         alignments=OUT_DIR / "{sample}" / "alignments_intersecting_mirna.sam",
-        intersect=OUT_DIR / "{sample}" / "intersected_extended_mirna.bed",
+        intersect=TMP_DIR / "{sample}" / "intersected_extended_mirna.bed",
         script=SCRIPTS_DIR / "iso_name_tagging.py",
     output:
-        sam=OUT_DIR / "{sample}" / "alignments_intersecting_mirna_tag.sam",
+        sam=TMP_DIR / "{sample}" / "alignments_intersecting_mirna_tag.sam",
     params:
         extension=config["extension"],
         cluster_log=CLUSTER_LOG / "add_intersecting_mirna_tag_{sample}.log",
@@ -312,9 +313,9 @@ rule add_intersecting_mirna_tag:
 
 rule sort_intersecting_mirna_by_feat_tag:
     input:
-        sam=OUT_DIR / "{sample}" / "alignments_intersecting_mirna_tag.sam",
+        sam=TMP_DIR / "{sample}" / "alignments_intersecting_mirna_tag.sam",
     output:
-        sam=OUT_DIR / "{sample}" / "alignments_intersecting_mirna_sorted_tag.sam",
+        sam=TMP_DIR / "{sample}" / "alignments_intersecting_mirna_sorted_tag.sam",
     params:
         cluster_log=CLUSTER_LOG / "sort_intersecting_mirna_by_feat_tag_{sample}.log",
     log:
@@ -334,15 +335,15 @@ rule sort_intersecting_mirna_by_feat_tag:
 
 rule quantify_mirna:
     input:
-        alignments=OUT_DIR / "{sample}" / "alignments_intersecting_mirna_sorted_tag.sam",
+        alignments=TMP_DIR / "{sample}" / "alignments_intersecting_mirna_sorted_tag.sam",
         script=SCRIPTS_DIR / "mirna_quantification.py",
     output:
-        table=OUT_DIR / "TABLES" / "mirna_counts_{sample}",
+        table=TMP_DIR / "TABLES" / "mirna_counts_{sample}",
     params:
         cluster_log=CLUSTER_LOG / "quantify_mirna_{sample}.log",
         mir_list=config["mir_list"],
         library="{sample}",
-        out_dir=OUT_DIR / "TABLES",
+        out_dir=TMP_DIR / "TABLES",
     log:
         LOCAL_LOG / "quantify_mirna_{sample}.log",
     container:
@@ -368,10 +369,10 @@ rule quantify_mirna:
 
 rule quantify_primir:
     input:
-        intersect=OUT_DIR / "{sample}" / "intersected_extended_primir.bed",
+        intersect=TMP_DIR / "{sample}" / "intersected_extended_primir.bed",
         script=SCRIPTS_DIR / "primir_quantification.py",
     output:
-        table=OUT_DIR / "TABLES" / "pri-mir_counts_{sample}",
+        table=TMP_DIR / "TABLES" / "pri-mir_counts_{sample}",
     params:
         cluster_log=CLUSTER_LOG / "quantify_primir_{sample}.log",
     log:
@@ -398,7 +399,7 @@ rule quantify_primir:
 rule merge_tables:
     input:
         table=expand(
-            OUT_DIR / "TABLES" / "{mir}_counts_{sample}",
+            TMP_DIR / "TABLES" / "{mir}_counts_{sample}",
             sample=pd.unique(samples_table.index.values),
             mir=[mir for mir in config["mir_list"] if mir != "isomir"],
         ),
@@ -408,7 +409,7 @@ rule merge_tables:
     params:
         cluster_log=CLUSTER_LOG / "merge_tables_{mirna}.log",
         prefix="{mirna}_counts_",
-        input_dir=OUT_DIR / "TABLES",
+        input_dir=TMP_DIR / "TABLES",
     log:
         LOCAL_LOG / "merge_tables_{mirna}.log",
     container:
@@ -461,7 +462,7 @@ rule convert_uncollpased_reads_sam_to_bam:
     input:
         maps=OUT_DIR / "{sample}" / "alignments_intersecting_mirna_uncollapsed.sam",
     output:
-        maps=OUT_DIR
+        maps=TMP_DIR
         / "{sample}"
         / "alignments_intersecting_mirna_uncollapsed.bam",
     params:
@@ -483,7 +484,7 @@ rule convert_uncollpased_reads_sam_to_bam:
 
 rule sort_uncollpased_reads_bam_by_position:
     input:
-        maps=OUT_DIR / "{sample}" / "alignments_intersecting_mirna_uncollapsed.bam",
+        maps=TMP_DIR / "{sample}" / "alignments_intersecting_mirna_uncollapsed.bam",
     output:
         maps=OUT_DIR
         / "{sample}"
