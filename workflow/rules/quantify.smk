@@ -199,9 +199,7 @@ rule index_intersecting_primir_bam:
     input:
         maps=TMP_DIR / "{sample}" / "alignments_intersecting_primir_sorted.bam",
     output:
-        maps=TMP_DIR
-        / "{sample}"
-        / "alignments_intersecting_primir_sorted.bam.bai",
+        maps=TMP_DIR / "{sample}" / "alignments_intersecting_primir_sorted.bam.bai",
     params:
         cluster_log=CLUSTER_LOG / "index_intersecting_primir_bam_{sample}.log",
     log:
@@ -462,9 +460,7 @@ rule convert_uncollpased_reads_sam_to_bam:
     input:
         maps=OUT_DIR / "{sample}" / "alignments_intersecting_mirna_uncollapsed.sam",
     output:
-        maps=TMP_DIR
-        / "{sample}"
-        / "alignments_intersecting_mirna_uncollapsed.bam",
+        maps=TMP_DIR / "{sample}" / "alignments_intersecting_mirna_uncollapsed.bam",
     params:
         cluster_log=CLUSTER_LOG / "convert_uncollapsed_reads_sam_to_bam_{sample}.log",
     log:
