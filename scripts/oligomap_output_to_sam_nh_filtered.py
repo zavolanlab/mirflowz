@@ -339,8 +339,8 @@ def eval_aln(nhfilter: int, d: Dict[str, list], min_err_nh: Dict[str, list],
     errors = fields.edit_dist[-1]
 
     if len(d) == 0:
-        if (seq_name not in list(
-           min_err_nh.keys()) or errors < min_err_nh[seq_name][0]):
+        if (seq_name not in list(min_err_nh.keys()) or
+           errors < min_err_nh[seq_name][0]):
 
             min_err_nh[seq_name] = [errors, 1]
             d[seq_name] = [fields]

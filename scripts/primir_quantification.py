@@ -32,7 +32,7 @@ def parse_arguments():
     """Command-line arguments parser."""
     parser = argparse.ArgumentParser(
         description=__doc__
-    )
+        )
     parser.add_argument(
         '-v', '--version',
         action='version',
@@ -111,9 +111,9 @@ def attributes_dictionary(attr: str) -> Dict[str, str]:
         attr_dict = {p.split('=')[0].lower(): p.split('=')[1] for p in pairs}
     else:
         attr_dict = {
-            p.split('"')[0].strip().lower(): p.split('"')[1]
-            for p in pairs
-        }
+                p.split('"')[0].strip().lower(): p.split('"')[1]
+                for p in pairs
+                }
 
     return attr_dict
 
@@ -138,7 +138,7 @@ def get_contribution(query_id: str,
         num_reads = 1
         nh_value = 1
 
-    return num_reads / nh_value
+    return num_reads/nh_value
 
 
 def get_initial_data(name: str, feat_extension: bool) -> list[str]:

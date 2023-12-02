@@ -285,18 +285,16 @@ def collapsed_contribution(aln: pysam.AlignedSegment) -> float:
             collapsed = float(coll.group())
 
     except AttributeError:
-        sys.stdout.write(
-            f"Invalid query name: '{aln.query_name}'.\n" +
-            "Option --collapsed specified but query name does " +
-            "not include the number of collapsed sequences.\n" +
-            "Check SAM file consistency and CLI options" +
-            " --collapsed and --nh.\n"
-        )
+        sys.stdout.write(f"Invalid query name: '{aln.query_name}'.\n" +
+                         "Option --collapsed specified but query name does" +
+                         " not include the number of collapsed sequences.\n" +
+                         "Check SAM file consistency and CLI options" +
+                         " --collapsed and --nh.\n")
         raise
 
     try:
         nh_value = float(aln.get_tag("NH"))
-        return collapsed / nh_value
+        return collapsed/nh_value
 
     except KeyError:
         return collapsed
@@ -322,7 +320,7 @@ def nh_contribution(aln: pysam.AlignedSegment) -> float:
         if (cont := re.search(r'\d+$', name)):
             nh_val = float(cont.group())
 
-        return 1 / nh_val
+        return 1/nh_val
 
     except AttributeError:
         sys.stdout.write(f"Invalid query name: '{aln.query_name}'.\n" +
@@ -348,7 +346,7 @@ def contribution(aln: pysam.AlignedSegment) -> float:
         the conrtibution of the alignment to the overall count
     """
     try:
-        return 1 / float(aln.get_tag("NH"))
+        return 1/float(aln.get_tag("NH"))
 
     except KeyError:
         return 1.0
@@ -396,13 +394,13 @@ def main(arguments) -> None:
     """Quantify miRNAs and corresponding isomiRs."""
     outdir = Path(arguments.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
-    outfile = outdir / f'mirna_counts_{arguments.lib}'
+    outfile = outdir/f'mirna_counts_{arguments.lib}'
 
     contribution_type = {
-        (True, True): collapsed_nh_contribution,
-        (True, False): collapsed_contribution,
-        (False, True): nh_contribution,
-        (False, False): contribution}
+            (True, True): collapsed_nh_contribution,
+            (True, False): collapsed_contribution,
+            (False, True): nh_contribution,
+            (False, False): contribution}
 
     get_contribution = contribution_type[arguments.collapsed, arguments.nh]
 

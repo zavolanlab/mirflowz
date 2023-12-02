@@ -145,8 +145,9 @@ def attributes_dictionary(attr: str) -> Dict[str, str]:
     if len(pairs[0].split('=')) == 2:
         attr_dict = {p.split('=')[0].lower(): p.split('=')[1] for p in pairs}
     else:
-        attr_dict = {p.split('"')[0].strip().lower(): p.split('"')[1]
-                     for p in pairs}
+        attr_dict = {
+                p.split('"')[0].strip().lower(): p.split('"')[1]
+                for p in pairs}
 
     return attr_dict
 
@@ -205,7 +206,7 @@ def get_tags(
         intersecting_mirna: list,
         alignment: pysam.AlignedSegment,
         extension: int
-) -> set:
+        ) -> set:
     """Get tag for alignment.
 
     Given an alignment and a list containing the feature name, start position,

@@ -17,66 +17,66 @@ from dataclasses import dataclass
 parser = ArgumentParser(
     description=__doc__,
     formatter_class=RawDescriptionHelpFormatter
-)
+    )
 parser.add_argument(
     '-v', '--version',
     action='version',
     version='%(prog)s 1.0',
     help="Show program's version number and exit"
-)
+    )
 parser.add_argument(
     '--trim',
     help=(
         "Character's used to trim the ID. Remove anything that follows the "
         "character's. Write \\ infront of \'.\' and \'-\' "
         "(i.e trim=\"$\\.\\-|_\").  Default: first white space"
-    ),
+        ),
     type=str,
     nargs='?',
     default=""
-)
+    )
 parser.add_argument(
     '--idlist',
     help="Generate text file with the sequences IDs. One ID per line."
-)
+    )
 parser.add_argument(
     '-f', '--filter',
     help=(
         "Input ID list. Filter IDs and sequences from FASTA file with the "
         "mode selected. Filter file must contain ONE ID per line"
-    ),
-)
+        ),
+    )
 parser.add_argument(
     '-m', '--mode',
     help=(
         "Type of filtering fasta file: keep (k) or discard (d) IDs contained "
         "in the ID list file."
-    ),
+        ),
     choices=('k', 'd')
-)
+    )
 parser.add_argument(
     '-r', '--remove',
     help="Remove sequences from FASTA file longer than specified length.",
     type=int
-)
+    )
 parser.add_argument(
     '-i', '--input',
     required=True,
     help="Input FASTA file",
     type=str
-)
+    )
 parser.add_argument(
     '-o', '--output',
     help="Output FASTA file"
-)
+    )
 
 args = parser.parse_args()
 
 if args.filter and not args.mode:
     sys.exit(
-        "ERROR! Mode argument required when using filter option. "
-        "(--mode, -m). See --help option."
-    )
+            "ERROR! Mode argument required when using filter option. "
+            "(--mode, -m). See --help option."
+             )
 
 
 # PARSE FASTA FILE #
@@ -125,7 +125,7 @@ with f:
                 inseq = 1
                 record[nrec].seq = line
             else:
-                cstring = record[nrec].seq + line
+                cstring = record[nrec].seq+line
                 record[nrec].seq = cstring
 
     sys.stdout.write("DONE\n")
@@ -150,33 +150,33 @@ if args.output:
 
         if args.filter and args.mode == 'k':
             if args.remove:
-                for x in range(0, nrec + 1):
+                for x in range(0, nrec+1):
                     if record[x].id in id_filter and\
-                            len(record[x].seq) - 1 <= args.remove:
+                            len(record[x].seq)-1 <= args.remove:
                         output.write(f">{record[x].id}\n{record[x].seq}")
             else:
-                for x in range(0, nrec + 1):
+                for x in range(0, nrec+1):
                     if record[x].id in id_filter:
                         output.write(f">{record[x].id}\n{record[x].seq}")
 
         elif args.filter and args.mode == 'd':
             if args.remove:
-                for x in range(0, nrec + 1):
+                for x in range(0, nrec+1):
                     if record[x].id not in id_filter and\
-                            len(record[x].seq) - 1 <= args.remove:
+                            len(record[x].seq)-1 <= args.remove:
                         output.write(f">{record[x].id}\n{record[x].seq}")
             else:
-                for x in range(0, nrec + 1):
+                for x in range(0, nrec+1):
                     if record[x].id not in id_filter:
                         output.write(f">{record[x].id}\n{record[x].seq}")
 
         else:
             if args.remove:
-                for x in range(0, nrec + 1):
-                    if len(record[x].seq) - 1 <= args.remove:
+                for x in range(0, nrec+1):
+                    if len(record[x].seq)-1 <= args.remove:
                         output.write(f">{record[x].id}\n{record[x].seq}")
             else:
-                for x in range(0, nrec + 1):
+                for x in range(0, nrec+1):
                     output.write(f">{record[x].id}\n{record[x].seq}")
     sys.stdout.write("DONE\n")
 

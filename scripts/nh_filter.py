@@ -23,8 +23,8 @@ elif len(sys.argv) < 4 or len(sys.argv) > 4:
 def main():
     """Filter alignments by NH tag."""
     sys.stdout.write(
-        f"Removing reads aligned more than {sys.argv[2]} times... \n"
-    )
+            f"Removing reads aligned more than {sys.argv[2]} times... \n"
+            )
 
     infile = pysam.Samfile(sys.argv[1], "r", check_sq=False)
     out = pysam.Samfile(sys.argv[3], "w", template=infile)

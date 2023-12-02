@@ -50,20 +50,20 @@ def parse_arguments():
     """Command-line arguments parser."""
     parser = argparse.ArgumentParser(
         description="Script to filter multimappers by indel counts."
-    )
+        )
 
     parser.add_argument(
         '-v', '--version',
         action='version',
         version='%(prog)s 1.0',
         help="Show program's version number and exit"
-    )
+        )
 
     parser.add_argument(
         'infile',
         help="Path to the SAM input file, sorted by query name.",
         type=Path
-    )
+        )
 
     parser.add_argument(
         '--nh',
@@ -128,16 +128,17 @@ def find_best_alignments(
 
     aln_indels = [(aln, count_indels(aln=aln)) for aln in alns]
     min_indels = min(aln_indels, key=lambda x: x[1])[1]
-    best_alignments = [aln
-                       for i, (aln, indels) in enumerate(aln_indels)
-                       if indels == min_indels]
+    best_alignments = [
+            aln
+            for i, (aln, indels) in enumerate(aln_indels)
+            if indels == min_indels]
 
     for i, best_aln in enumerate(best_alignments):
 
         if nh:
             name = (
-                f'{best_aln.query_name}_{len(best_alignments)}'
-            )
+                    f'{best_aln.query_name}_{len(best_alignments)}'
+                   )
             best_aln.query_name = name
 
         best_aln.set_tag('NH', len(best_alignments))
