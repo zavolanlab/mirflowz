@@ -48,6 +48,12 @@ jobs:
         working-directory: ./scripts
         run: pylint --rcfile=../pylint.cfg ./*.py
 
+      - name: black
+        uses: psf/black@stable
+        with:
+          options: "--check --verbose --line-length=79"
+          src: "./scripts"
+
 
   snakemake-format-graph-test:
     runs-on: ubuntu-latest
