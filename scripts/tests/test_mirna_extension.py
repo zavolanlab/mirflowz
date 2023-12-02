@@ -7,9 +7,7 @@ from pathlib import Path
 import gffutils
 import pytest
 
-sys.path.append("../../")
-
-from scripts.mirna_extension import (
+from ..mirna_extension import (
     main,
     MirnaExtension,
     parse_arguments

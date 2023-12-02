@@ -6,9 +6,7 @@ import sys
 import pysam
 import pytest
 
-sys.path.append("../../")
-
-from scripts.mirna_quantification import (
+from ..mirna_quantification import (
     collapsed_nh_contribution,
     collapsed_contribution,
     nh_contribution,

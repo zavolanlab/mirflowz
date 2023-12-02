@@ -6,9 +6,7 @@ import sys
 
 import pytest
 
-sys.path.append("../../")
-
-from scripts.iso_name_tagging import (
+from ..iso_name_tagging import (
     main,
     parse_arguments
 )

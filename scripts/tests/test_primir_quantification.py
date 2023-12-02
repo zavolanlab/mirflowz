@@ -6,9 +6,7 @@ import sys
 
 import pytest
 
-sys.path.append("../../")
-
-from scripts.primir_quantification import (
+from ..primir_quantification import (
     main,
     parse_arguments
 )

@@ -7,9 +7,7 @@ from pathlib import Path
 import pysam
 import pytest
 
-sys.path.append("../../")
-
-from scripts.filter_multimappers import (
+from ..filter_multimappers import (
     count_indels,
     find_best_alignments,
     main,

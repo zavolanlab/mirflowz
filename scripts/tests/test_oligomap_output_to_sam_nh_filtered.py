@@ -6,9 +6,7 @@ import sys
 
 import pytest
 
-sys.path.append("../../")
-
-from scripts.oligomap_output_to_sam_nh_filtered import (
+from ..oligomap_output_to_sam_nh_filtered import (
     eval_aln,
     Fields,
     get_cigar_md,
