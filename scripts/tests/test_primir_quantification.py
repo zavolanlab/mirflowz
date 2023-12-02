@@ -6,10 +6,7 @@ import sys
 
 import pytest
 
-from ..primir_quantification import (
-    main,
-    parse_arguments
-)
+from ..primir_quantification import main, parse_arguments
 
 
 @pytest.fixture
@@ -90,9 +87,11 @@ class TestParseArguments:
         """Call without input file."""
         with pytest.raises(SystemExit) as sysex:
             monkeypatch.setattr(
-                sys, 'argv',
-                ['primir_quantification',
-                 ]
+                sys,
+                "argv",
+                [
+                    "primir_quantification",
+                ],
             )
             parse_arguments().parse_args()
         assert sysex.value.code == 2
@@ -102,10 +101,12 @@ class TestParseArguments:
         in_bed, out_table = bed_file
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['primir_quantification',
-             str(in_bed),
-             ]
+            sys,
+            "argv",
+            [
+                "primir_quantification",
+                str(in_bed),
+            ],
         )
         args = parse_arguments().parse_args()
         assert isinstance(args, argparse.Namespace)
@@ -116,10 +117,13 @@ class TestParseArguments:
 
         with pytest.raises(SystemExit) as sysex:
             monkeypatch.setattr(
-                sys, 'argv',
-                ['primir_quantification',
-                 str(in_bed), str(in_bed),
-                 ]
+                sys,
+                "argv",
+                [
+                    "primir_quantification",
+                    str(in_bed),
+                    str(in_bed),
+                ],
             )
             parse_arguments().parse_args()
         assert sysex.value.code == 2
@@ -129,15 +133,18 @@ class TestParseArguments:
         in_bed, out_table = bed_file
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['primir_quantification',
-             str(in_bed),
-             '--id', "name",
-             '--feat-extension',
-             '--read-ids',
-             '--collapsed',
-             '--nh'
-             ]
+            sys,
+            "argv",
+            [
+                "primir_quantification",
+                str(in_bed),
+                "--id",
+                "name",
+                "--feat-extension",
+                "--read-ids",
+                "--collapsed",
+                "--nh",
+            ],
         )
         args = parse_arguments().parse_args()
         assert isinstance(args, argparse.Namespace)
@@ -151,54 +158,62 @@ class TestMain:
         empty_file = empty_file
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['primir_quantification',
-             str(empty_file),
-             ]
+            sys,
+            "argv",
+            [
+                "primir_quantification",
+                str(empty_file),
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
         captured = capsys.readouterr()
 
-        with open(empty_file, 'r') as out_file:
+        with open(empty_file, "r") as out_file:
             assert captured.out == out_file.read()
 
-    def test_main_no_extension(self, monkeypatch, capsys,
-                               bed_no_extension_files):
+    def test_main_no_extension(
+        self, monkeypatch, capsys, bed_no_extension_files
+    ):
         """Test main function with no extension in features names."""
         in_bed, expected_out = bed_no_extension_files
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['primir_quantification',
-             str(in_bed),
-             ]
+            sys,
+            "argv",
+            [
+                "primir_quantification",
+                str(in_bed),
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
         captured = capsys.readouterr()
 
-        with open(expected_out, 'r') as out_file:
+        with open(expected_out, "r") as out_file:
             assert captured.out == out_file.read()
 
-    def test_main_id_extension(self, monkeypatch, capsys,
-                               bed_extension_id_files):
+    def test_main_id_extension(
+        self, monkeypatch, capsys, bed_extension_id_files
+    ):
         """Test main function with extension in feature name and read names."""
         in_bed, expected_out = bed_extension_id_files
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['primir_quantification',
-             str(in_bed),
-             '--feat-extension',
-             '--read-ids',
-             ]
+            sys,
+            "argv",
+            [
+                "primir_quantification",
+                str(in_bed),
+                "--feat-extension",
+                "--read-ids",
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
         captured = capsys.readouterr()
 
-        with open(expected_out, 'r') as out_file:
+        with open(expected_out, "r") as out_file:
             assert captured.out == out_file.read()
 
     def test_main_id(self, monkeypatch, capsys, bed_id_files):
@@ -206,36 +221,41 @@ class TestMain:
         in_bed, expected_out = bed_id_files
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['primir_quantification',
-             str(in_bed),
-             '--read-ids',
-             ]
+            sys,
+            "argv",
+            [
+                "primir_quantification",
+                str(in_bed),
+                "--read-ids",
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
         captured = capsys.readouterr()
 
-        with open(expected_out, 'r') as out_file:
+        with open(expected_out, "r") as out_file:
             assert captured.out == out_file.read()
 
-    def test_main_some_extension_file(self, monkeypatch, capsys,
-                                      bed_some_extension_files):
+    def test_main_some_extension_file(
+        self, monkeypatch, capsys, bed_some_extension_files
+    ):
         """Test main function with read names."""
         in_bed, expected_out = bed_some_extension_files
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['primir_quantification',
-             str(in_bed),
-             '--feat-extension',
-             ]
+            sys,
+            "argv",
+            [
+                "primir_quantification",
+                str(in_bed),
+                "--feat-extension",
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
         captured = capsys.readouterr()
 
-        with open(expected_out, 'r') as out_file:
+        with open(expected_out, "r") as out_file:
             assert captured.out == out_file.read()
 
     def test_main_collpased_nh_file(self, monkeypatch, capsys, bed_file):
@@ -243,37 +263,42 @@ class TestMain:
         in_bed, expected_out = bed_file
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['primir_quantification',
-             str(in_bed),
-             '--collapsed',
-             '--nh',
-             ]
+            sys,
+            "argv",
+            [
+                "primir_quantification",
+                str(in_bed),
+                "--collapsed",
+                "--nh",
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
         captured = capsys.readouterr()
 
-        with open(expected_out, 'r') as out_file:
+        with open(expected_out, "r") as out_file:
             assert captured.out == out_file.read()
 
-    def test_main_collpased_file(self, monkeypatch, capsys,
-                                 bed_collapsed_file):
+    def test_main_collpased_file(
+        self, monkeypatch, capsys, bed_collapsed_file
+    ):
         """Test main function with collapsed alignments."""
         in_bed, expected_out = bed_collapsed_file
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['primir_quantification',
-             str(in_bed),
-             '--collapsed',
-             ]
+            sys,
+            "argv",
+            [
+                "primir_quantification",
+                str(in_bed),
+                "--collapsed",
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
         captured = capsys.readouterr()
 
-        with open(expected_out, 'r') as out_file:
+        with open(expected_out, "r") as out_file:
             assert captured.out == out_file.read()
 
     def test_main_nh_file(self, monkeypatch, capsys, bed_nh_file):
@@ -281,15 +306,17 @@ class TestMain:
         in_bed, expected_out = bed_nh_file
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['primir_quantification',
-             str(in_bed),
-             '--nh',
-             ]
+            sys,
+            "argv",
+            [
+                "primir_quantification",
+                str(in_bed),
+                "--nh",
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
         captured = capsys.readouterr()
 
-        with open(expected_out, 'r') as out_file:
+        with open(expected_out, "r") as out_file:
             assert captured.out == out_file.read()
