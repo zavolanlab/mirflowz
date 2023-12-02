@@ -38,7 +38,7 @@ jobs:
 
       - name: flake8
         working-directory: ./scripts
-        run: flake8 --ignore E402,W504
+        run: flake8
 
       - name: mypy
         working-directory: ./scripts
@@ -149,4 +149,4 @@ jobs:
       
       - name: run unit tests
         working-directory: ./scripts/tests
-        run: pytest --cov=scripts --cov-branch --cov-report=term-missing
+        run: pytest --import-mode prepend --cov=scripts --cov-branch --cov-report=term-missing
