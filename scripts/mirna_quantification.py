@@ -128,39 +128,40 @@ def parse_arguments():
     """Command-line arguments parser."""
     parser = argparse.ArgumentParser(
         description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
-        '-v', '--version',
-        action='version',
-        version='%(prog)s 1.0.0',
-        help="Show program's version number and exit."
+        "-v",
+        "--version",
+        action="version",
+        version="%(prog)s 1.0.0",
+        help="Show program's version number and exit.",
     )
     parser.add_argument(
-        'samfile',
+        "samfile",
         help=(
             "Path to the SAM file containing the intersecting miRNA name(s)."
         ),
-        type=Path
+        type=Path,
     )
     parser.add_argument(
-        '--outdir',
+        "--outdir",
         help="Path to the output directory. Default: %(default)s.",
         default=Path.cwd(),
-        type=Path
+        type=Path,
     )
     parser.add_argument(
-        '--mir-list',
+        "--mir-list",
         help=(
             "List of miRNA types to have in the output table."
             " Default: %(default)s."
         ),
-        nargs='*',
-        default=['isomir', 'mirna'],
-        type=str
+        nargs="*",
+        default=["isomir", "mirna"],
+        type=str,
     )
     parser.add_argument(
-        '--lib',
+        "--lib",
         help=(
             "Library to which the alignments belong to. Default: %(default)s."
         ),
@@ -168,16 +169,18 @@ def parse_arguments():
         default="lib",
     )
     parser.add_argument(
-        '-t', '--tag',
+        "-t",
+        "--tag",
         help=(
             "Indicate the tag storing the intersecting miRNA name."
             " Default: %(default)s."
         ),
-        default='YW',
-        type=str
+        default="YW",
+        type=str,
     )
     parser.add_argument(
-        '-c', '--collapsed',
+        "-c",
+        "--collapsed",
         help=(
             "Indicate that the SAM file has the reads collapsed by sequence."
             "In that case, the SAM query names are expected to follow the "
@@ -188,11 +191,11 @@ def parse_arguments():
             "FASTX-Toolkit: http://hannonlab.cshl.edu/fastx_toolkit/"
             " Default: %(default)s."
         ),
-        action='store_true',
-        default=False
+        action="store_true",
+        default=False,
     )
     parser.add_argument(
-        '--nh',
+        "--nh",
         help=(
             "Indicate that the SAM file has the NH value at the end of the"
             " read query name. In that case, SAM query names are expected to"
@@ -200,35 +203,35 @@ def parse_arguments():
             " name and NH is the NH value, i.e my_query_name_4. Default:"
             " %(default)s."
         ),
-        action='store_true',
-        default=False
+        action="store_true",
+        default=False,
     )
     parser.add_argument(
-        '--count',
+        "--count",
         help=(
             "If set, the amount of best alignments for each miRNA is included"
             " in the output table. Default: %(default)s"
         ),
-        action='store_true',
-        default=False
+        action="store_true",
+        default=False,
     )
     parser.add_argument(
-        '--len',
+        "--len",
         help=(
             "If set, the miRNA length is included in the output table."
             " Default: %(default)s."
         ),
-        action='store_true',
-        default=False
+        action="store_true",
+        default=False,
     )
     parser.add_argument(
-        '--read-ids',
+        "--read-ids",
         help=(
             "If set, the read IDs that belong to each miRNA are included in "
             "the output table separated by a semi-colon. Default: %(default)s."
         ),
-        action='store_true',
-        default=False
+        action="store_true",
+        default=False,
     )
 
     return parser
@@ -251,16 +254,18 @@ def collapsed_nh_contribution(aln: pysam.AlignedSegment) -> float:
     """
     name = str(aln.query_name)
     try:
-        if (val := re.search(r'\d+_\d+$', name)):
-            values = val.group().split('_')
+        if val := re.search(r"\d+_\d+$", name):
+            values = val.group().split("_")
 
         return float(values[0]) / float(values[1])
 
     except AttributeError:
-        sys.stdout.write(f"Invalid query name: '{aln.query_name}'.\n" +
-                         "Cannot calculate contribution.\n" +
-                         "Check the SAM file validity and CLI options" +
-                         " --collapsed and --nh.\n")
+        sys.stdout.write(
+            f"Invalid query name: '{aln.query_name}'.\n"
+            + "Cannot calculate contribution.\n"
+            + "Check the SAM file validity and CLI options"
+            + " --collapsed and --nh.\n"
+        )
         raise
 
 
@@ -281,20 +286,22 @@ def collapsed_contribution(aln: pysam.AlignedSegment) -> float:
     """
     name = str(aln.query_name)
     try:
-        if (coll := re.search(r'\d+$', name)):
+        if coll := re.search(r"\d+$", name):
             collapsed = float(coll.group())
 
     except AttributeError:
-        sys.stdout.write(f"Invalid query name: '{aln.query_name}'.\n" +
-                         "Option --collapsed specified but query name does" +
-                         " not include the number of collapsed sequences.\n" +
-                         "Check SAM file consistency and CLI options" +
-                         " --collapsed and --nh.\n")
+        sys.stdout.write(
+            f"Invalid query name: '{aln.query_name}'.\n"
+            + "Option --collapsed specified but query name does"
+            + " not include the number of collapsed sequences.\n"
+            + "Check SAM file consistency and CLI options"
+            + " --collapsed and --nh.\n"
+        )
         raise
 
     try:
         nh_value = float(aln.get_tag("NH"))
-        return collapsed/nh_value
+        return collapsed / nh_value
 
     except KeyError:
         return collapsed
@@ -317,17 +324,19 @@ def nh_contribution(aln: pysam.AlignedSegment) -> float:
     """
     name = str(aln.query_name)
     try:
-        if (cont := re.search(r'\d+$', name)):
+        if cont := re.search(r"\d+$", name):
             nh_val = float(cont.group())
 
-        return 1/nh_val
+        return 1 / nh_val
 
     except AttributeError:
-        sys.stdout.write(f"Invalid query name: '{aln.query_name}'.\n" +
-                         "Option --nh specified but query name does" +
-                         " not include NH.\n" +
-                         "Check SAM file consistency and CLI options" +
-                         " --collapsed and --nh.\n")
+        sys.stdout.write(
+            f"Invalid query name: '{aln.query_name}'.\n"
+            + "Option --nh specified but query name does"
+            + " not include NH.\n"
+            + "Check SAM file consistency and CLI options"
+            + " --collapsed and --nh.\n"
+        )
         raise
 
 
@@ -346,7 +355,7 @@ def contribution(aln: pysam.AlignedSegment) -> float:
         the conrtibution of the alignment to the overall count
     """
     try:
-        return 1/float(aln.get_tag("NH"))
+        return 1 / float(aln.get_tag("NH"))
 
     except KeyError:
         return 1.0
@@ -368,44 +377,42 @@ def get_name(pre_name: str) -> list[str]:
         list with the species name to be found in the final table and its type
     """
     data_name = pre_name.split("|")
-    cigar = re.sub(r'[^0-9]', '', data_name[3])
-    md = re.sub(r'[^0-9]', '', data_name[4])
+    cigar = re.sub(r"[^0-9]", "", data_name[3])
+    md = re.sub(r"[^0-9]", "", data_name[4])
 
-    if data_name[1] == '0' and data_name[2] == '0' and cigar == md:
-        return ['mirna', data_name[0]]
+    if data_name[1] == "0" and data_name[2] == "0" and cigar == md:
+        return ["mirna", data_name[0]]
 
-    return ['isomir', pre_name]
+    return ["isomir", pre_name]
 
 
 def write_output(
-        name: str,
-        species: list[str],
-        mir_list: list[str],
-        mirna_out: Path) -> None:
+    name: str, species: list[str], mir_list: list[str], mirna_out: Path
+) -> None:
     """Write to the output the correct miRNA type."""
-    with open(mirna_out, 'a', encoding="utf-8") as mirna:
+    with open(mirna_out, "a", encoding="utf-8") as mirna:
         if name in mir_list:
-            mirna.write('\t'.join(species) + '\n')
+            mirna.write("\t".join(species) + "\n")
         else:
-            mirna.write('')
+            mirna.write("")
 
 
 def main(arguments) -> None:
     """Quantify miRNAs and corresponding isomiRs."""
     outdir = Path(arguments.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
-    outfile = outdir/f'mirna_counts_{arguments.lib}'
+    outfile = outdir / f"mirna_counts_{arguments.lib}"
 
     contribution_type = {
-            (True, True): collapsed_nh_contribution,
-            (True, False): collapsed_contribution,
-            (False, True): nh_contribution,
-            (False, False): contribution}
+        (True, True): collapsed_nh_contribution,
+        (True, False): collapsed_contribution,
+        (False, True): nh_contribution,
+        (False, False): contribution,
+    }
 
     get_contribution = contribution_type[arguments.collapsed, arguments.nh]
 
-    with pysam.AlignmentFile(arguments.samfile, 'r') as samfile:
-
+    with pysam.AlignmentFile(arguments.samfile, "r") as samfile:
         try:
             alignment = next(samfile)
             current_species = alignment.get_tag(arguments.tag)
@@ -415,16 +422,17 @@ def main(arguments) -> None:
                 alns_count = 1
 
         except StopIteration:
-            write_output(name="",
-                         species=[],
-                         mir_list=arguments.mir_list,
-                         mirna_out=outfile)
+            write_output(
+                name="",
+                species=[],
+                mir_list=arguments.mir_list,
+                mirna_out=outfile,
+            )
 
             return
 
         for alignment in samfile:
-
-            if current_species == '':
+            if current_species == "":
                 current_species = alignment.get_tag(arguments.tag)
                 count = get_contribution(alignment)
                 alns_count = 1
@@ -446,12 +454,14 @@ def main(arguments) -> None:
                 if arguments.len:
                     species.append(str(alignment.query_alignment_length))
                 if arguments.read_ids:
-                    species.append(';'.join(read_ID))
+                    species.append(";".join(read_ID))
 
-                write_output(name=name[0],
-                             species=species,
-                             mir_list=arguments.mir_list,
-                             mirna_out=outfile)
+                write_output(
+                    name=name[0],
+                    species=species,
+                    mir_list=arguments.mir_list,
+                    mirna_out=outfile,
+                )
 
                 current_species = alignment.get_tag(arguments.tag)
                 count = get_contribution(alignment)
@@ -466,15 +476,16 @@ def main(arguments) -> None:
         if arguments.len:
             species.append(str(alignment.query_alignment_length))
         if arguments.read_ids:
-            species.append(';'.join(read_ID))
+            species.append(";".join(read_ID))
 
-        write_output(name=name[0],
-                     species=species,
-                     mir_list=arguments.mir_list,
-                     mirna_out=outfile)
+        write_output(
+            name=name[0],
+            species=species,
+            mir_list=arguments.mir_list,
+            mirna_out=outfile,
+        )
 
 
 if __name__ == "__main__":
-
     args = parse_arguments().parse_args()  # pragma: no cover
     main(args)  # pragma: no cover

@@ -97,22 +97,23 @@ class Fields(NamedTuple):
 def parse_arguments():
     """Command-line arguments parser."""
     parser = ArgumentParser(
-        description=__doc__,
-        formatter_class=RawDescriptionHelpFormatter
+        description=__doc__, formatter_class=RawDescriptionHelpFormatter
     )
     parser.add_argument(
-        '-v', '--version',
+        "-v",
+        "--version",
         action="version",
         version="%(prog)s 1.1.0",
-        help="Show program's version number and exit"
+        help="Show program's version number and exit",
     )
     parser.add_argument(
-        'infile',
+        "infile",
         help="Path to the FASTA file resulting from the oligomap mapping.",
         type=Path,
     )
     parser.add_argument(
-        '-n', '--nh-filter',
+        "-n",
+        "--nh-filter",
         help=(
             "Add NH tag to output and remove reads that contain more "
             "aligments than the provided NH value (with min error)."
@@ -123,8 +124,9 @@ def parse_arguments():
     return parser
 
 
-def get_cigar_md(errors: str, sequence: str, bars_line: str,
-                 ref_seq: str) -> tuple[str, str]:
+def get_cigar_md(
+    errors: str, sequence: str, bars_line: str, ref_seq: str
+) -> tuple[str, str]:
     """Get the CIGAR and MD strings.
 
     Given the read and target sequences, the number of errors and the
@@ -193,14 +195,14 @@ def get_cigar_md(errors: str, sequence: str, bars_line: str,
     """
     seq_len = len(sequence)
 
-    if errors == '0':
+    if errors == "0":
         return f"{seq_len}M", f"MD:Z:{seq_len}"
 
     # CASE 1: deletion in the read
-    if '-' in sequence:
+    if "-" in sequence:
         indelerr = "1D"
 
-        if bars_line[0] == ' ':
+        if bars_line[0] == " ":
             cigarStr = f"{indelerr}{seq_len - 1}M"
             matchingString = f"MD:Z:^{ref_seq[0]}{seq_len - 1}"
 
@@ -209,14 +211,14 @@ def get_cigar_md(errors: str, sequence: str, bars_line: str,
             matchingString = f"MD:Z:{seq_len - 1}^{ref_seq[seq_len - 1]}0"
 
         else:
-            idx = bars_line.index(' ')
+            idx = bars_line.index(" ")
             cigarStr = f"{idx}M{indelerr}{bars_line.count('|') - idx}M"
             matchingString = f"MD:Z:{idx}^{ref_seq[idx]}{seq_len - idx -1}"
 
         return cigarStr, matchingString
 
     # CASE 2: insertion in the read
-    if '-' in ref_seq:
+    if "-" in ref_seq:
         indelerr = "1I"
 
         if bars_line[0] == " ":
@@ -226,7 +228,7 @@ def get_cigar_md(errors: str, sequence: str, bars_line: str,
             cigarStr = f"{seq_len - 1}M{indelerr}"
 
         else:
-            idx = bars_line.index(' ')
+            idx = bars_line.index(" ")
             cigarStr = f"{idx}M{indelerr}{bars_line.count('|') - idx}M"
 
         return cigarStr, f"MD:Z:{seq_len}"
@@ -239,7 +241,7 @@ def get_cigar_md(errors: str, sequence: str, bars_line: str,
         matchingString = f"MD:Z:{seq_len - 1}{ref_seq[seq_len - 1]}"
 
     else:
-        idx = bars_line.index(' ')
+        idx = bars_line.index(" ")
         matchingString = f"MD:Z:{idx}{ref_seq[idx]}{seq_len - idx - 1}"
 
     return f"{seq_len}M", matchingString
@@ -285,19 +287,31 @@ def get_sam_fields(aln: list[str]) -> Fields:
 
     cigar, md = get_cigar_md(errors, seq, aln[4][:-1], aln[5].strip())
 
-    fields = Fields(seq_name_pos[0],
-                    '0' if aln[2].split()[3] == '+' else "16",
-                    aln[1].strip(),
-                    seq_name_pos[5].split('.')[0],
-                    "255", cigar, '*', '0', '0',
-                    re.sub('-', '', seq), '*',
-                    "NM:i:0" if errors == '0' else "NM:i:1", md)
+    fields = Fields(
+        seq_name_pos[0],
+        "0" if aln[2].split()[3] == "+" else "16",
+        aln[1].strip(),
+        seq_name_pos[5].split(".")[0],
+        "255",
+        cigar,
+        "*",
+        "0",
+        "0",
+        re.sub("-", "", seq),
+        "*",
+        "NM:i:0" if errors == "0" else "NM:i:1",
+        md,
+    )
 
     return fields
 
 
-def eval_aln(nhfilter: int, d: Dict[str, list], min_err_nh: Dict[str, list],
-             fields: Fields) -> None:
+def eval_aln(
+    nhfilter: int,
+    d: Dict[str, list],
+    min_err_nh: Dict[str, list],
+    fields: Fields,
+) -> None:
     """Evaluate an alignment to add, discard or write it to the STDOUT.
 
     Given a read's alignment, this function first checks if the dictionary
@@ -339,9 +353,10 @@ def eval_aln(nhfilter: int, d: Dict[str, list], min_err_nh: Dict[str, list],
     errors = fields.edit_dist[-1]
 
     if len(d) == 0:
-        if (seq_name not in list(min_err_nh.keys()) or
-           errors < min_err_nh[seq_name][0]):
-
+        if (
+            seq_name not in list(min_err_nh.keys())
+            or errors < min_err_nh[seq_name][0]
+        ):
             min_err_nh[seq_name] = [errors, 1]
             d[seq_name] = [fields]
     else:
@@ -350,33 +365,43 @@ def eval_aln(nhfilter: int, d: Dict[str, list], min_err_nh: Dict[str, list],
                 min_err_nh[seq_name][1] += 1
 
                 if nhfilter:
-
                     if min_err_nh[seq_name][1] <= nhfilter:
                         d[seq_name].append(fields)
 
                     else:
                         d.clear()
-                        sys.stderr.write(f"Filtered by NH | Read {seq_name}" +
-                                         f" | Errors = {errors}\n")
+                        sys.stderr.write(
+                            f"Filtered by NH | Read {seq_name}"
+                            + f" | Errors = {errors}\n"
+                        )
 
                 else:
                     d[seq_name].append(fields)
 
             elif errors < min_err_nh[seq_name][0]:
-                sys.stderr.write(f"Filtered by ERROR | Read {seq_name}" +
-                                 f" | Errors = {min_err_nh[seq_name][0]}\n")
+                sys.stderr.write(
+                    f"Filtered by ERROR | Read {seq_name}"
+                    + f" | Errors = {min_err_nh[seq_name][0]}\n"
+                )
 
-                min_err_nh[seq_name] = [min(errors, min_err_nh[seq_name][0]),
-                                        1]
+                min_err_nh[seq_name] = [
+                    min(errors, min_err_nh[seq_name][0]),
+                    1,
+                ]
                 d[seq_name] = [fields]
         else:
             for seq, aln in d.items():
-                sys.stderr.write(f"Written read {seq} | " +
-                                 f"Errors = {min_err_nh[seq][0]} | " +
-                                 f"NH = {min_err_nh[seq][1]}\n")
+                sys.stderr.write(
+                    f"Written read {seq} | "
+                    + f"Errors = {min_err_nh[seq][0]} | "
+                    + f"NH = {min_err_nh[seq][1]}\n"
+                )
                 for field in aln:
-                    sys.stdout.write('\t'.join(field) +
-                                     f"\tNH:i:{min_err_nh[seq][1]}" + '\n')
+                    sys.stdout.write(
+                        "\t".join(field)
+                        + f"\tNH:i:{min_err_nh[seq][1]}"
+                        + "\n"
+                    )
 
             d.clear()
             min_err_nh.clear()
@@ -390,37 +415,37 @@ def main(arguments) -> None:
     read_seqs: Dict[str, list] = {}
     seq_min_error_nh: Dict[str, list] = {}
 
-    with open(arguments.infile, 'r', encoding="utf-8") as in_file:
-
+    with open(arguments.infile, "r", encoding="utf-8") as in_file:
         sys.stderr.write("##############\nSTART READING...\n##############\n")
 
         lines = [in_file.readline() for _ in range(6)]
         i = 1
 
         while lines[0] != "":
-
             fields = get_sam_fields(lines)
 
             sys.stderr.write(f"Record:{i} | Sequence:{fields.read_name}\n")
 
-            eval_aln(arguments.nh_filter, read_seqs, seq_min_error_nh,
-                     fields)
+            eval_aln(arguments.nh_filter, read_seqs, seq_min_error_nh, fields)
             i += 1
 
             in_file.readline()
             lines = [in_file.readline() for _ in range(6)]
 
     if len(read_seqs) > 0:
-
         for read_name, alignments in read_seqs.items():
-            sys.stderr.write(f"Printed read {read_name} | Errors = " +
-                             f"{seq_min_error_nh[read_name][0]} | " +
-                             f"NH = {seq_min_error_nh[read_name][1]}\n")
+            sys.stderr.write(
+                f"Printed read {read_name} | Errors = "
+                + f"{seq_min_error_nh[read_name][0]} | "
+                + f"NH = {seq_min_error_nh[read_name][1]}\n"
+            )
 
             for aln in alignments:
-                sys.stdout.write('\t'.join(aln) +
-                                 f"\tNH:i:{seq_min_error_nh[read_name][1]}" +
-                                 '\n')
+                sys.stdout.write(
+                    "\t".join(aln)
+                    + f"\tNH:i:{seq_min_error_nh[read_name][1]}"
+                    + "\n"
+                )
 
     sys.stderr.write("SUCCESSFULLY FINISHED.")
 
