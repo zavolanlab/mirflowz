@@ -30,6 +30,11 @@
             "default": "results/",
             "description": "Path to the output directory."
         },
+        "tmp_dir":{
+            "type": "string",
+            "default": "results/inter_files",
+            "description": "Path to the temporary directory storing the intermediate files."
+        },
         "local_log":{
             "type": "string",
             "default": "logs/local/",
