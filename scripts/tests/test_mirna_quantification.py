@@ -6,16 +6,14 @@ import sys
 import pysam
 import pytest
 
-sys.path.append("../../")
-
-from scripts.mirna_quantification import (
+from ..mirna_quantification import (
     collapsed_nh_contribution,
     collapsed_contribution,
     nh_contribution,
     contribution,
     get_name,
     main,
-    parse_arguments
+    parse_arguments,
 )
 
 
@@ -85,7 +83,7 @@ def read_sam_file():
 
 @pytest.fixture
 def read_len_sam_file():
-    """Import path to test files with read IDs and feature len in the output table."""
+    """Import path to test files with read IDs and len in the output table."""
     sam_file = Path("files/in_aln_tag.sam")
     out_table = Path("files/len_ids_iso_mirna_quantification")
 
@@ -160,9 +158,11 @@ class TestParseArguments:
         """Call without input file."""
         with pytest.raises(SystemExit) as sysex:
             monkeypatch.setattr(
-                sys, 'argv',
-                ['mirna_quantification',
-                 ]
+                sys,
+                "argv",
+                [
+                    "mirna_quantification",
+                ],
             )
             parse_arguments().parse_args()
         assert sysex.value.code == 2
@@ -172,11 +172,14 @@ class TestParseArguments:
         in_sam = empty_file
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['mirna__quantification',
-             str(in_sam),
-             '--lib', 'test_lib',
-             ]
+            sys,
+            "argv",
+            [
+                "mirna__quantification",
+                str(in_sam),
+                "--lib",
+                "test_lib",
+            ],
         )
         args = parse_arguments().parse_args()
         assert isinstance(args, argparse.Namespace)
@@ -187,10 +190,13 @@ class TestParseArguments:
 
         with pytest.raises(SystemExit) as sysex:
             monkeypatch.setattr(
-                sys, 'argv',
-                ['mirna_quantification',
-                 str(in_sam), str(in_sam),
-                 ]
+                sys,
+                "argv",
+                [
+                    "mirna_quantification",
+                    str(in_sam),
+                    str(in_sam),
+                ],
             )
             parse_arguments().parse_args()
         assert sysex.value.code == 2
@@ -200,34 +206,40 @@ class TestParseArguments:
         in_sam = empty_file
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['mirna_quantification',
-             str(in_sam),
-             '--count',
-             '--len',
-             '--read-ids',
-             '--collapsed',
-             '--nh',
-             '--tag', 'YW',
-             '--outdir', 'Path.cwd()',
-             '--lib', 'test_lib',
-             '--mir-list', '[mirna, isomir]'
-             ]
+            sys,
+            "argv",
+            [
+                "mirna_quantification",
+                str(in_sam),
+                "--count",
+                "--len",
+                "--read-ids",
+                "--collapsed",
+                "--nh",
+                "--tag",
+                "YW",
+                "--outdir",
+                "Path.cwd()",
+                "--lib",
+                "test_lib",
+                "--mir-list",
+                "[mirna, isomir]",
+            ],
         )
         args = parse_arguments().parse_args()
         assert isinstance(args, argparse.Namespace)
 
 
-class TestGetContribution():
+class TestGetContribution:
     """Test 'get_contribution()' function."""
 
     def test_collapsed_nh(self, alns):
         """Test collapsed alignment with NH in the name."""
-        assert collapsed_nh_contribution(alns[0]) == 2/3
+        assert collapsed_nh_contribution(alns[0]) == 2 / 3
 
     def test_uncollpased_nh(self, alns):
         """Test uncollapsed alignment with NH in the name."""
-        assert nh_contribution(alns[1]) == 1/4
+        assert nh_contribution(alns[1]) == 1 / 4
 
     def test_collapsed_no_nh(self, alns):
         """Test collapsed alignment without NH in the name."""
@@ -235,7 +247,7 @@ class TestGetContribution():
 
     def test_uncollpased_no_nh(self, alns):
         """Test uncollapsed alignment without NH in the name."""
-        assert contribution(alns[3]) == 1/8
+        assert contribution(alns[3]) == 1 / 8
 
     def test_uncollpased_missing_nh(self, alns):
         """Test uncollapsed alignment with missing NH value."""
@@ -267,222 +279,276 @@ class TestMain:
     def test_main_empty_sam_file(self, monkeypatch, tmp_path, empty_file):
         """Test main function with an empty SAM file."""
         empty_in, empty_out = empty_file
-        output = tmp_path/"mirna_counts_lib"
+        output = tmp_path / "mirna_counts_lib"
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['mirna_quantification',
-             str(empty_in),
-             '--outdir', str(tmp_path),
-             ]
+            sys,
+            "argv",
+            [
+                "mirna_quantification",
+                str(empty_in),
+                "--outdir",
+                str(tmp_path),
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
 
-        with open(empty_out, 'r') as expected, open(output, 'r') as out_file:
+        with open(empty_out, "r") as expected, open(output, "r") as out_file:
             assert out_file.read() == expected.read()
 
     def test_main_isomir_mirna_sam_file(self, monkeypatch, tmp_path, sam_file):
         """Test main function with complete SAM file."""
         infile, out_table = sam_file
-        output = tmp_path/"mirna_counts_lib"
+        output = tmp_path / "mirna_counts_lib"
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['mirna_quantification',
-             str(infile),
-             '--collapsed',
-             '--nh',
-             '--outdir', str(tmp_path),
-             ]
+            sys,
+            "argv",
+            [
+                "mirna_quantification",
+                str(infile),
+                "--collapsed",
+                "--nh",
+                "--outdir",
+                str(tmp_path),
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
 
-        with open(out_table, 'r') as expected, open(output, 'r') as out_file:
+        with open(out_table, "r") as expected, open(output, "r") as out_file:
             assert out_file.read() == expected.read()
 
-    def test_main_iso_sam_file(self, monkeypatch, tmp_path, iso_mirna_sam_file):
+    def test_main_iso_sam_file(
+        self, monkeypatch, tmp_path, iso_mirna_sam_file
+    ):
         """Test main function tabulating only isomiRs."""
         infile, iso_out_table, mirna_out_table = iso_mirna_sam_file
-        mirna_output = tmp_path/"mirna_counts_lib"
+        mirna_output = tmp_path / "mirna_counts_lib"
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['mirna_quantification',
-             str(infile),
-             '--collapsed',
-             '--nh',
-             '--outdir', str(tmp_path),
-             '--mir-list', "isomir",
-             ]
+            sys,
+            "argv",
+            [
+                "mirna_quantification",
+                str(infile),
+                "--collapsed",
+                "--nh",
+                "--outdir",
+                str(tmp_path),
+                "--mir-list",
+                "isomir",
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
 
-        with open(iso_out_table, 'r') as expected, open(mirna_output, 'r') as out_file:
+        with open(iso_out_table, "r") as expected, open(
+            mirna_output, "r"
+        ) as out_file:
             assert out_file.read() == expected.read()
 
-    def test_main_mirna_sam_file(self, monkeypatch, tmp_path, iso_mirna_sam_file):
+    def test_main_mirna_sam_file(
+        self, monkeypatch, tmp_path, iso_mirna_sam_file
+    ):
         """Test main function tabulating only canonical miRNA."""
         infile, iso_out_table, mirna_out_table = iso_mirna_sam_file
-        mirna_output = tmp_path/"mirna_counts_lib"
+        mirna_output = tmp_path / "mirna_counts_lib"
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['mirna_quantification',
-             str(infile),
-             '--collapsed',
-             '--nh',
-             '--outdir', str(tmp_path),
-             '--mir-list',  "mirna"
-             ]
+            sys,
+            "argv",
+            [
+                "mirna_quantification",
+                str(infile),
+                "--collapsed",
+                "--nh",
+                "--outdir",
+                str(tmp_path),
+                "--mir-list",
+                "mirna",
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
 
-        with open(mirna_out_table, 'r') as expected, open(mirna_output, 'r') as out_file:
+        with (
+            open(mirna_out_table, "r") as expected,
+            open(mirna_output, "r") as out_file,
+        ):
             assert out_file.read() == expected.read()
 
-    def test_main_xn_tag_sam_file(self, monkeypatch, tmp_path, xn_tag_sam_file):
+    def test_main_xn_tag_sam_file(
+        self, monkeypatch, tmp_path, xn_tag_sam_file
+    ):
         """Test main function with feature name in the XN tag."""
         infile, out_table = xn_tag_sam_file
-        output = tmp_path/"mirna_counts_lib"
+        output = tmp_path / "mirna_counts_lib"
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['mirna_quantification',
-             str(infile),
-             '--collapsed',
-             '--nh',
-             '--tag', 'XN',
-             '--outdir', str(tmp_path),
-             ]
+            sys,
+            "argv",
+            [
+                "mirna_quantification",
+                str(infile),
+                "--collapsed",
+                "--nh",
+                "--tag",
+                "XN",
+                "--outdir",
+                str(tmp_path),
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
 
-        with open(out_table, 'r') as expected, open(output, 'r') as out_file:
+        with open(out_table, "r") as expected, open(output, "r") as out_file:
             assert out_file.read() == expected.read()
 
-    def test_main_nh_missing_sam_file(self, monkeypatch, tmp_path, nh_missing_sam_file):
+    def test_main_nh_missing_sam_file(
+        self, monkeypatch, tmp_path, nh_missing_sam_file
+    ):
         """Test main function with some missing NH tag in SAM file."""
         infile, out_table = nh_missing_sam_file
-        output = tmp_path/"mirna_counts_lib"
+        output = tmp_path / "mirna_counts_lib"
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['mirna_quantification',
-             str(infile),
-             '--collapsed',
-             '--outdir', str(tmp_path),
-             ]
+            sys,
+            "argv",
+            [
+                "mirna_quantification",
+                str(infile),
+                "--collapsed",
+                "--outdir",
+                str(tmp_path),
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
 
-        with open(out_table, 'r') as expected, open(output, 'r') as out_file:
+        with open(out_table, "r") as expected, open(output, "r") as out_file:
             assert out_file.read() == expected.read()
 
     def test_main_seq_len_sam_file(self, monkeypatch, tmp_path, len_sam_file):
         """Test main function with read lenght in output table."""
         infile, out_table = len_sam_file
-        output = tmp_path/"mirna_counts_lib"
+        output = tmp_path / "mirna_counts_lib"
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['mirna_quantification',
-             str(infile),
-             '--collapsed',
-             '--nh',
-             '--len',
-             '--outdir', str(tmp_path),
-             ]
+            sys,
+            "argv",
+            [
+                "mirna_quantification",
+                str(infile),
+                "--collapsed",
+                "--nh",
+                "--len",
+                "--outdir",
+                str(tmp_path),
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
 
-        with open(out_table, 'r') as expected, open(output, 'r') as out_file:
+        with open(out_table, "r") as expected, open(output, "r") as out_file:
             assert out_file.read() == expected.read()
 
     def test_main_read_sam_file(self, monkeypatch, tmp_path, read_sam_file):
         """Test main function with intersecting read IDs in the output."""
         infile, out_table = read_sam_file
-        output = tmp_path/"mirna_counts_lib"
+        output = tmp_path / "mirna_counts_lib"
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['mirna_quantification',
-             str(infile),
-             '--collapsed',
-             '--nh',
-             '--read-ids',
-             '--outdir', str(tmp_path),
-             ]
+            sys,
+            "argv",
+            [
+                "mirna_quantification",
+                str(infile),
+                "--collapsed",
+                "--nh",
+                "--read-ids",
+                "--outdir",
+                str(tmp_path),
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
 
-        with open(out_table, 'r') as expected, open(output, 'r') as out_file:
+        with open(out_table, "r") as expected, open(output, "r") as out_file:
             assert out_file.read() == expected.read()
 
-    def test_main_read_len_sam_file(self, monkeypatch, tmp_path, read_len_sam_file):
+    def test_main_read_len_sam_file(
+        self, monkeypatch, tmp_path, read_len_sam_file
+    ):
         """Test main function with read IDs and feature length im output."""
         infile, out_table = read_len_sam_file
-        output = tmp_path/"mirna_counts_lib"
+        output = tmp_path / "mirna_counts_lib"
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['mirna_quantification',
-             str(infile),
-             '--collapsed',
-             '--nh',
-             '--len',
-             '--read-ids',
-             '--outdir', str(tmp_path),
-             ]
+            sys,
+            "argv",
+            [
+                "mirna_quantification",
+                str(infile),
+                "--collapsed",
+                "--nh",
+                "--len",
+                "--read-ids",
+                "--outdir",
+                str(tmp_path),
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
 
-        with open(out_table, 'r') as expected, open(output, 'r') as out_file:
+        with open(out_table, "r") as expected, open(output, "r") as out_file:
             assert out_file.read() == expected.read()
 
-
-    def test_main_uncollpased_sam_file(self, monkeypatch, tmp_path, uncollapsed_sam_file):
+    def test_main_uncollpased_sam_file(
+        self, monkeypatch, tmp_path, uncollapsed_sam_file
+    ):
         """Test main function with uncollapsed SAM file."""
         infile, out_table = uncollapsed_sam_file
-        output = tmp_path/"mirna_counts_lib"
+        output = tmp_path / "mirna_counts_lib"
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['mirna_quantification',
-             str(infile),
-             '--nh',
-             '--outdir', str(tmp_path),
-             ]
+            sys,
+            "argv",
+            [
+                "mirna_quantification",
+                str(infile),
+                "--nh",
+                "--outdir",
+                str(tmp_path),
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
 
-        with open(out_table, 'r') as expected, open(output, 'r') as out_file:
+        with open(out_table, "r") as expected, open(output, "r") as out_file:
             assert out_file.read() == expected.read()
 
-    def test_main_uncollpased_missing_nh_sam_file(self, monkeypatch, tmp_path, uncollapsed_missing_nh_sam_file):
+    def test_main_uncollap_miss_nh_sam_file(
+        self, monkeypatch, tmp_path, uncollapsed_missing_nh_sam_file
+    ):
         """Test main function with uncollapsed SAM file and missing NH tags."""
         infile, out_table = uncollapsed_missing_nh_sam_file
-        output = tmp_path/"mirna_counts_lib"
+        output = tmp_path / "mirna_counts_lib"
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['mirna_quantification',
-             str(infile),
-             '--count',
-             '--outdir', str(tmp_path),
-             ]
+            sys,
+            "argv",
+            [
+                "mirna_quantification",
+                str(infile),
+                "--count",
+                "--outdir",
+                str(tmp_path),
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
 
-        with open(out_table, 'r') as expected, open(output, 'r') as out_file:
+        with open(out_table, "r") as expected, open(output, "r") as out_file:
             assert out_file.read() == expected.read()

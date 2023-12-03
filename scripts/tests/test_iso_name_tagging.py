@@ -6,12 +6,7 @@ import sys
 
 import pytest
 
-sys.path.append("../../")
-
-from scripts.iso_name_tagging import (
-    main,
-    parse_arguments
-)
+from ..iso_name_tagging import main, parse_arguments
 
 
 @pytest.fixture
@@ -62,24 +57,30 @@ class TestParseArguments:
 
         with pytest.raises(SystemExit) as sysex:
             monkeypatch.setattr(
-                sys, 'argv',
-                ['iso_name_tagging',
-                 '--sam', str(in_sam),
-                 ]
+                sys,
+                "argv",
+                [
+                    "iso_name_tagging",
+                    "--sam",
+                    str(in_sam),
+                ],
             )
             parse_arguments().parse_args()
         assert sysex.value.code == 2
-    
+
     def test_no_sam(self, monkeypatch, bed_sam):
         """Call without bed file."""
         in_bed, in_sam, output = bed_sam
 
         with pytest.raises(SystemExit) as sysex:
             monkeypatch.setattr(
-                sys, 'argv',
-                ['iso_name_tagging',
-                 '--bed', str(in_bed),
-                 ]
+                sys,
+                "argv",
+                [
+                    "iso_name_tagging",
+                    "--bed",
+                    str(in_bed),
+                ],
             )
             parse_arguments().parse_args()
         assert sysex.value.code == 2
@@ -89,27 +90,37 @@ class TestParseArguments:
         in_bed, in_sam, output = bed_sam
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['iso_name_tagging',
-             '--bed', str(in_bed),
-             '--sam', str(in_sam),
-             ]
+            sys,
+            "argv",
+            [
+                "iso_name_tagging",
+                "--bed",
+                str(in_bed),
+                "--sam",
+                str(in_sam),
+            ],
         )
         args = parse_arguments().parse_args()
         assert isinstance(args, argparse.Namespace)
-    
+
     def test_all_input(self, monkeypatch, bed_sam):
         """Call with all the options."""
         in_bed, in_sam, output = bed_sam
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['iso_name_tagging',
-             '--bed', str(in_bed),
-             '--sam', str(in_sam),
-             '--id', "alias",
-             '--extension', '6',
-             ]
+            sys,
+            "argv",
+            [
+                "iso_name_tagging",
+                "--bed",
+                str(in_bed),
+                "--sam",
+                str(in_sam),
+                "--id",
+                "alias",
+                "--extension",
+                "6",
+            ],
         )
         args = parse_arguments().parse_args()
         assert isinstance(args, argparse.Namespace)
@@ -118,96 +129,123 @@ class TestParseArguments:
 class TestMain:
     """Test 'main()' function."""
 
-    def test_main_empty_bed_file(self, monkeypatch, capsys, empty_files, bed_sam):
+    def test_main_empty_bed_file(
+        self, monkeypatch, capsys, empty_files, bed_sam
+    ):
         """Test main function with an empty bed file."""
         empty_bed, empty_sam = empty_files
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['iso_name_tagging',
-             '--bed', str(empty_bed),
-             '--sam', str(empty_sam),
-             ]
+            sys,
+            "argv",
+            [
+                "iso_name_tagging",
+                "--bed",
+                str(empty_bed),
+                "--sam",
+                str(empty_sam),
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
         captured = capsys.readouterr()
 
-        with open(empty_sam, 'r') as out_file:
+        with open(empty_sam, "r") as out_file:
             assert captured.out == out_file.read()
 
-    def test_main_empty_sam_file(self, monkeypatch, capsys, empty_files, bed_sam):
+    def test_main_empty_sam_file(
+        self, monkeypatch, capsys, empty_files, bed_sam
+    ):
         """Test main function with an empty sam file."""
         empty_bed, empty_sam = empty_files
         in_bed, in_sam, output = bed_sam
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['iso_name_tagging',
-             '--bed', str(in_bed),
-             '--sam', str(empty_sam),
-             ]
+            sys,
+            "argv",
+            [
+                "iso_name_tagging",
+                "--bed",
+                str(in_bed),
+                "--sam",
+                str(empty_sam),
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
         captured = capsys.readouterr()
 
-        with open(empty_sam, 'r') as out_file:
+        with open(empty_sam, "r") as out_file:
             assert captured.out == out_file.read()
-    
 
     def test_main_bed_sam_file(self, monkeypatch, capsys, bed_sam):
         """Test main function without options."""
         in_bed, in_sam, output = bed_sam
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['iso_name_tagging',
-             '--bed', str(in_bed),
-             '--sam', str(in_sam),
-             ]
+            sys,
+            "argv",
+            [
+                "iso_name_tagging",
+                "--bed",
+                str(in_bed),
+                "--sam",
+                str(in_sam),
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
         captured = capsys.readouterr()
 
-        with open(output, 'r') as out_file:
+        with open(output, "r") as out_file:
             assert captured.out == out_file.read()
-    
-    def test_main_bed_sam_extension_file(self, monkeypatch, capsys, bed_sam_extension):
+
+    def test_main_bed_sam_extension_file(
+        self, monkeypatch, capsys, bed_sam_extension
+    ):
         """Test main function with extension equals 6."""
         in_bed, in_sam, output = bed_sam_extension
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['iso_name_tagging',
-             '--bed', str(in_bed),
-             '--sam', str(in_sam),
-             '--extension', '6',
-             ]
+            sys,
+            "argv",
+            [
+                "iso_name_tagging",
+                "--bed",
+                str(in_bed),
+                "--sam",
+                str(in_sam),
+                "--extension",
+                "6",
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
         captured = capsys.readouterr()
 
-        with open(output, 'r') as out_file:
+        with open(output, "r") as out_file:
             assert captured.out == out_file.read()
 
-    def test_main_bed_sam_file(self, monkeypatch, capsys, bed_sam_id):
+    def test_main_bed_sam_file_id(self, monkeypatch, capsys, bed_sam_id):
         """Test main function with id equals id."""
         in_bed, in_sam, output = bed_sam_id
 
         monkeypatch.setattr(
-            sys, 'argv',
-            ['iso_name_tagging',
-             '--bed', str(in_bed),
-             '--sam', str(in_sam),
-             '--id', 'id'
-             ]
+            sys,
+            "argv",
+            [
+                "iso_name_tagging",
+                "--bed",
+                str(in_bed),
+                "--sam",
+                str(in_sam),
+                "--id",
+                "id",
+            ],
         )
         args = parse_arguments().parse_args()
         main(args)
         captured = capsys.readouterr()
 
-        with open(output, 'r') as out_file:
+        with open(output, "r") as out_file:
             assert captured.out == out_file.read()

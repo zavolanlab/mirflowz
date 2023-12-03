@@ -50,29 +50,30 @@ def parse_arguments():
     """Command-line arguments parser."""
     parser = argparse.ArgumentParser(
         description="Script to filter multimappers by indel counts."
-        )
+    )
 
     parser.add_argument(
-        '-v', '--version',
-        action='version',
-        version='%(prog)s 1.0',
-        help="Show program's version number and exit"
-        )
+        "-v",
+        "--version",
+        action="version",
+        version="%(prog)s 1.0",
+        help="Show program's version number and exit",
+    )
 
     parser.add_argument(
-        'infile',
+        "infile",
         help="Path to the SAM input file, sorted by query name.",
-        type=Path
-        )
+        type=Path,
+    )
 
     parser.add_argument(
-        '--nh',
+        "--nh",
         help=(
             "If set, the NH tag will be include in the alignment name after"
             "and underscore. Default: %(default)s."
         ),
-        action='store_true',
-        default=False
+        action="store_true",
+        default=False,
     )
 
     return parser
@@ -101,7 +102,7 @@ def count_indels(aln: pysam.libcalignedsegment.AlignedSegment) -> int:
 
 
 def find_best_alignments(
-        alns: List[pysam.AlignedSegment], nh: bool = False
+    alns: List[pysam.AlignedSegment], nh: bool = False
 ) -> List[pysam.AlignedSegment]:
     """Find alignments with less indels.
 
@@ -129,20 +130,18 @@ def find_best_alignments(
     aln_indels = [(aln, count_indels(aln=aln)) for aln in alns]
     min_indels = min(aln_indels, key=lambda x: x[1])[1]
     best_alignments = [
-            aln
-            for i, (aln, indels) in enumerate(aln_indels)
-            if indels == min_indels]
+        aln
+        for i, (aln, indels) in enumerate(aln_indels)
+        if indels == min_indels
+    ]
 
     for i, best_aln in enumerate(best_alignments):
-
         if nh:
-            name = (
-                    f'{best_aln.query_name}_{len(best_alignments)}'
-                   )
+            name = f"{best_aln.query_name}_{len(best_alignments)}"
             best_aln.query_name = name
 
-        best_aln.set_tag('NH', len(best_alignments))
-        best_aln.set_tag('HI', i + 1)
+        best_aln.set_tag("NH", len(best_alignments))
+        best_aln.set_tag("HI", i + 1)
 
     return best_alignments
 
@@ -154,20 +153,18 @@ def write_output(alns: List[pysam.AlignedSegment]) -> None:
         alignments: alignments with the same query name
     """
     for alignment in alns:
-        sys.stdout.write(alignment.to_string() + '\n')
+        sys.stdout.write(alignment.to_string() + "\n")
 
 
 def main(arguments) -> None:
     """Filter multimappers by indels count."""
     with pysam.AlignmentFile(arguments.infile, "r") as samfile:
-
         sys.stdout.write(str(samfile.header))
 
         current_alignments: list[pysam.AlignedSegment] = []
         current_query = None
 
         for alignment in samfile:
-
             if alignment.is_supplementary:
                 continue
 
@@ -178,16 +175,18 @@ def main(arguments) -> None:
                 current_alignments.append(alignment)
 
             else:
-                current_alignments = find_best_alignments(current_alignments,
-                                                          arguments.nh)
+                current_alignments = find_best_alignments(
+                    current_alignments, arguments.nh
+                )
                 write_output(alns=current_alignments)
 
                 current_query = alignment.query_name
                 current_alignments = [alignment]
 
         if len(current_alignments) > 0:
-            current_alignments = find_best_alignments(current_alignments,
-                                                      arguments.nh)
+            current_alignments = find_best_alignments(
+                current_alignments, arguments.nh
+            )
             write_output(alns=current_alignments)
 
 
