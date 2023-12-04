@@ -65,10 +65,6 @@ rule finish_quantify:
         primir_intersect_sam=OUT_DIR / "{sample}" / "alignments_intersecting_primir.sam",
         mirna_intersect_sam=OUT_DIR / "{sample}" / "alignments_intersecting_mirna.sam",
         table=OUT_DIR / "TABLES" / "all_{mir}_counts.tab",
-        uncollapsed_sam=expand(
-            OUT_DIR / "{sample}" / "alignments_intersecting_mirna_uncollapsed.sam",
-            sample=pd.unique(samples_table.index.values),
-        ),
         uncollapsed_bam=expand(
             OUT_DIR
             / "{sample}"
@@ -434,7 +430,7 @@ rule uncollapse_reads:
         maps=OUT_DIR / "{sample}" / "alignments_intersecting_mirna.sam",
         script=SCRIPTS_DIR / "sam_uncollapse.pl",
     output:
-        maps=OUT_DIR / "{sample}" / "alignments_intersecting_mirna_uncollapsed.sam",
+        maps=TMP_DIR / "{sample}" / "alignments_intersecting_mirna_uncollapsed.sam",
     params:
         cluster_log=CLUSTER_LOG / "uncollapse_reads_{sample}.log",
     log:
@@ -458,7 +454,7 @@ rule uncollapse_reads:
 
 rule convert_uncollpased_reads_sam_to_bam:
     input:
-        maps=OUT_DIR / "{sample}" / "alignments_intersecting_mirna_uncollapsed.sam",
+        maps=TMP_DIR / "{sample}" / "alignments_intersecting_mirna_uncollapsed.sam",
     output:
         maps=TMP_DIR / "{sample}" / "alignments_intersecting_mirna_uncollapsed.bam",
     params:
