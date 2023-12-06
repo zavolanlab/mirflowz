@@ -220,7 +220,7 @@ We recommend creating a copy of the
 
 ```bash
 cp  config/config_template.yaml  path/to/config.yaml
-```
+``` So on that PR I could move this information in the section/file all of this will be written. 
 
 Open the new copy in your editor of choice and adjust the configuration
 parameters to your liking. The template explains what each of the
@@ -255,31 +255,30 @@ the `results/` and `logs/` directories, respectively.
 ### Expected output files
 
 Upon successful execution of _MIRFLOWZ_, the tool automatically removes all
-intermediate files generated during the process. The final output comprises:
+intermediate files generated during the process. The final outputs comprise:
 
 1. A SAM file containing alignments intersecting a pri-miR locus. These
 alignments intersect with extended start and/or end positions specified in the
 provided pri-miR annotations. Please note that they may not contribute to the
-final counting and will not appear in the final table.
+final counting and may not appear in the final table. Alignments are discarded
+if their start and/or end positions differ from the ends of the provided
+pri-miR annotations by more bases than the extension used.
 
-2. A SAM file containing alignments intersecting a miRNA locus. Similar to the
-previous file, these alignments intersect with extended start and/or end
+2. A SAM file containing alignments intersecting a mature miRNA locus. Similar
+to the previous file, these alignments intersect with extended start and/or end
 positions specified in the provided miRNA annotations. They may not contribute
 to the final counting and might be absent from the final table.
 
-3. A SAM file containing the uncollapsed set of alignments that contribute to
-the final counting.
+3. A BAM file containing the set of alignments contributing to the final
+counting and its corresponding index file (`.bam.bai`).
 
-4. A BAM file containing the uncollapsed set of alignments contributing to the
-final counting and its corresponding index file (`bam..bai`).
-
-5. Table(s) containing the counting data from all libraries for (iso)miRs
+4. Table(s) containing the counting data from all libraries for (iso)miRs
 and/or pri-miRs. Each row corresponds to a miRNA species, and each column
-represents a sample library. Counting involves aggregating contributions from
-all alignments, calculated as the ratio of collapsed reads in th alignment to
-the number of hits (NH value).
+represents a sample library. Each read is counted towards all the annotated
+miRNA species it aligns to, with 1/n, where n is the number of genomic and/or
+transcriptomic loci that read aligns to.
 
-To retain all intermediate files, include --no-hooks in the workflow call.
+To retain all intermediate files, include `--no-hooks` in the workflow call.
 
 ```bash
 snakemake \
@@ -294,7 +293,7 @@ snakemake \
 ```
 
 After successful execution of the workflow, the intermediate files will be
-found in the `results/inter_files` directory.
+found in the `results/intermediates` directory.
 
 ### Creating a Snakemake report
 
