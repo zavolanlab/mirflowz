@@ -31,7 +31,7 @@ validate(config, Path("../config/config_schema.json"))
 
 
 OUT_DIR = Path(config["output_dir"])
-TMP_DIR = Path(config["tmp_dir"])
+INTERMEDIATES_DIR = Path(config["intermediates_dir"])
 LOG_DIR = Path(f"{config['local_log']}/../")
 
 
@@ -42,7 +42,7 @@ LOG_DIR = Path(f"{config['local_log']}/../")
 
 onsuccess:
     print("\nWORKFLOW SUCCEED. Removing intermediate files.\n")
-    shell("rm -rf {TMP_DIR}")
+    shell("rm -rf {INTERMEDIATES_DIR}")
 
 
 onerror:
