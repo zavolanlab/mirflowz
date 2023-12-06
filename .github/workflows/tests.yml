@@ -38,7 +38,7 @@ jobs:
 
       - name: flake8
         working-directory: ./scripts
-        run: flake8 ./*.py
+        run: flake8
 
       - name: mypy
         working-directory: ./scripts
@@ -47,6 +47,12 @@ jobs:
       - name: pylint
         working-directory: ./scripts
         run: pylint --rcfile=../pylint.cfg ./*.py
+
+      - name: black
+        uses: psf/black@stable
+        with:
+          options: "--check --verbose --line-length=79"
+          src: "./scripts"
 
 
   snakemake-format-graph-test:
@@ -149,4 +155,4 @@ jobs:
       
       - name: run unit tests
         working-directory: ./scripts/tests
-        run: pytest --cov=scripts --cov-branch --cov-report=term-missing
+        run: pytest --import-mode prepend --cov=scripts --cov-branch --cov-report=term-missing
