@@ -41,6 +41,7 @@ snakemake \
     --use-conda \
     --printshellcmds \
     --rerun-incomplete \
+    --no-hooks \
     --verbose
 
 # Snakemake report
