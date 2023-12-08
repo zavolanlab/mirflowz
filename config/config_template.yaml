@@ -32,6 +32,7 @@ map_chr_file: path/to/ucsc_ensembl_mappings.tsv
 #### DIRECTORIES ####
 
 output_dir: results/
+intermediates_dir: results/intermediates
 local_log: logs/local/
 cluster_log: logs/cluster/
 scripts_dir: ../scripts/

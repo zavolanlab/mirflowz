@@ -31,6 +31,23 @@ validate(config, Path("../config/config_schema.json"))
 
 
 OUT_DIR = Path(config["output_dir"])
+INTERMEDIATES_DIR = Path(config["intermediates_dir"])
+LOG_DIR = Path(f"{config['local_log']}/../")
+
+
+###############################################################################
+### onSuccess/onError handlers configuration
+###############################################################################
+
+
+onsuccess:
+    print("\nWORKFLOW SUCCEED. Removing intermediate files.\n")
+    shell("rm -rf {INTERMEDIATES_DIR}")
+
+
+onerror:
+    print("\nWORKFLOW FAILED. Check the log file in the log directory.\n")
+    shell("cat {log} > {LOG_DIR}/failed_workflow.log")
 
 
 ###############################################################################
@@ -65,10 +82,6 @@ rule finish:
         ),
         mirna_intersect_sam=expand(
             OUT_DIR / "{sample}" / "alignments_intersecting_mirna.sam",
-            sample=pd.unique(samples_table.index.values),
-        ),
-        intersect_sam=expand(
-            OUT_DIR / "{sample}" / "alignments_intersecting_mirna_sorted_tag.sam",
             sample=pd.unique(samples_table.index.values),
         ),
         table=expand(
