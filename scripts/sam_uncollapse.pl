@@ -92,7 +92,7 @@ Optional arguments:
 Comments:
 CAUTION: Only marginal validation of the input file type/format performed!
 
-Version 1.2 (2014-08-26)
+Version 1.2.1 (2023-12-08)
 Written by Alexander Kanitz on 2013-11-21
 ';
 }
