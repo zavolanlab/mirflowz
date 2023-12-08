@@ -46,7 +46,7 @@ onsuccess:
 
 
 onerror:
-    print("\nWORKFLOW FAILED. Check the log file in the LOGS/ directory.\n")
+    print("\nWORKFLOW FAILED. Check the log file in the log directory.\n")
     shell("cat {log} > {LOG_DIR}/failed_workflow.log")
 
 
