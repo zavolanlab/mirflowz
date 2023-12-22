@@ -159,7 +159,7 @@ tested, you can go ahead and run the workflow on your samples.
 It is suggested to have all the input files for a given run (or hard links 
 pointing to them) inside a dedicated directory, for instance under the 
 _MIRFLOWZ_ root directory. This way, it is easier to keep the data together,
-reproduce an analysis and set up Singularity access to them.  
+reproduce analysis and set up Singularity access to them.  
 
 #### 1. Prepare a sample table
 
@@ -220,7 +220,7 @@ We recommend creating a copy of the
 
 ```bash
 cp  config/config_template.yaml  path/to/config.yaml
-``` So on that PR I could move this information in the section/file all of this will be written. 
+```
 
 Open the new copy in your editor of choice and adjust the configuration
 parameters to your liking. The template explains what each of the
@@ -260,9 +260,7 @@ intermediate files generated during the process. The final outputs comprise:
 1. A SAM file containing alignments intersecting a pri-miR locus. These
 alignments intersect with extended start and/or end positions specified in the
 provided pri-miR annotations. Please note that they may not contribute to the
-final counting and may not appear in the final table. Alignments are discarded
-if their start and/or end positions differ from the ends of the provided
-pri-miR annotations by more bases than the extension used.
+final counting and may not appear in the final table.
 
 2. A SAM file containing alignments intersecting a mature miRNA locus. Similar
 to the previous file, these alignments intersect with extended start and/or end
@@ -313,19 +311,45 @@ snakemake \
 
 ## Workflow description
 
-The _MIRFLOWZ_ workflow first processes and indexes the user-provided genome 
-resources. Afterwards, the user-provided short read small-RNA-seq libraries will
-be aligned separately against the genome and transcriptome. For increased 
-fidelity, two separated aligners, [Segemehl][segemehl] and our in-house tool 
-[Oligomap][oligomap], are used. All the resulting alignments are merged such 
-that only the best alignments of each read are kept (smallest edit distance).
-Finally, alignments are intersected with the user-provided, pre-processed
-miRNA annotation file using [BEDTools][bedtools]. Counts are tabulated 
-separately for reads consistent with either miRNA precursors, mature miRNA
-and/or isomiRs.
+The _MIRFLOWZ_ workflow initially processes and indexes the genome resources
+provided by the user. The regions corresponding to mature miRNAs are extended
+on both sides to accommodate isomiR species with shifted start and/or end
+positions. If necessary, pri-miR loci are similarly extended to adjust to the
+new miRNA coordinates.
 
-> **NOTE:** For a detailed description of each rule, please, refer to the
-> [workflow documentation](pipeline_documentation.md)
+Subsequently, the user-provided short-read small RNA-seq libraries undergo
+quality filtering if a FASTQ file is provided. Alternatively, adapters are
+directly removed. The resulting reads are independently mapped to both the
+genome and the transcriptome using two distinct aligners: [Segemehl][segemehl]
+and our in-house tool [Oligomap][oligomap]. After the mapping, only the best
+alignments for each read, determined by the smallest edit distance, are
+retained by merging and filtering the resulting alignments into a single file.
+
+The collection of resulting alignments is then reduced to contain only unique
+entries. Due to the short length of the reads and the sequence similarity among
+miRNAs, the number of alignments can be high. Therefore, reads aligned beyond a
+specified threshold are discarded. To address multimapping, alignments with the
+fewest indels are preserved. These alignments are subsequently intersected with
+the user-provided, pre-processed miRNA annotation files using
+[BEDTools][bedtools]. Note that an alignment will not contribute to the final
+count if its start and/or end positions differ significantly from the provided
+miRNA annotations, beyond the extension applied to the mature miRNA start
+and/or end positions, or by 1 if no extension was applied. Conversely, a
+retained read contributes 1/n to all the annotated miRNA species it aligns
+with, where `n` is the number of genomic and/or transcriptomic loci it aligns
+to.
+
+_MIRFLOWZ_ employs an unambiguous notation to classify isomiRs using the format
+`miRNA_name|5p-shift|3p-shift|CIGAR|MD`, where `5p-shift` and `3p-shift`
+represent the differences between the annotated mature miRNA start and end
+positions and those of the alignment, respectively.
+
+Finally, counts are tabulated separately for reads consistent with either
+miRNA precursors, mature miRNA and/or isomiRs and all library counts are
+fused into a single table.
+
+> **NOTE:** For a detailed description of each rule along with some examples,
+> please, refer to the [workflow documentation](pipeline_documentation.md).
 
 The schema below is a visual representation of the individual workflow steps
 and how they are related:
@@ -337,8 +361,8 @@ and how they are related:
 _MIRFLOWZ_ is an open-source project which relies on community contributions.
 You are welcome to participate by submitting bug reports or feature requests,
 taking part in discussions, or proposing fixes and other code changes. Please
-refer to the [contributing guidelines](CONTRIBUTING.md) if you are interested in
-contribute.
+refer to the [contributing guidelines](CONTRIBUTING.md) if you are interested
+in contribute.
 
 ## License
 
@@ -346,7 +370,9 @@ This project is covered by the [MIT License](LICENSE).
 
 ## Contact
 
-For questions or suggestions regarding the code, please use the [issue tracker][issue-tracker]. Do not hesitate on contacting us via [email][email] for any other inquiries.
+For questions or suggestions regarding the code, please use the
+[issue tracker][issue-tracker]. Do not hesitate on contacting us via
+[email][email] for any other inquiries.
 
 &copy; 2023 [Zavolab, Biozentrum, University of Basel][zavolab]
 
