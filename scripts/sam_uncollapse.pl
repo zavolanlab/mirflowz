@@ -92,7 +92,7 @@ Optional arguments:
 Comments:
 CAUTION: Only marginal validation of the input file type/format performed!
 
-Version 1.2.1 (2023-12-08)
+Version 1.3 (2023-12-24)
 Written by Alexander Kanitz on 2013-11-21
 ';
 }
@@ -128,7 +128,7 @@ sub sam_uncollapse {
                         # Get QNAME
                         my ($id, $rest) = split /\t/, $line, 2;
                         # Find and remove appended copy number n
-                        $id =~ /^([^_-]+)-(\d+).?\d+/;
+                        $id =~ /^([^_-]+)-(\d+)/;
                         # Write appended copy number n to variable
                         my $read = $1;
                         my $repeat = $2;
