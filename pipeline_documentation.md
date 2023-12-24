@@ -79,6 +79,7 @@ on installation and usage please see [here](README.md).
     - [`sort_uncollapse_reads_bam_by_position`](#sort_uncollapse_reads_bam_by_position)
     - [`index_uncollapse_reads_bam`](#index_uncollapse_reads_bam)
 
+<!--add examples section?-->
 
 
 ## Third-party software used
@@ -99,13 +100,13 @@ on installation and usage please see [here](README.md).
 ## Description of workflow steps
 
 > The workflow consists of four Snakemake files: A main `Snakefile` and an
-individual Snakemake file for each step in the workflow (the file preparation,
-the reads mapping and the miRNA quantification). The main `Snakefile` contains
-the configuration file validation along with the inclusion of the
-sub-workflows. Individual steps of the workflow are described briefly, and
-links to the respective software manuals are given. Parameters that can be
-modified by the user (via the samples table and the configuration file) are
-also described.
+> individual Snakemake file for each step in the workflow (the genome resources
+> preparation, the reads mapping and the miRNA quantification). The main
+> `Snakefile` contains the configuration file validation along with the
+> inclusion of the sub-workflows. Individual steps of the workflow are 
+> described briefly along with some examples, and links to the respective
+> software manuals are given. Parameters that can be modified by the user (via
+> the samples table and the configuration file) are also described.
 
 ### Rule graph
 
@@ -127,10 +128,11 @@ Visual representation of the workflow. Automatically prepared with
 
 Parameter name | Description | Data type(s)
  --- | --- | --- 
-sample | Descriptive sample name. | `str`
-sample_file | Path of the library file in either `.fa.gz` or `.fastq.gz` format. | `str`
-adapter | Required for [Cutadapt](#third-party-software-used). Use a value such as `XXXXXXXXXX` if no adapter is present or if no trimming is desired | `str`
-format | There are two allowed values, `fa` and `fastq` according to the library format | `str`
+sample | Arbitrary name for the miRNA sequence library. | `str`
+sample_file | Path to the `gzip`ped miRNA sequencing library file. The path must be relative to the directory where the workflow will be run. | `str`
+adapter | Sequence of the 3'-end adapter used during library preparation. Required for [Cutadapt](#third-party-software-used). Use a value such as `XXXXXXXXXX` if no adapter is present or if no trimming is desired | `str`
+format | One of `fa`/`fasta` or `fq`/`fastq`, if the library file is in FASTA or FASTQ format, respectively.
+ | `str`
 
 
 #### Configuration file
@@ -148,17 +150,15 @@ Target rule as required by [Snakemake][docs-snakemake].
 > Local rule
 
 - **Input**
-  - pri-miR intersections file (`.bed`); from
-  [**intersect_extended_primir**](#intersect_extended_primir)
-  - miRNA intersections file (`.bed`); from
-  [**intersect_extended_mirna**](#intersect_extended_mirna)
-  - Alignments file, sorted and tagged (`.sam`); from
-  [**sort_intersecting_mirna_by_feat_tag**](#sort_intersecting_mirna_by_feat_tag)
-  - (iso)miR and/or pri-miR counts table (`.tab`); from
+  - (Workflow output) SAM file with the pri-miR intersecting alignments; from
+  [**filter_sam_by_intersecting_primir**](#filter_sam_by_intersecting_primir)
+  - (Workflow output) SAM file with the mature miRNA intersecting alignments; from
+  [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
+  - (Workflow output) (iso)miR and/or pri-miR counts table (`.tab`); from
   [**merge_tables**](#merge_tables)
-  - Alignments file (`.bam`); from
+  - (Workflow output) BAM file with the contributing alignments, sorted; from
   [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
-  - `BAM` index file (`.bam.bai`); from
+  - (Workflow output) BAM index file (`.bam.bai`); from
   [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
 
 
@@ -177,13 +177,13 @@ Target rule as required by [Snakemake][docs-snakemake].
   [**generate_segemehl_index_transcriptome**](#generate_segemehl_index_transcriptome)
   - Exon annotations (`.bed`); from
   [**convert_exons_gtf_to_bed**](#convert_exons_gtf_to_bed)
-  - Genome header (`.sam`); from
+  - SAM header (`.sam`); from
   [**create_genome_header**](#create_genome_header)
   - Tab-separated table mapping chromosome name(s) and length(s) (`.tsv`);
   from [**extract_chr_len**](#extract_chr_len)
-  - Primary miRNA transcript (pri-miR) extended annotation (`.gff3`);
+  - Primary miRNA transcript (pri-miR) extended annotations (`.gff3`);
   from [**extend_mirs_annotations**](#extend_mirs_annotations)
-  - Mature miRNA (miRNA) extended annotation (`.gff3`);
+  - Mature miRNA (miRNA) extended annotations (`.gff3`);
   from [**extend_mirs_annotations**](#extend_mirs_annotations)
 
 
@@ -192,9 +192,9 @@ Target rule as required by [Snakemake][docs-snakemake].
 Trim genome sequence IDs with a [**custom script**][custom-script-trim-id].
 
 - **Input**
-  - Genome sequence file (`.fasta`)
+  - (Workflow input) Genome sequence, `gzip`ed (`.fa.gz`/`.fasta.gz`)
 - **Output**
-  - Genome sequence file, trimmed IDs (`.fasta`); used in
+  - Genome sequence, trimmed IDs (`.fa`); used in
   [**extract_transcriptome_seqs**](#extract_transcriptome_seqs),
   [**create_genome_header**](#create_genome_header),
   [**create_index_genome_fasta**](#create_index_genome),
@@ -205,25 +205,28 @@ Trim genome sequence IDs with a [**custom script**][custom-script-trim-id].
 
 #### `extract_transcriptome_seqs`
 
-Create transcriptome from genome and genome annotations with 
+Create transcriptome from genome sequence and annotations with 
 [**cufflinks**](#third-party-software-used).
 
 - **Input**
-  - Genome sequence file (`.fasta`)
-  - Genome annotation file (.`gtf`)
+  - Genome sequence, trimmed IDs (`.fa`); from
+  [**trim_genome_seq_ids**](#trim_genome_seq_ids)
+  - (Workflow input) Genome annotations, `gzip`ed (`.gtf.gz`)
 - **Output**
-  - Transcriptome sequence file (`.fasta`); used in 
+  - Transcriptome sequence (`.fa`); used in 
   [**trim_transcriptome_seq_ids**](#trim_transcriptome_seq_ids)
 
 
 #### `trim_transcriptome_seq_ids`
 
-Trim transcriptome sequence IDs with a [**custom script**][custom-script-trim-id].
+Trim transcriptome sequence IDs with a
+[**custom script**][custom-script-trim-id].
 
 - **Input**
-  - Transcriptome sequence file (`.fasta`)
+  - Transcriptome sequence (`.fa`); from
+  [**extract_transcriptome_seqs**](#extract_transcriptome_seqs)
 - **Output**
-  - Transcriptome sequence, trimmed IDs (`.fasta`); used in
+  - Transcriptome sequence, trimmed IDs (`.fa`); used in
   [**generate_segemehl_index_transcriptome**](#generate_segemehl_index_transcriptome),
   [**mapping_transcriptome_segemehl**](#mapping_transcriptome_segemehl) and
   [**mapping_transcriptome_oligomap**](#mapping_transcriptome_oligomap)
@@ -235,10 +238,10 @@ Generate transcriptome index for [**segemehl**](#third-party-software-used)
 short read aligner.
 
 > The transcriptome index only needs to be generated once for each combination
-of genome and annotations and sample sets.
+> of genome and annotations and sample sets.
 
 - **Input**
-  - Transcriptome sequence file, trimmed IDs (`.fasta`); from
+  - Transcriptome sequence, trimmed IDs (`.fa`); from
   [**trim_transcriptome_seq_ids**](#trim_transcriptome_seq_ids)
 - **Output**
   - segemehl transcriptome index (`.idx`); used in 
@@ -251,10 +254,10 @@ Generate genome index for [**segemehl**](#third-party-software-used)
 short read aligner.
 
 > The genome index only needs to be generated once for each combination
-of annotations and sample sets.
+> of annotations and sample sets.
 
 - **Input**
-  - Genome sequence file with trim IDs (`.fasta`); from
+  - Genome sequence, trimmed IDs (`.fa`); from
   [**trim_genome_seq_ids**](#trim_genome_seq_ids)
 - **Output**
   - segemehl genome index (`.idx`); used in 
@@ -267,7 +270,7 @@ Retrieve exon annotations from genome annotations with a
 [**custom script**][custom-script-get-lines].
 
 - **Input**
-  - Genomic annotations (`.gtf`)
+  - (Workflow input) Genome annotations, `gzip`ed (`.gtf.gz`)
 - **Output**
   - Exon annotations (`.gtf`); used in 
   [**convert_exons_gtf_to_bed**](#convert_exons_gtf_to_bed)
@@ -286,45 +289,46 @@ Convert exon annotations `.gtf` to `.bed` with a
 
 #### `create_genome_header`
 
-Create `SAM` header for the genome with 
+Create SAM header for the genome with 
 [**SAMtools**](#third-party-software-used).
 
-> Required by [SAMtools](#third-party-software-used) to work with the alignment
-file.
+> Required by [SAMtools](#third-party-software-used) to work with the
+> alignments file.
 
 - **Input**
-  - Genome sequence file, trimmed IDs (`.fasta`); from
+  - Genome sequence, trimmed IDs (`.fa`); from
   [**trim_genome_seq_ids**](#trim_genome_seq_ids)
 - **Output**
-  - Genome header (`.sam`); used in [add_header_all_maps](#add_header_all_maps)
+  - SAM genome header (`.sam`); used in
+  [add_header_all_maps](#add_header_all_maps)
 
 
 #### `map_chr_names`
 
-Map UCSC-like chromosome names with Ensembl-like ones in miRNA annotation
+Map UCSC-like chromosome names with Ensembl-like ones in miRNA annotations
 with a [**custom script**][custom-script-map-chr].
 
 > Required by [BEDTools](#third-party-software) to intersect alignments with
-miRNA annotations. Several mapping tables are available [here][chr-maps].
+> miRNA annotations. Several mapping tables are available [here][chr-maps].
 
 - **Input**
-  - miRNA annotations (`.gff3`)
-  - Tab-separated mappings table (`.tsv`)
+  - (Workflow input) miRNA annotations (`.gff3`)
+  - (Workflow input) Tab-separated chromosome name mappings table (`.tsv`)
 - **Output**
-  - miRNA annotations with mapped genes(`.gff3`); used in 
+  - miRNA annotations, mapped chromosome name(s) (`.gff3`); used in 
   [**extend_mirs_annotations**](#extend_mirs_annotations)
 
 
 #### `create_index_genome_fasta`
 
-Create a `FASTA` index for the genome with 
+Create a FASTA index for the genome with 
 [**SAMtools**](#third-party-software-used).
 
 - **Input**
-  - Genome sequence file, trimmed IDs (`.fasta`); from
+  - Genome sequence, trimmed IDs (`.fa`); from
   [**trim_genome_seq_ids**](#trim_genome_seq_ids)
 - **Output**
-  - `FASTA` genome index (`.fa.fai`); used in
+  - FASTA genome index (`.fa.fai`); used in
   [**extract_chr_len**](#extract_chr_len)
 
 
@@ -333,7 +337,7 @@ Create a `FASTA` index for the genome with
 Extract chromosome(s) length from the genome sequence.
 
 - **Input**
-  - `FASTA` genome index (`.fa.fai`); from
+  - FASTA genome index (`.fa.fai`); from
   [**create_index_genome_fasta**](#create_index_genome_fasta)
 - **Output**
   - Tab-separated table mapping chromosome name(s) and length(s) (`.tsv`); used
@@ -346,21 +350,75 @@ Extend miRNA annotations and split the file by feature with a
 [**custom script**][custom-script-mir-ext].
 
 > Mature miRNA regions are extended on both sides to account for isomiR species
-with shifted start and/or end positions. If required, pri-miR loci are also 
-extended to accommodate the new miRNA coordinates. 
+> with shifted start and/or end positions without exceeding chromosome(s)
+> boundaries. If required, pri-miR loci are also extended to accommodate the
+> new miRNA coordinates. In addition, pri-miR names are modified to record the
+> final positions by appending `_-y` and `_+x` to it, where `y` is the 5' 
+> shift and `x` the 3' shift. 
 
 - **Input**
-  - miRNA annotations with mapped chromosomes(`.gff3`); from
+  - miRNA annotations, mapped chromosome name(s) (`.gff3`); from
   [**map_chr_names**](#map_chr_names)
 - **Parameters**
   - **config_template.yaml**
     - `extension`: Number of nucleotides by which mature miRNA annotated
-    regions are extended (default 6)
+    regions are extended at most (default: 6)
 - **Output**
-  - Primary miRNA transcript (pri-miR) extended annotation (`.gff3`); used in
+  - Primary miRNA transcript (pri-miR) extended annotations (`.gff3`); used in
   [**intersect_extended_primir**](#intersect_extended_primir)
-  - Mature miRNA (miRNA) extended annotation (`.gff3`); used in
+  - Mature miRNA (miRNA) extended annotations (`.gff3`); used in
   [**intersect_extended_mirna**](#intersect_extended_mirna)
+
+- **Examples**
+
+```console
+Example 1 | Mature miRNA extension
+
+IN:
+    pri-miR entry:
+        19	.	miRNA_primary_transcript	2517	2614	.	+	.	ID=MI0003141;Alias=MI0003141;Name=hsa-mir-512-2
+    mature miRNA entry:
+        19	.	miRNA	2536	2558	.	+	.	ID=MIMAT0002822_1;Alias=MIMAT0002822;Name=hsa-miR-512-5p;Derives_from=MI0003141
+    extension:
+        6
+OUT:
+    pri-miR entry:
+        19	.	miRNA_primary_transcript	2517	2614	.	+	.	ID=MI0003141;Alias=MI0003141;Name=hsa-mir-512-2_-0_+0
+    mature miRNA entry:
+        19	.	miRNA	2530	2564	.	+	.	ID=MIMAT0002822_1;Alias=MIMAT0002822;Name=hsa-miR-512-5p;Derives_from=MI0003141
+
+
+Example 2 | Mature miRNA and pri-miR extension
+
+IN:
+    pri-miR entry:
+        19	.	miRNA_primary_transcript	9	122	.	+	.	ID=MI0003140;Alias=MI0003140;Name=hsa-mir-512-1
+    mature miRNA entry:
+        19	.	miRNA	12	74	.	+	.	ID=MIMAT0002822;Alias=MIMAT0002822;Name=hsa-miR-512-5p;Derives_from=MI0003140
+    extension:
+        6
+OUT:
+    pri-miR entry:
+        19	.	miRNA_primary_transcript	6	124	.	+	.	ID=MI0003140;Alias=MI0003140;Name=hsa-mir-512-1_-3_+2
+    mature miRNA entry:
+        19	.	miRNA	6	80	.	+	.	ID=MIMAT0002822;Alias=MIMAT0002822;Name=hsa-miR-512-5p;Derives_from=MI0003140
+
+
+Example 3 | Matrue miRNA exceeding chromosome boundaries extension
+
+IN:
+    pri-miR entry:
+        19	.	miRNA_primary_transcript	2	122	.	+	.	ID=MI0003140;Alias=MI0003140;Name=hsa-mir-512-1
+    mature miRNA entry:
+        19	.	miRNA	3	74	.	+	.	ID=MIMAT0002822;Alias=MIMAT0002822;Name=hsa-miR-512-5p;Derives_from=MI0003140
+    extension:
+        6
+OUT:
+    pri-miR entry:
+        19	.	miRNA_primary_transcript	0	124	.	+	.	ID=MI0003140;Alias=MI0003140;Name=hsa-mir-512-1_-2_+2
+    mature miRNA entry:
+        19	.	miRNA	0	80	.	+	.	ID=MIMAT0002822;Alias=MIMAT0002822;Name=hsa-miR-512-5p;Derives_from=MI0003140
+```
 
 ### Map workflow
 
@@ -371,65 +429,67 @@ Target rule as required by [Snakemake][docs-snakemake].
 > Local rule
 
 - **Input**
-  - `BAM` index file (`.bam.bai`); from
+  - BAM index (`.bam.bai`); from
   [**index_all_alns_bam**](#index_all_alns_bam)
-
-
 
 #### `start`
 
 Copy and rename read files.
 
 > Local rule.
-Depending on the read files format, the output files undergo a quality filter
-(`.fastq`) or are directly formatted (`.fa`).
+> Depending on the library file format, the output file undergoes a quality
+> filter (`.fastq`) or is directly formatted (`.fa`).
 
 - **Input**
-  - Reads file (`.fa.gz`, `.fastq.gz`)
+  - (Workflow input) miRNA sequencing library, `gzip`ed
+  (`.fa.gz`/`.fasta.gz` or `.fq.gz`/`.fastq.gz`)
 - **Output**
-  - Reads file, copied, renamed (`.fa`, `.fastq`); used in
-  [**fastq_quality_filter**](#fastq_quality_filter) or 
+  - miRNA sequencing library, copied, renamed (`.fa`, `.fastq`); used in
+  [**fastq_quality_filter**](#fastq_quality_filter) and/or 
   [**format_fasta**](#format_fasta)
 
 
 #### `fastq_quality_filter`
 
-Conduct quality control for reads library with 
+Conduct quality control for reads library with
 [**fastx_toolkit**](#third-party-software-used).
 
 - **Input**
-  - Reads file, copied, renamed (`.fastq`); from [**start**](#start)
+  - miRNA sequencing library, copied, renamed (`.fastq`); from
+  [**start**](#start)
 - **Parameters**
   - **config_template.yaml**
-    - `q_value`: Minimum Q (Phred) score to keep (default 10)
+    - `q_value`: Minimum Q (Phred) score to keep (default: 10)
     - `p_value`: Minimum % of bases that must have a Q (Phred) quality
-    (default 50)
+    (default: 50)
 - **Output**
-  - Reads file, filtered (`.fastq`); used in
+  - miRNA sequencing library, filtered (`.fastq`); used in
   [**fastq_to_fasta**](#fastq_to_fasta)
 
 
 #### `fastq_to_fasta`
 
-Convert reads file from `.fastq` to `.fa` with 
+Convert reads file from FASTQ to FASTA with 
 [**fastx_toolkit**](#third-party-software-used).
 
+> Sequence identifiers are renamed to numbers.
+
 - **Input**
-  - Reads file, filtered (`.fastq`); from
+  - miRNA sequencing library, filtered (`.fastq`); from
   [**fastq_quality_filter**](#fastq-quality-filter)
 - **Output**
-  - Reads file (`.fa`); used in [**format_fasta**](#format_fasta)
+  - miRNA sequencing library (`.fa`); used in [**format_fasta**](#format_fasta)
 
 #### `format_fasta`
 
-Format reads to appear on a single line with
+Format read's sequences to appear on a single line with
 [**fastx_toolkit**](#third-party-software-used).
 
 - **Input**
-  - Reads file (`.fa`); from [**start**](#start) or 
+  - miRNA sequencing library (`.fa`); from [**start**](#start) or 
   [**fastq_to_fasta**](#fastq_to_fasta)
 - **Output**
-  - Reads file, formatted (`.fa`); used in
+  - miRNA sequencing library, formatted (`.fa`); used in
   [**remove_adapters**](#remove_adapters)
 
 
@@ -439,21 +499,22 @@ Trim adapters and `N` bases at either end. Filter reads by minimum length and
 number of inner `N` bases with [**cutadapt**](#third-party-software-used).
 
 - **Input**
-  - Reads file (`.fa`); from [**format_fasta**](#format_fasta)
+  - miRNA sequencing library, formatted (`.fa`); from
+  [**format_fasta**](#format_fasta)
 - **Parameters**
   - **samples.tsv**
-    - Adapter to be removed; specify in sample table column `adapter`
+    - Adapter to be removed; specified in the sample's table column `adapter`
   - **config_template.yaml**
     - `error_rate`: Fraction of allowed errors in the matched adapters
-    (default 0.1)
+    (default: 0.1)
     - `overlap`: Minimum overlap length between adapter and read to trim the
-    bases (default 3)
+    bases (default: 3)
     - `minimum_length`: Minimum length for a processed read to be kept
-    (default 15)
-    - `max_n`:  Maximum number of `N` bases for a processed read to be kept
-    (default 0)
+    (default: 15)
+    - `max_n`: Maximum number of `N` bases for a processed read to be kept
+    (default: 0)
 - **Output**
-  - Reads file (`.fa`; used in 
+  - miRNA sequencing library, filtered, without adapters (`.fasta`); used in 
   [**collapse_identical_reads**](#collapse_identical_reads)
 
 
@@ -462,10 +523,15 @@ number of inner `N` bases with [**cutadapt**](#third-party-software-used).
 Collapse and rename identical reads
 [**fastx_toolkit**](#third-party-software-used).
 
+> Sequences are renamed in the format `R-N`, where `R` is the assigned number
+> to the unique entry, and `N` is the amount of identical sequences within the 
+> library collapsed in it.
+
 - **Input**
-  - Reads file (`.fa`); from [**remove_adapters**](#remove_adapters)
+  - miRNA sequencing library, filtered, without adapters (`.fasta`); from 
+  [**remove_adapters**](#remove_adapters)
 - **Output**
-  - Reads file, collapsed, rename; used in
+  - miRNA sequencing library, collapsed, renamed (`.fasta`); used in
   [**filter_fasta_for_oligomap**](#filter_fasta_for_oligomap),
   [**map_genome_segemehl**](#map_genome_segemehl) and
   [**map_transcriptome_segemehl**](#map_transcriptome_segemehl)
@@ -477,9 +543,9 @@ Align short reads to reference genome with
 [**segemehl**](#third-party-software-used).
 
 - **Input**
-  - Reads file, collapsed (`.fa`); from
+  - miRNA sequencing library, collapsed, renamed (`.fasta`); from
   [**collapse_identical_reads**](#collapse_identical_reads)
-  - Genome sequence (`.fa`); from 
+  - Genome sequence, trimmed IDs (`.fa`); from 
   [**trim_genome_seq_ids**](#trim_genome_seq_ids)
   - segemehl genome index (`idx`); from
   [**generate_segemehl_index_genome**](#generate_segemehl_index_genome)
@@ -494,9 +560,9 @@ Align short reads to reference transcriptome with
 [**segemehl**](#third-party-software-used).
 
 - **Input**
-  - Reads file, collapsed (`.fa`); from
+  - miRNA sequencing library, collapsed (`.fa`); from
   [**collapse_identical_reads**](#collapse_identical_reads)
-  - Transcriptome sequence (`.fa`); from 
+  - Transcriptome sequence, trimmed IDs (`.fa`); from 
   [**trim_transcriptome_seq_ids**](#trim_transcriptome_seq_ids)
   - segemehl transcriptome index (`idx`); from
   [**generate_segemehl_index_transcriptome**](#generate_segemehl_index_transcriptome)
@@ -509,16 +575,21 @@ Align short reads to reference transcriptome with
 
 Filter reads by length with a [**custom script**][custom-script-validation].
 
+> Required for the mapping optimal speed. Oligomap is specifically written for
+> short reads. Therefore, reads with more bases than the default maximum (30
+> nts) makes the mapping slower.
+
 - **Input**
-  - Reads file, collapsed (`.fa`); from
+  - miRNA sequencing library, collapsed, renamed (`.fasta`); from
   [**collapse_identical_reads**](#collapse_identical_reads)
 - **Parameters**
   - **config_template.yaml**
-    - `max_length_reads`: Maximum length of processed reads to map with
-    [**oligomap**](#third-party-software-used)
+    - `max_length_reads`: Maximum length of processed reads to be mapped with
+    [**oligomap**](#third-party-software-used) (default: 30)
 - **Output**
-  - Reads file (`.fa`); used in [**map_genome_oligomap**](#map_genome_oligomap)
-  and [**map_transcriptome_oligomap**](#map_transcriptome_oligomap)
+  - miRNA sequencing library, collapsed, filtered (`.fasta`); used in 
+  [**map_genome_oligomap**](#map_genome_oligomap) and
+  [**map_transcriptome_oligomap**](#map_transcriptome_oligomap)
 
 
 #### `map_genome_oligomap`
@@ -526,13 +597,16 @@ Filter reads by length with a [**custom script**][custom-script-validation].
 Align short reads to reference genome with
 [**oligomap**](#third-party-software-used).
 
+> Refer to Oligomap's [**Output format section**][oligomap-out] for a specific
+> explanation and examples on the output format.
+
 - **Input**
-  - Reads file, collapsed (`.fa`); from
+  - miRNA sequencing library, collapsed, filtered (`.fasta`); from
   [**filter_fasta_for_oligomap**](#filter_fasta_for_oligomap)
-  - Genome sequence (`.fa`); from 
+  - Genome sequence, trimmed IDs (`.fa`); from 
   [**trim_genome_seq_ids**](#trim_genome_seq_ids)
 - **Output**
-  - Alignments file (`.fa`); used in
+  - Alignments file (`.fasta`); used in
   [**sort_genome_oligomap**](#sort_genome_oligomap)
   - Alignment report (`.txt`); used in
   [**sort_genome_oligomap**](#sort_genome_oligomap)
@@ -544,32 +618,33 @@ Sort [**oligomap**](#third-party-software-used) alignments by query name
 with a [**custom script**][custom-script-blocksort].
 
 - **Input**
-  - Alignments file (`.fa`); from
+  - Alignments file (`.fasta`); from
   [**map_genome_oligomap**](#map_genome_oligomap)
   - Alignment report (`.txt`); from
   [**map_genome_oligomap**](#map_genome_oligomap)
 - **Output**
-  - Alignments file, sorted (`.fa`); used in
-  [**convert_genome_to_sam_oligomap**](#convert_genome_to_sam_oligomap)
-  - Alignment report, sorted (`.txt`); used in
+  - Alignments file, sorted (`.fasta`); used in
   [**convert_genome_to_sam_oligomap**](#convert_genome_to_sam_oligomap)
 
 
 #### `convert_genome_to_sam_oligomap`
 
-Convert aligned reads `.fa` to `.sam` and filter alignments by number of hits
-with a [**custom script**][custom-script-oligo-sam].
+Convert aligned reads `.fasta` to `.sam` and filter alignments by number of
+hits with a [**custom script**][custom-script-oligo-sam].
+
+> Given the short length of the reads and the sequence similarity among miRNAs,
+> the number of hits can be notably high. Therefore, reads aligned beyond a
+> specified value are disregarded.
 
 - **Input**
-  - Alignments file, sorted (`.fa`); from
-  [**sort_genome_oligomap**](#sort_genome_oligomap)
-  - Alignment report, sorted (`.txt`); from
+  - Alignments file, sorted (`.fasta`); from
   [**sort_genome_oligomap**](#sort_genome_oligomap)
 - **Parameters**
   - **config_template.yaml**
-    - `nh`: Maximum number of hits an alignment can have to be kept
+    - `nh`: Maximum number of mappings per read to be kept (default: 100)
 - **Output**
-  - Alignments file (`.sam`); used in [**merge_genome_maps**](#merge_genome_maps)
+  - Alignments file, filtered (`.sam`); used in
+  [**merge_genome_maps**](#merge_genome_maps)
 
 
 #### `map_transcriptome_oligomap`
@@ -577,13 +652,16 @@ with a [**custom script**][custom-script-oligo-sam].
 Align short reads to reference transcriptome with
 [**oligomap**](#third-party-software-used).
 
+> Refer to Oligomap's [Output format section][oligomap-out] for a specific
+> explanation and examples on the output format.
+
 - **Input**
-  - Reads file (`.fa`); from
+  - miRNA sequencing library, collapsed, filtered (`.fasta`); from
   [**filter_fasta_for_oligomap**](#filter_fasta_for_oligomap)
-  - Transcriptome sequence (`.fa`); from 
+  - Transcriptome sequence, trimmed IDs (`.fa`); from 
   [**trim_transcriptome_seq_ids**](#trim_transcriptome_seq_ids)
 - **Output**
-  - Alignments file (`.fa`); used in
+  - Alignments file (`.fasta`); used in
   [**sort_transcriptome_oligomap**](#sort_transcriptome_oligomap)
   - Alignment report (`.txt`); used in
   [**sort_transcriptome_oligomap**](#sort_transcriptome_oligomap)
@@ -595,32 +673,32 @@ Sort [**oligomap**](#third-party-software-used) alignments by query name
 with a [**custom script**][custom-script-blocksort].
 
 - **Input**
-  - Alignments file (`.fa`); from
+  - Alignments file (`.fasta`); from
   [**map_transcriptome_oligomap**](#map_transcriptome_oligomap)
   - Alignment report (`.txt`); from
   [**map_transcriptome_oligomap**](#map_transcriptome_oligomap)
 - **Output**
-  - Aligned file, sorted (`.fa`); used in
+  - Alignments file, sorted (`.fasta`); used in
   [**convert_transcriptome_to_sam_oligomap**](#convert_transcriptome_to_sam_oligomap)
-  - Alignment report, sorted (`.txt`); used in
-  [**convert_transcriptome_to_sam_oligomap**](#convert_transcriptme_to_sam_oligomap)
 
 
 #### `convert_transcriptome_to_sam_oligomap`
 
-Convert aligned reads `.fa` to `.sam` and filter alignments by number of hits
-with a [**custom script**][custom-script-oligo-sam].
+Convert aligned reads `.fasta` to `.sam` and filter alignments by number of
+hits with a [**custom script**][custom-script-oligo-sam].
+
+> Given the short length of the reads and the sequence similarity among miRNAs,
+> the number of hits can be notably high. Therefore, reads aligned beyond a
+> specified value are disregarded.
 
 - **Input**
-  - Alignments file, sorted (`.fa`); from
-  [**sort_transcriptome_oligomap**](#sort_transcriptome_oligomap)
-  - Alignment report, sorted (`.txt`); from
+  - Alignments file, sorted (`.fasta`); from
   [**sort_transcriptome_oligomap**](#sort_transcriptome_oligomap)
 - **Parameters**
   - **config_template.yaml**
-    - `nh`: Maximum number of hits an alignment can have to be kept
+    - `nh`: Maximum number of mappings per read to be kept (default: 100)
 - **Output**
-  - Alignments file (`.sam`); used in
+  - Alignments file, filtered (`.sam`); used in
   [**merge_transcriptome_maps**](#merge_transcriptome_maps)
 
 
@@ -632,7 +710,7 @@ Concatenate [**segemehl**](#third-party-software-used) and
 - **Input**
   - Alignments file (`.sam`); from
   [**map_genome_segemehl**](#map_genome_segemehl)
-  - Alignments file (`.sam`); from
+  - Alignments file, filtered (`.sam`); from
   [**convert_genome_to_sam_oligomap**](#convert_genome_to_sam_oligomap)
 - **Output**
   - Alignments file (`.sam`); used in
@@ -647,7 +725,7 @@ Concatenate [**segemehl**](#third-party-software-used) and
 - **Input**
   - Alignments file (`.sam`); from
   [**map_transcriptome_segemehl**](#map_transcriptome_segemehl)
-  - Alignments file (`.sam`); from
+  - Alignments file, filtered (`.sam`); from
   [**convert_transcriptome_to_sam_oligomap**](#convert_transcriptome_to_sam_oligomap)
 - **Output**
   - Alignments file (`.sam`); used in
@@ -659,12 +737,17 @@ Concatenate [**segemehl**](#third-party-software-used) and
 Filter merged genome alignments by the number of hits with a
 [**custom script**][custom-script-nh-filter].
 
+> Given the short length of the reads, the sequence similarity among miRNAs,
+> and the merging of two different mapping results, the number of hits can
+> be notably high. Therefore, reads aligned beyond a specified value are
+> disregarded.
+
 - **Input**
   - Alignments file (`.sam`); from
   [**merge_genome_maps**](#merge_genome_maps)
 - **Parameters**
   - **config_template.yaml**
-    - `nh`: Maximum number of mappings per read to be kept (default 100)
+    - `nh`: Maximum number of mappings per read to be kept (default: 100)
 - **Output**
   - Alignments file, filtered (`.sam`); used in
   [**remove_header_genome_mappings**](#remove_header_genome_mappings)
@@ -674,12 +757,17 @@ Filter merged genome alignments by the number of hits with a
 Filter merged transcriptome alignments by the number of hits with a
 [**custom script**][custom-script-nh-filter].
 
+> Given the short length of the reads, the sequence similarity among miRNAs,
+> and the merging of two different mapping results, the number of hits can
+> be notably high. Therefore, reads aligned beyond a specified value are
+> disregarded.
+
 - **Input**
   - Alignments file (`.sam`); from
   [**merge_transcriptome_maps**](#merge_transcriptme_maps)
 - **Parameters**
   - **config_template.yaml**
-    - `nh`: Maximum number of mappings per read to be kept (default 100)
+    - `nh`: Maximum number of mappings per read to be kept (default: 100)
 - **Output**
   - Alignments file, filtered (`.sam`); used in
   [**remove_header_transcriptome_mappings**](#remove_header_transcriptome_mappings)
@@ -687,41 +775,43 @@ Filter merged transcriptome alignments by the number of hits with a
 
 #### `remove_header_genome_mappings`
 
-Remove the `SAM` header of the genome alignments file with
+Remove the SAM header of the genome alignments file with
 [**SAMtools**](#third-party-software-used).
 
 - **Input**
   - Alignments file (`.sam`); from
   [**filter_genome_by_nh**](#filter_genome_by_nh)
 - **Output**
-  - Alignments file (`.sam`); used in [**merge_all_maps**](#merge_all_maps)
+  - Alignments file, without SAM header (`.sam`); used in
+  [**merge_all_maps**](#merge_all_maps)
 
 
 #### `remove_header_transcriptome_mappings`
 
-Remove the `SAM` header of the transcriptome alignments file with
+Remove the SAM header of the transcriptome alignments file with
 [**SAMtools**](#third-party-software-used).
 
 - **Input**
   - Alignments file (`.sam`); from
   [**filter_transcriptome_by_nh**](#filter_transcriptome_by_nh)
 - **Output**
-  - Alignments file (`.sam`); used in 
+  - Alignments file, without SAM header (`.sam`); used in 
   [**transcriptome_to_genome_maps**](#transcriptome_to_genome_maps)
 
 
 #### `transcriptome_to_genome_maps`
 
-Convert the alignments transcriptome coordinates to genomic ones with a
+Convert the alignment's transcriptome coordinates to genomic ones with a
 [**custom script**][custom-script-sam-trx].
 
 - **Input**
-  - Alignments file (`.sam`); from 
+  - Alignments file, without SAM header (`.sam`); from 
   [**remove_header_transcriptome_mappings**](#remove_header_transcriptome_mappings)
   - Exon annotations (`.bed`); from
   [**convert_exons_gtf_to_bed**](#convert_exons_gtf_to_bed)
 - **Output**
-  - Alignments file (`.sam`); used in [**merge_all_maps**](#merge_all_maps)
+  - Alignments file, without SAM header (`.sam`); used in
+  [**merge_all_maps**](#merge_all_maps)
 
 
 #### `merge_all_maps`
@@ -729,21 +819,22 @@ Convert the alignments transcriptome coordinates to genomic ones with a
 Concatenate the four alignments files into a single file.
 
 - **Input**
-  - Alignments file (`.sam`); from
+  - Alignments files, without SAM header (`.sam`); from
   [**remove_header_genome_mappings**](#remove_header_genome_mappings) and
   [**transcriptome_to_genome_maps**](#transcriptome_to_genome_maps)
 - **Output**
-  - Alignments file (`.sam`); used in
+  - Alignments file, without SAM header (`.sam`); used in
   [**add_header_all_maps**](#add_header_all_maps)
 
 
 #### `add_header_all_maps`
 
-Add the `SAM` header to the aligned reads with
+Add the SAM header to the aligned reads merged file with
 [**SAMtools**](#third-party-software-used).
 
 - **Input**
-  - Alignments file (`.sam`); from [**merge_all_maps**](#merge_all_maps)
+  - Alignments file, without SAM header (`.sam`); from
+  [**merge_all_maps**](#merge_all_maps)
 - **Output**
   - Alignments file (`.sam`); used in [**sort_maps_by_id**](#sort_maps_by_id)
 
@@ -766,31 +857,94 @@ Remove duplicate and inferior alignments with a
 [**custom script**][custom-script-remove-dup].
 
 > Alignments are considered to be duplicates if having identical entries for
-the fields `QNAME`, `FLAG`, `RNAME`, `POS` and `CIGAR`. 
-Alignments are considered to be inferiors if having the same `QNAME` and
-a bigger edit distance than the minimum one within the group.
+> the fields `QNAME`, `FLAG`, `RNAME`, `POS` and `CIGAR`. 
+> Alignments are considered to be inferiors if having the same `QNAME` and
+> a bigger edit distance than the smaller one within the group. The tags `NH`
+> (number of hits) and `HI` (query hit index) are updated accordingly.
 
-
-- **Input**
-  - Alignments file, sorted (`.sam`); from [**sort_maps_by_id**](#sort_maps_by_id)
-- **Output**
-  - Alignments file (`.sam`); used in
-  [**filter_by_indels**](#filter_by_indels)
-
-
-#### `filter_by_indels`
-
-Remove multimappers favoring mismatches over indels with a
-[**custom script**][custom-script-filter-mm].
 
 - **Input**
   - Alignments file, sorted (`.sam`); from
+  [**sort_maps_by_id**](#sort_maps_by_id)
+- **Output**
+  - Alignments file, filtered (`.sam`); used in
+  [**filter_by_indels**](#filter_by_indels)
+- **Examples**
+
+```console
+Example 1 | Remove duplicates
+
+IN:
+    1-2	0	19	44414	1	21M	*	0	0	GAAGGCGCTTCCCTTTGGAGT	*	HI:i:0	NH:i:1	NM:i:0	MD:Z:21	RG:Z:A1	YZ:Z:0
+    1-2	0	19	44414	255	21M	*	0	0	GAAGGCGCTTCCCTTTGGAGT	*	NM:i:0	MD:Z:21	NH:i:1
+OUT:
+    1-2	0	19	44414	255	21M	*	0	0	GAAGGCGCTTCCCTTTGGAGT	*	MD:Z:21	NH:i:1	NM:i:0
+
+
+Example 2 | Remove inferiors single alignment
+
+IN:
+    1-704	16	19	207362	1	18M	*	0	0	CCCGGGCCCGGCGCGCCG	*	HI:i:0	NH:i:2	NM:i:0	MD:Z:18	RG:Z:A1	YZ:Z:0
+    1-704	272	19	471264	1	16M1I1M	*	0	0	CCCGGGCCCGGCGCGCCG	*	HI:i:1	NH:i:2	NM:i:2	MD:Z:11G5	RG:Z:A1	YZ:Z:0
+OUT:
+    1-704	16	19	207362	1	18M	*	0	0	CCCGGGCCCGGCGCGCCG	*	HI:i:0	NH:i:1	NM:i:0	MD:Z:18	RG:Z:A1	YZ:Z:0
+
+
+Example 3 | Remove inferiors multiple alignments
+
+IN:
+
+    1-1197	0	19	56327	1	15M	*	0	0	TATGGCACTGGTAGA	*	HI:i:0	NH:i:4	NM:i:2	MD:Z:1C11T1	RG:Z:A1	YZ:Z:0
+    1-1197	256	19	68983	1	15M	*	0	0	TATGGCACTGGTAGA	*	HI:i:1	NH:i:4	NM:i:3	MD:Z:1C10AT1	RG:Z:A1	YZ:Z:0
+    1-1197	256	19	76967	1	15M	*	0	0	TATGGCACTGGTAGA	*	HI:i:2	NH:i:4	NM:i:2	MD:Z:1C11T1	RG:Z:A1	YZ:Z:0
+    1-1197	256	19	92363	1	15M	*	0	0	TATGGCACTGGTAGA	*	HI:i:4	NH:i:4	NM:i:3	MD:Z:1C11TA	RG:Z:A1	YZ:Z:0
+
+OUT:
+    1-1197	0	19	56327	1	15M	*	0	0	TATGGCACTGGTAGA	*	HI:i:0	NH:i:2	NM:i:2	MD:Z:1C11T1	RG:Z:A1	YZ:Z:0
+    1-1197	256	19	76967	1	15M	*	0	0	TATGGCACTGGTAGA	*	HI:i:1	NH:i:2	NM:i:2	MD:Z:1C11T1	RG:Z:A1	YZ:Z:0
+```
+
+#### `filter_by_indels`
+
+Filter multimappers favoring mismatches over indels with a
+[**custom script**][custom-script-filter-mm].
+
+> Under the assumption that indels are less frequent than mismatches only
+> those alignments (of the same read with the same edit distance) with the
+> lowest number of indels are kept. This approach allows the presence of
+> multimappers and/or indels after the filtering if the alignments contain the
+> same proportion of mismatches vs. indels.
+
+- **Input**
+  - Alignments file, sorted, filtered (`.sam`); from
   [**remove_inferiors**](#remove_inferiors)
 - **Output**
-  - Alignments file (`.sam`); used in
+  - Alignments file, sorted, filtered (`.sam`); used in
   [**convert_all_alns_sam_to_bam**](#convert_all_alns_sam_to_bam) and
   [**filter_sam_by_intersecting_primir**](#filter_sam_by_intersecting_primr)
+- **Examples**
 
+```console
+Example 1 | Different proportion of mismatches vs. indels
+
+IN:
+    1-1	16	19	77595	255	14M1D8M	*	0	0	GCAGGAGAATCACTGATGTCAG	*	MD:Z:14^T2A1C3	NH:i:2	NM:i:3	XA:Z:Q	XI:i:1
+    1-1	0	19	330456	255	4M1D1M1I3M1D13M	*	0	0	CTGACATCAGTGATTCTCCTGC	*	MD:Z:4^G4^A13	NH:i:2	NM:i:3	XA:Z:Q	XI:i:0
+OUT:
+    1-1	16	19	77595	255	14M1D8M	*	0	0	GCAGGAGAATCACTGATGTCAG	*	MD:Z:14^T2A1C3	NM:i:3	XA:Z:Q	XI:i:1	NH:i:1	HI:i:1
+
+
+Example 2 | Equal proportion of mismatches vs. indels
+
+IN:
+    1-1	0	19	142777	255	15M1I5M	*	0	0	GCTAGGTGGGAGGCTTGAAGC	*	MD:Z:4C0T14	NH:i:3	NM:i:3	XA:Z:Q	XI:i:0
+    1-1	16	19	270081	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14G0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:2
+    1-1	16	19	545543	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14A0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:1
+OUT:
+    1-1	0	19	142777	255	15M1I5M	*	0	0	GCTAGGTGGGAGGCTTGAAGC	*	MD:Z:4C0T14	NH:i:3	NM:i:3	XA:Z:Q	XI:i:0
+    1-1	16	19	270081	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14G0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:2
+    1-1	16	19	545543	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14A0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:1
+```
 
 #### `convert_all_alns_sam_to_bam`
 
@@ -798,10 +952,10 @@ Convert alignments `.sam` file to `.bam` with
 [**SAMtools**](#third-party-software-used).
 
 > Required by [BEDTools](#third-party-software-used) to intersect alignments
-with pri-miR annotations.
+> with pri-miR annotations.
 
 - **Input**
-  - Alignments file (`.sam`); from [**filter_by_indels**](#filter_by_indels)
+  - Alignments file, filtered (`.sam`); from [**filter_by_indels**](#filter_by_indels)
 - **Output**
   - Alignments file (`.bam`); used in
   [**sort_all_alns_bam_by_position**](#sort_all_alns_bam_by_position)
@@ -812,7 +966,7 @@ with pri-miR annotations.
 Sort alignments by position with [**SAMtools**](#third-party-software-used).
 
 > Required by [BEDTools](#third-party-software-used) to intersect alignments
-with pri-miR annotations more efficiently.
+> with pri-miR annotations more efficiently.
 
 - **Input**
   - Alignments file (`.bam`); from
@@ -825,16 +979,16 @@ with pri-miR annotations more efficiently.
 
 #### `index_all_alns_bam`
 
-Create index `BAM` file with [**SAMtools**](#third-party-software-used).
+Create index BAM file with [**SAMtools**](#third-party-software-used).
 
 > Indexing is required by genome viewers such as IGV to quickly display
-alignments in a genomic region of interest.
+> alignments in a genomic region of interest.
 
 - **Input**
-  - Alignments file (`.bam`); from
+  - Alignments file, sorted (`.bam`); from
   [**sort_all_alns_bam_by_position**](#sort_all_alns_bam_by_position)
 - **Output**
-  - `BAM` index file (`.bam.bai`); used in
+  - BAM index file (`.bam.bai`); used in
   [**intersect_extended_primir**](#intersect_extended_primir)
 
 
@@ -851,13 +1005,11 @@ Target rule as required by [Snakemake][docs-snakemake].
   [**filter_sam_by_intersecting_primir**](#filter_sam_by_intersecting_primir)
   - Alignments file, filtered (`.sam`); from
   [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
-  - Alignments file, sorted, tagged (`.sam`); from
-  [**sort_intersecting_mirna_by_feat_tag**](#sort_intersecting_mirna_by_feat_tag)
   - (iso)miR and/or pri-miR counts table (`.tab`); from
   [**merge_tables**](#merge_tables)
-  - Alignments file (`.bam`); from
+  - Alignments file, uncollapsed, sorted (`.bam`); from
   [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
-  - `BAM` index file (`.bam.bai`); from
+  - BAM index file (`.bam.bai`); from
   [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
 
 #### `intersect_extendend_primir`
@@ -865,8 +1017,11 @@ Target rule as required by [Snakemake][docs-snakemake].
 Intersect the aligned reads with the extended pri-miR annotations with
 [**BEDTools**](#third-party-software-used).
 
+> Only those alignments fully intersecting a (possibly extended) pri-miR
+> annotated region are kept.
+
 - **Input**
-  - Alignments file (`.bam`); from
+  - Alignments file, sorted (`.bam`); from
   [**sort_all_alns_bam_by_position**](#sort_all_alns_bam_by_position)
   - pri-miR extended annotations (`.gff3`); from
   [**extend_mirs_annotations**](#extend_mirs_annotations)
@@ -881,14 +1036,16 @@ Intersect the aligned reads with the extended pri-miR annotations with
 Remove alignments that do not intersect with any pri-miR with
 [**SAMtools**](#third-party-software-used).
 
-> Required to only intersect alignments within a pri-miR locus.
+> Required to only intersect alignments within a (possibly extended) pri-miR
+> locus.
 
 - **Input**
-  - Alignments file (`.sam`); from [**filter_by_indels**](#filter_by_indels) 
+  - Alignments file, filtered (`.sam`); from
+  [**filter_by_indels**](#filter_by_indels) 
   - pri-miR intersections file (`.bed`); from
   [**intersect_extended_primir**](#intersect_extended_primir)
 - **Output**
-  - Alignments file, filtered (`.sam`); used in
+  - (Workflow output) Alignments file, filtered (`.sam`); used in
   [**convert_intersecting_primir_sam_to_bam**](#convert_intersecting_primir_sam_to_bam)
   and [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
 
@@ -899,10 +1056,10 @@ Convert alignments `.sam` file to `.bam` with
 [**SAMtools**](#third-party-software-used).
 
 > Required by [BEDTools](#third-party-software-used) to intersect alignments
-with miRNA annotations.
+> with miRNA annotations.
 
 - **Input**
-  - Alignments file (`.sam`); from
+  - Alignments file, filtered (`.sam`); from
   [**filter_sam_by_intersecting_primir**](#filter_sam_by_intersecting_primir)
 - **Output**
   - Alignments file (`.bam`); used in
@@ -914,7 +1071,7 @@ with miRNA annotations.
 Sort alignments by position with [**SAMtools**](#third-party-software-used).
 
 > Required by [BEDTools](#third-party-software-used) to intersect alignments
-with miRNA annotations more efficiently.
+> with miRNA annotations more efficiently.
 
 - **Input**
   - Alignments file (`.bam`); from
@@ -927,16 +1084,16 @@ with miRNA annotations more efficiently.
 
 #### `index_intersecting_primir_bam`
 
-Create index `BAM` file with [**SAMtools**](#third-party-software-used).
+Create index BAM file with [**SAMtools**](#third-party-software-used).
 
 > Indexing is required by genome viewers such as IGV to quickly display
-alignments in a genomic region of interest.
+> alignments in a genomic region of interest.
 
 - **Input**
-  - Alignments file (`.bam`); from
+  - Alignments file, sorted (`.bam`); from
   [**sort_intersecting_primir_bam_by_position**](#sort_intersecting_primir_bam_by_position)
 - **Output**
-  - `BAM` index file (`.bam.bai`); used in
+  - BAM index file (`.bam.bai`); used in
   [**intersect_extended_mirna**](#intersect_extended_mirna)
 
 
@@ -945,13 +1102,16 @@ alignments in a genomic region of interest.
 Intersect the aligned reads with the extended miRNA annotations with
 [**BEDTools**](#third-party-software-used).
 
+> Only those alignments fully intersecting an extended mature miRNA annotated
+> region are kept.
+
 - **Input**
-  - Alignments file (`.bam`); from
+  - Alignments file, sorted (`.bam`); from
   [**sort_intersecting_primir_bam_by_position**](#sort_intersecting_primir_bam_by_position)
-  - miRNA extended annotations (`.gff3`); from
+  - Mature miRNA extended annotations (`.gff3`); from
   [**extend_mirs_annotations**](#extend_mirs_annotations)
 - **Output**
-  - miRNA intersections file (`.bed`); used in
+  - Mature miRNA intersections file (`.bed`); used in
   [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
   and [**add_intersecting_mirna_tag**](#add_intersecting_mirna_tag)
 
@@ -964,12 +1124,12 @@ Remove alignments that do not intersect with any miRNA with
 > Required to efficiently classify the alignments.
 
 - **Input**
-  - Alignments file (`.sam`); from
+  - Alignments file, filtered (`.sam`); from
   [**filter_sam_by_intersecting_primir**](#filter_sam_by_intersecting_primir) 
-  - miRNA intersections file (`.bed`); from
+  - Mature miRNA intersections file (`.bed`); from
   [**intersect_extended_mirna**](#intersect_extended_mirna)
 - **Output**
-  - Alignments file, filtered (`.sam`); used in 
+  - (Workflow output) Alignments file, filtered (`.sam`); used in 
   [**add_intersecting_mirna_tag**](#add_intersecting_mirna_tag) and
   [**uncollapse_reads**](#uncollapse_reads)
 
@@ -979,29 +1139,73 @@ Remove alignments that do not intersect with any miRNA with
 Classify and add the intersecting (iso)miR to each alignment as a tag
 with a [**custom script**][custom-script-iso-tag].
 
-> To classify the reads, miRNA annotations are turned into the original ones.
-The alignment start and end shifts relative to the annotations are computed
-and append along with the `CIGAR` and `MD` strings to the intersecting miRNA.
-If the read is classified as a canonical miRNA, the name will not include
-the star and end shift, nor the `CIGAR` and `MD` strings.
+> In this step, the mature miRNA annotated regions are used instead of the
+> extended ones. Each alignment gets an extra tag (`YW:Z`) with either the
+> (iso)miR(s) it is considered to really intersect with or an empty string
+> otherwise. The format of the intersecting mature miRNA species is
+> `miRNA_name|5p-shift|3p-shift|CIGAR|MD`, where `5p-shift` and `3p-shift` are
+> the difference between the miRNA start and end coordinates and the
+> alignment's ones respectively.
 
 - **Input**
-  - Alignments file (`.sam`); from
+  - Alignments file, filtered (`.sam`); from
   [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
-  - miRNA intersections file (`.bed`); from
+  - Mature miRNA intersections file (`.bed`); from
   [**intersect_extended_mirna**](#intersect_extended_mirna)
 - **Parameters**
   - **config_template.yaml**
     - `extension`: Number of nucleotides by which mature miRNA annotated
-    regions are extended (default 6)
+    regions are extended (default: 6)
 - **Output**
   - Alignments file, tagged (`.sam`); used in
   [**sort_intersecting_mirna_by_feat_tag**](#sort_intersecting_mirna_by_feat_tag)
+- **Examples**
+
+```console
+Example 1 | Intersecting a canoncial mature miRNA
+
+IN miRNA annotations:
+    chr19	.	miRNA	44377	44398	.	+	.	ID=MIMAT0002849;Alias=MIMAT0002849;Name=hsa-miR-524-5p;Derives_from=MI0003160
+IN SAM record:
+    1-1_1	0	19	44377	255	22M	*	0	0	CTACAAAGGGAAGCACTTTCTC	*	MD:Z:22	NH:i:1	NM:i:0
+NEW TAG:
+	YW:Z:hsa-miR-524-5p|0|0|22M|22
+
+
+Example 2 | Intersecting an isomiR (no shifts)
+
+IN miRNA annotations:
+    chr19	.	miRNA	44377	44398	.	+	.	ID=MIMAT0002849;Alias=MIMAT0002849;Name=hsa-miR-524-5p;Derives_from=MI0003160
+IN SAM record:
+    1-1_1	0	19	44377	1	11M3I11M	*	0	0	CTACAAAGGGAGGTAGCACTTTCTC	*	HI:i:0	MD:Z:22	NH:i:1	NM:i:3
+NEW TAG:
+    YW:Z:hsa-miR-524-5p|0|0|11M3I11M|22
+
+
+Example 3 | Intersecting an isomiR (no indels nor mismatches)
+
+IN miRNA annotations:
+    chr19	.	miRNA	5338	5359	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786
+IN SAM record:
+    1-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
+NEW TAG:
+    YW:Z:hsa-miR-1323|0|-1|21M|21
+
+
+Example 4 | Not intersecting an (iso)miR
+
+IN miRNA annotations:
+    chr19	.	miRNA	5338	5359	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786
+IN SAM record:
+    1-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
+NEW TAG:
+    YW:Z:
+```
 
 
 #### `sort_intersecting_mirna_by_feat_tag`
 
-Sort the alignments by the tag containing the classified intersecting miRNA
+Sort the alignments by the tag containing the classified intersecting (iso)miR
 with [**SAMtools**](#third-party-software-used).
 
 > Required for an efficient quantification.
@@ -1016,65 +1220,85 @@ with [**SAMtools**](#third-party-software-used).
 
 #### `quantify_mirna`
 
-Tabulate alignments according to its tag with a
+Tabulate alignments according to its new tag (`YW:Z`) with a
 [**custom script**][custom-script-mir-quant].
 
-> Quantification is done with partial counts (_i.e._ each alignment contributes
-by the number of collapsed reads divided by the number of hits).
+> Each alignment contributes to the miRNA species in its `YW:Z` tag by `R/N`,
+> where `R` is the number of collapsed reads in that alignment, and `N` is the
+> number of genomic and/or transcriptomic loci it aligns to. The resulting
+> table has a row for each mature miRNA species (isomiR, canonical miRNA or
+> both) with the name format set in
+> [**add_intersecting_mirna_tag**](#add_intersecting_mirna_tag) unless
+> considered a canonical miRNA, which only keeps the annotated mature miRNA
+> name. A miRNA species is considered to be canonical if there are no shifts
+> between its start and end positions and the aligned read ones, and there
+> are no mismatches nor indels.
 
-- **Input**
-  - Alignments file, sorted, tagged (`.sam`); from
+- **Input** 
+  - Alignments file, tagged, sorted (`.sam`); from
   [**sort_intersecting_mirna_by_feat_tag**](#sort_intersecting_mirna_by_feat_tag)
 - **Parameters**
   - **samples.tsv**
-    - Library name; specify in sample table column `sample`
+    - Library name; specified in the sample's table column `sample`
   - **config_template.yaml**
-    - `mir_list`: miRNA features to be quantified (default isomir, mirna
+    - `mir_list`: miRNA features to be quantified (default: isomir, mirna
     pri-miR)
 - **Output**
   - (iso)miR counts tab-delimited file; used in
   [**merge_tables**](#merge_tables)
 
+<!-- examples. -->
 
 #### `quantify_primir`
 
 Tabulate alignments according to its intersecting pri-miR with a
 [**custom script**][custom-script-pri-quant]
 
-> Quantification is done with partial counts (_i.e._ each alignment contributes
-by the number of collapsed reads divided by the number of hits).
+> Each alignment contributes to the pri-miR it intersects with by `R/N`, where
+> `R` is the number of collapsed reads in that alignment, and `N` is the
+> number of genomic and/or transcriptomic loci it aligns to. The resulting
+> table has a row for each pri-miR with the name format set in
+> [**mirna_extension**](#mirna_extension).
 
 - **Input**
   - pri-miR intersections file (`.bed`); from
-  [**intersecti_extended_primir**](#intersect_extended_primir)
+  [**intersect_extended_primir**](#intersect_extended_primir)
 - **Output**
   - pri-miR counts tab-delimited file; used in
   [**merge_tables**](#merge_tables)
 
+<!-- examples. -->
 
 #### `merge_tables`
 
 Merge all the tables from the different libraries into a single one with a
 [**custom script**][custom-script-merge-tab].
 
+> The final table(s) containing the counting data from all libraries for the
+> (iso)miRs and/or pri-miRs have a row per miRNA species and a column per
+> sample library. If a miRNA species is not found in a certain library, its
+> value is set to `NA`.
+
 - **Input**
   - counts tab-delimited file; from [**quantify_mirna**](#quantify_mirna)
   and/or [**quantify_primir**](#quantify_primir)
 - **Parameters**
   - **cluster_schema.json**
-    - `mir_list`: miRNA features to be quantified (default isomir, mirna
+    - `mir_list`: miRNA features to be quantified (default: isomir, mirna
     pri-mir)
 - **Output**
-  - (iso)miR and/or pri-miR counts table (`.tab`)
+  - (Workflow output) (iso)miR and/or pri-miR counts table (`.tab`)
 
+<!-- examples. -->
 
 #### `uncollapse_reads`
 
 Reverse the collapsing of reads with identical sequences as done with
-[**FASTX-Toolkit**](#third-party-software-used).
+[**FASTX-Toolkit**](#third-party-software-used) with a
+[**custom script**][custom-script-uncollapse].
 
 - **Input**
-  - Alignments file (`.sam`); from
+  - Alignments file, filtered (`.sam`); from
   [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
 - **Output**
   - Uncollapsed aligned reads (`.sam`); used in
@@ -1087,10 +1311,10 @@ Convert alignments `.sam` file to `.bam` with
 [**SAMtools**](#third-party-software-used).
 
 - **Input**
-  - Alignments file (`.sam`); from
+  - Alignments file, uncollapsed (`.sam`); from
   [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
 - **Output**
-  - Alignments file (`.bam`); used in
+  - Alignments file, uncollapsed (`.bam`); used in
   [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
 
 
@@ -1099,25 +1323,25 @@ Convert alignments `.sam` file to `.bam` with
 Sort alignments by position with [**SAMtools**](#third-party-software-used).
 
 - **Input**
-  - Alignments file (`.bam`); from
+  - Alignments file, uncollapsed (`.bam`); from
   [**convert_uncollapsed_reads_sam_to_bam**](#convert_uncollapsed_reads_sam_to_bam)
 - **Output**
-  - Alignments file, sorted (`.bam`); used in
+  - (Workflow output) Alignments file, uncollapsed, sorted (`.bam`); used in
   [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
 
 
 #### `index_uncollapsed_reads_bam`
 
-Create index `BAM` file with [**SAMtools**](#third-party-software-used).
+Create index BAM file with [**SAMtools**](#third-party-software-used).
 
 > Indexing is required by genome viewers such as IGV to quickly display
-alignments in a genomic region of interest.
+> alignments in a genomic region of interest.
 
 - **Input**
-  - Alignments file (`.bam`); from
+  - (Workflow output) Alignments file, uncollapsed, sorted (`.bam`); from
   [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
 - **Output**
-  - `BAM` index file (`.bam.bai`)
+  - (Workflow output) BAM index file (`.bam.bai`)
 
 [chr-maps]: <https://github.com/dpryan79/ChromosomeMappings>
 [custom-script-blocksort]: scripts/blocksort.sh
@@ -1158,6 +1382,7 @@ alignments in a genomic region of interest.
 [license-gpl2]: <https://opensource.org/licenses/GPL-2.0>
 [license-gpl3]: <https://opensource.org/license/gpl-3-0/>
 [license-mit]: <https://opensource.org/licenses/MIT>
+[oligomap-out]: <https://github.com/zavolanlab/oligomap#output-format>
 [pub-bedtools]: <https://academic.oup.com/bioinformatics/article/26/6/841/244688>
 [pub-cufflinks]: <https://doi.org/10.1038/nprot.2012.016>
 [pub-cutadapt]: <https://doi.org/10.14806/ej.17.1.200>
