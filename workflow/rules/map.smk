@@ -374,7 +374,6 @@ rule map_genome_oligomap:
 rule sort_genome_oligomap:
     input:
         tmap=INTERMEDIATES_DIR / "{sample}" / "oligomap_genome_mappings.fasta",
-        report=INTERMEDIATES_DIR / "{sample}" / "oligomap_genome_report.txt",
         script=SCRIPTS_DIR / "blocksort.sh",
     output:
         sort=INTERMEDIATES_DIR / "{sample}" / "oligomap_genome_sorted.fasta",
@@ -467,7 +466,6 @@ rule map_transcriptome_oligomap:
 rule sort_transcriptome_oligomap:
     input:
         tmap=INTERMEDIATES_DIR / "{sample}" / "oligomap_transcriptome_mappings.fasta",
-        report=INTERMEDIATES_DIR / "{sample}" / "oligomap_transcriptome_report.txt",
         script=SCRIPTS_DIR / "blocksort.sh",
     output:
         sort=INTERMEDIATES_DIR / "{sample}" / "oligomap_transcriptome_sorted.fasta",
