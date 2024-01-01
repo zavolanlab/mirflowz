@@ -92,7 +92,7 @@ Optional arguments:
 Comments:
 CAUTION: Only marginal validation of the input file type/format performed!
 
-Version 1.2 (2014-08-26)
+Version 1.3 (2023-12-24)
 Written by Alexander Kanitz on 2013-11-21
 ';
 }
@@ -128,15 +128,16 @@ sub sam_uncollapse {
                         # Get QNAME
                         my ($id, $rest) = split /\t/, $line, 2;
                         # Find and remove appended copy number n
-                        $id =~ s/-(\d+)\Z//;
+                        $id =~ /^([^_-]+)-(\d+)/;
                         # Write appended copy number n to variable
-                        my $repeat = $1;
+                        my $read = $1;
+                        my $repeat = $2;
 			# If --suffix option is set...
 			if ($suffix) {
 				# Iterate over number of identical reads/alignments
 				for my $suffix (1..$repeat) {
 		                        # Recreate line with suffix
-                		        $line = join "\t", "$id.$suffix", $rest;
+                		        $line = join "\t", "$read.$suffix", $rest;
 		                        # Print line
 		                        print OUT $line;
 				}
@@ -145,7 +146,7 @@ sub sam_uncollapse {
 			# Else...
 			else {
                 	        # Recreate line
-        	                $line = join "\t", $id, $rest;
+        	                $line = join "\t", $read, $rest;
                         	# Print line n times
 	                        print OUT $line x $repeat;
 			}
