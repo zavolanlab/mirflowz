@@ -53,7 +53,7 @@ rule finish_prepare:
         idx_genome=INTERMEDIATES_DIR / "segemehl_genome_index.idx",
         exons=INTERMEDIATES_DIR / "exons.bed",
         header=INTERMEDIATES_DIR / "genome_header.sam",
-        chrsize=INTERMEDIATES_DIR / "chr_size.txt",
+        chrsize=INTERMEDIATES_DIR / "chr_size.tsv",
         extended_mir=expand(
             INTERMEDIATES_DIR / "extended_mirna_annotation_{extension}_nt.gff3",
             extension=config["extension"],
@@ -320,7 +320,7 @@ rule extract_chr_len:
     input:
         genome=INTERMEDIATES_DIR / "genome_processed.fa.fai",
     output:
-        chrsize=INTERMEDIATES_DIR / "chr_size.txt",
+        chrsize=INTERMEDIATES_DIR / "chr_size.tsv",
     params:
         cluster_log=CLUSTER_LOG / "extract_chr_len.log",
     log:
@@ -339,7 +339,7 @@ rule extract_chr_len:
 rule extend_mirs_annotations:
     input:
         gff3=INTERMEDIATES_DIR / "mirna_annotations.gff3",
-        chrsize=INTERMEDIATES_DIR / "chr_size.txt",
+        chrsize=INTERMEDIATES_DIR / "chr_size.tsv",
         script=SCRIPTS_DIR / "mirna_extension.py",
     output:
         extended_mir=expand(
