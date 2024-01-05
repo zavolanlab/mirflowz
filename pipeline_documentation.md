@@ -79,8 +79,6 @@ on installation and usage please see [here](README.md).
     - [`sort_uncollapse_reads_bam_by_position`](#sort_uncollapse_reads_bam_by_position)
     - [`index_uncollapse_reads_bam`](#index_uncollapse_reads_bam)
 
-<!--add examples section?-->
-
 
 ## Third-party software used
 
@@ -121,7 +119,7 @@ Visual representation of the workflow. Automatically prepared with
 
 ##### Requirements
 
-- tab-separated values (`.tsv`) file
+- Tab-separated values (`.tsv`) file
 - First row has to contain parameter names as in 
 [`samples_table.tsv`](test/test_files/samples_table.tsv) 
 - First column used as sample identifiers
@@ -130,9 +128,8 @@ Parameter name | Description | Data type(s)
  --- | --- | --- 
 sample | Arbitrary name for the miRNA sequence library. | `str`
 sample_file | Path to the `gzip`ped miRNA sequencing library file. The path must be relative to the directory where the workflow will be run. | `str`
-adapter | Sequence of the 3'-end adapter used during library preparation. Required for [Cutadapt](#third-party-software-used). Use a value such as `XXXXXXXXXX` if no adapter is present or if no trimming is desired | `str`
-format | One of `fa`/`fasta` or `fq`/`fastq`, if the library file is in FASTA or FASTQ format, respectively.
- | `str`
+adapter | Sequence of the 3'-end adapter used during library preparation. Required for [Cutadapt](#third-party-software-used). Use a value such as `XXXXXXXXXX` if no adapter is present or if no trimming is desired. | `str`
+format | One of `fa`/`fasta` or `fq`/`fastq`, if the library file is in FASTA or FASTQ format, respectively. | `str`
 
 
 #### Configuration file
@@ -140,6 +137,8 @@ format | One of `fa`/`fasta` or `fq`/`fastq`, if the library file is in FASTA or
 Some parameters within the workflow can be modified. Refer to the
 [configuration template](#config/config_template.yaml) for a detailed
 explanation of each option.
+
+<!-- add the default parameters? -->
 
 ### Snakefile
 
@@ -150,15 +149,15 @@ Target rule as required by [Snakemake][docs-snakemake].
 > Local rule
 
 - **Input**
-  - (Workflow output) SAM file with the pri-miR intersecting alignments; from
-  [**filter_sam_by_intersecting_primir**](#filter_sam_by_intersecting_primir)
-  - (Workflow output) SAM file with the mature miRNA intersecting alignments; from
+  - (**Workflow output**) SAM file with the pri-miR intersecting alignments;
+  from [**filter_sam_by_intersecting_primir**](#filter_sam_by_intersecting_primir)
+  - (**Workflow output**) SAM file with the mature miRNA intersecting alignments; from
   [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
-  - (Workflow output) (iso)miR and/or pri-miR counts table (`.tab`); from
+  - (**Workflow output**) (iso)miR and/or pri-miR counts table (`.tab`); from
   [**merge_tables**](#merge_tables)
-  - (Workflow output) BAM file with the contributing alignments, sorted; from
-  [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
-  - (Workflow output) BAM index file (`.bam.bai`); from
+  - (**Workflow output**) BAM file with the contributing alignments, sorted;
+  from [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
+  - (**Workflow output**) BAM index file (`.bam.bai`); from
   [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
 
 
@@ -192,7 +191,7 @@ Target rule as required by [Snakemake][docs-snakemake].
 Trim genome sequence IDs with a [**custom script**][custom-script-trim-id].
 
 - **Input**
-  - (Workflow input) Genome sequence, `gzip`ed (`.fa.gz`/`.fasta.gz`)
+  - (**Workflow input**) Genome sequence, `gzip`ed (`.fa.gz`/`.fasta.gz`)
 - **Output**
   - Genome sequence, trimmed IDs (`.fa`); used in
   [**extract_transcriptome_seqs**](#extract_transcriptome_seqs),
@@ -205,13 +204,13 @@ Trim genome sequence IDs with a [**custom script**][custom-script-trim-id].
 
 #### `extract_transcriptome_seqs`
 
-Create transcriptome from genome sequence and annotations with 
+Create transcriptome from genomic sequence and annotations with 
 [**cufflinks**](#third-party-software-used).
 
 - **Input**
   - Genome sequence, trimmed IDs (`.fa`); from
   [**trim_genome_seq_ids**](#trim_genome_seq_ids)
-  - (Workflow input) Genome annotations, `gzip`ed (`.gtf.gz`)
+  - (**Workflow input**) Genome annotations, `gzip`ed (`.gtf.gz`)
 - **Output**
   - Transcriptome sequence (`.fa`); used in 
   [**trim_transcriptome_seq_ids**](#trim_transcriptome_seq_ids)
@@ -238,14 +237,14 @@ Generate transcriptome index for [**segemehl**](#third-party-software-used)
 short read aligner.
 
 > The transcriptome index only needs to be generated once for each combination
-> of genome and annotations and sample sets.
+> of transcriptome sequence and annotations, and sample sets.
 
 - **Input**
   - Transcriptome sequence, trimmed IDs (`.fa`); from
   [**trim_transcriptome_seq_ids**](#trim_transcriptome_seq_ids)
 - **Output**
   - segemehl transcriptome index (`.idx`); used in 
-  [**mapping_genome_segemehl**](#mapping_genome_segemehl)
+  [**mapping_transcriptome_segemehl**](#mapping_transcriptome_segemehl)
 
 
 #### `generate_segemehl_index_genome`
@@ -270,7 +269,7 @@ Retrieve exon annotations from genome annotations with a
 [**custom script**][custom-script-get-lines].
 
 - **Input**
-  - (Workflow input) Genome annotations, `gzip`ed (`.gtf.gz`)
+  - (**Workflow input**) Genome annotations, `gzip`ed (`.gtf.gz`)
 - **Output**
   - Exon annotations (`.gtf`); used in 
   [**convert_exons_gtf_to_bed**](#convert_exons_gtf_to_bed)
@@ -312,8 +311,8 @@ with a [**custom script**][custom-script-map-chr].
 > miRNA annotations. Several mapping tables are available [here][chr-maps].
 
 - **Input**
-  - (Workflow input) miRNA annotations (`.gff3`)
-  - (Workflow input) Tab-separated chromosome name mappings table (`.tsv`)
+  - (**Workflow input**) miRNA annotations (`.gff3`)
+  - (**Workflow input**) Tab-separated chromosome name mappings table (`.tsv`)
 - **Output**
   - miRNA annotations, mapped chromosome name(s) (`.gff3`); used in 
   [**extend_mirs_annotations**](#extend_mirs_annotations)
@@ -335,6 +334,8 @@ Create a FASTA index for the genome with
 #### `extract_chr_len`
 
 Extract chromosome(s) length from the genome sequence.
+
+<!-- add "used in... for.."? -->
 
 - **Input**
   - FASTA genome index (`.fa.fai`); from
@@ -438,10 +439,10 @@ Copy and rename read files.
 
 > Local rule.
 > Depending on the library file format, the output file undergoes a quality
-> filter (`.fastq`) or is directly formatted (`.fa`).
+> filter (`fa`/`.fastq`) or is directly formatted (`.fa`/`.fasta`).
 
 - **Input**
-  - (Workflow input) miRNA sequencing library, `gzip`ed
+  - (**Workflow input**) miRNA sequencing library, `gzip`ed
   (`.fa.gz`/`.fasta.gz` or `.fq.gz`/`.fastq.gz`)
 - **Output**
   - miRNA sequencing library, copied, renamed (`.fa`, `.fastq`); used in
@@ -495,8 +496,8 @@ Format read's sequences to appear on a single line with
 
 #### `remove_adapters`
 
-Trim adapters and `N` bases at either end. Filter reads by minimum length and
-number of inner `N` bases with [**cutadapt**](#third-party-software-used).
+Trim 3' adapters and `N` bases at either end. Filter reads by minimum length
+and number of inner `N` bases with [**cutadapt**](#third-party-software-used).
 
 - **Input**
   - miRNA sequencing library, formatted (`.fa`); from
@@ -511,8 +512,8 @@ number of inner `N` bases with [**cutadapt**](#third-party-software-used).
     bases (default: 3)
     - `minimum_length`: Minimum length for a processed read to be kept
     (default: 15)
-    - `max_n`: Maximum number of `N` bases for a processed read to be kept
-    (default: 0)
+    - `max_n`: Maximum number of inner `N` bases for a processed read to be
+    kept (default: 0)
 - **Output**
   - miRNA sequencing library, filtered, without adapters (`.fasta`); used in 
   [**collapse_identical_reads**](#collapse_identical_reads)
@@ -1045,7 +1046,7 @@ Remove alignments that do not intersect with any pri-miR with
   - pri-miR intersections file (`.bed`); from
   [**intersect_extended_primir**](#intersect_extended_primir)
 - **Output**
-  - (Workflow output) Alignments file, filtered (`.sam`); used in
+  - (**Workflow output**) Alignments file, filtered (`.sam`); used in
   [**convert_intersecting_primir_sam_to_bam**](#convert_intersecting_primir_sam_to_bam)
   and [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
 
@@ -1129,7 +1130,7 @@ Remove alignments that do not intersect with any miRNA with
   - Mature miRNA intersections file (`.bed`); from
   [**intersect_extended_mirna**](#intersect_extended_mirna)
 - **Output**
-  - (Workflow output) Alignments file, filtered (`.sam`); used in 
+  - (**Workflow output**) Alignments file, filtered (`.sam`); used in 
   [**add_intersecting_mirna_tag**](#add_intersecting_mirna_tag) and
   [**uncollapse_reads**](#uncollapse_reads)
 
@@ -1287,7 +1288,7 @@ Merge all the tables from the different libraries into a single one with a
     - `mir_list`: miRNA features to be quantified (default: isomir, mirna
     pri-mir)
 - **Output**
-  - (Workflow output) (iso)miR and/or pri-miR counts table (`.tab`)
+  - (**Workflow output**) (iso)miR and/or pri-miR counts table (`.tab`)
 
 <!-- examples. -->
 
@@ -1326,7 +1327,7 @@ Sort alignments by position with [**SAMtools**](#third-party-software-used).
   - Alignments file, uncollapsed (`.bam`); from
   [**convert_uncollapsed_reads_sam_to_bam**](#convert_uncollapsed_reads_sam_to_bam)
 - **Output**
-  - (Workflow output) Alignments file, uncollapsed, sorted (`.bam`); used in
+  - (**Workflow output**) Alignments file, uncollapsed, sorted (`.bam`); used in
   [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
 
 
@@ -1338,10 +1339,10 @@ Create index BAM file with [**SAMtools**](#third-party-software-used).
 > alignments in a genomic region of interest.
 
 - **Input**
-  - (Workflow output) Alignments file, uncollapsed, sorted (`.bam`); from
+  - (**Workflow output**) Alignments file, uncollapsed, sorted (`.bam`); from
   [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
 - **Output**
-  - (Workflow output) BAM index file (`.bam.bai`)
+  - (**Workflow output**) BAM index file (`.bam.bai`)
 
 [chr-maps]: <https://github.com/dpryan79/ChromosomeMappings>
 [custom-script-blocksort]: scripts/blocksort.sh
