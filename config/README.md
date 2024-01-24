@@ -100,14 +100,14 @@ There are 4 files you must provide:
    resource][chrMap] provides such files for various organisms, and in the
    expected format.
 
+5. **OPTIONAL**. ASCII-style pileups of read alignments produced for individual
+    libraries, combinations of libraries and/or all libraries of a given run.
+    The exact number and nature of the outputs depends on the workflow
+    inputs/parameters.
+
 > General note: If you want to process the genome resources before use (e.g.,
 > filtering), you can do that, but make sure the formats of any modified
 > resource files meet the formatting expectations outlined above!
-
-In addition, if you want to generate
-[ASCII-style alignment pileups][ascii-pileups], a **BED6** file following the
-[Ensembl format][ensembl-bed] with the regions of interest you want the pileups
-to be performed on.
 
 ## 3. Prepare the configuration file
 
