@@ -209,14 +209,14 @@ There are 4 files you must provide:
    resource][chrMap] provides such files for various organisms, and in the
    expected format.
 
+5. **OPTIONAL**: A **BED6** file with regions for which to produce
+   [ASCII-style alignment pileups][ascii-pileups] for. If not provided, no
+   pileups will be generated. If provided, the input MUST follow the
+   [Ensembl format][ensembl-bed].
+
 > General note: If you want to process the genome resources before use (e.g.,
 > filtering), you can do that, but make sure the formats of any modified
 > resource files meet the formatting expectations outlined above!
-
-In addition, if you want to generate
-[ASCII-style alignment pileups][ascii-pileups], a **BED6** file following the
-[Ensembl format][ensembl-bed] with the regions of interest you want the pileups
-to be performed on.
 
 
 #### 3. Prepare a configuration file
@@ -284,9 +284,10 @@ represents a sample library. Each read is counted towards all the annotated
 miRNA species it aligns to, with 1/n, where n is the number of genomic and/or
 transcriptomic loci that read aligns to.
 
-5. ASCII-style pileups of read alignments for the whole run, across libraries,
-and across subset of libraries - if specified - against the regions in the
-user-provided BED file, if any.
+5. **OPTIONAL**. ASCII-style pileups of read alignments produced for individual
+libraries, combinations of libraries and/or all libraries of a given run. The
+exact number and nature of the outputs depends on the workflow
+inputs/parameters.
 
 To retain all intermediate files, include `--no-hooks` in the workflow call.
 
@@ -329,11 +330,11 @@ be aligned separately against the genome and transcriptome. For increased
 fidelity, two separated aligners, [Segemehl][segemehl] and our in-house tool 
 [Oligomap][oligomap], are used. All the resulting alignments are merged such 
 that only the best alignments of each read are kept (smallest edit distance).
-Finally, alignments are intersected with the user-provided, pre-processed
-miRNA annotation file using [BEDTools][bedtools]. Counts are tabulated 
-separately for reads consistent with either miRNA precursors, mature miRNA
-and/or isomiRs. Finally, if ASCII-style alignment pileups are generated across
-samples, for the whole run, and across conditions if specified.
+Alignments are intersected with the user-provided, pre-processed miRNA
+annotation file using [BEDTools][bedtools]. Counts are tabulated separately for
+reads consistent with either miRNA precursors, mature miRNA and/or isomiRs.
+Finally, ASCII-style alignment pileups are optionally generated for
+user-defined regions of interest.
 
 > **NOTE:** For a detailed description of each rule, please, refer to the
 > [workflow documentation](pipeline_documentation.md)
