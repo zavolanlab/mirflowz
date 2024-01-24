@@ -213,6 +213,12 @@ There are 4 files you must provide:
 > filtering), you can do that, but make sure the formats of any modified
 > resource files meet the formatting expectations outlined above!
 
+In addition, if you want to generate
+[ASCII-style alignment pileups][ascii-pileups], a **BED6** file following the
+[Ensembl format][ensembl-bed] with the regions of interest you want the pileups
+to be performed on.
+
+
 #### 3. Prepare a configuration file
 
 We recommend creating a copy of the
@@ -220,7 +226,7 @@ We recommend creating a copy of the
 
 ```bash
 cp  config/config_template.yaml  path/to/config.yaml
-``` So on that PR I could move this information in the section/file all of this will be written. 
+```
 
 Open the new copy in your editor of choice and adjust the configuration
 parameters to your liking. The template explains what each of the
@@ -278,6 +284,10 @@ represents a sample library. Each read is counted towards all the annotated
 miRNA species it aligns to, with 1/n, where n is the number of genomic and/or
 transcriptomic loci that read aligns to.
 
+5. ASCII-style pileups of read alignments for the whole run, across libraries,
+and across subset of libraries - if specified - against the regions in the
+user-provided BED file, if any.
+
 To retain all intermediate files, include `--no-hooks` in the workflow call.
 
 ```bash
@@ -322,7 +332,8 @@ that only the best alignments of each read are kept (smallest edit distance).
 Finally, alignments are intersected with the user-provided, pre-processed
 miRNA annotation file using [BEDTools][bedtools]. Counts are tabulated 
 separately for reads consistent with either miRNA precursors, mature miRNA
-and/or isomiRs.
+and/or isomiRs. Finally, if ASCII-style alignment pileups are generated across
+samples, for the whole run, and across conditions if specified.
 
 > **NOTE:** For a detailed description of each rule, please, refer to the
 > [workflow documentation](pipeline_documentation.md)
@@ -350,12 +361,14 @@ For questions or suggestions regarding the code, please use the [issue tracker][
 
 &copy; 2023 [Zavolab, Biozentrum, University of Basel][zavolab]
 
+[ascii-pileups]: <https://git.scicore.unibas.ch/zavolan_group/tools/ascii-alignment-pileup>
 [bedtools]: <https://github.com/arq5x/bedtools2>
 [chrMap]: <https://github.com/dpryan79/ChromosomeMappings>
 [conda]: <https://docs.conda.io/projects/conda/en/latest/index.html>
 [cluster execution]: <https://snakemake.readthedocs.io/en/stable/executing/cluster.html>
 [email]: <zavolab-biozentrum@unibas.ch>
 [ensembl]: <https://ensembl.org/>
+[ensembl-bed]: <https://www.ensembl.org/info/website/upload/bed.html>
 [issue-tracker]: <https://github.com/zavolanlab/mirflowz/issues>
 [mamba]: <https://github.com/mamba-org/mamba>
 [miniconda-installation]: <https://docs.conda.io/en/latest/miniconda.html>
