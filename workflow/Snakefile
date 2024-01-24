@@ -31,8 +31,8 @@ validate(config, Path("../config/config_schema.json"))
 
 
 OUT_DIR = Path(config["output_dir"])
+PILEUP_DIR = Path(config["pileups_dir"])
 INTERMEDIATES_DIR = Path(config["intermediates_dir"])
-LOG_DIR = Path(f"{config['local_log']}/../")
 
 
 ###############################################################################
@@ -67,6 +67,7 @@ localrules:
 include: Path("rules/prepare.smk")
 include: Path("rules/map.smk")
 include: Path("rules/quantify.smk")
+include: Path("rules/pileup.smk")
 
 
 ###############################################################################
@@ -99,4 +100,15 @@ rule finish:
             / "{sample}"
             / "alignments_intersecting_mirna_uncollapsed_sorted.bam.bai",
             sample=pd.unique(samples_table.index.values),
+        ),
+        piles_run=PILEUP_DIR / "all/check_file.txt",
+        piles_lib=expand(
+            PILEUP_DIR / "{sample}" / "check_file.txt",
+            sample=pd.unique(samples_table.index.values),
+        ),
+        piles_design=expand(
+            PILEUP_DIR / "{condition}" / "check_file_{condition}.txt"
+            if config["lib_dict"] != None
+            else [],
+            condition=list(config["lib_dict"].keys()),
         ),
