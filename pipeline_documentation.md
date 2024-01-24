@@ -94,7 +94,7 @@ on installation and usage please see [here](README.md).
 
 | Name | License | Tag line | More info |
 | --- | --- | --- | --- |
-| **ASCII-style alignment pileups** | [Apache 2.0][license-apache2] | _"Generates an ASCII-style pileup of read alignments in one or more BAM files against one or more regions specified in a BED file."_ | [code][code-ascii] | 
+| **ASCII-style alignment pileups** | [Apache 2.0][license-apache2] | _"Generates ASCII-style pileups of read alignments in one or more BAM files for one or more genomic regions."_ | [code][code-ascii] | 
 | **BEDTools** | [GPLv2][license-gpl2] | _"[...] intersect, merge, count, complement, and shuffle genomic intervals from multiple files in widely-used genomic file formats such as BAM, BED, GFF/GTF, VCF"_ | [code][code-bedtools] / [manual][manual-bedtools] / [publication][pub-bedtools] |
 | **cufflinks** | [BSL-1.0][license-bsl1] | _"[...] assembles transcripts, estimates their abundances, and tests for differential expression and regulation in RNA-Seq samples"_ | [code][code-cufflinks] / [manual][docs-cufflinks] / [publication][pub-cufflinks] |
 | **cutadapt** | [MIT][license-mit] | _"[...] finds and removes adapter sequences, primers, poly-A tails and other types of unwanted sequence from your high-throughput sequencing reads"_ | [code][code-cutadapt] / [manual][docs-cutadapt] / [publication][pub-cutadapt] |
