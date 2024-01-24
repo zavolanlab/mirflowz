@@ -15,6 +15,7 @@ samples: path/to/samples_table.tsv
 genome_file: path/to/gzipped/ensembl/genome.fa.gz
 gtf_file: path/to/gzipped/ensembl/gene_annotations.gtf.gz
 mirna_file: path/to/unzipped/mirbase/mirna_annotations.gff3
+bed_file: path/to/pileups/genomic_regions.bed
 
 # Tab-separated mappings table between UCSC (column 1)
 # and Ensembl (coulm 2) chromosome names 
@@ -32,6 +33,7 @@ map_chr_file: path/to/ucsc_ensembl_mappings.tsv
 #### DIRECTORIES ####
 
 output_dir: results/
+pileups_dir: results/pileups
 intermediates_dir: results/intermediates
 local_log: logs/local/
 cluster_log: logs/cluster/
@@ -63,4 +65,15 @@ nh: 100 # discard reads with more mappings than the indicated number
 # If 'isomir' and 'mirna' are both in the list, a single table with both types
 # is made.
 mir_list: ['isomir', 'mirna', 'pri-mir']
+
+#### ASCII-STYLE ALIGNMENT PILEUPS PARAMETERS ####
+
+# Dictionary with the list of library names to group when performing the
+# pileups as values and the condition as keys. Library names must match the
+# ones in the samples' table `sample` column. The dictionary keys will be used
+# as the pileups output directory name.
+# e.g. lib_dict: {"group_A": ["lib_1", "lib_3"], "group_B": ["lib_2"]}
+#
+# Leave as an empty dictionary if no pileups are desired.
+lib_dict: {}
 ...
