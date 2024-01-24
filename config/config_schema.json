@@ -12,7 +12,7 @@
         "bed_file":{
             "type": "string",
             "default": "",
-            "description": "Path to the genomic regions file to do the pileups on."
+            "description": "Path to the genomic regions file to do the pileups for."
         },
         "genome_file":{
             "type": "string",
@@ -120,7 +120,7 @@
                 "type": "array",
             },
             "default": {},
-            "description": "Dictionary with a list of library names, as in the samples table, to perfrom the pileups on as value and a condition name as keys."
+            "description": "Dictionary with a list of library names, as in the samples table, to generate pileups for as value and a condition name as keys."
         }
     }
 }
