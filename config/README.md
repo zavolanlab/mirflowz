@@ -104,6 +104,11 @@ There are 4 files you must provide:
 > filtering), you can do that, but make sure the formats of any modified
 > resource files meet the formatting expectations outlined above!
 
+In addition, if you want to generate
+[ASCII-style alignment pileups][ascii-pileups], a **BED6** file following the
+[Ensembl format][ensembl-bed] with the regions of interest you want the pileups
+to be performed on.
+
 ## 3. Prepare the configuration file
 
 We recommend creating a copy of the
@@ -118,8 +123,9 @@ Open the new copy in your editor of choice and adjust the configuration
 parameters to your liking. The template explains what each of the parameters
 mean and how you can meaningfully adjust them.
 
-
+[ascii-pileups]: <https://git.scicore.unibas.ch/zavolan_group/tools/ascii-alignment-pileup>
 [chrMap]: <https://github.com/dpryan79/ChromosomeMappings>
 [ensembl]: <https://ensembl.org/>
+[ensembl-bed]: <https://www.ensembl.org/info/website/upload/bed.html>
 [mamba]: <https://github.com/mamba-org/mamba>
 [mirbase]: <https://mirbase.org/>
