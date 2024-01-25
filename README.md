@@ -211,8 +211,8 @@ There are 4 files you must provide:
 
 5. **OPTIONAL**: A **BED6** file with regions for which to produce
    [ASCII-style alignment pileups][ascii-pileups] for. If not provided, no
-   pileups will be generated. If provided, the input MUST follow the
-   [Ensembl format][ensembl-bed].
+   pileups will be generated. Refer [here][bed-format] to see the expected
+   format.
 
 > General note: If you want to process the genome resources before use (e.g.,
 > filtering), you can do that, but make sure the formats of any modified
@@ -363,13 +363,13 @@ For questions or suggestions regarding the code, please use the [issue tracker][
 &copy; 2023 [Zavolab, Biozentrum, University of Basel][zavolab]
 
 [ascii-pileups]: <https://git.scicore.unibas.ch/zavolan_group/tools/ascii-alignment-pileup>
+[bed-format]: <https://gist.github.com/deliaBlue/19ad3740c95937378bd9281bd9d1bc72>
 [bedtools]: <https://github.com/arq5x/bedtools2>
 [chrMap]: <https://github.com/dpryan79/ChromosomeMappings>
 [conda]: <https://docs.conda.io/projects/conda/en/latest/index.html>
 [cluster execution]: <https://snakemake.readthedocs.io/en/stable/executing/cluster.html>
 [email]: <zavolab-biozentrum@unibas.ch>
 [ensembl]: <https://ensembl.org/>
-[ensembl-bed]: <https://www.ensembl.org/info/website/upload/bed.html>
 [issue-tracker]: <https://github.com/zavolanlab/mirflowz/issues>
 [mamba]: <https://github.com/mamba-org/mamba>
 [miniconda-installation]: <https://docs.conda.io/en/latest/miniconda.html>
