@@ -210,9 +210,8 @@ There are 4 files you must provide:
    expected format.
 
 5. **OPTIONAL**: A **BED6** file with regions for which to produce
-   [ASCII-style alignment pileups][ascii-pileups] for. If not provided, no
-   pileups will be generated. Refer [here][bed-format] to see the expected
-   format.
+   [ASCII-style alignment pileups][ascii-pileups]. If not provided, no pileups
+   will be generated. See [here][bed-format] for the expected format.
 
 > General note: If you want to process the genome resources before use (e.g.,
 > filtering), you can do that, but make sure the formats of any modified
@@ -287,7 +286,9 @@ transcriptomic loci that read aligns to.
 5. **OPTIONAL**. ASCII-style pileups of read alignments produced for individual
 libraries, combinations of libraries and/or all libraries of a given run. The
 exact number and nature of the outputs depends on the workflow
-inputs/parameters.
+inputs/parameters. See the
+[pileups section](pipeline_documentation.md/#pileup-workflow) for a detailed
+description.
 
 To retain all intermediate files, include `--no-hooks` in the workflow call.
 
