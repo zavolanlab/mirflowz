@@ -101,9 +101,8 @@ There are 4 files you must provide:
    expected format.
 
 5. **OPTIONAL**: A **BED6** file with regions for which to produce
-   [ASCII-style alignment pileups][ascii-pileups] for. If not provided, no
-   pileups will be generated. Refer [here][bed-format] to see the expected
-   format.
+   [ASCII-style alignment pileups][ascii-pileups]. If not provided, no pileups
+   will be generated. See [here][bed-format] for the expected format.
 
 > General note: If you want to process the genome resources before use (e.g.,
 > filtering), you can do that, but make sure the formats of any modified
