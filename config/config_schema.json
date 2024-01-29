@@ -112,7 +112,7 @@
                 "enum": ["isomir", "mirna", "pri-mir"]
             },
             "default": ["isomir", "mirna", "pri-mir"],
-            "description": " miRNA speices to be quantified."
+            "description": "miRNA speices to be quantified."
         },
         "lib_dict":{
             "type": "object",
@@ -120,7 +120,7 @@
                 "type": "array",
             },
             "default": {},
-            "description": "Dictionary with a list of library names, as in the samples table, to generate pileups for as value and a condition name as keys."
+            "description": "Dictionary of arbitrary condition names (keys) and library names to aggregate alignment pileups for (values; MUST correspond to names in samples table)."
         }
     }
 }
