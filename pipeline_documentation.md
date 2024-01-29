@@ -167,7 +167,7 @@ Target rule as required by [Snakemake][docs-snakemake].
   from [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
   - (**Workflow output**) BAM index file (`.bam.bai`); from
   [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
-  - Empty text file (`.txt`); from
+  - (**Workflow output**) Empty text file (`.txt`)
   [**create_per_library_ascii_pileups**](#create_per_library_ascii_pileups),
   [**create_per_run_ascii_pileups**](#create_per_run_ascii_pileups) and/or
   [**create_per_condition_ascii_pileups**](#create_per_condition_ascii_pileups)
@@ -445,7 +445,7 @@ Target rule as required by [Snakemake][docs-snakemake].
 > Local rule
 
 - **Input**
-  - BAM index (`.bam.bai`); from
+  - BAM index file (`.bam.bai`); from
   [**index_all_alns_bam**](#index_all_alns_bam)
 
 #### `start`
@@ -622,7 +622,7 @@ Align short reads to reference genome with
   - Genome sequence, trimmed IDs (`.fa`); from 
   [**trim_genome_seq_ids**](#trim_genome_seq_ids)
 - **Output**
-  - Alignments file (`.fasta`); used in
+  - Alignments file (`.oligomap`); used in
   [**sort_genome_oligomap**](#sort_genome_oligomap)
   - Alignment report (`.txt`); used in
   [**sort_genome_oligomap**](#sort_genome_oligomap)
@@ -634,18 +634,16 @@ Sort [**oligomap**](#third-party-software-used) alignments by query name
 with a [**custom script**][custom-script-blocksort].
 
 - **Input**
-  - Alignments file (`.fasta`); from
-  [**map_genome_oligomap**](#map_genome_oligomap)
-  - Alignment report (`.txt`); from
+  - Alignments file (`.oligomap`); from
   [**map_genome_oligomap**](#map_genome_oligomap)
 - **Output**
-  - Alignments file, sorted (`.fasta`); used in
+  - Alignments file, sorted (`.oligomap`); used in
   [**convert_genome_to_sam_oligomap**](#convert_genome_to_sam_oligomap)
 
 
 #### `convert_genome_to_sam_oligomap`
 
-Convert aligned reads `.fasta` to `.sam` and filter alignments by number of
+Convert aligned reads `.oligomap` to `.sam` and filter alignments by number of
 hits with a [**custom script**][custom-script-oligo-sam].
 
 > Given the short length of the reads and the sequence similarity among miRNAs,
@@ -653,7 +651,7 @@ hits with a [**custom script**][custom-script-oligo-sam].
 > specified value are disregarded.
 
 - **Input**
-  - Alignments file, sorted (`.fasta`); from
+  - Alignments file, sorted (`.oligomap`); from
   [**sort_genome_oligomap**](#sort_genome_oligomap)
 - **Parameters**
   - **config_template.yaml**
@@ -677,7 +675,7 @@ Align short reads to reference transcriptome with
   - Transcriptome sequence, trimmed IDs (`.fa`); from 
   [**trim_transcriptome_seq_ids**](#trim_transcriptome_seq_ids)
 - **Output**
-  - Alignments file (`.fasta`); used in
+  - Alignments file (`.oligomap`); used in
   [**sort_transcriptome_oligomap**](#sort_transcriptome_oligomap)
   - Alignment report (`.txt`); used in
   [**sort_transcriptome_oligomap**](#sort_transcriptome_oligomap)
@@ -689,18 +687,16 @@ Sort [**oligomap**](#third-party-software-used) alignments by query name
 with a [**custom script**][custom-script-blocksort].
 
 - **Input**
-  - Alignments file (`.fasta`); from
-  [**map_transcriptome_oligomap**](#map_transcriptome_oligomap)
-  - Alignment report (`.txt`); from
+  - Alignments file (`.oligomap`); from
   [**map_transcriptome_oligomap**](#map_transcriptome_oligomap)
 - **Output**
-  - Alignments file, sorted (`.fasta`); used in
+  - Alignments file, sorted (`.oligomap`); used in
   [**convert_transcriptome_to_sam_oligomap**](#convert_transcriptome_to_sam_oligomap)
 
 
 #### `convert_transcriptome_to_sam_oligomap`
 
-Convert aligned reads `.fasta` to `.sam` and filter alignments by number of
+Convert aligned reads `.oligomap` to `.sam` and filter alignments by number of
 hits with a [**custom script**][custom-script-oligo-sam].
 
 > Given the short length of the reads and the sequence similarity among miRNAs,
@@ -708,7 +704,7 @@ hits with a [**custom script**][custom-script-oligo-sam].
 > specified value are disregarded.
 
 - **Input**
-  - Alignments file, sorted (`.fasta`); from
+  - Alignments file, sorted (`.oligomap`); from
   [**sort_transcriptome_oligomap**](#sort_transcriptome_oligomap)
 - **Parameters**
   - **config_template.yaml**
@@ -1019,14 +1015,14 @@ Target rule as required by [Snakemake][docs-snakemake].
 - **Input**
   - Alignments file, filtered (`.sam`); from
   [**filter_sam_by_intersecting_primir**](#filter_sam_by_intersecting_primir)
-  - Alignments file, filtered (`.sam`); from
-  [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
+  and [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
   - (iso)miR and/or pri-miR counts table (`.tab`); from
   [**merge_tables**](#merge_tables)
   - Alignments file, uncollapsed, sorted (`.bam`); from
   [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
   - BAM index file (`.bam.bai`); from
   [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
+
 
 #### `intersect_extendend_primir`
 
@@ -1254,7 +1250,7 @@ Tabulate alignments according to its new tag (`YW:Z`) with a
   [**sort_intersecting_mirna_by_feat_tag**](#sort_intersecting_mirna_by_feat_tag)
 - **Parameters**
   - **samples.tsv**
-    - Library name; specified in the sample's table column `sample`
+    - Library name; specified in the samples table column `sample`
   - **config_template.yaml**
     - `mir_list`: miRNA features to be quantified (default: isomir, mirna
     pri-miR)
@@ -1295,7 +1291,7 @@ Merge all the tables from the different libraries into a single one with a
 > value is set to `NA`.
 
 - **Input**
-  - counts tab-delimited file; from [**quantify_mirna**](#quantify_mirna)
+  - Counts tab-delimited file; from [**quantify_mirna**](#quantify_mirna)
   and/or [**quantify_primir**](#quantify_primir)
 - **Parameters**
   - **cluster_schema.json**
@@ -1373,7 +1369,7 @@ Target rule as required by [Snakemake][docs-snakemake].
 > Local rule
 
 - **Input**
-  - Empty text files (`.txt`); from
+  - (**Workflow output**) Empty text file (`.txt`)
   [**create_per_library_ascii_pileups**](#create_per_library_ascii_pileups) and
   [**create_per_run_ascii_pileups**](#create_per_run_ascii_pileups)
 
@@ -1391,7 +1387,7 @@ Create an empty BED file if the user has not provided one.
     - `bed_file`: BED6 file with all the desired annotation regions to perform
     the ASCII-style alignment pileups on. (Default: None)
 - **Output**
-  - BED empty file (`.bed`); used in
+  - Empty BED file (`.bed`); used in
   [**create_per_library_ascii_pileups**](#create_per_library_ascii_pileups),
   [**create_per_run_ascii_pileups**](#create_per_run_ascii_pileups) and/or
   [**create_per_condition_ascii_pileups**](#create_per_condition_ascii_pileups)
@@ -1406,10 +1402,10 @@ Compress the processed genome with trimmed IDs using `bgzip`.
 > using Singularity, [**SAMtools**](#third-party-software-used) is used.
 
 - **Input**
-  - Genome sequence file, trimmed IDs (`.fa`); from
+  - Genome sequence, trimmed IDs (`.fa`); from
   [**trim_genome_seq_ids**](#trim_genome_seq_ids)
 - **Output**
-  - Genome sequence file, trimmed IDs, `bgzip`ed (`.fa.bz`); used in
+  - Genome sequence, trimmed IDs, `bgzip`ed (`.fa.bz`); used in
   [**create_per_library_ascii_pileups**](#create_per_library_ascii_pileups),
   [**create_per_run_ascii_pileups**](#create_per_run_ascii_pileups) and/or
   [**create_per_condition_ascii_pileups**](#create_per_condition_ascii_pileups)
@@ -1418,25 +1414,25 @@ Compress the processed genome with trimmed IDs using `bgzip`.
 #### `create_per_library_ascii_pileups`
 
 Create ASCII-style pileups for all the desired annotated regions across
-libraries with [**ASCII-style alignment pilueups**](#third-party-software-used).
+libraries with [**ASCII-style alignment pileups**](#third-party-software-used).
 
 > A directory containing the ASCII-style pileups is created for each
 > library. If no BED file is provided, the pileups' output directories will
 > only contain an empty file.
 
 - **Input**
-  - Genome sequence file, trimmed IDs, `bgzip`ed (`.fa.bz`); from
+  - Genome sequence, trimmed IDs, `bgzip`ed (`.fa.bz`); from
   [**compress_reference_genome**](#compress_reference_genome)
-  - miRNA annotations with mapped genes(`.gff3`); from
+  - miRNA annotations, mapped chromosome name(s) (`.gff3`); from
   [**map_chr_names**](#map_chr_names)
-  - Alignments file (`.bam`); from
+  - (**Workflow output**) Alignments file, uncollapsed, sorted (`.bam`); from
   [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
-  - `BAM` index file (`.bam.bai`); from
+  - (**Workflow output**) BAM index file (`.bam.bai`); used in
   [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
   - Annotated genomic regions (`.bed`); from workflow input files or
   [**create_empty_bed**](#create_empty_bed)
 - **Output**
-  - Empty text file (`.txt`)
+  - (**Workflow output**) Empty text file (`.txt`)
 
 
 #### `create_per_run_ascii_pileups`
@@ -1448,18 +1444,18 @@ run with [**ASCII-style alignment pilueups**](#third-party-software-used).
 > an empty file.
 
 - **Input**
-  - Genome sequence file, trimmed IDs, `bgzip`ed (`.fa.bz`); from
+  - Genome sequence, trimmed IDs, `bgzip`ed (`.fa.bz`); from
   [**compress_reference_genome**](#compress_reference_genome)
-  - miRNA annotations with mapped genes(`.gff3`); from
+  - miRNA annotations, mapped chromosome name(s) (`.gff3`); from
   [**map_chr_names**](#map_chr_names)
-  - Alignments file (`.bam`); from
+  - (**Workflow output**) Alignments file, uncollapsed, sorted (`.bam`); from
   [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
-  - `BAM` index file (`.bam.bai`); from
+  - (**Workflow output**) BAM index file (`.bam.bai`); used in
   [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
   - Annotated genomic regions (`.bed`); from workflow input files or
   [**create_empty_bed**](#create_empty_bed)
 - **Output**
-  - Empty text file (`.txt`)
+  - (**Workflow output**) Empty text file (`.txt`)
 
 
 #### `create_per_condition_ascii_pileups`
@@ -1474,21 +1470,21 @@ different library subsets if provided with
 > executed, and no output will be generated.
 
 - **Input**
-  - Genome sequence file, trimmed IDs, `bgzip`ed (`.fa.bz`); from
+  - Genome sequence, trimmed IDs, `bgzip`ed (`.fa.bz`); from
   [**compress_reference_genome**](#compress_reference_genome)
-  - miRNA annotations with mapped genes(`.gff3`); from
+  - miRNA annotations, mapped chromosome name(s) (`.gff3`); from
   [**map_chr_names**](#map_chr_names)
-  - Alignments file (`.bam`); from
+  - (**Workflow output**) Alignments file, uncollapsed, sorted (`.bam`); from
   [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
-  - `BAM` index file (`.bam.bai`); from
+  - (**Workflow output**) BAM index file (`.bam.bai`); used in
   [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
   - Annotated genomic regions (`.bed`); from workflow input files or
   [**create_empty_bed**](#create_empty_bed)
 - **Parameters**
   - **config_template.yaml**
-    - `lib_dict`: Subset(s) of library name(s), as specified in the samples'
-    table column `sample` and the subset identifier stored in a dictionary.
-    (default: None)
+    - `lib_dict`: Dictionary of arbitrary condition names (keys) and library
+    names to aggregate alignment pileups for (values; MUST correspond to names
+    in samples table) (default: None)
 - **Output**
   - Empty text file (`.txt`)
 
