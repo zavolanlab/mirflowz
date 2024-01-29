@@ -1,4 +1,5 @@
 """Unit tests for module 'mirna_quantification.py'."""
+
 import argparse
 from pathlib import Path
 import sys
@@ -344,9 +345,10 @@ class TestMain:
         args = parse_arguments().parse_args()
         main(args)
 
-        with open(iso_out_table, "r") as expected, open(
-            mirna_output, "r"
-        ) as out_file:
+        with (
+            open(iso_out_table, "r") as expected,
+            open(mirna_output, "r") as out_file,
+        ):
             assert out_file.read() == expected.read()
 
     def test_main_mirna_sam_file(

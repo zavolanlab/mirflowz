@@ -1,3 +1,5 @@
+from pathlib import Path
+
 ###############################################################################
 ### Functions
 ###############################################################################
@@ -22,3 +24,11 @@ def convert_lib_format(lib_format: str) -> str:
         "FASTQ": "fastq",
     }
     return formats[lib_format]
+
+
+def create_empty_bed_file(config_file: dict, dir: Path) -> Path:
+    """Create empty bed file and store its path in the configuration file."""
+    empty_bed = f"{dir}/empty_file.bed"
+    config_file["bed_file"] = empty_bed
+
+    return empty_bed

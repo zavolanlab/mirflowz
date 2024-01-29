@@ -78,6 +78,13 @@ on installation and usage please see [here](README.md).
     - [`convert_uncollapse_reads_sam_to_bam`](#convert_uncollapse_reads_sam_to_bam)
     - [`sort_uncollapse_reads_bam_by_position`](#sort_uncollapse_reads_bam_by_position)
     - [`index_uncollapse_reads_bam`](#index_uncollapse_reads_bam)
+  - [Pileup workflow](#pileup-workflow)
+    - [`finish_pileup`](#finish_pileup)
+    - [`create_empty_bed`](#create_empty_bed)
+    - [`compress_reference_genome`](#compress_reference_genome)
+    - [`create_per_library_ascii_pileups`](#create_per_library_ascii_pileups)
+    - [`create_per_run_ascii_pileups`](#create_per_run_ascii_pileups)
+    - [`create_per_condition_ascii_pileups`](#create_per_condition_ascii_pileups)
 
 
 ## Third-party software used
@@ -86,6 +93,7 @@ on installation and usage please see [here](README.md).
 
 | Name | License | Tag line | More info |
 | --- | --- | --- | --- |
+| **ASCII-style alignment pileups** | [Apache 2.0][license-apache2] | _"Generates ASCII-style pileups of read alignments in one or more BAM files for one or more genomic regions."_ | [code][code-ascii] | 
 | **BEDTools** | [GPLv2][license-gpl2] | _"[...] intersect, merge, count, complement, and shuffle genomic intervals from multiple files in widely-used genomic file formats such as BAM, BED, GFF/GTF, VCF"_ | [code][code-bedtools] / [manual][manual-bedtools] / [publication][pub-bedtools] |
 | **cufflinks** | [BSL-1.0][license-bsl1] | _"[...] assembles transcripts, estimates their abundances, and tests for differential expression and regulation in RNA-Seq samples"_ | [code][code-cufflinks] / [manual][docs-cufflinks] / [publication][pub-cufflinks] |
 | **cutadapt** | [MIT][license-mit] | _"[...] finds and removes adapter sequences, primers, poly-A tails and other types of unwanted sequence from your high-throughput sequencing reads"_ | [code][code-cutadapt] / [manual][docs-cutadapt] / [publication][pub-cutadapt] |
@@ -99,12 +107,12 @@ on installation and usage please see [here](README.md).
 
 > The workflow consists of four Snakemake files: A main `Snakefile` and an
 > individual Snakemake file for each step in the workflow (the genome resources
-> preparation, the reads mapping and the miRNA quantification). The main
-> `Snakefile` contains the configuration file validation along with the
-> inclusion of the sub-workflows. Individual steps of the workflow are 
-> described briefly along with some examples, and links to the respective
-> software manuals are given. Parameters that can be modified by the user (via
-> the samples table and the configuration file) are also described.
+> preparation, the reads mapping, the miRNA quantification and the ASCII-style
+> pileups generation). The main `Snakefile` contains the configuration file
+> validation along with the inclusion of the sub-workflows. Individual steps of
+> the workflow are described briefly along with some examples, and links to the
+> respective software manuals are given. Parameters that can be modified by the
+> user (via the samples table and the configuration file) are also described.
 
 ### Rule graph
 
@@ -159,6 +167,10 @@ Target rule as required by [Snakemake][docs-snakemake].
   from [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
   - (**Workflow output**) BAM index file (`.bam.bai`); from
   [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
+  - Empty text file (`.txt`); from
+  [**create_per_library_ascii_pileups**](#create_per_library_ascii_pileups),
+  [**create_per_run_ascii_pileups**](#create_per_run_ascii_pileups) and/or
+  [**create_per_condition_ascii_pileups**](#create_per_condition_ascii_pileups)
 
 
 ### Prepare workflow
@@ -198,8 +210,9 @@ Trim genome sequence IDs with a [**custom script**][custom-script-trim-id].
   [**create_genome_header**](#create_genome_header),
   [**create_index_genome_fasta**](#create_index_genome),
   [**generate_segemehl_index_genome**](#generate_segemehl_index_genome),
-  [**mapping_genome_segemehl**](#mapping_genome_segemehl) and
-  [**mapping_genome_oligomap**](#mapping_genome_oligomap)
+  [**mapping_genome_segemehl**](#mapping_genome_segemehl),
+  [**mapping_genome_oligomap**](#mapping_genome_oligomap) and
+  [**compress_reference_genome**](#compress_reference_genome)
 
 
 #### `extract_transcriptome_seqs`
@@ -315,7 +328,9 @@ with a [**custom script**][custom-script-map-chr].
   - (**Workflow input**) Tab-separated chromosome name mappings table (`.tsv`)
 - **Output**
   - miRNA annotations, mapped chromosome name(s) (`.gff3`); used in 
-  [**extend_mirs_annotations**](#extend_mirs_annotations)
+  [**create_per_library_ascii_pileups**](#create_per_library_ascii_pileups),
+  [**create_per_run_ascii_pileups**](#create_per_run_ascii_pileups) and/or
+  [**create_per_condition_ascii_pileups**](#create_per_condition_ascii_pileups)
 
 
 #### `create_index_genome_fasta`
@@ -1203,7 +1218,6 @@ NEW TAG:
     YW:Z:
 ```
 
-
 #### `sort_intersecting_mirna_by_feat_tag`
 
 Sort the alignments by the tag containing the classified intersecting (iso)miR
@@ -1328,7 +1342,9 @@ Sort alignments by position with [**SAMtools**](#third-party-software-used).
   [**convert_uncollapsed_reads_sam_to_bam**](#convert_uncollapsed_reads_sam_to_bam)
 - **Output**
   - (**Workflow output**) Alignments file, uncollapsed, sorted (`.bam`); used in
-  [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
+  [**create_per_library_ascii_pileups**](#create_per_library_ascii_pileups),
+  [**create_per_run_ascii_pileups**](#create_per_run_ascii_pileups) and/or
+  [**create_per_condition_ascii_pileups**](#create_per_condition_ascii_pileups)
 
 
 #### `index_uncollapsed_reads_bam`
@@ -1342,7 +1358,139 @@ Create index BAM file with [**SAMtools**](#third-party-software-used).
   - (**Workflow output**) Alignments file, uncollapsed, sorted (`.bam`); from
   [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
 - **Output**
-  - (**Workflow output**) BAM index file (`.bam.bai`)
+  - (**Workflow output**) BAM index file (`.bam.bai`); used in
+  [**create_per_library_ascii_pileups**](#create_per_library_ascii_pileups),
+  [**create_per_run_ascii_pileups**](#create_per_run_ascii_pileups) and/or
+  [**create_per_condition_ascii_pileups**](#create_per_condition_ascii_pileups)
+
+
+### Pileup workflow
+
+#### `finish_pileup`
+
+Target rule as required by [Snakemake][docs-snakemake].
+
+> Local rule
+
+- **Input**
+  - Empty text files (`.txt`); from
+  [**create_per_library_ascii_pileups**](#create_per_library_ascii_pileups) and
+  [**create_per_run_ascii_pileups**](#create_per_run_ascii_pileups)
+
+
+#### `create_empty_bed`
+
+Create an empty BED file if the user has not provided one.
+
+> **OPTIONAL RULE.** This rule will be executed if, and only if, the user has
+> not provided a BED file in the [configuration file](#configuration-file)
+> with the regions the ASCII-style alignment pileups must be performed on.
+
+- **Condition**
+  - **config_template.yaml**
+    - `bed_file`: BED6 file with all the desired annotation regions to perform
+    the ASCII-style alignment pileups on. (Default: None)
+- **Output**
+  - BED empty file (`.bed`); used in
+  [**create_per_library_ascii_pileups**](#create_per_library_ascii_pileups),
+  [**create_per_run_ascii_pileups**](#create_per_run_ascii_pileups) and/or
+  [**create_per_condition_ascii_pileups**](#create_per_condition_ascii_pileups)
+
+
+#### `compress_reference_genome`
+
+Compress the processed genome with trimmed IDs using `bgzip`. 
+
+> Required to perform the ASCII-style alignment pileups.
+> In order to be able to use the `bgzip` command when running the workflow
+> using Singularity, [**SAMtools**](#third-party-software-used) is used.
+
+- **Input**
+  - Genome sequence file, trimmed IDs (`.fa`); from
+  [**trim_genome_seq_ids**](#trim_genome_seq_ids)
+- **Output**
+  - Genome sequence file, trimmed IDs, `bgzip`ed (`.fa.bz`); used in
+  [**create_per_library_ascii_pileups**](#create_per_library_ascii_pileups),
+  [**create_per_run_ascii_pileups**](#create_per_run_ascii_pileups) and/or
+  [**create_per_condition_ascii_pileups**](#create_per_condition_ascii_pileups)
+
+
+#### `create_per_library_ascii_pileups`
+
+Create ASCII-style pileups for all the desired annotated regions across
+libraries with [**ASCII-style alignment pilueups**](#third-party-software-used).
+
+> A directory containing the ASCII-style pileups is created for each
+> library. If no BED file is provided, the pileups' output directories will
+> only contain an empty file.
+
+- **Input**
+  - Genome sequence file, trimmed IDs, `bgzip`ed (`.fa.bz`); from
+  [**compress_reference_genome**](#compress_reference_genome)
+  - miRNA annotations with mapped genes(`.gff3`); from
+  [**map_chr_names**](#map_chr_names)
+  - Alignments file (`.bam`); from
+  [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
+  - `BAM` index file (`.bam.bai`); from
+  [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
+  - Annotated genomic regions (`.bed`); from workflow input files or
+  [**create_empty_bed**](#create_empty_bed)
+- **Output**
+  - Empty text file (`.txt`)
+
+
+#### `create_per_run_ascii_pileups`
+
+Create ASCII-style pileups for all the desired annotated regions for the whole
+run with [**ASCII-style alignment pilueups**](#third-party-software-used). 
+
+> If no BED file is provided, the pileups' output directory will only contain
+> an empty file.
+
+- **Input**
+  - Genome sequence file, trimmed IDs, `bgzip`ed (`.fa.bz`); from
+  [**compress_reference_genome**](#compress_reference_genome)
+  - miRNA annotations with mapped genes(`.gff3`); from
+  [**map_chr_names**](#map_chr_names)
+  - Alignments file (`.bam`); from
+  [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
+  - `BAM` index file (`.bam.bai`); from
+  [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
+  - Annotated genomic regions (`.bed`); from workflow input files or
+  [**create_empty_bed**](#create_empty_bed)
+- **Output**
+  - Empty text file (`.txt`)
+
+
+#### `create_per_condition_ascii_pileups`
+
+Create ASCII-style pileups for all the desired annotated regions across the
+different library subsets if provided with
+[**ASCII-style alignment pilueups**](#third-party-software-used).
+
+> **OPTIONAL RULE.** The ASCII-style pileups for each annotated region are
+> made if, and only if, at least one library subset is specified in the
+> [configuration file](#configuration-file). Otherwise, this rule will not be
+> executed, and no output will be generated.
+
+- **Input**
+  - Genome sequence file, trimmed IDs, `bgzip`ed (`.fa.bz`); from
+  [**compress_reference_genome**](#compress_reference_genome)
+  - miRNA annotations with mapped genes(`.gff3`); from
+  [**map_chr_names**](#map_chr_names)
+  - Alignments file (`.bam`); from
+  [**sort_uncollapsed_reads_bam_by_position**](#sort_uncollapsed_reads_bam_by_position)
+  - `BAM` index file (`.bam.bai`); from
+  [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
+  - Annotated genomic regions (`.bed`); from workflow input files or
+  [**create_empty_bed**](#create_empty_bed)
+- **Parameters**
+  - **config_template.yaml**
+    - `lib_dict`: Subset(s) of library name(s), as specified in the samples'
+    table column `sample` and the subset identifier stored in a dictionary.
+    (default: None)
+- **Output**
+  - Empty text file (`.txt`)
 
 [chr-maps]: <https://github.com/dpryan79/ChromosomeMappings>
 [custom-script-blocksort]: scripts/blocksort.sh
@@ -1362,6 +1510,7 @@ Create index BAM file with [**SAMtools**](#third-party-software-used).
 [custom-script-trim-id]: scripts/trim_id_fasta.sh
 [custom-script-uncollapse]: scripts/sam_uncollapse.pl
 [custom-script-validation]: scripts/validation_fasta.py
+[code-ascii]: <https://git.scicore.unibas.ch/zavolan_group/tools/ascii-alignment-pileup>
 [code-bedtools]: <https://github.com/arq5x/bedtools2>
 [code-cufflinks]: <https://github.com/cole-trapnell-lab/cufflinks>
 [code-cutadapt]: <https://github.com/marcelm/cutadapt>
@@ -1379,6 +1528,7 @@ Create index BAM file with [**SAMtools**](#third-party-software-used).
 [docs-snakemake]: <https://snakemake.readthedocs.io/en/stable/>
 [license-afl3]: <https://opensource.org/license/afl-3-0-php/>
 [license-agpl3]: <https://opensource.org/license/agpl-v3/>
+[license-apache2]: <https://opensource.org/license/apache-2-0/>
 [license-bsl1]: <https://opensource.org/license/bsl-1-0/>
 [license-gpl2]: <https://opensource.org/licenses/GPL-2.0>
 [license-gpl3]: <https://opensource.org/license/gpl-3-0/>
@@ -1387,7 +1537,8 @@ Create index BAM file with [**SAMtools**](#third-party-software-used).
 [pub-bedtools]: <https://academic.oup.com/bioinformatics/article/26/6/841/244688>
 [pub-cufflinks]: <https://doi.org/10.1038/nprot.2012.016>
 [pub-cutadapt]: <https://doi.org/10.14806/ej.17.1.200>
-[pub-oligomap]: <https://doi.org/10.1016/j.ymeth.2007.10.002 >
+[pub-oligomap]: <https://doi.org/10.1016/j.ymeth.2007.10.002>
 [pub-samtools]: <https://doi.org/10.1093/bioinformatics/btp352>
 [pub-segemehl]: <https://doi.org/10.1371/journal.pcbi.1000502>
 [rule-graph]: images/rule_graph.svg
+
