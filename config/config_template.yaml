@@ -70,7 +70,7 @@ mir_list: ['isomir', 'mirna', 'pri-mir']
 
 # Dictionary with the list of library names to aggregate when performing the
 # pileups as values and the condition as keys. Library names must match the
-# ones in the samples' table `sample` column. The dictionary keys will be used
+# ones in the samples table `sample` column. The dictionary keys will be used
 # as the pileup's output directory name.
 # e.g. lib_dict: {"group_A": ["lib_1", "lib_3"], "group_B": ["lib_2"]}
 #
