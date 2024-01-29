@@ -209,9 +209,14 @@ There are 4 files you must provide:
    resource][chrMap] provides such files for various organisms, and in the
    expected format.
 
+5. **OPTIONAL**: A **BED6** file with regions for which to produce
+   [ASCII-style alignment pileups][ascii-pileups]. If not provided, no pileups
+   will be generated. See [here][bed-format] for the expected format.
+
 > General note: If you want to process the genome resources before use (e.g.,
 > filtering), you can do that, but make sure the formats of any modified
 > resource files meet the formatting expectations outlined above!
+
 
 #### 3. Prepare a configuration file
 
@@ -220,7 +225,7 @@ We recommend creating a copy of the
 
 ```bash
 cp  config/config_template.yaml  path/to/config.yaml
-``` So on that PR I could move this information in the section/file all of this will be written. 
+```
 
 Open the new copy in your editor of choice and adjust the configuration
 parameters to your liking. The template explains what each of the
@@ -278,6 +283,13 @@ represents a sample library. Each read is counted towards all the annotated
 miRNA species it aligns to, with 1/n, where n is the number of genomic and/or
 transcriptomic loci that read aligns to.
 
+5. **OPTIONAL**. ASCII-style pileups of read alignments produced for individual
+libraries, combinations of libraries and/or all libraries of a given run. The
+exact number and nature of the outputs depends on the workflow
+inputs/parameters. See the
+[pileups section](pipeline_documentation.md/#pileup-workflow) for a detailed
+description.
+
 To retain all intermediate files, include `--no-hooks` in the workflow call.
 
 ```bash
@@ -319,10 +331,11 @@ be aligned separately against the genome and transcriptome. For increased
 fidelity, two separated aligners, [Segemehl][segemehl] and our in-house tool 
 [Oligomap][oligomap], are used. All the resulting alignments are merged such 
 that only the best alignments of each read are kept (smallest edit distance).
-Finally, alignments are intersected with the user-provided, pre-processed
-miRNA annotation file using [BEDTools][bedtools]. Counts are tabulated 
-separately for reads consistent with either miRNA precursors, mature miRNA
-and/or isomiRs.
+Alignments are intersected with the user-provided, pre-processed miRNA
+annotation file using [BEDTools][bedtools]. Counts are tabulated separately for
+reads consistent with either miRNA precursors, mature miRNA and/or isomiRs.
+Finally, ASCII-style alignment pileups are optionally generated for
+user-defined regions of interest.
 
 > **NOTE:** For a detailed description of each rule, please, refer to the
 > [workflow documentation](pipeline_documentation.md)
@@ -350,6 +363,8 @@ For questions or suggestions regarding the code, please use the [issue tracker][
 
 &copy; 2023 [Zavolab, Biozentrum, University of Basel][zavolab]
 
+[ascii-pileups]: <https://git.scicore.unibas.ch/zavolan_group/tools/ascii-alignment-pileup>
+[bed-format]: <https://gist.github.com/deliaBlue/19ad3740c95937378bd9281bd9d1bc72>
 [bedtools]: <https://github.com/arq5x/bedtools2>
 [chrMap]: <https://github.com/dpryan79/ChromosomeMappings>
 [conda]: <https://docs.conda.io/projects/conda/en/latest/index.html>

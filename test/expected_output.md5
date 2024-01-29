@@ -43,11 +43,14 @@ a124a5afdb5f7bfbcc5683260556c9c4  results/intermediates/test_lib/genome_mappings
 f68693cfaa1e6ea78e1a5562ade6d9ed  results/intermediates/test_lib/intersected_extended_primir.bed
 c2a5770a755ada66ef63d96eec4afb00  results/intermediates/test_lib/reads_filtered_for_oligomap.fasta
 fe5388094985e9604a302d39d2abc82c  results/intermediates/test_lib/oligomap_transcriptome_report.txt
+96a178aabc41d3020992efd6acbecb5a  results/intermediates/genome_processed.fa.bz
+d34fc868b861b1bc46db07a397dc0f10  results/intermediates/genome_processed.fa.bz.fai
 be7a0d92e57480190de57eb30baffa36  results/intermediates/extended_mirna_annotation_6_nt.gff3
 8148cd880602255be166beb59bbed95a  results/intermediates/genome_header.sam
 09e24a504bfec37fee3d5ff1b5c7738e  results/intermediates/exons.bed
 4fb453846e88593d0cac13220ec2d685  results/intermediates/segemehl_genome_index.idx
 44dbf7c3eae00d0bc8d5e1319123746c  results/intermediates/chr_size.tsv
+f5749f5d2096386444a3d021e0a01817  results/intermediates/genome_processed.fa.bz.gzi
 d34fc868b861b1bc46db07a397dc0f10  results/intermediates/genome_processed.fa.fai
 21e102e4ebd3508bb06f46366a3d578d  results/intermediates/exons.gtf
 003b92b245ac336e3d70a513033e1cee  results/intermediates/transcriptome_trimmed_id.fa
@@ -56,3 +59,12 @@ f28cc0143ab6659bef3de3a7afa1dccc  results/intermediates/mirna_annotations.gff3
 2d437f8681f4248d4f2075f86debb920  results/intermediates/transcriptome.fa
 7eb64c112830266bcf416ded60b4cf77  results/intermediates/segemehl_transcriptome_index.idx
 4fba145540a2c61f29bfddfd0f5a4d4e  results/intermediates/genome_processed.fa
+fbbaf665220bc2c2222b04e394515f69  results/pileups/test_lib/test_lib.hsa-mir-516a-1.min.1.pileup.tab
+d41d8cd98f00b204e9800998ecf8427e  results/pileups/test_lib/check_file.txt
+b974c1abfed36e33b37e040b7a1afb2d  results/pileups/test_lib/test_lib.hsa-mir-1323.min.1.pileup.tab
+fbbaf665220bc2c2222b04e394515f69  results/pileups/group_A/group_A.hsa-mir-516a-1.min.1.pileup.tab
+ced1f017e7758c03686310072e20f92d  results/pileups/group_A/group_A.hsa-mir-1323.min.1.pileup.tab
+d41d8cd98f00b204e9800998ecf8427e  results/pileups/group_A/check_file_group_A.txt
+d41d8cd98f00b204e9800998ecf8427e  results/pileups/all/check_file.txt
+b974c1abfed36e33b37e040b7a1afb2d  results/pileups/all/all_samples.hsa-mir-1323.min.1.pileup.tab
+fbbaf665220bc2c2222b04e394515f69  results/pileups/all/all_samples.hsa-mir-516a-1.min.1.pileup.tab
