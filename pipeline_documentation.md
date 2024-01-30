@@ -384,7 +384,6 @@ Extend miRNA annotations and split the file by feature with a
   [**intersect_extended_primir**](#intersect_extended_primir)
   - Mature miRNA (miRNA) extended annotations (`.gff3`); used in
   [**intersect_extended_mirna**](#intersect_extended_mirna)
-
 - **Examples**
 
 ```console
@@ -764,6 +763,7 @@ Filter merged genome alignments by the number of hits with a
   - Alignments file, filtered (`.sam`); used in
   [**remove_header_genome_mappings**](#remove_header_genome_mappings)
 
+
 #### `filter_transcriptome_by_nh`
 
 Filter merged transcriptome alignments by the number of hits with a
@@ -874,7 +874,6 @@ Remove duplicate and inferior alignments with a
 > a bigger edit distance than the smaller one within the group. The tags `NH`
 > (number of hits) and `HI` (query hit index) are updated accordingly.
 
-
 - **Input**
   - Alignments file, sorted (`.sam`); from
   [**sort_maps_by_id**](#sort_maps_by_id)
@@ -915,6 +914,7 @@ OUT:
     1-1197	0	19	56327	1	15M	*	0	0	TATGGCACTGGTAGA	*	HI:i:0	NH:i:2	NM:i:2	MD:Z:1C11T1	RG:Z:A1	YZ:Z:0
     1-1197	256	19	76967	1	15M	*	0	0	TATGGCACTGGTAGA	*	HI:i:1	NH:i:2	NM:i:2	MD:Z:1C11T1	RG:Z:A1	YZ:Z:0
 ```
+
 
 #### `filter_by_indels`
 
@@ -1257,8 +1257,12 @@ Tabulate alignments according to its new tag (`YW:Z`) with a
 - **Output**
   - (iso)miR counts tab-delimited file; used in
   [**merge_tables**](#merge_tables)
+- **Examples**
 
-<!-- examples. -->
+```console
+
+```
+
 
 #### `quantify_primir`
 
@@ -1487,6 +1491,7 @@ different library subsets if provided with
     in samples table) (default: None)
 - **Output**
   - Empty text file (`.txt`)
+
 
 [chr-maps]: <https://github.com/dpryan79/ChromosomeMappings>
 [custom-script-blocksort]: scripts/blocksort.sh
