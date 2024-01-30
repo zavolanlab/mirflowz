@@ -343,7 +343,7 @@ rule map_genome_oligomap:
         reads=INTERMEDIATES_DIR / "{sample}" / "reads_filtered_for_oligomap.fasta",
         target=INTERMEDIATES_DIR / "genome_processed.fa",
     output:
-        gmap=INTERMEDIATES_DIR / "{sample}" / "oligomap_genome_mappings.fasta",
+        gmap=INTERMEDIATES_DIR / "{sample}" / "oligomap_genome_mappings.oligomap",
         report=INTERMEDIATES_DIR / "{sample}" / "oligomap_genome_report.txt",
     params:
         cluster_log=CLUSTER_LOG / "map_genome_oligomap_{sample}.log",
@@ -373,10 +373,10 @@ rule map_genome_oligomap:
 
 rule sort_genome_oligomap:
     input:
-        tmap=INTERMEDIATES_DIR / "{sample}" / "oligomap_genome_mappings.fasta",
+        tmap=INTERMEDIATES_DIR / "{sample}" / "oligomap_genome_mappings.oligomap",
         script=SCRIPTS_DIR / "blocksort.sh",
     output:
-        sort=INTERMEDIATES_DIR / "{sample}" / "oligomap_genome_sorted.fasta",
+        sort=INTERMEDIATES_DIR / "{sample}" / "oligomap_genome_sorted.oligomap",
     params:
         cluster_log=CLUSTER_LOG / "sort_genome_oligomap_{sample}.log",
     log:
@@ -401,7 +401,7 @@ rule sort_genome_oligomap:
 
 rule convert_genome_to_sam_oligomap:
     input:
-        sort=INTERMEDIATES_DIR / "{sample}" / "oligomap_genome_sorted.fasta",
+        sort=INTERMEDIATES_DIR / "{sample}" / "oligomap_genome_sorted.oligomap",
         script=SCRIPTS_DIR / "oligomap_output_to_sam_nh_filtered.py",
     output:
         gmap=INTERMEDIATES_DIR / "{sample}" / "oligomap_genome_mappings.sam",
@@ -434,7 +434,7 @@ rule map_transcriptome_oligomap:
         reads=INTERMEDIATES_DIR / "{sample}" / "reads_filtered_for_oligomap.fasta",
         target=INTERMEDIATES_DIR / "transcriptome_trimmed_id.fa",
     output:
-        tmap=INTERMEDIATES_DIR / "{sample}" / "oligomap_transcriptome_mappings.fasta",
+        tmap=INTERMEDIATES_DIR / "{sample}" / "oligomap_transcriptome_mappings.oligomap",
         report=INTERMEDIATES_DIR / "{sample}" / "oligomap_transcriptome_report.txt",
     params:
         cluster_log=CLUSTER_LOG / "map_transcriptome_oligomap_{sample}.log",
@@ -465,10 +465,10 @@ rule map_transcriptome_oligomap:
 
 rule sort_transcriptome_oligomap:
     input:
-        tmap=INTERMEDIATES_DIR / "{sample}" / "oligomap_transcriptome_mappings.fasta",
+        tmap=INTERMEDIATES_DIR / "{sample}" / "oligomap_transcriptome_mappings.oligomap",
         script=SCRIPTS_DIR / "blocksort.sh",
     output:
-        sort=INTERMEDIATES_DIR / "{sample}" / "oligomap_transcriptome_sorted.fasta",
+        sort=INTERMEDIATES_DIR / "{sample}" / "oligomap_transcriptome_sorted.oligomap",
     params:
         cluster_log=CLUSTER_LOG / "sort_transcriptome_oligomap_{sample}.log",
     log:
@@ -492,7 +492,7 @@ rule sort_transcriptome_oligomap:
 
 rule convert_transcriptome_to_sam_oligomap:
     input:
-        sort=INTERMEDIATES_DIR / "{sample}" / "oligomap_transcriptome_sorted.fasta",
+        sort=INTERMEDIATES_DIR / "{sample}" / "oligomap_transcriptome_sorted.oligomap",
         script=SCRIPTS_DIR / "oligomap_output_to_sam_nh_filtered.py",
     output:
         tmap=INTERMEDIATES_DIR / "{sample}" / "oligomap_transcriptome_mappings.sam",
