@@ -105,7 +105,7 @@ on installation and usage please see [here](README.md).
 
 ## Description of workflow steps
 
-> The workflow consists of four Snakemake files: A main `Snakefile` and an
+> The workflow consists of five Snakemake files: A main `Snakefile` and an
 > individual Snakemake file for each step in the workflow (the genome resources
 > preparation, the reads mapping, the miRNA quantification and the ASCII-style
 > pileups generation). The main `Snakefile` contains the configuration file
@@ -146,7 +146,6 @@ Some parameters within the workflow can be modified. Refer to the
 [configuration template](#config/config_template.yaml) for a detailed
 explanation of each option.
 
-<!-- add the default parameters? -->
 
 ### Snakefile
 
@@ -221,9 +220,9 @@ Create transcriptome from genomic sequence and annotations with
 [**cufflinks**](#third-party-software-used).
 
 - **Input**
+  - (**Workflow input**) Genome annotations, `gzip`ed (`.gtf.gz`)
   - Genome sequence, trimmed IDs (`.fa`); from
   [**trim_genome_seq_ids**](#trim_genome_seq_ids)
-  - (**Workflow input**) Genome annotations, `gzip`ed (`.gtf.gz`)
 - **Output**
   - Transcriptome sequence (`.fa`); used in 
   [**trim_transcriptome_seq_ids**](#trim_transcriptome_seq_ids)
@@ -287,6 +286,7 @@ Retrieve exon annotations from genome annotations with a
   - Exon annotations (`.gtf`); used in 
   [**convert_exons_gtf_to_bed**](#convert_exons_gtf_to_bed)
 
+
 #### `convert_exons_gtf_to_bed`
 
 Convert exon annotations `.gtf` to `.bed` with a
@@ -305,7 +305,7 @@ Create SAM header for the genome with
 [**SAMtools**](#third-party-software-used).
 
 > Required by [SAMtools](#third-party-software-used) to work with the
-> alignments file.
+> alignment files.
 
 - **Input**
   - Genome sequence, trimmed IDs (`.fa`); from
@@ -350,7 +350,9 @@ Create a FASTA index for the genome with
 
 Extract chromosome(s) length from the genome sequence.
 
-<!-- add "used in... for.."? -->
+> Required to ensure that the extended annotations in generated in the
+> [**extend_mirs_annotations**](#extend_mirs_annotations) rule do not exceed
+> the chromosome(s) boundaries.
 
 - **Input**
   - FASTA genome index (`.fa.fai`); from
@@ -369,8 +371,8 @@ Extend miRNA annotations and split the file by feature with a
 > with shifted start and/or end positions without exceeding chromosome(s)
 > boundaries. If required, pri-miR loci are also extended to accommodate the
 > new miRNA coordinates. In addition, pri-miR names are modified to record the
-> final positions by appending `_-y` and `_+x` to it, where `y` is the 5' 
-> shift and `x` the 3' shift. 
+> final positions by appending `_-y` and `_+x` to them, where `y` is the 5'
+> shift and `x` the 3' shift.
 
 - **Input**
   - miRNA annotations, mapped chromosome name(s) (`.gff3`); from
@@ -447,6 +449,7 @@ Target rule as required by [Snakemake][docs-snakemake].
   - BAM index file (`.bam.bai`); from
   [**index_all_alns_bam**](#index_all_alns_bam)
 
+
 #### `start`
 
 Copy and rename read files.
@@ -495,6 +498,7 @@ Convert reads file from FASTQ to FASTA with
 - **Output**
   - miRNA sequencing library (`.fa`); used in [**format_fasta**](#format_fasta)
 
+
 #### `format_fasta`
 
 Format read's sequences to appear on a single line with
@@ -504,7 +508,7 @@ Format read's sequences to appear on a single line with
   - miRNA sequencing library (`.fa`); from [**start**](#start) or 
   [**fastq_to_fasta**](#fastq_to_fasta)
 - **Output**
-  - miRNA sequencing library, formatted (`.fa`); used in
+  - miRNA sequencing library, formatted (`.fasta`); used in
   [**remove_adapters**](#remove_adapters)
 
 
@@ -514,7 +518,7 @@ Trim 3' adapters and `N` bases at either end. Filter reads by minimum length
 and number of inner `N` bases with [**cutadapt**](#third-party-software-used).
 
 - **Input**
-  - miRNA sequencing library, formatted (`.fa`); from
+  - miRNA sequencing library, formatted (`.fasta`); from
   [**format_fasta**](#format_fasta)
 - **Parameters**
   - **samples.tsv**
@@ -562,7 +566,7 @@ Align short reads to reference genome with
   [**collapse_identical_reads**](#collapse_identical_reads)
   - Genome sequence, trimmed IDs (`.fa`); from 
   [**trim_genome_seq_ids**](#trim_genome_seq_ids)
-  - segemehl genome index (`idx`); from
+  - segemehl genome index (`.idx`); from
   [**generate_segemehl_index_genome**](#generate_segemehl_index_genome)
 - **Output**
   - Alignments file (`.sam`); used in
@@ -575,11 +579,11 @@ Align short reads to reference transcriptome with
 [**segemehl**](#third-party-software-used).
 
 - **Input**
-  - miRNA sequencing library, collapsed (`.fa`); from
+  - miRNA sequencing library, collapsed, renamed (`.fasta`); from
   [**collapse_identical_reads**](#collapse_identical_reads)
   - Transcriptome sequence, trimmed IDs (`.fa`); from 
   [**trim_transcriptome_seq_ids**](#trim_transcriptome_seq_ids)
-  - segemehl transcriptome index (`idx`); from
+  - segemehl transcriptome index (`.idx`); from
   [**generate_segemehl_index_transcriptome**](#generate_segemehl_index_transcriptome)
 - **Output**
   - Alignments file (`.sam`); used in
@@ -590,7 +594,7 @@ Align short reads to reference transcriptome with
 
 Filter reads by length with a [**custom script**][custom-script-validation].
 
-> Required for the mapping optimal speed. Oligomap is specifically written for
+> Required for an optimal mapping speed. Oligomap is specifically written for
 > short reads. Therefore, reads with more bases than the default maximum (30
 > nts) makes the mapping slower.
 
@@ -623,8 +627,7 @@ Align short reads to reference genome with
 - **Output**
   - Alignments file (`.oligomap`); used in
   [**sort_genome_oligomap**](#sort_genome_oligomap)
-  - Alignment report (`.txt`); used in
-  [**sort_genome_oligomap**](#sort_genome_oligomap)
+  - Alignments report (`.txt`)
 
 
 #### `sort_genome_oligomap`
@@ -676,8 +679,7 @@ Align short reads to reference transcriptome with
 - **Output**
   - Alignments file (`.oligomap`); used in
   [**sort_transcriptome_oligomap**](#sort_transcriptome_oligomap)
-  - Alignment report (`.txt`); used in
-  [**sort_transcriptome_oligomap**](#sort_transcriptome_oligomap)
+  - Alignments report (`.txt`)
 
 
 #### `sort_transcriptome_oligomap`
@@ -813,7 +815,7 @@ Remove the SAM header of the transcriptome alignments file with
 
 #### `transcriptome_to_genome_maps`
 
-Convert the alignment's transcriptome coordinates to genomic ones with a
+Convert the alignments' transcriptome coordinates to genomic ones with a
 [**custom script**][custom-script-sam-trx].
 
 - **Input**
@@ -828,7 +830,7 @@ Convert the alignment's transcriptome coordinates to genomic ones with a
 
 #### `merge_all_maps`
 
-Concatenate the four alignments files into a single file.
+Concatenate the four alignment files into a single one.
 
 - **Input**
   - Alignments files, without SAM header (`.sam`); from
@@ -957,6 +959,7 @@ OUT:
     1-1	16	19	270081	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14G0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:2
     1-1	16	19	545543	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14A0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:1
 ```
+
 
 #### `convert_all_alns_sam_to_bam`
 
@@ -1236,9 +1239,10 @@ Tabulate alignments according to its new tag (`YW:Z`) with a
 
 > Each alignment contributes to the miRNA species in its `YW:Z` tag by `R/N`,
 > where `R` is the number of collapsed reads in that alignment, and `N` is the
-> number of genomic and/or transcriptomic loci it aligns to. The resulting
-> table has a row for each mature miRNA species (isomiR, canonical miRNA or
-> both) with the name format set in
+> number of genomic and/or transcriptomic loci it aligns to. The values of
+> both, `R` and `N` are inferred from the sequence name which follows the
+> format `ID-R_N`. The resulting table has a row for each mature miRNA species
+> (isomiR, canonical miRNA or both) with the name format set in
 > [**add_intersecting_mirna_tag**](#add_intersecting_mirna_tag) unless
 > considered a canonical miRNA, which only keeps the annotated mature miRNA
 > name. A miRNA species is considered to be canonical if there are no shifts
@@ -1250,7 +1254,7 @@ Tabulate alignments according to its new tag (`YW:Z`) with a
   [**sort_intersecting_mirna_by_feat_tag**](#sort_intersecting_mirna_by_feat_tag)
 - **Parameters**
   - **samples.tsv**
-    - Library name; specified in the samples table column `sample`
+    - Library name; specified in the sample's table column `sample`
   - **config_template.yaml**
     - `mir_list`: miRNA features to be quantified (default: isomir, mirna
     pri-miR)
@@ -1260,7 +1264,71 @@ Tabulate alignments according to its new tag (`YW:Z`) with a
 - **Examples**
 
 ```console
+Example 1 | Canonical miRNA and isomiR
 
+IN SAM record:
+    10-4_2	0	19	34627	255	21M	*	0	0	AAAGTGCTTCCTTTTAGAGGG	*	MD:Z:21	NM:i:0	NH:i:2	HI:i:1	YW:Z:hsa-miR-520b-3p|0|0|21M|21
+    10-4_2	0	19	40866	255	21M	*	0	0	AAAGTGCTTCCTTTTAGAGGG	*	MD:Z:21	NM:i:0	NH:i:2	HI:i:2	YW:Z:hsa-miR-520c-3p|0|-1|21M|21
+
+Data:
+    Alignment:
+        Read ID: 10
+        Number of collapsed reads: 4
+        Number of mapped genomic loci: 2
+        Contribution: 4/2 = 2
+
+    miRNA species:
+        Tag name: hsa-miR-520b-3p|0|0|21M|21
+        Type: Canonical
+        Table name: hsa-miR-520b-3p
+        Total count: 2
+
+        Tag name: hsa-miR-520c-3p|0|-1|21M|21
+        Type: isomiR
+        Table name: hsa-miR-520c-3p|0|-1|21M|21
+        Total count: 2
+
+OUT table:
+    ID	                        lib_name
+    hsa-miR-520b-3p         	2
+    hsa-miR-520c-3p|0|-1|21M|21	2
+
+
+Example 2 | Different isomiRs
+
+IN SAM record:
+    599-1_3	0	19	27804	255	20M	*	0	0	AAAGTGCTTCCTTTTAGAGG	*	MD:Z:20	NM:i:0	NH:i:3	HI:i:1	YW:Z:hsa-miR-526b-3p|1|-1|20M|20
+    599-1_3	0	19	34627	255	20M	*	0	0	AAAGTGCTTCCTTTTAGAGG	*	MD:Z:20	NM:i:0	NH:i:3	HI:i:2	YW:Z:hsa-miR-520b-3p|0|-1|20M|20
+    599-1_3	0	19	40866	255	20M	*	0	0	AAAGTGCTTCCTTTTAGAGG	*	MD:Z:20	NM:i:0	NH:i:3	HI:i:3	YW:Z:hsa-miR-520c-3p|0|-2|20M|20
+
+Data:
+    Alignment:
+        Read ID: 599
+        Number of collapsed reads: 1
+        Number of mapped genomic loci: 3
+        Contribution: 1/3 = 0.33
+
+    miRNA species:
+        Tag name: hsa-miR-526b-3p|1|-1|20M|20
+        Type: isomiR
+        Table name: hsa-miR-526b-3p|1|-1|20M|20
+        Total count: 0.33
+
+        Tag name: hsa-miR-520b-3p|0|-1|20M|20 
+        Type: isomiR
+        Table name: hsa-miR-520b-3p|0|-1|20M|20
+        Total count: 0.33
+
+        Tag name: hsa-miR-520c-3p|0|-2|20M|20
+        Type: isomiR
+        Table name: hsa-miR-520c-3p|0|-2|20M|20 
+        Total count: 0.33
+                      
+OUT table:            
+    ID	                        lib_name
+    hsa-miR-520b-3p|0|-1|20M|20	0.33
+    hsa-miR-520c-3p|0|-2|20M|20	0.33
+    hsa-miR-526b-3p|1|-1|20M|20	0.33
 ```
 
 
@@ -1271,9 +1339,10 @@ Tabulate alignments according to its intersecting pri-miR with a
 
 > Each alignment contributes to the pri-miR it intersects with by `R/N`, where
 > `R` is the number of collapsed reads in that alignment, and `N` is the
-> number of genomic and/or transcriptomic loci it aligns to. The resulting
-> table has a row for each pri-miR with the name format set in
-> [**mirna_extension**](#mirna_extension).
+> number of genomic and/or transcriptomic loci it aligns to. The values of
+> both, `R` and `N` are inferred from the sequence name which follows the
+> format `ID-R_N`. The resulting table has a row for each pri-miR with the
+> name format set in [**mirna_extension**](#mirna_extension).
 
 - **Input**
   - pri-miR intersections file (`.bed`); from
@@ -1281,8 +1350,61 @@ Tabulate alignments according to its intersecting pri-miR with a
 - **Output**
   - pri-miR counts tab-delimited file; used in
   [**merge_tables**](#merge_tables)
+- **Examples**
 
-<!-- examples. -->
+```console
+Example 1 | One single pri-miR with different alignments
+
+IN BED records:
+    19	.	miRNA_primary_transcript	27766	27788	.	+	.	ID=MI0003150;Alias=MI0003150;Name=hsa-mir-526b_-0_+0	19	27765	27788	68-2_1	255	+
+    19	.	miRNA_primary_transcript	27766	27787	.	+	.	ID=MI0003150;Alias=MI0003150;Name=hsa-mir-526b_-0_+0	19	27765	27787	316-1_7	1	+
+    19	.	miRNA_primary_transcript	27804	27823	.	+	.	ID=MI0003150;Alias=MI0003150;Name=hsa-mir-526b_-0_+0	19	27803	27823	599-1_3	255	+
+    19	.	miRNA_primary_transcript	27805	27822	.	+	.	ID=MI0003150;Alias=MI0003150;Name=hsa-mir-526b_-0_+0	19	27804	27822	226-1_4	1	+
+
+Alignments:
+    Read ID: 68
+    Number of collapsed reads: 2
+    Number of mapped genomic loci: 1
+    Contribution: 2/1 = 2
+
+    Read ID: 316
+    Number of collapsed reads: 1
+    Number of mapped genomic loci: 7
+    Contribution: 1/7 = 0.143
+
+    Read ID: 599
+    Number of collapsed reads: 1
+    Number of mapped genomic loci: 3
+    Contribution: 1/3 = 0.33
+
+    Read ID: 226
+    Number of collapsed reads: 1
+    Number of mapped genomic loci: 4
+    Contribution: 1/4 = 0.25
+
+OUT table:            
+    ID	                lib_name
+    hsa-mir-526b_-0_+0	2.723
+
+
+Example 2 | Different pri-miRs for a single read
+
+IN BED records:
+    19	.	miRNA_primary_transcript	40866	40886	.	+	.	ID=MI0003158;Alias=MI0003158;Name=hsa-mir-520c_-0_+0	19	40865	40886	10-4_2	255	+
+    19	.	miRNA_primary_transcript	34627	34647	.	+	.	ID=MI0003155;Alias=MI0003155;Name=hsa-mir-520b_-5_+6	19	34626	34647	10-4_2	255	+
+
+Alignment:
+    Read ID: 10
+    Number of collapsed reads: 4
+    Number of mapped genomic loci: 2
+    Contribution: 4/2 = 2
+
+OUT table:            
+    ID	                lib_name
+    hsa-mir-520c_-0_+0	2
+    hsa-mir-520b_-5_+6	2
+```
+
 
 #### `merge_tables`
 
@@ -1303,8 +1425,30 @@ Merge all the tables from the different libraries into a single one with a
     pri-mir)
 - **Output**
   - (**Workflow output**) (iso)miR and/or pri-miR counts table (`.tab`)
+- **Example**
 
-<!-- examples. -->
+```console
+IN library 1
+    ID                              lib_1
+    hsa-miR-524-5p          	    1	 
+    hsa-miR-524-5p|0|0|22M|9G12	    1    
+    hsa-miR-524-5p|0|0|22M|9G9C2	1    
+
+IN library 2
+    ID                              lib_2
+    hsa-miR-524-5p          	    1
+    hsa-miR-1283	                1
+    hsa-miR-1283|-1|-2|21M|21	    1
+
+OUT table
+    ID                              lib_1  lib_2
+    hsa-miR-524-5p          	    1	    1
+    hsa-miR-524-5p|0|0|22M|9G12	    1   	NA
+    hsa-miR-524-5p|0|0|22M|9G9C2	1   	NA
+    hsa-miR-1283	                NA	    1
+    hsa-miR-1283|-1|-2|21M|21	    NA	    1
+```
+
 
 #### `uncollapse_reads`
 
