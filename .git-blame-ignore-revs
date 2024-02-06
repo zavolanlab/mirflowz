@@ -1,0 +1,5 @@
+# This file is used to list commits which will be ignored by github to calculate git blame
+# These are commits which modify multiple parts of the codebase, e.g formatting changes
+
+# Format Snakefile with snakefmt
+684d582acdb8af4ae87911dc7eb747411ff30eaa
