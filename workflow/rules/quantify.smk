@@ -45,7 +45,6 @@ samples_table = pd.read_csv(
     sep="\t",
 )
 
-
 ###############################################################################
 ### Global configuration
 ###############################################################################
@@ -64,7 +63,10 @@ rule finish_quantify:
     input:
         primir_intersect_sam=OUT_DIR / "{sample}" / "alignments_intersecting_primir.sam",
         mirna_intersect_sam=OUT_DIR / "{sample}" / "alignments_intersecting_mirna.sam",
-        table=OUT_DIR / "TABLES" / "all_{mir}_counts.tab",
+        table=expand(
+            OUT_DIR / "TABLES" / "all_{mir}_counts.tab",
+            mir=[mir for mir in config["mir_list"] if mir != "isomir"],
+        ),
         uncollapsed_bam=expand(
             OUT_DIR
             / "{sample}"
