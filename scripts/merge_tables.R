@@ -177,9 +177,8 @@ merge_tables <- function(cwd, prefix) {
   
   if (length(dataFiles)) {
     mat <- get_table(dataFiles[1], prefix)
-    
     for (i in seq_len(length(dataFiles) - 1)) {
-      mat <- full_join(mat, get_table(dataFiles[i + 1], prefix), by = "ID")
+      mat <- full_join(mat, get_table(dataFiles[i + 1], prefix), by = "ID", relationship = "many-to-many")
     }
     mat <- filter(mat, !is.na(ID))
   }
