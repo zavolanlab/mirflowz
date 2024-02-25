@@ -113,6 +113,8 @@ rule compress_reference_genome:
         LOCAL_LOG / "compress_reference_genome.log",
     container:
         "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+    conda:
+        ENV_DIR / "samtools.yaml"
     shell:
         "(bgzip < {input.genome} > {output.genome}) &> {log}"
 
