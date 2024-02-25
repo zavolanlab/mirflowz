@@ -141,7 +141,7 @@ rule create_per_library_ascii_pileups:
     params:
         cluster_log=CLUSTER_LOG / "pileups_{sample}.log",
         out_dir=lambda wildcards: expand(
-            PILEUP_DIR / "{sample}", sample=pd.unique(samples_table.index.values)
+            PILEUP_DIR / "{sample}", sample=[wildcards.sample]
         ),
         prefix="{sample}",
     log:
