@@ -63,10 +63,7 @@ rule finish_quantify:
     input:
         primir_intersect_sam=OUT_DIR / "{sample}" / "alignments_intersecting_primir.sam",
         mirna_intersect_sam=OUT_DIR / "{sample}" / "alignments_intersecting_mirna.sam",
-        table=expand(
-            OUT_DIR / "TABLES" / "all_{mir}_counts.tab",
-            mir=[mir for mir in config["mir_list"] if mir != "isomir"],
-        ),
+        table=OUT_DIR / "TABLES" / "all_{mir}_counts.tab",
         uncollapsed_bam=expand(
             OUT_DIR
             / "{sample}"
