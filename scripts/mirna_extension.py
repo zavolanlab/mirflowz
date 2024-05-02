@@ -108,41 +108,42 @@ class MirnaExtension:
                 "miRNA_primary_transcript"
             ):
                 seqid = primary_mirna.seqid
-                start = int(primary_mirna.start)
-                end = int(primary_mirna.end)
+                min_start = primary_mirna.start
+                max_end = primary_mirna.end
 
                 mature_miRNAs = list(
                     self.db.region(
                         seqid=seqid,
-                        start=start,
-                        end=end,
+                        start=min_start,
+                        end=max_end,
                         featuretype="miRNA",
                         completely_within=True,
                     )
                 )
 
                 if mature_miRNAs:
-                    for mir in mature_miRNAs:
-                        if mir.start - n > 0:
-                            mir.start -= n
+                    for mature_mir in mature_miRNAs:
+                        if mature_mir.start - n > 0:
+                            mature_mir.start -= n
                         else:
-                            mir.start = 0
+                            mature_mir.start = 0
 
-                        if mir.end + n < seq_lengths[seqid]:
-                            mir.end += n
+                        if mature_mir.end + n < seq_lengths[seqid]:
+                            mature_mir.end += n
                         else:
-                            mir.end = seq_lengths[seqid]
+                            mature_mir.end = seq_lengths[seqid]
 
-                        if mir.start < start:
-                            primary_mirna.start = mir.start
+                        min_start = min(min_start, mature_mir.start)
+                        max_end = max(max_end, mature_mir.end)
 
-                        if mir.end > end:
-                            primary_mirna.end = mir.end
+                        mirna.write(str(mature_mir) + "\n")
 
-                        mirna.write(str(mir) + "\n")
+                    start_diff = primary_mirna.start - min_start
+                    end_diff = max_end - primary_mirna.end
 
-                    start_diff = start - primary_mirna.start
-                    end_diff = primary_mirna.end - end
+                    primary_mirna.start = min_start
+                    primary_mirna.end = max_end
+
                     primary_mirna.attributes["Name"][0] += f"_-{start_diff}"
                     primary_mirna.attributes["Name"][0] += f"_+{end_diff}"
 
