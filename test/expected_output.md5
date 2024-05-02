@@ -54,7 +54,7 @@ f5749f5d2096386444a3d021e0a01817  results/intermediates/genome_processed.fa.bz.g
 d34fc868b861b1bc46db07a397dc0f10  results/intermediates/genome_processed.fa.fai
 21e102e4ebd3508bb06f46366a3d578d  results/intermediates/exons.gtf
 003b92b245ac336e3d70a513033e1cee  results/intermediates/transcriptome_trimmed_id.fa
-cc5c3512dab0e269d82bd625de74198e  results/intermediates/extended_primir_annotation_6_nt.gff3
+ead03955b87c6effac9afdf971559787  results/intermediates/extended_primir_annotation_6_nt.gff3
 f28cc0143ab6659bef3de3a7afa1dccc  results/intermediates/mirna_annotations.gff3
 2d437f8681f4248d4f2075f86debb920  results/intermediates/transcriptome.fa
 7eb64c112830266bcf416ded60b4cf77  results/intermediates/segemehl_transcriptome_index.idx
