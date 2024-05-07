@@ -94,25 +94,25 @@ on installation and usage please see [here](README.md).
 | Name | License | Tag line | More info |
 | --- | --- | --- | --- |
 | **ASCII-style alignment pileups** | [Apache 2.0][license-apache2] | _"Generates ASCII-style pileups of read alignments in one or more BAM files for one or more genomic regions."_ | [code][code-ascii] | 
-| **BEDTools** | [GPLv2][license-gpl2] | _"[...] intersect, merge, count, complement, and shuffle genomic intervals from multiple files in widely-used genomic file formats such as BAM, BED, GFF/GTF, VCF"_ | [code][code-bedtools] / [manual][manual-bedtools] / [publication][pub-bedtools] |
+| **BEDTools** | [GPLv2][license-gpl2] | _"[...] intersect, merge, count, complement, and shuffle genomic intervals from multiple files in widely-used genomic file formats such as BAM, BED, GFF/GTF, VCF"_ | [code][code-bedtools] / [manual][docs-bedtools] / [publication][pub-bedtools] |
 | **cufflinks** | [BSL-1.0][license-bsl1] | _"[...] assembles transcripts, estimates their abundances, and tests for differential expression and regulation in RNA-Seq samples"_ | [code][code-cufflinks] / [manual][docs-cufflinks] / [publication][pub-cufflinks] |
 | **cutadapt** | [MIT][license-mit] | _"[...] finds and removes adapter sequences, primers, poly-A tails and other types of unwanted sequence from your high-throughput sequencing reads"_ | [code][code-cutadapt] / [manual][docs-cutadapt] / [publication][pub-cutadapt] |
 | **FASTX-Toolkit** | [AGPL-3.0][license-agpl3] | _"[...] collection of command line tools for Short-Reads FASTA/FASTQ files preprocessing"_ | [code][code-fastx] / [manual][docs-fastx] |
-| **GFFUtils** | [AFL-3][license-afl3] | _"[...]  a small set of utility programs for working with GFF and GTF files"_ | [code][code-gffutils] / [manual][docs-gffutils] |
+| **GFFUtils** | [AFL-3][license-afl3] | _"[...] a small set of utility programs for working with GFF and GTF files"_ | [code][code-gffutils] / [manual][docs-gffutils] |
 | **Oligomap** | [GPLv3][license-gpl3] | _"[...] fast identification of nearly-perfect matches of small RNAs in sequence databases. It allows to exhaustively identify all the perfect and 1-error (where an error is defined to be a mismatch, insertion or deletion) matches of large sets of small RNAs to target sequences"_ | [code][code-oligomap] / [publication][pub-oligomap] |
 | **SAMtools** | [MIT][license-mit] | _"[...] suite of programs for interacting with high-throughput sequencing data"_ | [code][code-samtools] / [manual][docs-samtools] / [publication][pub-samtools] |
-| **segemehl** | [GPLv3][license-gpl3] | _"[...]  map short sequencer reads to reference genomes"_ | [manual][docs-segemehl] / [publication][pub-segemehl] |
+| **segemehl** | [GPLv3][license-gpl3] | _"[...] map short sequencer reads to reference genomes"_ | [manual][docs-segemehl] / [publication][pub-segemehl] |
 
 ## Description of workflow steps
 
 > The workflow consists of five Snakemake files: A main `Snakefile` and an
-> individual Snakemake file for each step in the workflow (the genome resources
-> preparation, the reads mapping, the miRNA quantification and the ASCII-style
-> pileups generation). The main `Snakefile` contains the configuration file
-> validation along with the inclusion of the sub-workflows. Individual steps of
-> the workflow are described briefly along with some examples, and links to the
-> respective software manuals are given. Parameters that can be modified by the
-> user (via the samples table and the configuration file) are also described.
+> individual Snakemake file each for the genome resources preparation, the
+> reads mapping, the miRNA quantification and the ASCII-style pileups
+> generation. The main `Snakefile` contains the configuration file validation
+> along with the wiring of the modules. Individual steps of the workflow are
+> described briefly along with some examples, and links to the respective
+> software manuals are given. Parameters that can be modified by the user (via
+> the samples table and the configuration file) are also described.
 
 ### Rule graph
 
@@ -920,14 +920,14 @@ OUT:
 
 #### `filter_by_indels`
 
-Filter multimappers favoring mismatches over indels with a
+Filter multimappers favoring mismatches over InDels with a
 [**custom script**][custom-script-filter-mm].
 
-> Under the assumption that indels are less frequent than mismatches only
+> Under the assumption that InDels are less frequent than mismatches only
 > those alignments (of the same read with the same edit distance) with the
-> lowest number of indels are kept. This approach allows the presence of
-> multimappers and/or indels after the filtering if the alignments contain the
-> same proportion of mismatches vs. indels.
+> lowest number of InDels are kept. This approach allows the presence of
+> multimappers and/or InDels after the filtering if the alignments contain the
+> same proportion of mismatches vs. InDels.
 
 - **Input**
   - Alignments file, sorted, filtered (`.sam`); from
@@ -939,7 +939,7 @@ Filter multimappers favoring mismatches over indels with a
 - **Examples**
 
 ```console
-Example 1 | Different proportion of mismatches vs. indels
+Example 1 | Different proportion of mismatches vs. InDels
 
 IN:
     1-1	16	19	77595	255	14M1D8M	*	0	0	GCAGGAGAATCACTGATGTCAG	*	MD:Z:14^T2A1C3	NH:i:2	NM:i:3	XA:Z:Q	XI:i:1
@@ -948,7 +948,7 @@ OUT:
     1-1	16	19	77595	255	14M1D8M	*	0	0	GCAGGAGAATCACTGATGTCAG	*	MD:Z:14^T2A1C3	NM:i:3	XA:Z:Q	XI:i:1	NH:i:1	HI:i:1
 
 
-Example 2 | Equal proportion of mismatches vs. indels
+Example 2 | Equal proportion of mismatches vs. InDels
 
 IN:
     1-1	0	19	142777	255	15M1I5M	*	0	0	GCTAGGTGGGAGGCTTGAAGC	*	MD:Z:4C0T14	NH:i:3	NM:i:3	XA:Z:Q	XI:i:0
@@ -1197,7 +1197,7 @@ NEW TAG:
     YW:Z:hsa-miR-524-5p|0|0|11M3I11M|22
 
 
-Example 3 | Intersecting an isomiR (no indels nor mismatches)
+Example 3 | Intersecting an isomiR (no InDels nor mismatches)
 
 IN miRNA annotations:
     chr19	.	miRNA	5338	5359	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786
@@ -1247,7 +1247,7 @@ Tabulate alignments according to its new tag (`YW:Z`) with a
 > considered a canonical miRNA, which only keeps the annotated mature miRNA
 > name. A miRNA species is considered to be canonical if there are no shifts
 > between its start and end positions and the aligned read ones, and there
-> are no mismatches nor indels.
+> are no mismatches nor InDels.
 
 - **Input** 
   - Alignments file, tagged, sorted (`.sam`); from
@@ -1586,7 +1586,7 @@ libraries with [**ASCII-style alignment pileups**](#third-party-software-used).
 #### `create_per_run_ascii_pileups`
 
 Create ASCII-style pileups for all the desired annotated regions for the whole
-run with [**ASCII-style alignment pilueups**](#third-party-software-used). 
+run with [**ASCII-style alignment pileups**](#third-party-software-used). 
 
 > If no BED file is provided, the pileups' output directory will only contain
 > an empty file.
@@ -1610,7 +1610,7 @@ run with [**ASCII-style alignment pilueups**](#third-party-software-used).
 
 Create ASCII-style pileups for all the desired annotated regions across the
 different library subsets if provided with
-[**ASCII-style alignment pilueups**](#third-party-software-used).
+[**ASCII-style alignment pileups**](#third-party-software-used).
 
 > **OPTIONAL RULE.** The ASCII-style pileups for each annotated region are
 > made if, and only if, at least one library subset is specified in the
