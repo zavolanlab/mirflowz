@@ -159,7 +159,7 @@ tested, you can go ahead and run the workflow on your samples.
 It is suggested to have all the input files for a given run (or hard links 
 pointing to them) inside a dedicated directory, for instance under the 
 _MIRFLOWZ_ root directory. This way, it is easier to keep the data together,
-reproduce analysis and set up Singularity access to them.  
+set up Singularity access to them and reproduce analyses.  
 
 #### 1. Prepare a sample table
 
@@ -325,41 +325,54 @@ snakemake \
 
 The _MIRFLOWZ_ workflow initially processes and indexes the genome resources
 provided by the user. The regions corresponding to mature miRNAs are extended
-on both sides to accommodate isomiR species with shifted start and/or end
-positions. If necessary, pri-miR loci are similarly extended to adjust to the
-new miRNA coordinates.
+by a fixed but user-adjustable number of nucleotides on both sides to
+accommodate isomiR species with shifted start and/or end positions. If
+necessary, pri-miR loci are extended to adjust to the new miRNA coordinates.
+The user-provided short-read small RNA-seq libraries undergo quality filtering
+(skipped if libraries are provided in FASTA rather than FASTQ), followed by
+adapter removal.
 
-Subsequently, the user-provided short-read small RNA-seq libraries undergo
-quality filtering if a FASTQ file is provided. Alternatively, adapters are
-directly removed. The resulting reads are independently mapped to both the
-genome and the transcriptome using two distinct aligners: [Segemehl][segemehl]
-and our in-house tool [Oligomap][oligomap]. After the mapping, only the best
-alignments for each read, determined by the smallest edit distance, are
-retained by merging and filtering the resulting alignments into a single file.
+The resulting reads are independently mapped to both the genome and the
+transcriptome using two distinct aligners: Segemehl and our in-house tool
+Oligomap. On the one hand, Segemehl implements a fast heuristic strategy that
+returns the alignment(s) with the smallest edit distance. Oligomap, on the
+other hand, implements a slower and more restricted approach that reports all
+the alignments with an edit distance of at most 1. The combination of the fast
+and flexible results and the strict selection ensures results with a higher
+fidelity than if only one of the tools were to be used. After the mapping,
+duplicate alignments resulting from the partially redundant mapping strategy
+are discarded and only the best alignments for each read are retained in a
+a single file.
 
-The collection of resulting alignments is then reduced to contain only unique
-entries. Due to the short length of the reads and the sequence similarity among
+<!--
+
+TO REFORMULATE AND ADD PRI-MIR NAME STUFF
+
+Due to the short length of the reads and the sequence similarity among
 miRNAs, the number of alignments can be high. Therefore, reads aligned beyond a
 specified threshold are discarded. To address multimapping, alignments with the
-fewest indels are preserved. These alignments are subsequently intersected with
-the user-provided, pre-processed miRNA annotation files using
-[BEDTools][bedtools]. Note that an alignment will not contribute to the final
-count if its start and/or end positions differ significantly from the provided
-miRNA annotations, beyond the extension applied to the mature miRNA start
-and/or end positions, or by 1 if no extension was applied. Conversely, a
-retained read contributes 1/n to all the annotated miRNA species it aligns
-with, where `n` is the number of genomic and/or transcriptomic loci it aligns
-to.
+fewest InDels are preserved.
 
-_MIRFLOWZ_ employs an unambiguous notation to classify isomiRs using the format
-`miRNA_name|5p-shift|3p-shift|CIGAR|MD`, where `5p-shift` and `3p-shift`
-represent the differences between the annotated mature miRNA start and end
-positions and those of the alignment, respectively.
+These alignments are subsequently intersected with
+the user-provided, pre-processed miRNA annotation files using
+BEDTools. _MIRFLOWZ_ employs an unambiguous notation to classify isomiRs using
+the format `miRNA_name|5p-shift|3p-shift|CIGAR|MD`, where `5p-shift` and
+`3p-shift` represent the differences between the annotated mature miRNA start
+and end positions and those of the read alignment, respectively.
 
 Counts are tabulated separately for reads consistent with either
-miRNA precursors, mature miRNA and/or isomiRs and all library counts are
-fused into a single table. Finally, ASCII-style alignment pileups are
-optionally generated for user-defined regions of interest.
+miRNA precursors, mature miRNA and/or isomiRs, and all library counts are fused
+into a single table. Note that an alignment is only counted towards a given
+miRNA (or isomiR) species if one of its alignments fully falls within the
+(previously extended) locus annotated for that miRNA. Specifically, reads
+contribute with 1/n for each miRNA for which that is the case, where `n` is the
+total number of genomic loci the read aligns to.
+
+-->
+
+Finally, to visualize the distribution of read alignments around miRNA
+loci, ASCII-style alignment pileups are optionally generated for user-defined
+regions of interest.
 
 > **NOTE:** For a detailed description of each rule along with some examples,
 > please, refer to the [workflow documentation](pipeline_documentation.md).
@@ -375,7 +388,7 @@ _MIRFLOWZ_ is an open-source project which relies on community contributions.
 You are welcome to participate by submitting bug reports or feature requests,
 taking part in discussions, or proposing fixes and other code changes. Please
 refer to the [contributing guidelines](CONTRIBUTING.md) if you are interested
-in contribute.
+in contributing.
 
 ## License
 
@@ -384,7 +397,7 @@ This project is covered by the [MIT License](LICENSE).
 ## Contact
 
 For questions or suggestions regarding the code, please use the
-[issue tracker][issue-tracker]. Do not hesitate on contacting us via
+[issue tracker][issue-tracker]. Do not hesitate to contact us via
 [email][email] for any other inquiries.
 
 &copy; 2023 [Zavolab, Biozentrum, University of Basel][zavolab]
