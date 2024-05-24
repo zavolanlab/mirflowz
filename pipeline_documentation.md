@@ -109,10 +109,11 @@ on installation and usage please see [here](README.md).
 > individual Snakemake file each for the genome resources preparation, the
 > reads mapping, the miRNA quantification and the ASCII-style pileups
 > generation. The main `Snakefile` contains the configuration file validation
-> along with the wiring of the modules. Individual steps of the workflow are
-> described briefly along with some examples, and links to the respective
-> software manuals are given. Parameters that can be modified by the user (via
-> the samples table and the configuration file) are also described.
+> and imports the various functional modules described below. Individual steps
+> of the workflow are described briefly along with some examples, and links to
+> the respective software manuals are given. Parameters that can be modified by
+> the user (via the samples table and the configuration file) are also
+> described.
 
 ### Rule graph
 
