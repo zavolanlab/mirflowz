@@ -323,35 +323,64 @@ snakemake \
 
 ## Workflow description
 
+_MIRFLOWZ_ consists of a main `Snakefile` and four functional modules. In the
+`Snakefile`, the configuration file is validated, and the various modules are
+imported. <!-- ADDITIONAL DESCRIPTION OF SNAKEFILE -->
+The modules (1) process the genome resources, (2) map and (3) quantify the
+reads, and (4) generate pileups, as described in detail below.
+
+> **NOTE:** For an elaborated description of each rule along with some
+> examples, please, refer to the
+> [workflow documentation](pipeline_documentation.md).
+
+
+### Prepare module
+
 The _MIRFLOWZ_ workflow initially processes and indexes the genome resources
 provided by the user. The regions corresponding to mature miRNAs are extended
 by a fixed but user-adjustable number of nucleotides on both sides to
 accommodate isomiR species with shifted start and/or end positions. If
 necessary, pri-miR loci are extended to adjust to the new miRNA coordinates.
+
+### Map module
+
 The user-provided short-read small RNA-seq libraries undergo quality filtering
 (skipped if libraries are provided in FASTA rather than FASTQ), followed by
 adapter removal.
 
 The resulting reads are independently mapped to both the genome and the
 transcriptome using two distinct aligners: Segemehl and our in-house tool
-Oligomap. On the one hand, Segemehl implements a fast heuristic strategy that
+Oligomap.
+
+On the one hand, Segemehl implements a fast heuristic strategy that
 returns the alignment(s) with the smallest edit distance. Oligomap, on the
 other hand, implements a slower and more restricted approach that reports all
 the alignments with an edit distance of at most 1. The combination of the fast
 and flexible results and the strict selection ensures results with a higher
-fidelity than if only one of the tools were to be used. After the mapping,
+fidelity than if only one of the tools were to be used.
+
+
+After the mapping,
 duplicate alignments resulting from the partially redundant mapping strategy
 are discarded and only the best alignments for each read are retained in a
-a single file.
+single file.
 
 <!--
 
 TO REFORMULATE AND ADD PRI-MIR NAME STUFF
 
+https://zavolab.slack.com/archives/C04K2PNR0AX/p1694011332229759
+
 Due to the short length of the reads and the sequence similarity among
 miRNAs, the number of alignments can be high. Therefore, reads aligned beyond a
 specified threshold are discarded. To address multimapping, alignments with the
 fewest InDels are preserved.
+
+-->
+
+### Quantify module
+
+<!--
 
 These alignments are subsequently intersected with
 the user-provided, pre-processed miRNA annotation files using
@@ -370,12 +399,12 @@ total number of genomic loci the read aligns to.
 
 -->
 
+### ASCII-style pileups module
+
 Finally, to visualize the distribution of read alignments around miRNA
 loci, ASCII-style alignment pileups are optionally generated for user-defined
 regions of interest.
 
-> **NOTE:** For a detailed description of each rule along with some examples,
-> please, refer to the [workflow documentation](pipeline_documentation.md).
 
 The schema below is a visual representation of the individual workflow steps
 and how they are related:
