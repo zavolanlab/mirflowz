@@ -54,7 +54,7 @@ class TestParseArguments:
 
     def test_no_files(self, monkeypatch):
         """Call without input nor output files."""
-        with pytest.raises(SystemExit) as sysex:
+with pytest.raises(SystemExit) as sysex:
             monkeypatch.setattr(sys, "argv", ["mirna_extension"])
             parse_arguments().parse_args()
         assert sysex.value.code == 2
@@ -204,48 +204,222 @@ class TestMain:
             assert output.read() == expected.read()
 
 
-class TestLoadGffFile:
-    """Test for the 'load_gff_file' method."""
+class TestSetDb:
+    """Test for the 'set_db' method."""
 
-    def test_load_gff_file(self, gff_no_extremes):
-        """Test input loading from file."""
+    def test_set_db_file(self, gff_no_extremes):
+        """Test setting local db from file."""
         in_file, pre_exp, mir_exp = gff_no_extremes
 
-        mirnaObject = MirnaExtension()
-        mirnaObject.load_gff_file(str(in_file))
+        miR_obj = MirnaExtension()
+        miR_obj.set_db(str(in_file))
 
-        assert mirnaObject is not None
-        assert isinstance(mirnaObject.db, gffutils.FeatureDB)
+        assert miR_obj is not None
+        assert isinstance(miR_obj.db, gffutils.FeatureDB)
         assert (
             len(
                 list(
-                    mirnaObject.db.features_of_type("miRNA_primary_transcript")
+                    miR_obj.db.features_of_type("miRNA_primary_transcript")
                 )
             )
             == 2
         )
-        assert len(list(mirnaObject.db.features_of_type("miRNA"))) == 3
+        assert len(list(miR_obj.db.features_of_type("miRNA"))) == 3
 
-    def test_load_gff_file_std(self, monkeypatch, gff_no_extremes):
-        """Test input loading from standard input."""
+    def test_set_db_stdin(self, monkeypatch, gff_no_extremes):
+        """Test setting local db from standard input."""
         in_file, pre_exp, mir_exp = gff_no_extremes
         monkeypatch.setattr(sys, "stdin", str(in_file))
 
-        mirnaObject = MirnaExtension()
-        mirnaObject.load_gff_file()
+        miR_obj = MirnaExtension()
+        miR_obj.set_db()
 
-        assert mirnaObject is not None
-        assert isinstance(mirnaObject.db, gffutils.FeatureDB)
+        assert miR_obj is not None
+        assert isinstance(miR_obj.db, gffutils.FeatureDB)
         assert (
             len(
                 list(
-                    mirnaObject.db.features_of_type("miRNA_primary_transcript")
+                    miR_obj.db.features_of_type("miRNA_primary_transcript")
                 )
             )
             == 2
         )
-        assert len(list(mirnaObject.db.features_of_type("miRNA"))) == 3
+        assert len(list(miR_obj.db.features_of_type("miRNA"))) == 3
 
+
+class TestSetSeqLengths:
+    """Test for the 'set_seq_lengths' method."""
+
+    def test_set_lengths_no_tbl(self, ):
+        """Test create sequence lengths dictionary from GFF3 file."""
+        # Add files
+
+        miR_obj = MirnaExtension()
+        miR_obj.set_db()
+        miR_obj.set_seq_lengths()
+
+        # Assert correct lengths?
+        # Assert not empty?
+
+    def test_set_lengths_wrong_tbl(self, ):
+        """Test create sequence lengths dictionary from wrong table."""
+        # Add tables
+
+        miR_obj = MirnaExtension()
+        miR_obj.set_seq_lengths()
+
+        # Assert valueError?
+        # Assert not empty?
+
+    def test_set_lengths_correct_tbl(self, ):
+        """Test create sequence lengths dictionary from correct table."""
+        # Add tables
+
+        miR_obj = MirnaExtension()
+        miR_obj.set_seq_lengths()
+
+        # Assert correct lengths?
+        # Assert not empty?
+
+
+class TestProcessPrecursor:
+    """Test for the 'process_precursor' method."""
+
+    def test_process_prec_diff_strand_same_coords(self, ):
+        """Test processing precursor on different strands, similar coords."""
+        # Add files and tables
+
+        miR_obj = MirnaExtension()
+        miR_obj.set_db()
+        miR_obj.set_seq_lengths()
+        precursor = miR_obj.process_precursor(precursor="name")
+
+        # Assert correct precursor new name
+        # Assert correct mature extension ?
+
+    def test_process_prec_miR_out_seq_init_boundaries(self, ):
+        """Test processing precursor for outside seq boundaries miRNAs."""
+        # Add files and tables
+
+        miR_obj = MirnaExtension()
+        miR_obj.set_db()
+        miR_obj.set_seq_lengths()
+        precursor = miR_obj.process_precursor(precursor="name")
+
+        # Assert ValueError
+
+    def test_process_prec_unknown_seq(self, ):
+        """Test processing precursor with annotated seq ID not in len dict."""
+        # Add files and tables
+
+        miR_obj = MirnaExtension()
+        miR_obj.set_db()
+        miR_obj.set_seq_lengths()
+        precursor = miR_obj.process_precursor(precursor="name")
+
+        # Assert KeyError
+
+    def test_process_prec_no_precursor_extension(self, ):
+        """Test processing precursor without precursor extension."""
+        # Add files and tables
+
+        miR_obj = MirnaExtension()
+        miR_obj.set_db()
+        miR_obj.set_seq_lengths()
+        precursor = miR_obj.process_precursor(precursor="name")
+
+        # Assert precursor name
+        # Assert correct mature miR extension
+
+    def test_process_prec_extended_miR_out_seq_boundaries(self, ):
+        """Test processing precursor with extended miRs out seq boundaries."""
+        # Add files
+
+        miR_obj = MirnaExtension()
+        miR_obj.set_db()
+        miR_obj.set_seq_lengths()
+        precursor = miR_obj.process_precursor(precursor="name")
+
+        # Assert one miR starts at 0
+        # Assert one miR ends and chr boundaries
+
+    def test_process_prec_extended_miR_in_seq_boundaries(self, ):
+        """Test processing precursor with extended miRs in seq boundaries."""
+        # Add files and tables
+
+        miR_obj = MirnaExtension()
+        miR_obj.set_db()
+        miR_obj.set_seq_lengths()
+        precursor = miR_obj.process_precursor(precursor="name")
+
+        # Assert no miR start = 0
+        # Assert no miR ends at chr boundaries
+
+
+class TestExtendMirnas:
+    """Test for the 'extend_mirnas' method."""
+
+    def test_extend_mirnas_no_extension(self, ):
+        """Test not extending miRNA coordinates."""
+        # Add files
+
+        miR_obj = MirnaExtension()
+        miR_obj.set_db()
+        miR_obj.set_seq_lengths()
+        miR_obj.extend_mirnas(n=0)
+
+        # Assert db == out_db
+
+    def test_extend_mirnas_extend_6_nts(self, ):
+        """Test extending miRNA coordinates 6 positions."""
+        # Add files
+
+        miR_obj = MirnaExtension()
+        miR_obj.set_db()
+        miR_obj.set_seq_lengths()
+        miR_obj.extend_mirnas()
+
+        # Assert correct extension
+
+
+class TestWriteGFF:
+    """Test for the 'write_gff' method."""
+
+    def test_write_precursor_file(self, ):
+        """Test writing only precursor GFF3."""
+        # Add files
+
+        miR_obj = MirnaExtension()
+        miR_obj.set_db()
+        miR_obj.set_seq_lengths()
+        miR_obj.extend_mirnas()
+        miR_obj.write_gff(feature_type="miRNA_primary_transcript")
+
+        # Assert only precursor?
+
+    def test_write_mature_mir_file(self, ):
+        """Test writing only mature miRNA GFF3."""
+        # Add files
+
+        miR_obj = MirnaExtension()
+        miR_obj.set_db()
+        miR_obj.set_seq_lengths()
+        miR_obj.extend_mirnas()
+        miR_obj.write_gff(feature_type="miRNA")
+
+        # Assert only miRNA?
+
+    def test_write_both_features_file(self, ):
+        """Test writing both precursor and mature miRNA GFF3."""
+        # Add files
+
+        miR_obj = MirnaExtension()
+        miR_obj.set_db()
+        miR_obj.set_seq_lengths()
+        miR_obj.extend_mirnas()
+        miR_obj.write_gff()
+
+        # Assert both features?
 
 class TestExtendMirnas:
     """Test for the 'extend_mirnas' method."""
@@ -257,9 +431,9 @@ class TestExtendMirnas:
         primir_out = tmp_path / "extended_primir_annotation_6_nt.gff3"
         mir_out = tmp_path / "extended_mirna_annotation_6_nt.gff3"
 
-        mirnaObject = MirnaExtension()
-        mirnaObject.load_gff_file(str(in_file))
-        mirnaObject.extend_mirnas(primir_out=primir_out, mir_out=mir_out)
+        miR_obj = MirnaExtension()
+        miR_obj.load_gff_file(str(in_file))
+        miR_obj.extend_mirnas(primir_out=primir_out, mir_out=mir_out)
 
         with open(primir_out, "r") as output, open(pre_exp, "r") as expected:
             assert output.read() == expected.read()
@@ -274,9 +448,9 @@ class TestExtendMirnas:
         primir_out = tmp_path / "extended_primir_annotation_6_nt.gff3"
         mir_out = tmp_path / "extended_mirna_annotation_6_nt.gff3"
 
-        mirnaObject = MirnaExtension()
-        mirnaObject.load_gff_file(str(in_file))
-        mirnaObject.extend_mirnas(primir_out=primir_out, mir_out=mir_out)
+        miR_obj = MirnaExtension()
+        miR_obj.load_gff_file(str(in_file))
+        miR_obj.extend_mirnas(primir_out=primir_out, mir_out=mir_out)
 
         with open(primir_out, "r") as output, open(pre_exp, "r") as expected:
             assert output.read() == expected.read()
@@ -299,9 +473,9 @@ class TestExtendMirnas:
                 line = line.strip().split("\t")
                 len_dict[line[0]] = int(line[1])
 
-        mirnaObject = MirnaExtension()
-        mirnaObject.load_gff_file(str(in_file))
-        mirnaObject.extend_mirnas(
+        miR_obj = MirnaExtension()
+        miR_obj.load_gff_file(str(in_file))
+        miR_obj.extend_mirnas(
             primir_out=primir_out, mir_out=mir_out, seq_lengths=len_dict
         )
 
