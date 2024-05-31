@@ -30,7 +30,7 @@ def gff_no_extremes():
 
 @pytest.fixture
 def gff_extremes():
-    """Import path to mirna annotation files with extreme miRNA coords."""
+    """Import path to miRNA annotation files with extreme miRNA coords."""
     in_extremes = Path("files/in_mirna_extreme_mirs.gff3")
     out_primir = Path("files/extreme_primir_anno.gff3")
     out_mir = Path("files/extreme_mir_anno.gff3")
@@ -40,168 +40,21 @@ def gff_extremes():
 
 @pytest.fixture
 def gff_extremes_chr():
-    """Import path to mirna annotation files and chr size."""
-    chr_size = Path("files/chr_size.txt")
+    """Import path to miRNA annotation files."""
     in_chr_extremes = Path("files/in_mirna_extreme_chr_mirs.gff3")
     out_primir = Path("files/extreme_chr_primir_anno.gff3")
     out_mir = Path("files/extreme_chr_mir_anno.gff3")
 
-    return chr_size, in_chr_extremes, out_primir, out_mir
+    return in_chr_extremes, out_primir, out_mir
 
 
-class TestParseArguments:
-    """Test 'parse_arguments()' function."""
+@pytest.fixture
+def seq_len_tbl():
+    """Import path to sequence lengths tables."""
+    correct_seq_len = Path("files/seq_len.tsv")
+    incorrect_seq_len = Path("files/seq_len_wrong.tsv")
 
-    def test_no_files(self, monkeypatch):
-        """Call without input nor output files."""
-with pytest.raises(SystemExit) as sysex:
-            monkeypatch.setattr(sys, "argv", ["mirna_extension"])
-            parse_arguments().parse_args()
-        assert sysex.value.code == 2
-
-    def test_in_files(self, monkeypatch, gff_empty, tmp_path):
-        """Call with in and output files."""
-        gff_in = gff_empty
-
-        monkeypatch.setattr(
-            sys,
-            "argv",
-            [
-                "mirna_extension",
-                str(gff_in),
-                "--outdir",
-                str(tmp_path),
-            ],
-        )
-
-        args = parse_arguments().parse_args()
-        assert isinstance(args, argparse.Namespace)
-
-    def test_all_arguments(self, monkeypatch, gff_extremes_chr, tmp_path):
-        """Call with all the arguments."""
-        chr_size, gff_in, gff_pre_out, gff_mir_out = gff_extremes_chr
-
-        monkeypatch.setattr(
-            sys,
-            "argv",
-            [
-                "mirna_extension",
-                str(gff_in),
-                "--outdir",
-                str(tmp_path),
-                "--chr",
-                str(chr_size),
-                "--extension",
-                "6",
-            ],
-        )
-
-        args = parse_arguments().parse_args()
-        assert isinstance(args, argparse.Namespace)
-
-
-class TestMain:
-    """Test 'main()' function."""
-
-    def test_main_empty_file(self, monkeypatch, gff_empty, tmp_path):
-        """Test main function with an empty file."""
-        gff_empty = gff_empty
-
-        primir_out = tmp_path / "extended_primir_annotation_6_nt.gff3"
-        mir_out = tmp_path / "extended_mirna_annotation_6_nt.gff3"
-
-        monkeypatch.setattr(
-            sys,
-            "argv",
-            [
-                "mirna_extension",
-                str(gff_empty),
-                "--outdir",
-                str(tmp_path),
-            ],
-        )
-        args = parse_arguments().parse_args()
-        main(args)
-
-        with open(gff_empty, "r") as expected, open(primir_out, "r") as output:
-            assert output.read() == expected.read()
-
-        with open(gff_empty, "r") as expected, open(mir_out, "r") as output:
-            assert output.read() == expected.read()
-
-    def test_main_no_extreme_coords(
-        self, monkeypatch, tmp_path, gff_no_extremes
-    ):
-        """Test main function with no extreme coords."""
-        in_gff, pre_gff, mir_gff = gff_no_extremes
-
-        primir_out = tmp_path / "extended_primir_annotation_6_nt.gff3"
-        mir_out = tmp_path / "extended_mirna_annotation_6_nt.gff3"
-
-        monkeypatch.setattr(
-            sys,
-            "argv",
-            ["mirna_extension", str(in_gff), "--outdir", str(tmp_path)],
-        )
-        args = parse_arguments().parse_args()
-        main(args)
-
-        with open(pre_gff, "r") as expected, open(primir_out, "r") as output:
-            assert output.read() == expected.read()
-
-        with open(mir_gff, "r") as expected, open(mir_out, "r") as output:
-            assert output.read() == expected.read()
-
-    def test_main_extreme_coords(self, monkeypatch, tmp_path, gff_extremes):
-        """Test main function with extreme coords."""
-        in_gff, pre_gff, mir_gff = gff_extremes
-
-        primir_out = tmp_path / "extended_primir_annotation_6_nt.gff3"
-        mir_out = tmp_path / "extended_mirna_annotation_6_nt.gff3"
-
-        monkeypatch.setattr(
-            sys,
-            "argv",
-            ["mirna_extension", str(in_gff), "--outdir", str(tmp_path)],
-        )
-        args = parse_arguments().parse_args()
-        main(args)
-
-        with open(pre_gff, "r") as expected, open(primir_out, "r") as output:
-            assert output.read() == expected.read()
-
-        with open(mir_gff, "r") as expected, open(mir_out, "r") as output:
-            assert output.read() == expected.read()
-
-    def test_main_extreme_coords_limit_size(
-        self, monkeypatch, tmp_path, gff_extremes_chr
-    ):
-        """Test main function with extreme coords and limited by chr size."""
-        chr_size, in_gff, pre_gff, mir_gff = gff_extremes_chr
-
-        primir_out = tmp_path / "extended_primir_annotation_6_nt.gff3"
-        mir_out = tmp_path / "extended_mirna_annotation_6_nt.gff3"
-
-        monkeypatch.setattr(
-            sys,
-            "argv",
-            [
-                "mirna_extension",
-                str(in_gff),
-                "--outdir",
-                str(tmp_path),
-                "--chr",
-                str(chr_size),
-            ],
-        )
-        args = parse_arguments().parse_args()
-        main(args)
-
-        with open(pre_gff, "r") as expected, open(primir_out, "r") as output:
-            assert output.read() == expected.read()
-
-        with open(mir_gff, "r") as expected, open(mir_out, "r") as output:
-            assert output.read() == expected.read()
+    return correct_seq_len, incorrect_seq_len
 
 
 class TestSetDb:
@@ -212,7 +65,7 @@ class TestSetDb:
         in_file, pre_exp, mir_exp = gff_no_extremes
 
         miR_obj = MirnaExtension()
-        miR_obj.set_db(str(in_file))
+        miR_obj.set_db(path=in_file)
 
         assert miR_obj is not None
         assert isinstance(miR_obj.db, gffutils.FeatureDB)
@@ -224,7 +77,7 @@ class TestSetDb:
             )
             == 2
         )
-        assert len(list(miR_obj.db.features_of_type("miRNA"))) == 3
+        assert len(list(miR_obj.db.features_of_type("miRNA"))) == 4
 
     def test_set_db_stdin(self, monkeypatch, gff_no_extremes):
         """Test setting local db from standard input."""
@@ -244,7 +97,17 @@ class TestSetDb:
             )
             == 2
         )
-        assert len(list(miR_obj.db.features_of_type("miRNA"))) == 3
+        assert len(list(miR_obj.db.features_of_type("miRNA"))) == 4
+
+    def test_set_db_empty_file(self, monkeypatch, gff_empty):
+        """Test setting local db from empty file."""
+        in_file = gff_empty
+
+        miR_obj = MirnaExtension()
+        miR_obj.set_db(path=in_file)
+
+        assert miR_obj.db is None
+        assert isinstance(miR_obj.db, gffutils.FeatureDB)
 
 
 class TestSetSeqLengths:
@@ -252,10 +115,10 @@ class TestSetSeqLengths:
 
     def test_set_lengths_no_tbl(self, ):
         """Test create sequence lengths dictionary from GFF3 file."""
-        # Add files
+        in_file, pre_exp, mir_exp = gff_no_extremes
 
         miR_obj = MirnaExtension()
-        miR_obj.set_db()
+        miR_obj.set_db(path=in_file)
         miR_obj.set_seq_lengths()
 
         # Assert correct lengths?
@@ -483,4 +346,159 @@ class TestExtendMirnas:
             assert output.read() == expected.read()
 
         with open(mir_out, "r") as output, open(mir_exp, "r") as expected:
+            assert output.read() == expected.read()
+
+
+## REINDENT
+class TestParseArguments:
+    """Test 'parse_arguments()' function."""
+    def test_no_files(self, monkeypatch):
+        """Call without input nor output files."""
+            with pytest.raises(SystemExit) as sysex:
+                monkeypatch.setattr(sys, "argv", ["mirna_extension"])
+            parse_arguments().parse_args()
+            assert sysex.value.code == 2
+
+            def test_in_files(self, monkeypatch, gff_empty, tmp_path):
+                """Call with in and output files."""
+            gff_in = gff_empty
+
+            monkeypatch.setattr(
+                    sys,
+                    "argv",
+                    [
+                        "mirna_extension",
+                        str(gff_in),
+                        "--outdir",
+                        str(tmp_path),
+                        ],
+                    )
+
+            args = parse_arguments().parse_args()
+            assert isinstance(args, argparse.Namespace)
+
+            def test_all_arguments(self, monkeypatch, gff_extremes_chr, tmp_path):
+                """Call with all the arguments."""
+            chr_size, gff_in, gff_pre_out, gff_mir_out = gff_extremes_chr
+
+            monkeypatch.setattr(
+                    sys,
+                    "argv",
+                    [
+                        "mirna_extension",
+                        str(gff_in),
+                        "--outdir",
+                        str(tmp_path),
+                        "--chr",
+                        str(chr_size),
+                        "--extension",
+                        "6",
+                        ],
+                    )
+
+            args = parse_arguments().parse_args()
+            assert isinstance(args, argparse.Namespace)
+
+
+class TestMain:
+    """Test 'main()' function."""
+
+    def test_main_empty_file(self, monkeypatch, gff_empty, tmp_path):
+        """Test main function with an empty file."""
+        gff_empty = gff_empty
+
+        primir_out = tmp_path / "extended_primir_annotation_6_nt.gff3"
+        mir_out = tmp_path / "extended_mirna_annotation_6_nt.gff3"
+
+        monkeypatch.setattr(
+                sys,
+                "argv",
+                [
+                    "mirna_extension",
+                    str(gff_empty),
+                    "--outdir",
+                    str(tmp_path),
+                    ],
+                )
+        args = parse_arguments().parse_args()
+        main(args)
+
+        with open(gff_empty, "r") as expected, open(primir_out, "r") as output:
+            assert output.read() == expected.read()
+
+        with open(gff_empty, "r") as expected, open(mir_out, "r") as output:
+            assert output.read() == expected.read()
+
+    def test_main_no_extreme_coords(
+            self, monkeypatch, tmp_path, gff_no_extremes
+            ):
+        """Test main function with no extreme coords."""
+        in_gff, pre_gff, mir_gff = gff_no_extremes
+
+        primir_out = tmp_path / "extended_primir_annotation_6_nt.gff3"
+        mir_out = tmp_path / "extended_mirna_annotation_6_nt.gff3"
+
+        monkeypatch.setattr(
+                sys,
+                "argv",
+                ["mirna_extension", str(in_gff), "--outdir", str(tmp_path)],
+                )
+        args = parse_arguments().parse_args()
+        main(args)
+
+        with open(pre_gff, "r") as expected, open(primir_out, "r") as output:
+            assert output.read() == expected.read()
+
+        with open(mir_gff, "r") as expected, open(mir_out, "r") as output:
+            assert output.read() == expected.read()
+
+    def test_main_extreme_coords(self, monkeypatch, tmp_path, gff_extremes):
+        """Test main function with extreme coords."""
+        in_gff, pre_gff, mir_gff = gff_extremes
+
+        primir_out = tmp_path / "extended_primir_annotation_6_nt.gff3"
+        mir_out = tmp_path / "extended_mirna_annotation_6_nt.gff3"
+
+        monkeypatch.setattr(
+                sys,
+                "argv",
+                ["mirna_extension", str(in_gff), "--outdir", str(tmp_path)],
+                )
+        args = parse_arguments().parse_args()
+        main(args)
+
+        with open(pre_gff, "r") as expected, open(primir_out, "r") as output:
+            assert output.read() == expected.read()
+
+        with open(mir_gff, "r") as expected, open(mir_out, "r") as output:
+            assert output.read() == expected.read()
+
+    def test_main_extreme_coords_limit_size(
+            self, monkeypatch, tmp_path, gff_extremes_chr
+            ):
+        """Test main function with extreme coords and limited by chr size."""
+        chr_size, in_gff, pre_gff, mir_gff = gff_extremes_chr
+
+        primir_out = tmp_path / "extended_primir_annotation_6_nt.gff3"
+        mir_out = tmp_path / "extended_mirna_annotation_6_nt.gff3"
+
+        monkeypatch.setattr(
+                sys,
+                "argv",
+                [
+                    "mirna_extension",
+                    str(in_gff),
+                    "--outdir",
+                    str(tmp_path),
+                    "--chr",
+                    str(chr_size),
+                    ],
+                )
+        args = parse_arguments().parse_args()
+        main(args)
+
+        with open(pre_gff, "r") as expected, open(primir_out, "r") as output:
+            assert output.read() == expected.read()
+
+        with open(mir_gff, "r") as expected, open(mir_out, "r") as output:
             assert output.read() == expected.read()
