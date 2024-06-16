@@ -62,13 +62,72 @@ class MirnaExtension:
                             f' "{ref_seq}"; integer value expected'
                         ) from exc
 
+    def adjust_names(
+        self, precursor: gffutils.Feature, matures: list[gffutils.Feature]
+    ) -> None:
+        """Adjust miRNAs 'Name' attribute.
+
+        This method adjusts the miRNAs 'Name' attribute to account for the
+        different genomic locations the miRNA sequence is annotated on and
+        ensure their uniqueness.
+
+        miRNA primary transcript names have either the format
+        'SPECIES-mir-NAME' or 'SPECIES-mir-NAME-#' where '#' is an integer
+        indicating which replicate is it. If there are several entries with
+        the exact same name, the feature 'ID' has the format 'ID_#'.
+
+        Mature miRNA names present one of the following formats:
+            - 'SPECIES-miR-NAME-ARM'
+            - 'SPECIES-miR-NAME-#-ARM'
+        Or, if there's a single mature miRNA:
+            - 'SPECIES-miR-NAME'
+            - 'SPECIES-miR-NAME-#'
+
+        If one precursor is considered to have multiple entries, the suffix of
+        either the 'Name' or the 'ID' is set in its corresponding mature
+        miRNA(s) name. The precursor 'Name' is also updated if the suffix is
+        found in the 'ID'.
+
+        Args:
+            precursor: 'miRNA primary transcript' feature entry
+            matures: list with the corresponding 'mature miRNA' feature(s)
+                    entry(s)
+        """
+        suffix = None
+        precursor_name = precursor.attributes["Name"][0].split("-")
+        precursor_id = precursor.attributes["ID"][0].split("_")
+
+        if len(precursor_name) == 4:
+            suffix = precursor_name[-1]
+
+        elif len(precursor_name) == 3 and len(precursor_id) == 2:
+            suffix = precursor_id[-1]
+            precursor_name.append(suffix)
+
+        if suffix:
+            for mir in matures:
+                mir_name = mir.attributes["Name"][0].split("-")
+
+                if len(mir_name) == 5:
+                    mir_name[3] = suffix
+
+                elif len(mir_name) == 4 and mir_name[-1] != suffix:
+                    mir_name.insert(3, suffix)
+
+                elif len(mir_name) == 3:
+                    mir_name.append(suffix)
+
+                mir.attributes["Name"][0] = "-".join(mir_name)
+
+        precursor.attributes["Name"][0] = "-".join(precursor_name)
+
     def process_precursor(
         self, precursor: gffutils.Feature, n: int = 6
     ) -> list[gffutils.Feature]:
         """whatever blah blah.
 
         Args:
-            precursor: whatever
+            precursor: 'miRNA primary transcript' feature entry
             n: Number of nucleotides to extend miRs start and end coordinates.
         """
         assert isinstance(self.seq_lengths, dict)
@@ -86,6 +145,9 @@ class MirnaExtension:
                 completely_within=True,
             )
         )
+
+        self.adjust_names(precursor, matures)
+
         for mir in matures:
             try:
                 if self.seq_lengths[mir.seqid] < mir.end:
