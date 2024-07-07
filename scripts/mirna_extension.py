@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Extend miRNA start and end coordinates."""
+"""Extend miRNA start and end coordinates and ensure name uniqueness."""
 
 import argparse
 from pathlib import Path
@@ -9,7 +9,7 @@ import gffutils  # type: ignore
 
 
 class MirnaExtension:
-    """Class for extending miRNA start and end coordinates.
+    """Class for updating miRNA annotated coordinates and names.
 
     Attributes:
         db: In-memory database of the input GFF3 records.
@@ -45,17 +45,38 @@ class MirnaExtension:
                 sequences and the corresponding total length, in base pairs.
         """
         self.seq_lengths = {}
+        anno_lengths = {}
+
+        if not isinstance(self.db, gffutils.FeatureDB):
+            return
+
+        for _id in self.db.seqids():  # type: ignore
+            anno_lengths[_id] = max(
+                rec.end for rec in self.db.region(_id)  # type: ignore
+            )
+
         if path is None:
-            for _id in self.db.seqids():  # type: ignore
-                self.seq_lengths[_id] = max(
-                    rec.end for rec in self.db.region(_id)  # type: ignore
-                )
+            self.seq_lengths = anno_lengths
         else:
             with open(path, encoding="utf-8") as _file:
                 for line in _file:
                     ref_seq, length = line.strip().split("\t")
+
+                    try:
+                        max_len = anno_lengths[ref_seq]
+                    except KeyError:
+                        max_len = 0
+
                     try:
                         self.seq_lengths[ref_seq] = int(length)
+                        if max_len > int(length):
+                            raise Exception(
+                                "The provided GFF3 miRNA annotations and"
+                                " reference sequence lengths are"
+                                f" incompatible: end coordinate {max_len}"
+                                " exceeds length of reference sequence"
+                                f' "{ref_seq}" ({length} nt)'
+                            )
                     except ValueError as exc:
                         raise ValueError(
                             f'Invalid length: "{length}" for sequence'
@@ -71,60 +92,70 @@ class MirnaExtension:
         different genomic locations the miRNA sequence is annotated on and
         ensure their uniqueness.
 
-        miRNA primary transcript names have either the format
-        'SPECIES-mir-NAME' or 'SPECIES-mir-NAME-#' where '#' is an integer
-        indicating which replicate is it. If there are several entries with
-        the exact same name, the feature 'ID' has the format 'ID_#'.
+        In precursors, the suffix indicating its replica number, is taken
+        either from the 'Name' or the 'ID' attribute. Mature miRNAs take
+        this number as an infix/suffix to construct its name. If the annotated
+        name already has an infix/suffix, it is replaced by the precursor one.
 
-        Mature miRNA names present one of the following formats:
-            - 'SPECIES-miR-NAME-ARM'
+        Precursor names have the format:
+            'SPECIES-mir-NAME-#'
+        Mature miRNA names present one of the following formats depending on
+        whether the arm is specified or not:
             - 'SPECIES-miR-NAME-#-ARM'
-        Or, if there's a single mature miRNA:
-            - 'SPECIES-miR-NAME'
             - 'SPECIES-miR-NAME-#'
+        where # is the integer indicating the replica the miRNAs are.
 
-        If one precursor is considered to have multiple entries, the suffix of
-        either the 'Name' or the 'ID' is set in its corresponding mature
-        miRNA(s) name. The precursor 'Name' is also updated if the suffix is
-        found in the 'ID'.
+        If a precursor has a replica but its number is set in the 'ID'
+        attribute, the first instance does not has a suffix and but the other
+        one do.
+
+        If a precursor has no other occurrences, no modifications are made.
 
         Args:
             precursor: 'miRNA primary transcript' feature entry
             matures: list with the corresponding 'mature miRNA' feature(s)
                     entry(s)
         """
-        suffix = None
+        replica = None
         precursor_name = precursor.attributes["Name"][0].split("-")
         precursor_id = precursor.attributes["ID"][0].split("_")
 
         if len(precursor_name) == 4:
-            suffix = precursor_name[-1]
+            replica = precursor_name[-1]
 
         elif len(precursor_name) == 3 and len(precursor_id) == 2:
-            suffix = precursor_id[-1]
-            precursor_name.append(suffix)
+            replica = precursor_id[-1]
+            precursor_name.append(replica)
+            precursor.attributes["Name"][0] = "-".join(precursor_name)
 
-        if suffix:
+        if replica is not None:
             for mir in matures:
                 mir_name = mir.attributes["Name"][0].split("-")
 
                 if len(mir_name) == 5:
-                    mir_name[3] = suffix
+                    mir_name[3] = replica
 
-                elif len(mir_name) == 4 and mir_name[-1] != suffix:
-                    mir_name.insert(3, suffix)
+                elif len(mir_name) == 4 and mir_name[-1] != replica:
+                    mir_name.insert(3, replica)
 
                 elif len(mir_name) == 3:
-                    mir_name.append(suffix)
+                    mir_name.append(replica)
 
                 mir.attributes["Name"][0] = "-".join(mir_name)
-
-        precursor.attributes["Name"][0] = "-".join(precursor_name)
 
     def process_precursor(
         self, precursor: gffutils.Feature, n: int = 6
     ) -> list[gffutils.Feature]:
-        """whatever blah blah.
+        """Extend miRNAs start and end coordinates and ensure name uniqueness.
+
+        This method elongates the start and end coordinates of mature miRNAs
+        by 'n' nucleotides. In the case that this extension makes the start/end
+        coordinates to exceed the corresponding primary miRNA boundaries,
+        these will be extended as far as the miRNA coordinates.
+        If provided, the elongation will take into account the chromosome size.
+
+        In addition, the method `adjust_names` is called to ensure uniqueness
+        in the `Name` attribute for both the precursor and its arms.
 
         Args:
             precursor: 'miRNA primary transcript' feature entry
@@ -132,8 +163,8 @@ class MirnaExtension:
         """
         assert isinstance(self.seq_lengths, dict)
 
-        pre_orig_start = precursor.start
-        pre_orig_end = precursor.end
+        pre_start = precursor.start
+        pre_end = precursor.end
 
         matures = list(
             self.db.region(  # type: ignore
@@ -146,18 +177,12 @@ class MirnaExtension:
             )
         )
 
-        self.adjust_names(precursor, matures)
+        self.adjust_names(precursor=precursor, matures=matures)
 
         for mir in matures:
             try:
-                if self.seq_lengths[mir.seqid] < mir.end:
-                    raise ValueError(
-                        "The provided GFF3 miRNA annotations and reference"
-                        " sequence lengths are incompatible: end coordinate"
-                        f' {mir.end} of miRNA "{mir.id}" exceeds length of'
-                        f' reference sequence "{mir.seqid}"'
-                        f" ({self.seq_lengths[mir.seqid]} nt)"
-                    )
+                mir.start = max(mir.start - n, 1)
+                mir.end = min(mir.end + n, self.seq_lengths[mir.seqid])
             except KeyError as exc:
                 raise KeyError(
                     "The provided GFF3 miRNA annotations and reference"
@@ -165,34 +190,31 @@ class MirnaExtension:
                     f' "{mir.seqid}" of miRNA "{mir.id}" is not available in'
                     " the provided reference sequence lengths table"
                 ) from exc
-            mir.start = max(mir.start - n, 0)
-            mir.end = min(mir.end + n, self.seq_lengths[mir.seqid])
 
         precursor.start = min(
             precursor.start, min(mir.start for mir in matures)
         )
         precursor.end = max(precursor.end, max(mir.end for mir in matures))
-        precursor.attributes["Name"][0] += f"_-{pre_orig_start - precursor.start}"
-        precursor.attributes["Name"][0] += f"_+{precursor.end - pre_orig_end}"
+        precursor.attributes["Name"][0] += f"_-{pre_start - precursor.start}"
+        precursor.attributes["Name"][0] += f"_+{precursor.end - pre_end}"
 
         return [precursor] + matures
 
-    def extend_mirnas(
+    def update_db(
         self,
         n: int = 6,
     ) -> None:
-        """Extend miRNAs start and end coordinates.
+        """Update miRNA annotations in the local database.
 
-        This method elongates the start and end coordinates of mature miRNAs
-        by n nucleotides. In the case that this extension makes the start/end
-        coordinates to exceed the corresponding primary miRNA boundaries,
-        these will be extended as far as the miRNA coordinates.
-        If provided, the elongation will take into account the chromosome size.
+        Using the method `process_precursor` annotated coordinates are
+        extended by `n` nucleotides and, if needed, the `Name` attribute is
+        modified to contain the sequence replica number.
 
         Args:
             n: Number of nucleotides to extend miRs start and end coordinates.
         """
-        assert isinstance(self.db, gffutils.FeatureDB)
+        if not isinstance(self.db, gffutils.FeatureDB):
+            return
 
         feats_updated: list[gffutils.Feature] = []
 
@@ -233,14 +255,33 @@ class MirnaExtension:
 
 def parse_arguments():
     """Parse command-line arguments."""
-    description = """Extend miRNA start and end coordinates.
+    description = """Extend miRNA annotated regions and ensure name uniqueness.
 
-Extends mature miRNA start and end coordinates in a GFF3 file by the indicated
-number of nucleotides, but not exceeding chromosome boundaries. If the
+Adjust the miRNAs 'Name' attribute to account for the different genomic
+locations the miRNA sequence is annotated on and ensure their uniqueness.
+In precursors, the suffix indicating its replica number, is taken either from
+the 'Name' or the 'ID' attribute. Mature miRNAs take this number as an
+infix/suffix to construct its name. If the annotated name already has an
+infix/suffix, it is replaced by the precursor one.
+
+Precursor names have the format:
+    'SPECIES-mir-NAME-#'
+Mature miRNA names present one of the following formats depending on whether
+the arm is specified or not:
+    - 'SPECIES-miR-NAME-#-ARM'
+    - 'SPECIES-miR-NAME-#'
+where # is the integer indicating the replica the miRNAs are.
+
+If a precursor has a replica but its number is set in the 'ID' attribute, the
+first instance does not has a suffix and but the other one do.
+If a precursor has no other occurrences, no modifications are made.
+
+Extend mature miRNA start and end coordinates in a GFF3 file by the indicated
+number of nucleotides without exceeding chromosome boundaries. If the
 extension causes the mature miRNA coordinates to exceed the boundaries of the
 corresponding precursor (see note in "Constraints" below), the precursor
-coordinates will be extended accordingly. The precursor name will be appended
-with "_-n" and/or "_+m", where n and m represent the extensions on the 5' and
+coordinates are extended accordingly. The precursor name will be appended
+with '_-n' and/or '_+m', where n and m represent the extensions on the 5' and
 3' end, respectively (or 0 otherwise). The modified mature miRNA and precursor
 annotations will be written to separate GFF3 files.
 
@@ -315,7 +356,7 @@ def main(args) -> None:
 
     if isinstance(mirna_extension.db, gffutils.FeatureDB):
         mirna_extension.set_seq_lengths(path=args.chr)
-        mirna_extension.extend_mirnas(n=args.extension)
+        mirna_extension.update_db(n=args.extension)
 
     mirna_extension.write_gff(
         path=args.outdir
