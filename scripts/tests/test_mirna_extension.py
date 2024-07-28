@@ -1,13 +1,14 @@
 """Unit tests for module 'mirna_extension.py'."""
 
 import argparse
+from pathlib import Path
 import sys
 
-from pathlib import Path
 import gffutils  # type: ignore
 import pytest
 
-from ..mirna_extension import main, MirnaExtension, parse_arguments
+from ..mirna_extension import (AnnotationException, MirnaExtension, main,
+                               parse_arguments)
 
 
 @pytest.fixture
@@ -16,6 +17,14 @@ def gff_empty():
     empty = Path("files/empty_file")
 
     return empty
+
+
+@pytest.fixture
+def gff_illegal_coords():
+    """Import path to miRNA annotation file with illegal coordinates."""
+    in_illegal = Path("files/in_illegal_mirna_anno.gff3")
+
+    return in_illegal
 
 
 @pytest.fixture
@@ -91,6 +100,16 @@ class TestSetDb:
 
         assert miR_obj.db is None
 
+    def test_set_db_illegal_coord(self, gff_illegal_coords):
+        """Test setting local db from file with illegal start coordinate."""
+        in_file = gff_illegal_coords
+
+        miR_obj = MirnaExtension()
+
+        with pytest.raises(AnnotationException,
+                           match=r".* position 0. .*"):
+            miR_obj.set_db(path=in_file)
+
 
 class TestSetSeqLengths:
     """Test for the 'set_seq_lengths' method."""
@@ -137,7 +156,7 @@ class TestSetSeqLengths:
         miR_obj = MirnaExtension()
         miR_obj.set_db(path=in_file)
 
-        with pytest.raises(Exception, match=r".* exceeds .*"):
+        with pytest.raises(AnnotationException, match=r".* exceeds .*"):
             miR_obj.set_seq_lengths(path=table)
 
     def test_set_lengths_correct_tbl(self, gff_extremes_chr, seq_len_tbl):
@@ -252,10 +271,10 @@ class TestProcessPrecursor:
         correct_tbl = seq_len_tbl
 
         exp_mir_obj = MirnaExtension()
-        exp_mir_obj.set_db(out_file)
+        exp_mir_obj.set_db(path=out_file)
 
         miR_obj = MirnaExtension()
-        miR_obj.set_db(in_file)
+        miR_obj.set_db(path=in_file)
         miR_obj.set_seq_lengths(correct_tbl)
 
         out_pre_1 = miR_obj.process_precursor(
@@ -299,10 +318,10 @@ class TestProcessPrecursor:
         correct_tbl = seq_len_tbl
 
         exp_pre_obj = MirnaExtension()
-        exp_pre_obj.set_db(pre_out)
+        exp_pre_obj.set_db(path=pre_out)
 
         miR_obj = MirnaExtension()
-        miR_obj.set_db(in_file)
+        miR_obj.set_db(path=in_file)
         miR_obj.set_seq_lengths(correct_tbl)
 
         out_pre_1 = miR_obj.process_precursor(
@@ -327,7 +346,7 @@ class TestProcessPrecursor:
         table.write_text("13\t600000")
 
         miR_obj = MirnaExtension()
-        miR_obj.set_db(in_file)
+        miR_obj.set_db(path=in_file)
         miR_obj.set_seq_lengths(table)
 
         with pytest.raises(KeyError, match=r".* not available .*"):
@@ -339,11 +358,11 @@ class TestProcessPrecursor:
 
         exp_pre_obj = MirnaExtension()
         exp_mir_obj = MirnaExtension()
-        exp_pre_obj.set_db(pre_out)
-        exp_mir_obj.set_db(mir_out)
+        exp_pre_obj.set_db(path=pre_out)
+        exp_mir_obj.set_db(path=mir_out)
 
         miR_obj = MirnaExtension()
-        miR_obj.set_db(in_file)
+        miR_obj.set_db(path=in_file)
         miR_obj.set_seq_lengths()
 
         out_pre = miR_obj.process_precursor(
@@ -366,7 +385,7 @@ class TestUpdateDb:
         in_file, out_file = gff_diff_strand
 
         miR_obj = MirnaExtension()
-        miR_obj.set_db(in_file)
+        miR_obj.set_db(path=in_file)
         miR_obj.set_seq_lengths()
         miR_obj.update_db(n=0)
 
@@ -379,10 +398,10 @@ class TestUpdateDb:
         in_file, out_file = gff_replicas
 
         exp_mir_obj = MirnaExtension()
-        exp_mir_obj.set_db(out_file)
+        exp_mir_obj.set_db(path=out_file)
 
         miR_obj = MirnaExtension()
-        miR_obj.set_db(in_file)
+        miR_obj.set_db(path=in_file)
         miR_obj.set_seq_lengths()
         miR_obj.update_db(n=0)
 
@@ -398,10 +417,10 @@ class TestUpdateDb:
         correct_tbl = seq_len_tbl
 
         exp_mir_obj = MirnaExtension()
-        exp_mir_obj.set_db(out_file)
+        exp_mir_obj.set_db(path=out_file)
 
         miR_obj = MirnaExtension()
-        miR_obj.set_db(in_file)
+        miR_obj.set_db(path=in_file)
         miR_obj.set_seq_lengths(correct_tbl)
         miR_obj.update_db(n=6)
 
@@ -414,10 +433,10 @@ class TestUpdateDb:
         in_file, out_file = gff_replicas
 
         exp_mir_obj = MirnaExtension()
-        exp_mir_obj.set_db(out_file)
+        exp_mir_obj.set_db(path=out_file)
 
         miR_obj = MirnaExtension()
-        miR_obj.set_db(in_file)
+        miR_obj.set_db(path=in_file)
         miR_obj.set_seq_lengths()
         miR_obj.update_db(n=6)
 
@@ -436,7 +455,7 @@ class TestWriteGFF:
         empty_out = tmp_path / "empty.gff3"
 
         miR_obj = MirnaExtension()
-        miR_obj.set_db(empty_file)
+        miR_obj.set_db(path=empty_file)
         miR_obj.set_seq_lengths()
         miR_obj.update_db()
         miR_obj.write_gff(path=empty_out)
@@ -454,7 +473,7 @@ class TestWriteGFF:
         pre_out = tmp_path / "extended_premir_annotation_2_nt.gff3"
 
         miR_obj = MirnaExtension()
-        miR_obj.set_db(in_file)
+        miR_obj.set_db(path=in_file)
         miR_obj.set_seq_lengths(correct_tbl)
         miR_obj.update_db(n=2)
         miR_obj.write_gff(
@@ -474,7 +493,7 @@ class TestWriteGFF:
         mir_out = tmp_path / "extended_mir_annotation_2_nt.gff3"
 
         miR_obj = MirnaExtension()
-        miR_obj.set_db(in_file)
+        miR_obj.set_db(path=in_file)
         miR_obj.set_seq_lengths(correct_tbl)
         miR_obj.update_db(n=2)
         miR_obj.write_gff(path=mir_out, feature_type="miRNA")
@@ -494,7 +513,7 @@ class TestWriteGFF:
         out_file = tmp_path / "extended_mirna_annotation_6_nt.gff3"
 
         miR_obj = MirnaExtension()
-        miR_obj.set_db(in_file)
+        miR_obj.set_db(path=in_file)
         miR_obj.set_seq_lengths(correct_tbl)
         miR_obj.update_db()
         miR_obj.write_gff(path=out_file)
