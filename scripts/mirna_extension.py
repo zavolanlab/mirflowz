@@ -3,9 +3,14 @@
 
 import argparse
 from pathlib import Path
+from sqlite3 import InterfaceError
 from typing import Optional
 
 import gffutils  # type: ignore
+
+
+class AnnotationException(BaseException):
+    """A custom exception class for MirnaExtension class."""
 
 
 class MirnaExtension:
@@ -36,6 +41,14 @@ class MirnaExtension:
             )
         except gffutils.exceptions.EmptyInputError:
             pass
+        except InterfaceError as err:
+            raise AnnotationException(
+                "\n\n"
+                "Illegal coordinate: The provided GFF3 miRNA annotation file"
+                " contains at least one miRNA species starting at position 0."
+                " Please, check that all entries start at least at position 1"
+                "\n"
+            ) from err
 
     def set_seq_lengths(self, path: Optional[Path] = None) -> None:
         """Set the reference sequence lengths.
@@ -69,19 +82,19 @@ class MirnaExtension:
 
                     try:
                         self.seq_lengths[ref_seq] = int(length)
-                        if max_len > int(length):
-                            raise Exception(
-                                "The provided GFF3 miRNA annotations and"
-                                " reference sequence lengths are"
-                                f" incompatible: end coordinate {max_len}"
-                                " exceeds length of reference sequence"
-                                f' "{ref_seq}" ({length} nt)'
-                            )
                     except ValueError as exc:
                         raise ValueError(
                             f'Invalid length: "{length}" for sequence'
                             f' "{ref_seq}"; integer value expected'
                         ) from exc
+
+                    if max_len > int(length):
+                        raise AnnotationException(
+                            "The provided GFF3 miRNA annotations and"
+                            " reference sequence lengths are incompatible:"
+                            f" end coordinate {max_len} exceeds length of"
+                            f' reference sequence "{ref_seq}" ({length} nt)'
+                        )
 
     def adjust_names(
         self, precursor: gffutils.Feature, matures: list[gffutils.Feature]
@@ -352,6 +365,7 @@ def main(args) -> None:
     """Extend miRNAs start/end coordinates."""
     args.outdir.mkdir(parents=True, exist_ok=True)
     mirna_extension = MirnaExtension()
+
     mirna_extension.set_db(path=args.input)
 
     if isinstance(mirna_extension.db, gffutils.FeatureDB):
