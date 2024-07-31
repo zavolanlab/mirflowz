@@ -250,7 +250,7 @@ def collapsed_nh_contribution(aln: pysam.AlignedSegment) -> float:
             Alignment to which the overall contribution is calculated
 
     Returns:
-        the contribution of the alignment to the overall count
+        Contribution of alignment to overall count
     """
     name = str(aln.query_name)
     values = []
