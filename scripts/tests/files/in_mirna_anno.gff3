@@ -1,5 +1,6 @@
-19	.	miRNA_primary_transcript	2517	2614	.	+	.	ID=MI0003141;Alias=MI0003141;Name=hsa-mir-512-2
-19	.	miRNA	2536	2558	.	+	.	ID=MIMAT0002822_1;Alias=MIMAT0002822;Name=hsa-miR-512-5p;Derives_from=MI0003141
-19	.	miRNA	2573	2594	.	+	.	ID=MIMAT0002823_1;Alias=MIMAT0002823;Name=hsa-miR-512-3p;Derives_from=MI0003141
-19	.	miRNA_primary_transcript	5328	5400	.	+	.	ID=MI0003786;Alias=MI0003786;Name=hsa-mir-1323
-19	.	miRNA	5338	5359	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786
+19	.	miRNA_primary_transcript	121035	121101	.	+	.	ID=MI0000779;Alias=MI0000779;Name=hsa-mir-371a
+19	.	miRNA	121040	121059	.	+	.	ID=MIMAT0004687;Alias=MIMAT0004687;Name=hsa-miR-371a-5p;Derives_from=MI0000779
+19	.	miRNA	121076	121098	.	+	.	ID=MIMAT0000723;Alias=MIMAT0000723;Name=hsa-miR-371a-3p;Derives_from=MI0000779
+19	.	miRNA_primary_transcript	121037	121102	.	-	.	ID=MI0017393;Alias=MI0017393;Name=hsa-mir-371b
+19	.	miRNA	121075	121096	.	-	.	ID=MIMAT0019892;Alias=MIMAT0019892;Name=hsa-miR-371b-5p;Derives_from=MI0017393
+19	.	miRNA	121038	121060	.	-	.	ID=MIMAT0019893;Alias=MIMAT0019893;Name=hsa-miR-371b-3p;Derives_from=MI0017393
