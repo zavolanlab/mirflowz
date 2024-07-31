@@ -128,7 +128,7 @@ with f:
     sys.stdout.write("DONE\n")
 
 # ID FILTER LIST #
-
+id_filter = []
 if args.filter:
     sys.stdout.write("Filtering FASTA file...")
 
