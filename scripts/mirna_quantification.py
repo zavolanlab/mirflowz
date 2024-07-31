@@ -283,7 +283,7 @@ def collapsed_contribution(aln: pysam.AlignedSegment) -> float:
             Alignment to which the overall contribution is calculated
 
     Returns:
-        the contribution of the alignment to the overall count
+        Contribution of alignment to overall count
     """
     name = str(aln.query_name)
     collapsed = 0.0
@@ -322,7 +322,7 @@ def nh_contribution(aln: pysam.AlignedSegment) -> float:
             Alignment to which the overall contribution is calculated
 
     Returns:
-        the contribution of the alignment to the overall count
+        Contribution of alignment to overall count
     """
     name = str(aln.query_name)
     nh_val = 0.0
@@ -355,7 +355,7 @@ def contribution(aln: pysam.AlignedSegment) -> float:
             Alignment to which the overall contribution is calculated
 
     Returns:
-        the contribution of the alignment to the overall count
+        Contribution of alignment to overall count
     """
     try:
         return 1 / float(aln.get_tag("NH"))
