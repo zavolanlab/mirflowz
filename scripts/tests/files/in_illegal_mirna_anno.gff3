@@ -1,0 +1,3 @@
+19	.	miRNA_primary_transcript	2	122	.	+	.	ID=MI0003140;Alias=MI0003140;Name=hsa-mir-512-1
+19	.	miRNA	3	74	.	+	.	ID=MIMAT0002822;Alias=MIMAT0002822;Name=hsa-miR-512-5p;Derives_from=MI0003140
+19	.	miRNA	0	24	.	+	.	ID=MIMAT2002822;Alias=MIMAT2002822;Name=hsa-miR-512-3p;Derives_from=MI0003140
