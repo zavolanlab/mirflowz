@@ -45,7 +45,7 @@ fe5388094985e9604a302d39d2abc82c  results/intermediates/test_lib/oligomap_transc
 d41d8cd98f00b204e9800998ecf8427e  results/intermediates/test_lib/oligomap_transcriptome_sorted.oligomap
 96a178aabc41d3020992efd6acbecb5a  results/intermediates/genome_processed.fa.bz
 d34fc868b861b1bc46db07a397dc0f10  results/intermediates/genome_processed.fa.bz.fai
-be7a0d92e57480190de57eb30baffa36  results/intermediates/extended_mirna_annotation_6_nt.gff3
+05542e2fdb7e8c7abd4374b0c63b5d1e  results/intermediates/extended_mirna_annotation_6_nt.gff3
 8148cd880602255be166beb59bbed95a  results/intermediates/genome_header.sam
 09e24a504bfec37fee3d5ff1b5c7738e  results/intermediates/exons.bed
 4fb453846e88593d0cac13220ec2d685  results/intermediates/segemehl_genome_index.idx
@@ -54,7 +54,7 @@ f5749f5d2096386444a3d021e0a01817  results/intermediates/genome_processed.fa.bz.g
 d34fc868b861b1bc46db07a397dc0f10  results/intermediates/genome_processed.fa.fai
 21e102e4ebd3508bb06f46366a3d578d  results/intermediates/exons.gtf
 003b92b245ac336e3d70a513033e1cee  results/intermediates/transcriptome_trimmed_id.fa
-ead03955b87c6effac9afdf971559787  results/intermediates/extended_primir_annotation_6_nt.gff3
+8fc8e961a10b73ab7901c406a0679634  results/intermediates/extended_primir_annotation_6_nt.gff3
 f28cc0143ab6659bef3de3a7afa1dccc  results/intermediates/mirna_annotations.gff3
 2d437f8681f4248d4f2075f86debb920  results/intermediates/transcriptome.fa
 7eb64c112830266bcf416ded60b4cf77  results/intermediates/segemehl_transcriptome_index.idx

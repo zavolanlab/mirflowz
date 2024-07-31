@@ -242,7 +242,7 @@ def collapsed_nh_contribution(aln: pysam.AlignedSegment) -> float:
 
     The contribution is computed as the ratio of the number of reads collapsed
     in the alignment and the NH value. It is assumed that the alignment query
-    name contians the number of collapsed reads as well as the NH value in the
+    name contains the number of collapsed reads as well as the NH value in the
     format NAME-COUNT_NH.
 
     Args:
@@ -250,9 +250,10 @@ def collapsed_nh_contribution(aln: pysam.AlignedSegment) -> float:
             Alignment to which the overall contribution is calculated
 
     Returns:
-        the conrtibution of the alignment to the overall count
+        Contribution of alignment to overall count
     """
     name = str(aln.query_name)
+    values = []
     try:
         if val := re.search(r"\d+_\d+$", name):
             values = val.group().split("_")
@@ -274,7 +275,7 @@ def collapsed_contribution(aln: pysam.AlignedSegment) -> float:
 
     The contribution is computed as the ratio of the number of reads collapsed
     in the alignment and the value stored in the NH tag. If the tag is missing,
-    the NH value is 1. It is assumed that the alignment query name contians
+    the NH value is 1. It is assumed that the alignment query name contains
     the number of collapsed reads in the format NAME-COUNT.
 
     Args:
@@ -282,9 +283,10 @@ def collapsed_contribution(aln: pysam.AlignedSegment) -> float:
             Alignment to which the overall contribution is calculated
 
     Returns:
-        the conrtibution of the alignment to the overall count
+        Contribution of alignment to overall count
     """
     name = str(aln.query_name)
+    collapsed = 0.0
     try:
         if coll := re.search(r"\d+$", name):
             collapsed = float(coll.group())
@@ -312,7 +314,7 @@ def nh_contribution(aln: pysam.AlignedSegment) -> float:
 
     The contribution is computed as the ratio of the number of reads collapsed
     in the alignment and the value stored in the NH tag. If the tag is missing,
-    the NH value is 1. It is assumed that the alignment query name contians the
+    the NH value is 1. It is assumed that the alignment query name contains the
     NH value in the format NAME_NH.
 
     Args:
@@ -320,9 +322,10 @@ def nh_contribution(aln: pysam.AlignedSegment) -> float:
             Alignment to which the overall contribution is calculated
 
     Returns:
-        the conrtibution of the alignment to the overall count
+        Contribution of alignment to overall count
     """
     name = str(aln.query_name)
+    nh_val = 0.0
     try:
         if cont := re.search(r"\d+$", name):
             nh_val = float(cont.group())
@@ -352,7 +355,7 @@ def contribution(aln: pysam.AlignedSegment) -> float:
             Alignment to which the overall contribution is calculated
 
     Returns:
-        the conrtibution of the alignment to the overall count
+        Contribution of alignment to overall count
     """
     try:
         return 1 / float(aln.get_tag("NH"))
@@ -362,7 +365,7 @@ def contribution(aln: pysam.AlignedSegment) -> float:
 
 
 def get_name(pre_name: str) -> list[str]:
-    """Get the final name for the spieces name.
+    """Get the final name for the species name.
 
     Take a string and processes it to obtain the final name for the species
     and the type of miRNA the string belongs to. Only the feat_name is
