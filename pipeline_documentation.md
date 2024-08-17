@@ -365,10 +365,18 @@ Extract chromosome(s) length from the genome sequence.
 
 #### `extend_mirs_annotations`
 
-Extend miRNA annotations and split the file by feature with a
-[**custom script**][custom-script-mir-ext].
+Extend miRNA annotations, ensure feature names uniqueness and split the file
+by feature with a [**custom script**][custom-script-mir-ext].
 
-> Mature miRNA regions are extended on both sides to account for isomiR species
+> Adjust miRNAs' 'Name' attribute to account for the different genomic
+> locations the miRNA sequence is annotated on and ensure their uniqueness.
+> The name format is `SPECIES-mir-NAME-#` for pri-miRs, and 
+> `SPECIES-miR-NAME-#-ARM` or `SPECIES-miR-NAME-#` for mature miRNA with both
+> or just one arm respectively, where `#` is the replica integer. If a pri-miR
+> has a replica but its number is set in the 'ID' attribute, the first instance
+> does not has a suffix but the other one(s) do. If a precursor has no other
+> occurrences, no further modifications are made. On the other hand,
+> mature miRNA regions are extended on both sides to account for isomiR species
 > with shifted start and/or end positions without exceeding chromosome(s)
 > boundaries. If required, pri-miR loci are also extended to accommodate the
 > new miRNA coordinates. In addition, pri-miR names are modified to record the
@@ -390,7 +398,7 @@ Extend miRNA annotations and split the file by feature with a
 - **Examples**
 
 ```console
-Example 1 | Mature miRNA extension
+Example 1 | Extension | Mature miRNA extension
 
 IN:
     pri-miR entry:
@@ -403,10 +411,10 @@ OUT:
     pri-miR entry:
         19	.	miRNA_primary_transcript	2517	2614	.	+	.	ID=MI0003141;Alias=MI0003141;Name=hsa-mir-512-2_-0_+0
     mature miRNA entry:
-        19	.	miRNA	2530	2564	.	+	.	ID=MIMAT0002822_1;Alias=MIMAT0002822;Name=hsa-miR-512-5p;Derives_from=MI0003141
+        19	.	miRNA	2530	2564	.	+	.	ID=MIMAT0002822_1;Alias=MIMAT0002822;Name=hsa-miR-512-2-5p;Derives_from=MI0003141
 
 
-Example 2 | Mature miRNA and pri-miR extension
+Example 2 | Extension | Mature miRNA and pri-miR extension
 
 IN:
     pri-miR entry:
@@ -417,12 +425,12 @@ IN:
         6
 OUT:
     pri-miR entry:
-        19	.	miRNA_primary_transcript	6	124	.	+	.	ID=MI0003140;Alias=MI0003140;Name=hsa-mir-512-1_-3_+2
+        19	.	miRNA_primary_transcript	6	122	.	+	.	ID=MI0003140;Alias=MI0003140;Name=hsa-mir-512-1_-3_+0
     mature miRNA entry:
-        19	.	miRNA	6	80	.	+	.	ID=MIMAT0002822;Alias=MIMAT0002822;Name=hsa-miR-512-5p;Derives_from=MI0003140
+        19	.	miRNA	6	80	.	+	.	ID=MIMAT0002822;Alias=MIMAT0002822;Name=hsa-miR-512-1-5p;Derives_from=MI0003140
 
 
-Example 3 | Matrue miRNA exceeding chromosome boundaries extension
+Example 3 | Extension | Matrue miRNA exceeding chromosome boundaries extension
 
 IN:
     pri-miR entry:
@@ -433,9 +441,71 @@ IN:
         6
 OUT:
     pri-miR entry:
-        19	.	miRNA_primary_transcript	0	124	.	+	.	ID=MI0003140;Alias=MI0003140;Name=hsa-mir-512-1_-2_+2
+        19	.	miRNA_primary_transcript	1	122	.	+	.	ID=MI0003140;Alias=MI0003140;Name=hsa-mir-512-1_-1_+0
     mature miRNA entry:
-        19	.	miRNA	0	80	.	+	.	ID=MIMAT0002822;Alias=MIMAT0002822;Name=hsa-miR-512-5p;Derives_from=MI0003140
+        19	.	miRNA	1	80	.	+	.	ID=MIMAT0002822;Alias=MIMAT0002822;Name=hsa-miR-512-1-5p;Derives_from=MI0003140
+
+
+Example 4 | Name uniqueness | Replica number in the ID
+
+IN:
+    pri-miR entries:
+        chr21	.	miRNA_primary_transcript	8206563	8206618	.	+	.	ID=MI0033425;Alias=MI0033425;Name=hsa-mir-10401
+        chr21	.	miRNA_primary_transcript	8250772	8250827	.	+	.	ID=MI0033425_2;Alias=MI0033425;Name=hsa-mir-10401
+    mature miRNA entries:
+        chr21	.	miRNA	8206563	8206582	.	+	.	ID=MIMAT0041633;Alias=MIMAT0041633;Name=hsa-miR-10401-5p;Derives_from=MI0033425
+        chr21	.	miRNA	8206598	8206618	.	+	.	ID=MIMAT0041634;Alias=MIMAT0041634;Name=hsa-miR-10401-3p;Derives_from=MI0033425
+        chr21	.	miRNA	8250772	8250791	.	+	.	ID=MIMAT0041633_1;Alias=MIMAT0041633;Name=hsa-miR-10401-5p;Derives_from=MI0033425
+        chr21	.	miRNA	8250807	8250827	.	+	.	ID=MIMAT0041634_1;Alias=MIMAT0041634;Name=hsa-miR-10401-3p;Derives_from=MI0033425
+OUT:
+    pri-miR entries:
+        chr21	.	miRNA_primary_transcript	8206563	8206618	.	+	.	ID=MI0033425;Alias=MI0033425;Name=hsa-mir-10401
+        chr21	.	miRNA_primary_transcript	8250772	8250827	.	+	.	ID=MI0033425_2;Alias=MI0033425;Name=hsa-mir-10401-2
+    mature miRNA entries:
+        chr21	.	miRNA	8206563	8206582	.	+	.	ID=MIMAT0041633;Alias=MIMAT0041633;Name=hsa-miR-10401-5p;Derives_from=MI0033425
+        chr21	.	miRNA	8206598	8206618	.	+	.	ID=MIMAT0041634;Alias=MIMAT0041634;Name=hsa-miR-10401-3p;Derives_from=MI0033425
+        chr21	.	miRNA	8250772	8250791	.	+	.	ID=MIMAT0041633_1;Alias=MIMAT0041633;Name=hsa-miR-10401-2-5p;Derives_from=MI0033425
+        chr21	.	miRNA	8250807	8250827	.	+	.	ID=MIMAT0041634_1;Alias=MIMAT0041634;Name=hsa-miR-10401-2-3p;Derives_from=MI0033425
+
+
+Example 5 | Name uniqueness | Replica number in the Name; single mature arm
+
+IN:
+    pri-miR entries:
+        chr21	.	miRNA_primary_transcript	8205315	8205406	.	+	.	ID=MI0022559;Alias=MI0022559;Name=hsa-mir-6724-1
+        chr21	.	miRNA_primary_transcript	8249505	8249596	.	+	.	ID=MI0031516;Alias=MI0031516;Name=hsa-mir-6724-2
+    mature miRNA entries:
+        chr21	.	miRNA	8205325	8205347	.	+	.	ID=MIMAT0025856;Alias=MIMAT0025856;Name=hsa-miR-6724-5p;Derives_from=MI0022559
+        chr21	.	miRNA	8249515	8249537	.	+	.	ID=MIMAT0025856_1;Alias=MIMAT0025856;Name=hsa-miR-6724-5p;Derives_from=MI0031516
+OUT:
+    pri-miR entries:
+        chr21	.	miRNA_primary_transcript	8205315	8205406	.	+	.	ID=MI0022559;Alias=MI0022559;Name=hsa-mir-6724-1
+        chr21	.	miRNA_primary_transcript	8249505	8249596	.	+	.	ID=MI0031516;Alias=MI0031516;Name=hsa-mir-6724-2
+    mature miRNA entries:
+        chr21	.	miRNA	8205325	8205347	.	+	.	ID=MIMAT0025856;Alias=MIMAT0025856;Name=hsa-miR-6724-1-5p;Derives_from=MI0022559
+        chr21	.	miRNA	8249515	8249537	.	+	.	ID=MIMAT0025856_1;Alias=MIMAT0025856;Name=hsa-miR-6724-2-5p;Derives_from=MI0031516
+
+
+Example 6 | Name uniqueness | Both mature miRNA arms but just one with the replica number
+
+IN:
+    pri-miR entries:
+        chr2	.	miRNA_primary_transcript	135665397	135665478	.	+	.	ID=MI0000447;Alias=MI0000447;Name=hsa-mir-128-1
+        chr3	.	miRNA_primary_transcript	35744476	35744559	.	+	.	ID=MI0000727;Alias=MI0000727;Name=hsa-mir-128-2
+    mature miRNA entries:
+        chr2	.	miRNA	135665446	135665466	.	+	.	ID=MIMAT0000424;Alias=MIMAT0000424;Name=hsa-miR-128-3p;Derives_from=MI0000447
+        chr2	.	miRNA	135665411	135665433	.	+	.	ID=MIMAT0026477;Alias=MIMAT0026477;Name=hsa-miR-128-1-5p;Derives_from=MI0000447
+        chr3	.	miRNA	35744527	35744547	.	+	.	ID=MIMAT0000424_1;Alias=MIMAT0000424;Name=hsa-miR-128-3p;Derives_from=MI0000727
+        chr3	.	miRNA	35744490	35744512	.	+	.	ID=MIMAT0031095;Alias=MIMAT0031095;Name=hsa-miR-128-2-5p;Derives_from=MI0000727
+OUT:
+    pri-miR entries:
+        chr2	.	miRNA_primary_transcript	135665397	135665478	.	+	.	ID=MI0000447;Alias=MI0000447;Name=hsa-mir-128-1
+        chr3	.	miRNA_primary_transcript	35744476	35744559	.	+	.	ID=MI0000727;Alias=MI0000727;Name=hsa-mir-128-2
+    mature miRNA entries:
+        chr2	.	miRNA	135665446	135665466	.	+	.	ID=MIMAT0000424;Alias=MIMAT0000424;Name=hsa-miR-128-1-3p;Derives_from=MI0000447
+        chr2	.	miRNA	135665411	135665433	.	+	.	ID=MIMAT0026477;Alias=MIMAT0026477;Name=hsa-miR-128-1-5p;Derives_from=MI0000447
+        chr3	.	miRNA	35744527	35744547	.	+	.	ID=MIMAT0000424_1;Alias=MIMAT0000424;Name=hsa-miR-128-2-3p;Derives_from=MI0000727
+        chr3	.	miRNA	35744490	35744512	.	+	.	ID=MIMAT0031095;Alias=MIMAT0031095;Name=hsa-miR-128-2-5p;Derives_from=MI0000727
 ```
 
 ### Map workflow
@@ -649,9 +719,11 @@ with a [**custom script**][custom-script-blocksort].
 Convert aligned reads `.oligomap` to `.sam` and filter alignments by number of
 hits with a [**custom script**][custom-script-oligo-sam].
 
-> Given the short length of the reads and the sequence similarity among miRNAs,
-> the number of hits can be notably high. Therefore, reads aligned beyond a
-> specified value are disregarded.
+> If a read has been aligned beyond a specified threshold, it is removed due
+> to (1) performance reasons as the file size can rapidly increase, and (2)
+> the fact that each read contributes to each count `1/N` where `N` is the
+> number of genomic loci it aligns to and a large `N` makes the contribution
+> negligible.
 
 - **Input**
   - Alignments file, sorted (`.oligomap`); from
@@ -701,9 +773,11 @@ with a [**custom script**][custom-script-blocksort].
 Convert aligned reads `.oligomap` to `.sam` and filter alignments by number of
 hits with a [**custom script**][custom-script-oligo-sam].
 
-> Given the short length of the reads and the sequence similarity among miRNAs,
-> the number of hits can be notably high. Therefore, reads aligned beyond a
-> specified value are disregarded.
+> If a read has been aligned beyond a specified threshold, it is removed due
+> to (1) performance reasons as the file size can rapidly increase, and (2)
+> the fact that each read contributes to each count `1/N` where `N` is the
+> number of genomic loci it aligns to and a large `N` makes the contribution
+> negligible.
 
 - **Input**
   - Alignments file, sorted (`.oligomap`); from
@@ -751,10 +825,11 @@ Concatenate [**segemehl**](#third-party-software-used) and
 Filter merged genome alignments by the number of hits with a
 [**custom script**][custom-script-nh-filter].
 
-> Given the short length of the reads, the sequence similarity among miRNAs,
-> and the merging of two different mapping results, the number of hits can
-> be notably high. Therefore, reads aligned beyond a specified value are
-> disregarded.
+> If a read has been aligned beyond a specified threshold, it is removed due
+> to (1) performance reasons as the file size can rapidly increase, and (2)
+> the fact that each read contributes to each count `1/N` where `N` is the
+> number of genomic loci it aligns to and a large `N` makes the contribution
+> negligible.
 
 - **Input**
   - Alignments file (`.sam`); from
@@ -772,10 +847,11 @@ Filter merged genome alignments by the number of hits with a
 Filter merged transcriptome alignments by the number of hits with a
 [**custom script**][custom-script-nh-filter].
 
-> Given the short length of the reads, the sequence similarity among miRNAs,
-> and the merging of two different mapping results, the number of hits can
-> be notably high. Therefore, reads aligned beyond a specified value are
-> disregarded.
+> If a read has been aligned beyond a specified threshold, it is removed due
+> to (1) performance reasons as the file size can rapidly increase, and (2)
+> the fact that each read contributes to each count `1/N` where `N` is the
+> number of genomic loci it aligns to and a large `N` makes the contribution
+> negligible.
 
 - **Input**
   - Alignments file (`.sam`); from
@@ -1441,13 +1517,16 @@ IN library 2
     hsa-miR-1283	                1
     hsa-miR-1283|-1|-2|21M|21	    1
 
+IN library 3
+    ID                              lib_3
+
 OUT table
-    ID                              lib_1  lib_2
-    hsa-miR-524-5p          	    1	    1
-    hsa-miR-524-5p|0|0|22M|9G12	    1   	NA
-    hsa-miR-524-5p|0|0|22M|9G9C2	1   	NA
-    hsa-miR-1283	                NA	    1
-    hsa-miR-1283|-1|-2|21M|21	    NA	    1
+    ID                              lib_1  lib_2  lib_3
+    hsa-miR-524-5p          	    1	    1       NA
+    hsa-miR-524-5p|0|0|22M|9G12	    1   	NA      NA
+    hsa-miR-524-5p|0|0|22M|9G9C2	1   	NA      NA
+    hsa-miR-1283	                NA	    1       NA
+    hsa-miR-1283|-1|-2|21M|21	    NA	    1       NA
 ```
 
 
@@ -1544,11 +1623,10 @@ Create an empty BED file if the user has not provided one.
 
 #### `compress_reference_genome`
 
-Compress the processed genome with trimmed IDs using `bgzip`. 
+Compress the processed genome with trimmed IDs using `bgzip` with
+[**SAMtools**](#third-party-software-used). 
 
 > Required to perform the ASCII-style alignment pileups.
-> In order to be able to use the `bgzip` command when running the workflow
-> using Singularity, [**SAMtools**](#third-party-software-used) is used.
 
 - **Input**
   - Genome sequence, trimmed IDs (`.fa`); from
