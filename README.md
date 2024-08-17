@@ -353,7 +353,11 @@ provided by the user. The regions corresponding to mature miRNAs are extended
 by a fixed but user-adjustable number of nucleotides on both sides to
 accommodate isomiR species with shifted start and/or end positions. If
 necessary, pri-miR loci are extended to adjust to the new miRNA coordinates.
-
+In addition, to account for the different genomic locations a miRNA sequence
+can be annotated, the name of these sequences are modified to have the format
+`SPECIES-mir-NAME-#` for pri-miRs and `SPECIES-miR-NAME-#-ARM` or
+`SPECIES-miR-NAME-#` for mature miRNAs with both or just one arm respectively,
+where `#` is the replica number.
 
 ### Map module
 
@@ -370,15 +374,6 @@ edit distance of at most 1. The combination of the fast and flexible results
 and the strict selection ensures results with a higher fidelity than if only
 one of the tools was to be used.
 
-<!--
-
-Due to the short length of the reads and the sequence similarity among
-miRNAs, the number of alignments can be high. Therefore, reads aligned beyond a
-specified threshold are discarded. To address multimapping, alignments with the
-fewest InDels are preserved.
-
--->
-
 Two merging steps are done in order to have all the alignments in a single
 file. In the first one, the transcriptome and the genome mappings from both
 aligners are fused and only those alignments with a smaller NH than the one
@@ -388,6 +383,10 @@ alignments resulting from the partially redundant mapping strategy are
 discarded and only the best alignments for each read are retained (_i.e._ the
 ones with the smallest edit distance). In addition, and due to the alignment's
 aggregation, a second filtering according to the new NH is performed. 
+If a read has been aligned beyond a specified threshold, it is removed due to
+(1) performance reasons as the file size can rapidly increase, and (2) the fact
+that each read contributes to each count `1/N` where `N` is the number of
+genomic loci it aligns to and a large `N` makes the contribution negligible.
 
 A final filter is made to further increase the classification accuracy and
 reduce the amount of multimappers. Given that isomiRs are known to present more
@@ -409,7 +408,7 @@ precursors, mature miRNA and/or isomiRs, and all library counts are fused
 into a single table. Note that an alignment is only counted towards a given
 miRNA (or isomiR) species if one of its alignments fully falls within the
 (previously extended) locus annotated for that miRNA. Specifically, reads
-contribute with `1/n` for each miRNA for which that is the case, where `n` is
+contribute with `1/N` for each miRNA for which that is the case, where `N` is
 the total number of genomic loci the read aligns to. Under this criterion, the
 precursor counts contain reads that intersect with its mature arm(s), its
 hairpin sequence and/or the whole precursor itself.
