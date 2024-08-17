@@ -1235,9 +1235,9 @@ with a [**custom script**][custom-script-iso-tag].
 > extended ones. Each alignment gets an extra tag (`YW:Z`) with either the
 > (iso)miR(s) it is considered to really intersect with or an empty string
 > otherwise. The format of the intersecting mature miRNA species is
-> `miRNA_name|5p-shift|3p-shift|CIGAR|MD`, where `5p-shift` and `3p-shift` are
-> the difference between the miRNA start and end coordinates and the
-> alignment's ones respectively.
+> `miRNA_name|5p-shift|3p-shift|CIGAR|MD|read_name`, where `5p-shift` and
+> `3p-shift` are the difference between the miRNA start and end coordinates and
+> the alignment's ones respectively.
 
 - **Input**
   - Alignments file, filtered (`.sam`); from
@@ -1261,7 +1261,7 @@ IN miRNA annotations:
 IN SAM record:
     1-1_1	0	19	44377	255	22M	*	0	0	CTACAAAGGGAAGCACTTTCTC	*	MD:Z:22	NH:i:1	NM:i:0
 NEW TAG:
-	YW:Z:hsa-miR-524-5p|0|0|22M|22
+	YW:Z:hsa-miR-524-5p|0|0|22M|22|CTACAAAGGGAAGCACTTTCTC
 
 
 Example 2 | Intersecting an isomiR (no shifts)
@@ -1271,7 +1271,7 @@ IN miRNA annotations:
 IN SAM record:
     1-1_1	0	19	44377	1	11M3I11M	*	0	0	CTACAAAGGGAGGTAGCACTTTCTC	*	HI:i:0	MD:Z:22	NH:i:1	NM:i:3
 NEW TAG:
-    YW:Z:hsa-miR-524-5p|0|0|11M3I11M|22
+    YW:Z:hsa-miR-524-5p|0|0|11M3I11M|22|CTACAAAGGGAGGTAGCACTTTCTC
 
 
 Example 3 | Intersecting an isomiR (no InDels nor mismatches)
@@ -1281,7 +1281,7 @@ IN miRNA annotations:
 IN SAM record:
     1-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
 NEW TAG:
-    YW:Z:hsa-miR-1323|0|-1|21M|21
+    YW:Z:hsa-miR-1323|0|-1|21M|21|TCAAAACTGAGGGGCATTTTC
 
 
 Example 4 | Not intersecting an (iso)miR
@@ -1355,20 +1355,20 @@ Data:
         Contribution: 4/2 = 2
 
     miRNA species:
-        Tag name: hsa-miR-520b-3p|0|0|21M|21
+        Tag name: hsa-miR-520b-3p|0|0|21M|21|AAAGTGCTTCCTTTTAGAGGG
         Type: Canonical
         Table name: hsa-miR-520b-3p
         Total count: 2
 
-        Tag name: hsa-miR-520c-3p|0|-1|21M|21
+        Tag name: hsa-miR-520c-3p|0|-1|21M|21|AAAGTGCTTCCTTTTAGAGGG
         Type: isomiR
-        Table name: hsa-miR-520c-3p|0|-1|21M|21
+        Table name: hsa-miR-520c-3p|0|-1|21M|21|AAAGTGCTTCCTTTTAGAGGG
         Total count: 2
 
 OUT table:
-    ID	                        lib_name
-    hsa-miR-520b-3p         	2
-    hsa-miR-520c-3p|0|-1|21M|21	2
+    ID	                                                lib_name
+    hsa-miR-520b-3p         	                        2
+    hsa-miR-520c-3p|0|-1|21M|21|AAAGTGCTTCCTTTTAGAGGG	2
 
 
 Example 2 | Different isomiRs
@@ -1386,26 +1386,26 @@ Data:
         Contribution: 1/3 = 0.33
 
     miRNA species:
-        Tag name: hsa-miR-526b-3p|1|-1|20M|20
+        Tag name: hsa-miR-526b-3p|1|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
         Type: isomiR
-        Table name: hsa-miR-526b-3p|1|-1|20M|20
+        Table name: hsa-miR-526b-3p|1|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
         Total count: 0.33
 
-        Tag name: hsa-miR-520b-3p|0|-1|20M|20 
+        Tag name: hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG 
         Type: isomiR
-        Table name: hsa-miR-520b-3p|0|-1|20M|20
+        Table name: hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
         Total count: 0.33
 
-        Tag name: hsa-miR-520c-3p|0|-2|20M|20
+        Tag name: hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG
         Type: isomiR
-        Table name: hsa-miR-520c-3p|0|-2|20M|20 
+        Table name: hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG 
         Total count: 0.33
                       
 OUT table:            
-    ID	                        lib_name
-    hsa-miR-520b-3p|0|-1|20M|20	0.33
-    hsa-miR-520c-3p|0|-2|20M|20	0.33
-    hsa-miR-526b-3p|1|-1|20M|20	0.33
+    ID	                                                lib_name
+    hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG	0.33
+    hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG    0.33
+    hsa-miR-526b-3p|1|-1|20M|20|AAAGTGCTTCCTTTTAGAGG    0.33
 ```
 
 
@@ -1506,27 +1506,27 @@ Merge all the tables from the different libraries into a single one with a
 
 ```console
 IN library 1
-    ID                              lib_1
-    hsa-miR-524-5p          	    1	 
-    hsa-miR-524-5p|0|0|22M|9G12	    1    
-    hsa-miR-524-5p|0|0|22M|9G9C2	1    
+    ID                                                       lib_1
+    hsa-miR-524-5p          	                             1	 
+    hsa-miR-524-5p|0|0|22M|9G12|CTACAAAGGTAAGCACTTTCTC       1    
+    hsa-miR-524-5p|0|0|22M|9G9C2|CTACAAAGGTAAGCACTTTATC      1    
 
 IN library 2
-    ID                              lib_2
-    hsa-miR-524-5p          	    1
-    hsa-miR-1283	                1
-    hsa-miR-1283|-1|-2|21M|21	    1
+    ID                                                      lib_2
+    hsa-miR-524-5p          	                            1
+    hsa-miR-1283	                                        1
+    hsa-miR-498-3p|0|0|23M|8T14|AAAGCACCACCAGAGCTTGAAGC	    1
 
 IN library 3
-    ID                              lib_3
+    ID   lib_3
 
 OUT table
-    ID                              lib_1  lib_2  lib_3
-    hsa-miR-524-5p          	    1	    1       NA
-    hsa-miR-524-5p|0|0|22M|9G12	    1   	NA      NA
-    hsa-miR-524-5p|0|0|22M|9G9C2	1   	NA      NA
-    hsa-miR-1283	                NA	    1       NA
-    hsa-miR-1283|-1|-2|21M|21	    NA	    1       NA
+    ID                                                     lib_1  lib_2  lib_3
+    hsa-miR-524-5p                                   	    1	    1       NA
+    hsa-miR-524-5p|0|0|22M|9G12|CTACAAAGGTAAGCACTTTCTC	    1   	NA      NA
+    hsa-miR-524-5p|0|0|22M|9G9C2|CTACAAAGGTAAGCACTTTATC     1   	NA      NA
+    hsa-miR-1283	                                        NA	    1       NA
+    hsa-miR-498-3p|0|0|23M|8T14|AAAGCACCACCAGAGCTTGAAGC	    NA	    1       NA
 ```
 
 
