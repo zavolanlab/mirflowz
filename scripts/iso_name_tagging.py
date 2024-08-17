@@ -233,7 +233,8 @@ def get_tags(
     alignment positions. Similarly, the 3'-end shift is the result of
     subtracting the feature end position to the alignment's one. If both shifts
     values are within the range +/-extension, the name is added to the final
-    list.
+    list. Note that `pysam` assumes 0-base index therefore, the addition of
+    one base is required to compute the 5' end shift.
 
     Args:
         intersecting_mirna:
