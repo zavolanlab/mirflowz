@@ -20,7 +20,7 @@ can also contain the alignment NH vale (see 'READ NAME FORMAT' section)
 
 FEATURE NAME FORMAT
 The name of the intersecting feature(s) has to follow the format:
-feat_name|5p-shift|3p-shift|CIGAR|MD|READ_SEQ.
+FEAT_NAME|5p-SHIFT|3p-SHIFT|CIGAR|MD|READ_SEQ.
 For isomiRs, the whole name is used. For canonical miRNAs, the `feat_name`.
 A feature is classified as canonical if the 5p and 3p shifts are both 0 and the
 CIGAR and MD strings are the same. If there are different features names
@@ -69,7 +69,7 @@ overlap with the feature will always be in the last column.
 
 EXAMPLES
     Example 1
-    input: SAM with intersecting feature names in stored in the tag XN
+    input: SAM with intersecting feature names in the tag XN
     command: mirna_quantification.py SAM --tag XN
     output: hsa-miR-516b-5p	3.0
             hsa-miR-517-5p|-1|0|23M|22T|ACCTCTAGATGGAAGCACTGTCG	0.6000000000000001
@@ -108,7 +108,7 @@ EXAMPLES
     input: SAM with read names following the format NAME_NH
     command: mirna_quantification.py SAM --read-ids --nh --mir-list mirna
     output: hsa-miR-498-5p	4.333333333333333   270396_3
-            hsa-miR-1323    12.0    673650_2;673650_2
+            hsa-miR-1323    12.0    673650_2;906983_4
 
     Example 8
     input: SAM meeting the minimal characteristics
@@ -372,7 +372,7 @@ def get_name(pre_name: str) -> list[str]:
 
     Args:
         pre_name:
-            string with the format feat_name|5p-shift|3p-shift|CIGAR|MD
+            string with the format FEAT_NAME|5p-SHIFT|3p-SHIFT|CIGAR|MD|READ_SEQ
 
     Returns:
         list with the species name to be found in the final table and its type
