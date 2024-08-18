@@ -157,7 +157,7 @@ def attributes_dictionary(attr: str) -> Dict[str, str]:
 
 
 def parse_intersect_output(
-    intersect_file: Path, id: str = "name", extension: int = 0
+    intersect_file: Path, ID: str = "name", extension: int = 0
 ) -> Optional[Dict[Optional[str], list]]:
     """Parse intersect BED file.
 
@@ -205,7 +205,7 @@ def parse_intersect_output(
         for line in bedfile:
             fields = Fields(*line.strip().split("\t"))
 
-            miRNA_name = attributes_dictionary(fields.feat_attributes)[id]
+            miRNA_name = attributes_dictionary(fields.feat_attributes)[ID]
             miRNA_start = int(fields.feat_start) + extension
             miRNA_end = int(fields.feat_end) - extension
 
@@ -268,7 +268,7 @@ def main(args) -> None:
     """Add intersecting feature(s) into a SAM file as a tag."""
     intersect_data = parse_intersect_output(
             intersect_file=args.bed,
-            id=args.id,
+            ID=args.id,
             extension=args.extension,
     )
 
