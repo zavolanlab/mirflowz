@@ -243,7 +243,7 @@ class TestParseIntersectOutput:
         in_bed, in_sam, out_f = bed_sam
         out_name, out_id_alias, out_ext_3 = intersect_dicts
 
-        out_inter = parse_intersect_output(intersect_file=in_bed, id="alias")
+        out_inter = parse_intersect_output(intersect_file=in_bed, ID="alias")
 
         assert sorted(out_inter.items()) == sorted(out_id_alias.items())
 
@@ -252,7 +252,7 @@ class TestParseIntersectOutput:
         in_bed, in_sam, out_f = bed_sam
         out_name, out_id_alias, out_ext_3 = intersect_dicts
 
-        out_inter = parse_intersect_output(intersect_file=in_bed, id="id")
+        out_inter = parse_intersect_output(intersect_file=in_bed, ID="id")
 
         assert sorted(out_inter.items()) == sorted(out_id_alias.items())
 
