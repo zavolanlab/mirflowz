@@ -267,9 +267,9 @@ def get_tags(
 def main(args) -> None:
     """Add intersecting feature(s) into a SAM file as a tag."""
     intersect_data = parse_intersect_output(
-            intersect_file=args.bed,
-            ID=args.id,
-            extension=args.extension,
+        intersect_file=args.bed,
+        ID=args.id,
+        extension=args.extension,
     )
 
     with pysam.AlignmentFile(args.sam, "r") as samfile:
