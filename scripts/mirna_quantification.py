@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# pylint: disable=line-too-long
+
 """Quantify miRNAs and corresponding isomiRs.
 
 Read the input SAM file, calculate the contribution sum of the intersecting
@@ -115,7 +117,8 @@ EXAMPLES
     command: mirna_quantification.py SAM --count --len --mir-list isomir
     output: hsa-miR-512-3p|0|1|23M|22C0|AAGTGCTGTCATAGCTGAGGTAA	4.333333333333333  6 23
             hsa-miR-512-3p|0|1|23M|3T18C0|AAGGGCTGTCATAGCTGAGGTAA 12.0  8 19
-"""
+"""  # noqa: E501
+# pylint: enable=line-too-long
 
 import argparse
 from pathlib import Path
@@ -285,7 +288,6 @@ def collapsed_contribution(aln: pysam.AlignedSegment) -> float:
             Alignment to which the overall contribution is calculated
 
     Returns:
-
         Contribution of alignment to overall count
     """
     name = str(aln.query_name)
@@ -372,7 +374,8 @@ def get_name(pre_name: str) -> list[str]:
 
     Args:
         pre_name:
-            string with the format FEAT_NAME|5p-SHIFT|3p-SHIFT|CIGAR|MD|READ_SEQ
+            string with the format
+            FEAT_NAME|5p-SHIFT|3p-SHIFT|CIGAR|MD|READ_SEQ
 
     Returns:
         list with the species name to be found in the final table and its type
