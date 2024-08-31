@@ -15,6 +15,10 @@ _MIRFLOWZ_ is a [Snakemake][snakemake] workflow for mapping miRNAs and isomiRs.
     - [Expected output files](#expected-output-files)
     - [Creating a Snakemake report](#creating-a-snakemake-report)
 3. [Workflow description](#workflow-description)
+    - [Prepare module](#prepare-module)
+    - [Map module](#map-module)
+    - [Quantify module](#quantify-module)
+    - [ASCII-style pileups module](#ascii-style-pileups-module)
 4. [Contributing](#contributing)
 5. [License](#license)
 6. [Contact](#contact)
@@ -40,8 +44,8 @@ For improved reproducibility and reusability of the workflow, as well as an
 easy means to run it on a high performance computing (HPC) cluster managed,
 e.g., by [Slurm][slurm], all steps of the workflow run inside isolated
 environments ([Singularity][singularity] containers or [Conda][conda]
-environments). As a consequence, running this workflow has only a few individual
-dependencies. These are managed by the package manager Conda, which 
+environments). As a consequence, running this workflow has only a few
+individual dependencies. These are managed by the package manager Conda, which 
 needs to be installed on your system before proceeding.
 
 If you do not already have Conda installed globally on your system,
@@ -159,7 +163,7 @@ tested, you can go ahead and run the workflow on your samples.
 It is suggested to have all the input files for a given run (or hard links 
 pointing to them) inside a dedicated directory, for instance under the 
 _MIRFLOWZ_ root directory. This way, it is easier to keep the data together,
-reproduce an analysis and set up Singularity access to them.  
+set up Singularity access to them and reproduce analyses.  
 
 #### 1. Prepare a sample table
 
@@ -210,8 +214,8 @@ There are 4 files you must provide:
    expected format.
 
 5. **OPTIONAL**: A **BED6** file with regions for which to produce
-   [ASCII-style alignment pileups][ascii-pileups]. If not provided, no pileups
-   will be generated. See [here][bed-format] for the expected format.
+   [ASCII-style pileups][ascii-pileups]. If not provided, no pileups are
+   generated. See [here][bed-format] for the expected format.
 
 > General note: If you want to process the genome resources before use (e.g.,
 > filtering), you can do that, but make sure the formats of any modified
@@ -265,9 +269,7 @@ intermediate files generated during the process. The final outputs comprise:
 1. A SAM file containing alignments intersecting a pri-miR locus. These
 alignments intersect with extended start and/or end positions specified in the
 provided pri-miR annotations. Please note that they may not contribute to the
-final counting and may not appear in the final table. Alignments are discarded
-if their start and/or end positions differ from the ends of the provided
-pri-miR annotations by more bases than the extension used.
+final counting and may not appear in the final table.
 
 2. A SAM file containing alignments intersecting a mature miRNA locus. Similar
 to the previous file, these alignments intersect with extended start and/or end
@@ -325,33 +327,126 @@ snakemake \
 
 ## Workflow description
 
-The _MIRFLOWZ_ workflow first processes and indexes the user-provided genome 
-resources. Afterwards, the user-provided short read small-RNA-seq libraries will
-be aligned separately against the genome and transcriptome. For increased 
-fidelity, two separated aligners, [Segemehl][segemehl] and our in-house tool 
-[Oligomap][oligomap], are used. All the resulting alignments are merged such 
-that only the best alignments of each read are kept (smallest edit distance).
-Alignments are intersected with the user-provided, pre-processed miRNA
-annotation file using [BEDTools][bedtools]. Counts are tabulated separately for
-reads consistent with either miRNA precursors, mature miRNA and/or isomiRs.
-Finally, ASCII-style alignment pileups are optionally generated for
-user-defined regions of interest.
+_MIRFLOWZ_ consists of a main `Snakefile` and four functional modules. In the
+`Snakefile`, the configuration file is validated, and the various modules are
+imported. In addition, a handler for both, a successful and a failed run are
+set. If the workflow finishes without any errors, all the intermediate files
+are removed, otherwise, a log file is created. To keep the intermediate files
+upon completion, use the `--no-hooks` CLI argument when running the pipeline.
 
-> **NOTE:** For a detailed description of each rule, please, refer to the
-> [workflow documentation](pipeline_documentation.md)
+The modules [(1)](#prepare-module) process the genome resources,
+[(2)](#map-module) map and [(3)](#quantify-module) quantify the reads, and
+[(4)](#ascii-style-pileups-module) generate pileups, as described in detail
+below.
+
+> **NOTE:** _MIRFLOWZ_ uses the notation provided by miRBase (_i.e._
+> "miRNA primary transcript" for precursors and "miRNA" for the canonical
+> mature miRNA). This implies that precursors are named "pri-miRs" across the
+> workflow instead of pre-miR. This decision is made upon the lack of
+> guarantee that "miRNA primary transcripts" are full pre-miR (and pre-miR
+> only) sequences.
+
+### Prepare module
+
+The _MIRFLOWZ_ workflow initially processes and indexes the genome resources
+provided by the user. The regions corresponding to mature miRNAs are extended
+by a fixed but user-adjustable number of nucleotides on both sides to
+accommodate isomiR species with shifted start and/or end positions. If
+necessary, pri-miR loci are extended to adjust to the new miRNA coordinates.
+In addition, to account for the different genomic locations a miRNA sequence
+can be annotated, the name of these sequences are modified to have the format
+`SPECIES-mir-NAME-#` for pri-miRs and `SPECIES-miR-NAME-#-ARM` or
+`SPECIES-miR-NAME-#` for mature miRNAs with both or just one arm respectively,
+where `#` is the replica number.
+
+### Map module
+
+The user-provided short-read small RNA-seq libraries undergo quality filtering
+(skipped if libraries are provided in FASTA rather than FASTQ), followed by
+adapter removal. The resulting reads are independently mapped to both the
+genome and the transcriptome using two distinct aligners: Segemehl and our
+in-house tool Oligomap.
+
+Segemehl implements a fast heuristic strategy that returns the alignment(s)
+with the smallest edit distance. Oligomap, on the other hand, implements a
+slower and more restricted approach that reports all the alignments with an
+edit distance of at most 1. The combination of the fast and flexible results
+and the strict selection ensures results with a higher fidelity than if only
+one of the tools was to be used.
+
+Two merging steps are done in order to have all the alignments in a single
+file. In the first one, the transcriptome and the genome mappings from both
+aligners are fused and only those alignments with a smaller NH than the one
+provided are kept. For the second step, transcriptomic coordinates are turned
+into genomic ones and alignments are combined into a single file. Duplicate
+alignments resulting from the partially redundant mapping strategy are
+discarded and only the best alignments for each read are retained (_i.e._ the
+ones with the smallest edit distance). In addition, and due to the alignment's
+aggregation, a second filtering according to the new NH is performed. 
+If a read has been aligned beyond a specified threshold, it is removed due to
+(1) performance reasons as the file size can rapidly increase, and (2) the fact
+that each read contributes to each count `1/N` where `N` is the number of
+genomic loci it aligns to and a large `N` makes the contribution negligible.
+
+A final filter is made to further increase the classification accuracy and
+reduce the amount of multimappers. Given that isomiRs are known to present more
+mismatches than InDels when compared to the canonical sequence they come from,
+when addressing the multiple genomic locations a read has been mapped to, the
+alignments with fewer InDels are kept. Note that some multimappers might still
+be present if the number of InDels and mismatches is the same across
+alignments.
+
+### Quantify module
+
+The filtered alignments are subsequently intersected with the user-provided,
+pre-processed miRNA annotation files using BEDTools. Each alignment is
+classified according to the miRNA species it fully intersects with in order
+to do the counts.
+
+Counts are tabulated separately for reads consistent with either miRNA
+precursors, mature miRNA and/or isomiRs, and all library counts are fused
+into a single table. Note that an alignment is only counted towards a given
+miRNA (or isomiR) species if one of its alignments fully falls within the
+(previously extended) locus annotated for that miRNA. Specifically, reads
+contribute with `1/N` for each miRNA for which that is the case, where `N` is
+the total number of genomic loci the read aligns to. Under this criterion, the
+precursor counts contain reads that intersect with its mature arm(s), its
+hairpin sequence and/or the whole precursor itself.
+
+#### isomiRs notation
+
+A sequence is considered to be an isomiR if it has a shift on either end, an
+InDel or a mismatch on its sequence when compared to the canonical miRNA it
+maps and intersects with.
+
+_MIRFLOWZ_ employs an unambiguous notation to classify isomiRs using the
+format `miRNA_name|5p-shift|3p-shift|CIGAR|MD`, where `5p-shift` and
+`3p-shift` represent the differences between the annotated mature miRNA
+start and end positions and those of the read alignment, respectively.
+
+### ASCII-style pileups module
+
+Finally, to visualize the distribution of read alignments around miRNA
+loci, ASCII-style alignment pileups are optionally generated for user-defined
+regions of interest.
+
 
 The schema below is a visual representation of the individual workflow steps
 and how they are related:
 
 > ![rule-graph][rule-graph]
 
+> **NOTE:** For an elaborated description of each rule along with some
+> examples, please, refer to the
+> [workflow documentation](pipeline_documentation.md).
+
 ## Contributing
 
 _MIRFLOWZ_ is an open-source project which relies on community contributions.
 You are welcome to participate by submitting bug reports or feature requests,
 taking part in discussions, or proposing fixes and other code changes. Please
-refer to the [contributing guidelines](CONTRIBUTING.md) if you are interested in
-contribute.
+refer to the [contributing guidelines](CONTRIBUTING.md) if you are interested
+in contributing.
 
 ## License
 
@@ -359,13 +454,14 @@ This project is covered by the [MIT License](LICENSE).
 
 ## Contact
 
-For questions or suggestions regarding the code, please use the [issue tracker][issue-tracker]. Do not hesitate on contacting us via [email][email] for any other inquiries.
+For questions or suggestions regarding the code, please use the
+[issue tracker][issue-tracker]. Do not hesitate to contact us via
+[email][email] for any other inquiries.
 
 &copy; 2023 [Zavolab, Biozentrum, University of Basel][zavolab]
 
 [ascii-pileups]: <https://git.scicore.unibas.ch/zavolan_group/tools/ascii-alignment-pileup>
 [bed-format]: <https://gist.github.com/deliaBlue/19ad3740c95937378bd9281bd9d1bc72>
-[bedtools]: <https://github.com/arq5x/bedtools2>
 [chrMap]: <https://github.com/dpryan79/ChromosomeMappings>
 [conda]: <https://docs.conda.io/projects/conda/en/latest/index.html>
 [cluster execution]: <https://snakemake.readthedocs.io/en/stable/executing/cluster.html>
@@ -375,9 +471,7 @@ For questions or suggestions regarding the code, please use the [issue tracker][
 [mamba]: <https://github.com/mamba-org/mamba>
 [miniconda-installation]: <https://docs.conda.io/en/latest/miniconda.html>
 [mirbase]: <https://mirbase.org/>
-[oligomap]: <https://bio.tools/oligomap>
 [rule-graph]: images/rule_graph.svg
-[segemehl]: <https://www.bioinf.uni-leipzig.de/Software/segemehl/>
 [singularity]: <https://apptainer.org/admin-docs/3.8/index.html>
 [slurm]: <https://slurm.schedmd.com/documentation.html>
 [snakemake]: <https://snakemake.readthedocs.io/en/stable/>
