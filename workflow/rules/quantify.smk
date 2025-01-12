@@ -304,6 +304,7 @@ rule add_intersecting_mirna_tag:
         --bed {input.intersect} \
         --sam {input.alignments} \
         --extension {params.extension} \
+        --shift {params.extension} \
         > {output.sam} \
         ) &> {log}"
 
