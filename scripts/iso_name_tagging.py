@@ -6,27 +6,25 @@
 
 Build new names for the intersecting features from a BED file and add them as
 a tag to alignments in a SAM file using the format
-miRNA_ID|5'-shift|3'-shift|CIGAR|MD|READ_SEQ. If either the BED or the SAM
-file is empty, only the SAM file header is returned.
+FEATURE_ID|5'-shift|3'-shift|CIGAR|MD|READ_SEQ.
 
 EXPECTED INPUT FILES
 The BED file must be the output of a bedtools intersect call with `-a` being a
-GFF3 file and `-b` a BAM file. If the GFF3 used in the bedtools intersect call
-has the features start and end coordinates extended, the number of additional
-nucleotides must be specified using the CLI option `--extension`. The SAM file
-must contain only the reads that have an intersecting feature.
+GFF3 file and `-b` a BAM file. The SAM file must only
+contain alignments with an intersecting feature. If either the BED or the SAM
+file is empty, only the SAM file header is returned.
 
 NAME CREATION and TAG ADDITION
 For each alignment, the name of the intersecting feature follows the
-format miRNA_ID|5'-shift|3'-shift|CIGAR|MD|READ_SEQ. The CLI option `--id`
-specifies the feature identifier to be used as miRNA_ID from the attributes
+format FEATURE_ID|5'-shift|3'-shift|CIGAR|MD|READ_SEQ. The CLI option `--id`
+specifies the feature identifier to be used as FEATURE_ID from the attributes
 column in the BED file. The 5' and 3' shift values are the difference between
-the feature (extended) start and end coordinates and the alignment ones. If
-`--extension` is provided, the feature start and end positions are adjusted by
-adding and subtracting respectively the given value. If both, the 5' and
-3'-end shifts, are within the range +/- extension (or equal 0 if no value is
-provided) the feature name is added to the alignment as the new tag "YW".
-Multiple intersecting feature names are separated by a semi-colon.
+the alignment and its intersecting feature(s) start and end coordinates
+respectively. If `--extension` is provided, features start and end positions
+are adjusted by adding and subtracting respectively the given value. If
+`--shift` is provided, and both, the 5' and 3'-end shifts, are within the
+range +/- `--shift` the feature name is added to the alignment as the new tag
+"YW". Multiple intersecting feature names are separated by a semi-colon.
 
 EXAMPLES
     Example 1
@@ -40,6 +38,12 @@ EXAMPLES
         ""
     out SAM record:
         13-1_1	0	19	44377	1	11M3I11M	*	0	0	CTACAAAGGGAGGTAGCACTTTCTC	*	HI:i:0	MD:Z:22	NH:i:1	NM:i:3	RG:Z:A1	YZ:Z:0	YW:Z:
+    explanation:
+        The aligned read has a length of 22 whereas the feature has a length of
+        21. As both have the same starting position, there is a 1bp shift at
+        the 3' end. Given that no extension nor shift are provided in the
+        script call, no adjustments to the annotated coordinates are made and
+        no shifts are allowed. Hence, no tag is added.
 
     Example 2
     in BED record:
@@ -52,6 +56,11 @@ EXAMPLES
         hsa-miR-1323|0|0|21M|21|TCAAAACTGAGGGGCATTTTC
     out SAM record:
         48-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0	YW:Z:hsa-miR-1323|0|0|21M|21|TCAAAACTGAGGGGCATTTTC
+    explanation:
+        The aligned read and the annotated featrue have the same start and end
+        positions. Given that no extension are provided in the script call, no
+        coordinates adjustments are made. And there is no shift on ether end,
+        the new tag is added.
 
     Example 3
     in BED record:
@@ -59,11 +68,17 @@ EXAMPLES
     in SAM record:
         48-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
     command:
-        iso_name_tagging.py -b BED -s SAM --extension 6
+        iso_name_tagging.py -b BED -s SAM --extension 6 --shift 7
     new name:
         hsa-miR-1323|0|0|21M|21|TCAAAACTGAGGGGCATTTTC
     out SAM record:
         48-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0	YW:Z:hsa-miR-1323|0|0|21M|21|TCAAAACTGAGGGGCATTTTC
+    explanation:
+        The feature's start and end coordinates are adjusted by amount of bp
+        specified by the CLI argument `--extension`. The alignment start and
+        end positions differ from the adjusted miRNA ones by 6 bp. As there is
+        a +/- 7 bp shift allowed and both shifts are within this range, the new
+        tag is added.
 
     Example 4
     in BED record:
@@ -71,11 +86,17 @@ EXAMPLES
     in SAM record:
         13-1_1	0	19	44377	1	11M3I11M	*	0	0	CTACAAAGGGAGGTAGCACTTTCTC	*	HI:i:0	MD:Z:25	NH:i:1	NM:i:3	RG:Z:A1	YZ:Z:0
     command:
-        iso_name_tagging.py -b BED -s SAM --extension 6 --id id
+        iso_name_tagging.py -b BED -s SAM --extension 6 --shift 7 --id id
     new name:
         MIMAT0002849|6|4|11M3I11M|25|CTACAAAGGGAGGTAGCACTTTCTC
     out SAM record:
         13-1_1	0	19	44377	1	11M3I11M	*	0	0	CTACAAAGGGAGGTAGCACTTTCTC	*	HI:i:0	MD:Z:25	NH:i:1	NM:i:3	RG:Z:A1	YZ:Z:0	YW:Z:MIMAT0002849|6|4|11M3I11M|25|CTACAAAGGGAGGTAGCACTTTCTC
+    explanation:
+        The feature's start and end coordinates are adjusted by amount of bp
+        specified by the CLI argument `--extension`. The alignment start and
+        end positions differ from the adjusted miRNA ones by 6 bp. As there is
+        a +/- 7 bp shift allowed and both shifts are within this range, the new
+        tag is added. This time using the feature ID instead of the Name.
 """  # noqa: E501
 # pylint: enable=line-too-long
 
@@ -130,6 +151,17 @@ def parse_arguments():
         type=int,
     )
     parser.add_argument(
+        "-S",
+        "--shift",
+        help=(
+            "Absoulte difference in nucleotides allowed between the alignment"
+            " and its intersecting features' start and end coordinates."
+            " Default: %(default)d."
+        ),
+        default=0,
+        type=int,
+    )
+    parser.add_argument(
         "--id",
         help=(
             "ID used to identify the feature in the name that is added as tag."
@@ -161,18 +193,18 @@ def parse_intersect_output(
 ) -> Optional[Dict[Optional[str], list]]:
     """Parse intersect BED file.
 
-    Given a BED file generated by intersecting a GFF file (-a) with a BAM file
+    Given a BED file generated by intersecting a GFF3 file (-a) with a BAM file
     (-b) using bedtools intersect, create a dictionary where the alignment
-    names are the keys. The values are lists containing the feature name,
-    start position, and end position. The id argument specifies the feature
-    name to use, and the extension argument adjusts the feature coordinates by
-    adding the given value and subtracts it from the end position. If the BED
-    file is empty, `None` is returned.
+    names are the keys, and the values are lists containing the feature name,
+    the start and the end positions. The `ID` argument specifies the feature
+    name to use, and the `extension` argument adjusts the feature coordinates
+    by adding and subtracting the given value to the start and end positions
+    respectively. If the BED file is empty, `None` is returned.
 
     Args:
         intersect_file:
             Path to the intersect BED file.
-        id:
+        ID:
             ID used to identify the feature. Defaults to "name".
         extension:
             Number of nucleotides the start and end coordinates have to be
@@ -205,12 +237,12 @@ def parse_intersect_output(
         for line in bedfile:
             fields = Fields(*line.strip().split("\t"))
 
-            miRNA_name = attributes_dictionary(fields.feat_attributes)[ID]
-            miRNA_start = int(fields.feat_start) + extension
-            miRNA_end = int(fields.feat_end) - extension
+            feat_name = attributes_dictionary(fields.feat_attributes)[ID]
+            feat_start = int(fields.feat_start) + extension
+            feat_end = int(fields.feat_end) - extension
 
             intersect_data[fields.read_name].append(
-                (miRNA_name, miRNA_start, miRNA_end)
+                (feat_name, feat_start, feat_end)
             )
 
     if not intersect_data:
@@ -220,34 +252,34 @@ def parse_intersect_output(
 
 
 def get_tags(
-    intersecting_mirna: list, alignment: pysam.AlignedSegment, extend: int
+    intersecting_feat: list, alignment: pysam.AlignedSegment, shift: int = 0
 ) -> set:
-    """Get tag for alignment.
+    """Get alignment's new tag.
 
-    Given an alignment and a list containing the name, start and end
-    (extended) positions of all the intersecting miRNA species, create the set
-    of strings used as a new custom tag to that alignment.
+    Given an alignment and a list containing the name, the (extended) start and
+    end positions of all the intersecting features, create a set of strings
+    to be used as a new custom tag on that alignment.
     Each string follows the format:
-        miRNA_ID|5'-shift|3'-shift|CIGAR|MD|READ_SEQ
+        FEATURE_ID|5'-shift|3'-shift|CIGAR|MD|READ_SEQ
     The 5' end shift is computed as the difference between the feature and the
-    alignment positions. Similarly, the 3'-end shift is the result of
-    subtracting the feature end position to the alignment's one. If both shifts
-    values are within the range +/-extension, the name is added to the final
-    list. Note that `pysam` assumes 0-base index therefore, the addition of
-    one base is required to compute the 5' end shift.
+    alignment starting coordinate. Similarly, the 3' end shift is the result of
+    subtracting the feature's end position to the alignment's one. If both
+    shifts values are within the range +/- `shift`, the name is added to the
+    final list. Note that `pysam` assumes 0-base index therefore, the addition
+    of one base is required to compute the 5' end shift.
 
     Args:
-        intersecting_mirna:
+        intersecting_feat:
             list with the miRNA species name, start and end positions
         alignment:
             alignment to create the tag for
-        extend:
+        shift:
             value that sets the range in which both shifts have to be in to
-            create a new string for a particular miRNA species
+            create a new string for a particular feature
 
     Returns:
         tags:
-            set of strings for each valid intersecting miRNA
+            set of strings for each valid intersecting feature
     """
     cigar = alignment.cigarstring
     seq = alignment.query_sequence
@@ -255,11 +287,11 @@ def get_tags(
 
     tags = []
 
-    for miR_name, miR_start, miR_end in intersecting_mirna:
-        shift_5 = alignment.reference_start - miR_start + 1
-        shift_3 = alignment.reference_start + alignment.query_length - miR_end
-        if -extend <= shift_5 <= extend and -extend <= shift_3 <= extend:
-            tags.append(f"{miR_name}|{shift_5}|{shift_3}|{cigar}|{md}|{seq}")
+    for feat_name, feat_start, feat_end in intersecting_feat:
+        shift_5 = alignment.reference_start - feat_start + 1
+        shift_3 = alignment.reference_start + alignment.query_length - feat_end
+        if -shift <= shift_5 <= shift and -shift <= shift_3 <= shift:
+            tags.append(f"{feat_name}|{shift_5}|{shift_3}|{cigar}|{md}|{seq}")
 
     return set(tags)
 
@@ -280,12 +312,12 @@ def main(args) -> None:
 
         for alignment in samfile:
             alignment_id = alignment.query_name
-            intersecting_miRNAs = intersect_data[alignment_id]
+            intersecting_feats = intersect_data[alignment_id]
 
             tags = get_tags(
-                intersecting_mirna=intersecting_miRNAs,
+                intersecting_feat=intersecting_feats,
                 alignment=alignment,
-                extend=args.extension,
+                shift=args.shift,
             )
 
             alignment.set_tag("YW", ";".join(tags))
