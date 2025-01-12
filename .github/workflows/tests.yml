@@ -25,6 +25,7 @@ jobs:
         with:
           mamba-version: "*"
           activate-environment: mirflowz
+          channel-priority: true
           environment-file: environment.yml
           auto-activate-base: false
       
@@ -68,6 +69,7 @@ jobs:
         with:
           mamba-version: "*"
           activate-environment: mirflowz
+          channel-priority: true
           environment-file: environment.yml
           auto-activate-base: false
       
@@ -105,6 +107,7 @@ jobs:
         with:
           mamba-version: "*"
           activate-environment: mirflowz
+          channel-priority: true
           environment-file: environment.yml
           auto-activate-base: false
       
@@ -139,6 +142,7 @@ jobs:
         with:
           mamba-version: "*"
           activate-environment: mirflowz
+          channel-priority: true
           environment-file: environment.yml
           auto-activate-base: false
       
