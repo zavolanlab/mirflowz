@@ -87,7 +87,6 @@ def alns():
     aln1.set_tag("NH", 2)
     aln1.set_tag("HI", 1)
 
-    # Alignment with 3 insertions
     aln2 = pysam.AlignedSegment()
     aln2.cigarstring = "21M"
     aln2.query_name = "8-2_1"
@@ -275,9 +274,9 @@ class TestGetTags:
         out_name, out_id_alias, out_ext_3 = intersect_dicts
 
         tags = get_tags(
-            intersecting_mirna=out_name[aln_1.query_name],
+            intersecting_feat=out_name[aln_1.query_name],
             alignment=aln_1,
-            extend=1,
+            shift=1,
         )
         expected = "hsa-miR-524-3p|1|1|21M|21|GAAGGCGCTTCCCTTTGGAGT"
 
@@ -289,9 +288,9 @@ class TestGetTags:
         out_name, out_id_alias, out_ext_3 = intersect_dicts
 
         tags = get_tags(
-            intersecting_mirna=out_name[aln_1.query_name],
+            intersecting_feat=out_name[aln_1.query_name],
             alignment=aln_2,
-            extend=0,
+            shift=0,
         )
         assert tags == set()
 
@@ -368,6 +367,8 @@ class TestParseArguments:
                 "alias",
                 "--extension",
                 "6",
+                "--shift",
+                "6",
             ],
         )
         args = parse_arguments().parse_args()
@@ -398,7 +399,7 @@ class TestMain:
         main(args)
         captured = capsys.readouterr()
 
-        with open(empty_sam, "r") as out_file:
+        with open(empty_sam, encoding="utf-8") as out_file:
             assert captured.out == out_file.read()
 
     def test_main_empty_sam_file(
@@ -423,7 +424,7 @@ class TestMain:
         main(args)
         captured = capsys.readouterr()
 
-        with open(empty_sam, "r") as out_file:
+        with open(empty_sam, encoding="utf-8") as out_file:
             assert captured.out == out_file.read()
 
     def test_main_bed_sam_file(self, monkeypatch, capsys, bed_sam):
@@ -445,13 +446,13 @@ class TestMain:
         main(args)
         captured = capsys.readouterr()
 
-        with open(output, "r") as out_file:
+        with open(output, encoding="utf-8") as out_file:
             assert captured.out == out_file.read()
 
     def test_main_bed_sam_extension_file(
         self, monkeypatch, capsys, bed_sam_extension
     ):
-        """Test main function with extension equals 6."""
+        """Test main function with extension and allowed shit equal to 6."""
         in_bed, in_sam, output = bed_sam_extension
 
         monkeypatch.setattr(
@@ -465,13 +466,15 @@ class TestMain:
                 str(in_sam),
                 "--extension",
                 "6",
+                "--shift",
+                "6",
             ],
         )
         args = parse_arguments().parse_args()
         main(args)
         captured = capsys.readouterr()
 
-        with open(output, "r") as out_file:
+        with open(output, encoding="utf-8") as out_file:
             assert captured.out == out_file.read()
 
     def test_main_bed_sam_file_id(self, monkeypatch, capsys, bed_sam_id):
@@ -495,5 +498,5 @@ class TestMain:
         main(args)
         captured = capsys.readouterr()
 
-        with open(output, "r") as out_file:
+        with open(output, encoding="utf-8") as out_file:
             assert captured.out == out_file.read()
