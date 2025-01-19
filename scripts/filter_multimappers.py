@@ -1,43 +1,51 @@
 #!/usr/bin/env python
 
-"""Filter multimappers in a SAM file by indel count.
+# pylint: disable=line-too-long
 
-This script uses the pysam library to open the input SAM file and iterates
-over each alignment in it. It is assumed that the file is ordered by query
-name. For each alignment, it checks if it is a secondary or supplementary
-alignment, if it is, it skips to the next alignment. Otherwise, it adds the
-alignment to a list storing all alignments with the same query name.
-If the current query changes, it selects the best alignment(s) from the list
-of current alingments and writes them to the standard output. Current query
-and current alignments list are reset to the new query and alignment
-respectively.
-Finally, if there are any remaining alignments in the current alignments
-list and selects the best alignment(s) for those queries, writing them to
-standard output. If --nh is set, all query names are modified to include the
-NH tag after an underscore.
+"""Filter miRNA reads mapped to multiple locations by indel count.
 
-Input:
-    input_sam_file: Path to the input SAM file, ordered by query name.
+From all the alignments with the same query name and edit distance, keep the
+ones with the higher amount of indels. Supplementary alignments are dismissed.
+Additionally, the 'NH' and 'HI' tags are updated to match the new amount of
+alignments and keep their identifier within the new set respectively. If the
+CLI flag `--nh` is set, query names are appended the suffix '_#' were '#' is
+the updated alignment's NH tag.
 
-Output:
-    standard output: Filtered SAM file
+The following assumptions are made:
+    - The input SAM file is sorted by query name.
 
-Functions:
-    parse_arguments():
-        Command-line arguments parser
-    count_indels(pysam.AlignedSegment):
-        Count the number of indels in an alignment based on its CIGAR string.
-    find_best_alignments(list[pysam.AlignedSegment]):
-        Find alignments with less indels
-    write_output(list[pysam.AlignedSegment]):
-        Write the output to the standard output (stdout).
-    main(Path):
-        Filter multimappers by indels count.
 
-Usage:
-    filter_multimappers.py SAM
-    filter_multimappers.py SAM > SAM
-"""
+EXAMPLES:
+    Example 1
+    IN SAM records:
+        read-1	16	19	77595	255	14M1D8M	*	0	0	GCAGGAGAATCACTGATGTCAG	*	MD:Z:14^T2A1C3	NH:i:2	NM:i:3	XA:Z:Q	XI:i:1
+        read-1	0	19	330456	255	4M1D1M1I3M1D13M	*	0	0	CTGACATCAGTGATTCTCCTGC	*	MD:Z:4^G4^A13	NH:i:2	NM:i:3	XA:Z:Q	XI:i:0
+    command:
+        filter_multimappers.py SAM > out_SAM
+    OUT SAM record:
+        read-1	0	19	330456	255	4M1D1M1I3M1D13M	*	0	0	CTGACATCAGTGATTCTCCTGC	*	MD:Z:4^G4^A13	NH:i:1	HI:i:1	NM:i:3	XA:Z:Q	XI:i:0
+
+    Example 2
+    IN SAM records:
+        read-2	0	19	142777	255	21M	*	0	0	GCTAGGTGGGAGGCTTGAAGCT	*	MD:Z:4C0T14A	NH:i:3	NM:i:3	XA:Z:Q	XI:i:0
+        read-2	16	19	270081	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14G0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:2
+        read-2	16	19	545543	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14A0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:1
+    command:
+        filter_multimappers.py SAM --nh > out_SAM
+    OUT SAM record:
+        read-2_2	16	19	270081	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14G0G4	NH:i:2	HI:i:1	NM:i:3	XA:Z:Q	XI:i:2
+        read-2_2	16	19	545543	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14A0G4	NH:i:2	HI:i:2	NM:i:3	XA:Z:Q	XI:i:1
+
+    Example 3
+    IN SAM records:
+        read-3	2128	19	63251	255	22M	*	0	0	AAAGCGCTTCCCTTCAGAGTGA	*	MD:Z:21T	NH:i:1	NM:i:1
+    command:
+        filter_multimappers.py SAM > out_SAM
+    OUT SAM record:
+
+"""  # noqa: E501
+# pylint: enable=line-too-long
+
 import argparse
 from pathlib import Path
 import sys
@@ -49,14 +57,15 @@ import pysam
 def parse_arguments():
     """Command-line arguments parser."""
     parser = argparse.ArgumentParser(
-        description="Script to filter multimappers by indel counts."
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
     parser.add_argument(
         "-v",
         "--version",
         action="version",
-        version="%(prog)s 1.0",
+        version="%(prog)s 1.1.0",
         help="Show program's version number and exit",
     )
 
@@ -70,7 +79,7 @@ def parse_arguments():
         "--nh",
         help=(
             "If set, the NH tag will be include in the alignment name after"
-            "and underscore. Default: %(default)s."
+            " and underscore. Default: %(default)s."
         ),
         action="store_true",
         default=False,
@@ -89,11 +98,10 @@ def count_indels(aln: pysam.libcalignedsegment.AlignedSegment) -> int:
     https://pysam.readthedocs.io/en/v0.15.0/api.html#pysam.AlignedSegment.cigartuples
 
     Args:
-        alignments: The read to count insertions for.
-
+        aln: alignment to count insertions and deletions for.
 
     Returns:
-        int: The sum of insertions and deletions in the alignment.
+        int: sum of insertions and deletions in that alignment.
     """
     cigar = aln.cigartuples
     assert isinstance(cigar, list)
@@ -106,19 +114,18 @@ def find_best_alignments(
 ) -> List[pysam.AlignedSegment]:
     """Find alignments with less indels.
 
-    This function creates a list of tuples with the alignment object and its
-    number of indels. Then, computes the minimum number of indels and returns
-    a list with the alignments that have no more than that minimum number of
-    indels. In addition, it updates the 'NH' and 'HI' tags to match the final
-    number of alignments kept and its identifier respectively. If 'nh' is set
-    to 'True', all query names are modified to include the NH tag after an
-    underscore.
+    Using the function `count_indels` each alignment is assigned with its
+    number of indels. Then, only those alignments with the higher amount of
+    indels are returned. In addition, the 'NH' and 'HI' tags are updated to
+    match the new amount of alignments and keep its identifier within the set
+    respectively. If `nh` is set to `True`, all query names are appended a
+    suffix `_#` were '`#` is the new alignment's NH tag.
 
     Args:
         alignments: alignments with the same query name
 
-    Retrns:
-        best_alignments: alignments with the less indels
+    Returns:
+        best_alignments: alignments with the more indels
     """
     if len(alns) == 1:
         if nh:
@@ -128,14 +135,15 @@ def find_best_alignments(
         return alns
 
     aln_indels = [(aln, count_indels(aln=aln)) for aln in alns]
-    min_indels = min(aln_indels, key=lambda x: x[1])[1]
+    max_indels = max(aln_indels, key=lambda x: x[1])[1]
     best_alignments = [
         aln
         for i, (aln, indels) in enumerate(aln_indels)
-        if indels == min_indels
+        if indels == max_indels
     ]
 
     for i, best_aln in enumerate(best_alignments):
+
         if nh:
             name = f"{best_aln.query_name}_{len(best_alignments)}"
             best_aln.query_name = name
@@ -159,12 +167,14 @@ def write_output(alns: List[pysam.AlignedSegment]) -> None:
 def main(arguments) -> None:
     """Filter multimappers by indels count."""
     with pysam.AlignmentFile(arguments.infile, "r") as samfile:
+
         sys.stdout.write(str(samfile.header))
 
         current_alignments: list[pysam.AlignedSegment] = []
         current_query = None
 
         for alignment in samfile:
+
             if alignment.is_supplementary:
                 continue
 
