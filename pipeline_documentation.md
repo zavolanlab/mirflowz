@@ -1000,11 +1000,11 @@ OUT:
 Filter multimappers favoring mismatches over InDels with a
 [**custom script**][custom-script-filter-mm].
 
-> Under the assumption that InDels are less frequent than mismatches only
-> those alignments (of the same read with the same edit distance) with the
-> lowest number of InDels are kept. This approach allows the presence of
-> multimappers and/or InDels after the filtering if the alignments contain the
-> same proportion of mismatches vs. InDels.
+> Provided that InDels are more frequent than mismatches only those alignments
+> (of the same read with the same edit distance) with the higher number of
+> InDels are kept. This approach allows the presence of multimappers and/or
+> mismatches after the filtering if several alignments contain the same amount
+> of InDels.
 
 - **Input**
   - Alignments file, sorted, filtered (`.sam`); from
@@ -1016,25 +1016,25 @@ Filter multimappers favoring mismatches over InDels with a
 - **Examples**
 
 ```console
-Example 1 | Different proportion of mismatches vs. InDels
+Example 1 | Different amount of InDels
 
 IN:
     1-1	16	19	77595	255	14M1D8M	*	0	0	GCAGGAGAATCACTGATGTCAG	*	MD:Z:14^T2A1C3	NH:i:2	NM:i:3	XA:Z:Q	XI:i:1
     1-1	0	19	330456	255	4M1D1M1I3M1D13M	*	0	0	CTGACATCAGTGATTCTCCTGC	*	MD:Z:4^G4^A13	NH:i:2	NM:i:3	XA:Z:Q	XI:i:0
 OUT:
-    1-1	16	19	77595	255	14M1D8M	*	0	0	GCAGGAGAATCACTGATGTCAG	*	MD:Z:14^T2A1C3	NM:i:3	XA:Z:Q	XI:i:1	NH:i:1	HI:i:1
+    1-1	0	19	330456	255	4M1D1M1I3M1D13M	*	0	0	CTGACATCAGTGATTCTCCTGC	*	MD:Z:4^G4^A13	NH:i:1	HI:i:1  NM:i:3	XA:Z:Q	XI:i:0
 
 
-Example 2 | Equal proportion of mismatches vs. InDels
+Example 2 | Equal amount of InDels
 
 IN:
     1-1	0	19	142777	255	15M1I5M	*	0	0	GCTAGGTGGGAGGCTTGAAGC	*	MD:Z:4C0T14	NH:i:3	NM:i:3	XA:Z:Q	XI:i:0
     1-1	16	19	270081	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14G0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:2
     1-1	16	19	545543	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14A0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:1
 OUT:
-    1-1	0	19	142777	255	15M1I5M	*	0	0	GCTAGGTGGGAGGCTTGAAGC	*	MD:Z:4C0T14	NH:i:3	NM:i:3	XA:Z:Q	XI:i:0
-    1-1	16	19	270081	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14G0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:2
-    1-1	16	19	545543	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14A0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:1
+    1-1	0	19	142777	255	15M1I5M	*	0	0	GCTAGGTGGGAGGCTTGAAGC	*	MD:Z:4C0T14	NH:i:3	HI:i:1  NM:i:3	XA:Z:Q	XI:i:0
+    1-1	16	19	270081	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14G0G4	NH:i:3	HI:i:2  NM:i:3	XA:Z:Q	XI:i:2
+    1-1	16	19	545543	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14A0G4	NH:i:3	HI:i:3  NM:i:3	XA:Z:Q	XI:i:1
 ```
 
 
