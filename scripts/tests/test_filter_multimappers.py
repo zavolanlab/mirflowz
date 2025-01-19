@@ -221,7 +221,7 @@ class TestFindBestAlignments:
         output = find_best_alignments([alns[0], alns[1]])
 
         assert len(output) == 1
-        assert output[0] == alns[0]
+        assert output[0] == alns[1]
 
         assert output[0].get_tag("NH") == 1
         assert output[0].get_tag("HI") == 1
@@ -244,7 +244,7 @@ class TestFindBestAlignments:
         output = find_best_alignments([alns[0], alns[1]], True)
 
         assert len(output) == 1
-        assert output[0] == alns[0]
+        assert output[0] == alns[1]
         assert output[0].query_name == "read1_1"
 
         assert output[0].get_tag("NH") == 1
@@ -267,11 +267,11 @@ class TestFindBestAlignments:
         assert output[1].get_tag("HI") == 2
 
 
-class TestWriteOutout:
+class TestWriteOutput:
     """Test 'write_output()' function."""
 
     def test_write_output_one_alignment(self, capsys, sam_multimappers_files):
-        """Test funciton with a single alignment."""
+        """Test function with a single alignment."""
         in_sam, out_sam = sam_multimappers_files
 
         with pysam.AlignmentFile(in_sam, "r") as in_file:
