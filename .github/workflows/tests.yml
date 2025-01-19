@@ -31,7 +31,7 @@ jobs:
           auto-activate-base: false
       
       - name: Update mirflowz env with dev packages
-        run: mamba env update -p $CONDA_PREFIX -n mirflowz -f environment.dev.yml
+        run: mamba env update -p $MAMBA_ROOT_PREFIX -n mirflowz -f environment.dev.yml
       
       - name: display environment info
         run: |
@@ -76,7 +76,7 @@ jobs:
           auto-activate-base: false
       
       - name: update mirflowz env with dev packages
-        run: mamba env update -p $CONDA_PREFIX -n mirflowz -f environment.dev.yml
+        run: mamba env update -p $MAMBA_ROOT_PREFIX -n mirflowz -f environment.dev.yml
       
       - name: display environment info
         run: |
@@ -115,7 +115,7 @@ jobs:
           auto-activate-base: false
       
       - name: update mirflowz env with root packages
-        run: mamba env update -p $CONDA_PREFIX -n mirflowz -f environment.root.yml
+        run: mamba env update -p $MAMBA_ROOT_PREFIX -n mirflowz -f environment.root.yml
       
       - name: display environment info
         run: |
@@ -151,7 +151,7 @@ jobs:
           auto-activate-base: false
       
       - name: update mirflowz env with dev packages
-        run: mamba env update -p $CONDA_PREFIX -n mirflowz -f environment.dev.yml
+        run: mamba env update -p $MAMBA_ROOT_PREFIX -n mirflowz -f environment.dev.yml
       
       - name: display environment info
         run: |
