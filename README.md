@@ -390,11 +390,10 @@ genomic loci it aligns to and a large `N` makes the contribution negligible.
 
 A final filter is made to further increase the classification accuracy and
 reduce the amount of multimappers. Given that isomiRs are known to present more
-mismatches than InDels when compared to the canonical sequence they come from,
+InDels than mismatches when compared to the canonical sequence they come from,
 when addressing the multiple genomic locations a read has been mapped to, the
-alignments with fewer InDels are kept. Note that some multimappers might still
-be present if the number of InDels and mismatches is the same across
-alignments.
+alignments with most InDels are kept. Note that some multimappers might still
+be present if the number of InDels is the same across alignments.
 
 ### Quantify module
 
