@@ -28,6 +28,7 @@ jobs:
           auto-update-conda: false
           activate-environment: mirflowz
           environment-file: environment.yml
+          conda-remove-defaults: true
           auto-activate-base: false
       
       - name: Update mirflowz env with dev packages
@@ -73,6 +74,7 @@ jobs:
           auto-update-conda: false
           activate-environment: mirflowz
           environment-file: environment.yml
+          conda-remove-defaults: true
           auto-activate-base: false
       
       - name: update mirflowz env with dev packages
@@ -112,6 +114,7 @@ jobs:
           channel-priority: true
           auto-update-conda: false
           environment-file: environment.yml
+          conda-remove-defaults: true
           auto-activate-base: false
       
       - name: update mirflowz env with root packages
@@ -148,6 +151,7 @@ jobs:
           auto-update-conda: false
           activate-environment: mirflowz
           environment-file: environment.yml
+          conda-remove-defaults: true
           auto-activate-base: false
       
       - name: update mirflowz env with dev packages
