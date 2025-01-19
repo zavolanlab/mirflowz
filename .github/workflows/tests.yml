@@ -11,7 +11,7 @@ on:
 jobs:
 
   static-code-analysis:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     defaults:
       run:
         shell: bash -l {0}
@@ -21,15 +21,17 @@ jobs:
         uses: actions/checkout@v4
          
       - name: Setup Conda/Mamba
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
           mamba-version: "*"
+          channel-priority: true
+          auto-update-conda: false
           activate-environment: mirflowz
           environment-file: environment.yml
           auto-activate-base: false
       
       - name: Update mirflowz env with dev packages
-        run: mamba env update -n mirflowz -f environment.dev.yml
+        run: mamba env update -p $CONDA_PREFIX -n mirflowz -f environment.dev.yml
       
       - name: display environment info
         run: |
@@ -53,7 +55,7 @@ jobs:
         run: black --check --verbose --line-length=79 ./*.py
 
   snakemake-format-graph-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     defaults:
       run:
         shell: bash -l {0}
@@ -64,15 +66,17 @@ jobs:
         uses: actions/checkout@v4
          
       - name: setup Conda/Mamba
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
           mamba-version: "*"
+          channel-priority: true
+          auto-update-conda: false
           activate-environment: mirflowz
           environment-file: environment.yml
           auto-activate-base: false
       
       - name: update mirflowz env with dev packages
-        run: mamba env update -n mirflowz -f environment.dev.yml
+        run: mamba env update -p $CONDA_PREFIX -n mirflowz -f environment.dev.yml
       
       - name: display environment info
         run: |
@@ -90,7 +94,7 @@ jobs:
 
 
   snakemake-integration-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     defaults:
       run:
         shell: bash -l {0}
@@ -101,15 +105,17 @@ jobs:
         uses: actions/checkout@v4
          
       - name: setup Conda/Mamba
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
           mamba-version: "*"
           activate-environment: mirflowz
+          channel-priority: true
+          auto-update-conda: false
           environment-file: environment.yml
           auto-activate-base: false
       
       - name: update mirflowz env with root packages
-        run: mamba env update -n mirflowz -f environment.root.yml
+        run: mamba env update -p $CONDA_PREFIX -n mirflowz -f environment.root.yml
       
       - name: display environment info
         run: |
@@ -124,7 +130,7 @@ jobs:
 
 
   unit-testing:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     defaults:
       run:
         shell: bash -l {0}
@@ -135,15 +141,17 @@ jobs:
         uses: actions/checkout@v4
          
       - name: setup Conda/Mamba
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
           mamba-version: "*"
+          channel-priority: true
+          auto-update-conda: false
           activate-environment: mirflowz
           environment-file: environment.yml
           auto-activate-base: false
       
       - name: update mirflowz env with dev packages
-        run: mamba env update -n mirflowz -f environment.dev.yml
+        run: mamba env update -p $CONDA_PREFIX -n mirflowz -f environment.dev.yml
       
       - name: display environment info
         run: |
