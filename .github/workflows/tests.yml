@@ -112,7 +112,7 @@ jobs:
           mamba-version: "*"
           activate-environment: mirflowz
           channel-priority: true
-          auto-update-conda: false
+          auto-update-conda: true
           environment-file: environment.yml
           conda-remove-defaults: true
           auto-activate-base: false
