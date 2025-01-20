@@ -23,7 +23,7 @@ jobs:
       - name: Setup Conda/Mamba
         uses: conda-incubator/setup-miniconda@v3
         with:
-          mamba-version: "*"
+          mamba-version: "2"
           channel-priority: true
           auto-update-conda: false
           activate-environment: mirflowz
@@ -69,7 +69,7 @@ jobs:
       - name: setup Conda/Mamba
         uses: conda-incubator/setup-miniconda@v3
         with:
-          mamba-version: "*"
+          mamba-version: "2"
           channel-priority: true
           auto-update-conda: false
           activate-environment: mirflowz
@@ -109,7 +109,7 @@ jobs:
       - name: setup Conda/Mamba
         uses: conda-incubator/setup-miniconda@v3
         with:
-          mamba-version: "*"
+          mamba-version: "2"
           activate-environment: mirflowz
           channel-priority: true
           auto-update-conda: false
@@ -146,7 +146,7 @@ jobs:
       - name: setup Conda/Mamba
         uses: conda-incubator/setup-miniconda@v3
         with:
-          mamba-version: "*"
+          mamba-version: "2"
           channel-priority: true
           auto-update-conda: false
           activate-environment: mirflowz
