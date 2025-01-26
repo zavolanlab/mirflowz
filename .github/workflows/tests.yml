@@ -129,7 +129,9 @@ jobs:
         run: bash test/test_workflow_local_with_singularity.sh
 
       - name: run local test with Conda
-        run: bash test/test_workflow_local_with_conda.sh
+        run: |
+          conda config --set channel_priority strict
+          bash test/test_workflow_local_with_conda.sh
 
 
   unit-testing:
