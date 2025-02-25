@@ -11,7 +11,7 @@ on:
 jobs:
 
   static-code-analysis:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         shell: bash -l {0}
@@ -56,7 +56,7 @@ jobs:
         run: black --check --verbose --line-length=79 ./*.py
 
   snakemake-format-graph-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         shell: bash -l {0}
@@ -96,7 +96,7 @@ jobs:
 
 
   snakemake-integration-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         shell: bash -l {0}
@@ -135,7 +135,7 @@ jobs:
 
 
   unit-testing:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         shell: bash -l {0}
