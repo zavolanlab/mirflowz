@@ -23,7 +23,7 @@ snakemake \
     --cores 4  \
     --configfile="config.yaml" \
     --use-singularity \
-    --singularity-args "--bind ${PWD}/../" \
+    --singularity-args "--bind ${PWD}/../ --fakeroot" \
     --printshellcmds \
     --rerun-incomplete \
     --no-hooks \
