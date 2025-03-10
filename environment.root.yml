@@ -2,4 +2,4 @@ name: mirflowz
 channels:
   - bioconda
 dependencies:
-  - singularity>=4.2.2
+  - singularity>=3.10.4
