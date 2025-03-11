@@ -126,9 +126,7 @@ jobs:
           conda list   
 
       - name: run local test with Singularity
-        run: |
-          sudo setfacl -m u:runner:rwx /home/runner/work/mirflowz/mirflowz/test/.snakemake/singularity/
-          bash test/test_workflow_local_with_singularity.sh
+        run: bash test/test_workflow_local_with_singularity.sh
 
       - name: run local test with Conda
         run: |
