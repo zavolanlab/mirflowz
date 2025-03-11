@@ -97,9 +97,6 @@ jobs:
 
   snakemake-integration-test:
     runs-on: ubuntu-latest
-    container:
-      image: quay.io/singularity/singularity:v3.9.0
-      options: --privileged
     defaults:
       run:
         shell: bash -l {0}
