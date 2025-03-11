@@ -97,6 +97,9 @@ jobs:
 
   snakemake-integration-test:
     runs-on: ubuntu-latest
+    container:
+      image: sylabsio/singularity:v3.9.0
+      options: --privileged
     defaults:
       run:
         shell: bash -l {0}
