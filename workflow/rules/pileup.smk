@@ -92,7 +92,7 @@ if config["bed_file"] == "":
         log:
             LOCAL_LOG / "create_empty_bed.log",
         container:
-            "docker://ubuntu:lunar-20221207"
+            "docker://ubuntu:noble-20250127"
         shell:
             "(touch {output})"
 

@@ -93,7 +93,7 @@ rule start:
     log:
         LOCAL_LOG / "uncompress_zipped_files_{sample}_{format}.log",
     container:
-        "docker://ubuntu:lunar-20221207"
+        "docker://ubuntu:noble-20250127"
     shell:
         "(zcat {input.reads} > {output.reads}) &> {log}"
 
@@ -385,7 +385,7 @@ rule sort_genome_oligomap:
         threads=8,
         time=6,
     container:
-        "docker://ubuntu:lunar-20221207"
+        "docker://ubuntu:noble-20250127"
     shell:
         "(bash {input.script} \
         {input.tmap} \
@@ -476,7 +476,7 @@ rule sort_transcriptome_oligomap:
     resources:
         threads=8,
     container:
-        "docker://ubuntu:lunar-20221207"
+        "docker://ubuntu:noble-20250127"
     shell:
         "(bash {input.script} \
         {input.tmap} \
@@ -528,7 +528,7 @@ rule merge_genome_maps:
     log:
         LOCAL_LOG / "merge_genome_maps_{sample}.log",
     container:
-        "docker://ubuntu:lunar-20221207"
+        "docker://ubuntu:noble-20250127"
     shell:
         "(cat {input.gmap1} {input.gmap2} > {output.gmaps}) &> {log}"
 
@@ -549,7 +549,7 @@ rule merge_transcriptome_maps:
     log:
         LOCAL_LOG / "merge_transcriptome_maps_{sample}.log",
     container:
-        "docker://ubuntu:lunar-20221207"
+        "docker://ubuntu:noble-20250127"
     shell:
         "(cat {input.tmap1} {input.tmap2} > {output.tmaps}) &> {log}"
 
@@ -698,7 +698,7 @@ rule merge_all_maps:
     log:
         LOCAL_LOG / "merge_all_mappings_{sample}.log",
     container:
-        "docker://ubuntu:lunar-20221207"
+        "docker://ubuntu:noble-20250127"
     shell:
         "(cat {input.gmap1} {input.gmap2} > {output.catmaps}) &> {log}"
 
@@ -719,7 +719,7 @@ rule add_header_all_maps:
     log:
         LOCAL_LOG / "add_header_{sample}.log",
     container:
-        "docker://ubuntu:lunar-20221207"
+        "docker://ubuntu:noble-20250127"
     shell:
         "(cat {input.header} {input.catmaps} > {output.concatenate}) &> {log}"
 
