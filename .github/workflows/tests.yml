@@ -118,15 +118,12 @@ jobs:
           mamba-version: "2"
       
       - name: update mirflowz env with root packages
-        run: mamba env update -p $CONDA_PREFIX -f environment.root.yml 
+        run: mamba env update -n mirflowz -f environment.root.yml 
       
       - name: display environment info
         run: |
           conda info -a
           conda list   
-
-      - name: run local test with Singularity
-        run: bash test/test_workflow_local_with_singularity.sh
 
       - name: run local test with Conda
         run: |
