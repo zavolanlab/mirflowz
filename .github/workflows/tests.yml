@@ -126,7 +126,10 @@ jobs:
           conda list   
 
       - name: run local test with Conda
-        run: bash test/test_workflow_local_with_conda.sh
+        run: |
+          conda config --set channel_priority strict
+          mamba install -c conda-forge mamba=1
+          bash test/test_workflow_local_with_conda.sh
 
 
   unit-testing:
