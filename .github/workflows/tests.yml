@@ -118,7 +118,7 @@ jobs:
           mamba-version: "2"
       
       - name: update mirflowz env with root packages
-        run: mamba env update -p $CONDA_PREFIX -f environment.root.yml 
+        run: mamba env update -n mirflowz -f environment.root.yml 
       
       - name: display environment info
         run: |
@@ -126,9 +126,7 @@ jobs:
           conda list   
 
       - name: run local test with Conda
-        run: |
-          conda config --set channel_priority strict
-          bash test/test_workflow_local_with_conda.sh
+        run: bash test/test_workflow_local_with_conda.sh
 
 
   unit-testing:
