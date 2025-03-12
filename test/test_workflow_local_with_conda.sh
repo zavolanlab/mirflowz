@@ -30,7 +30,9 @@ snakemake \
 
 # Snakemake report
 snakemake \
-    --report snakemake_report.html
+    --snakefile="../workflow/Snakefile" \
+    --configfile="config.yaml" \
+    --report="snakemake_report.html"
 
 # Check md5 sum of some output files
 find results/ -type f -name \*\.gz -exec gunzip '{}' \;
