@@ -452,7 +452,7 @@ class TestMain:
     def test_main_bed_sam_extension_file(
         self, monkeypatch, capsys, bed_sam_extension
     ):
-        """Test main function with extension and allowed shit equal to 6."""
+        """Test main function with extension and allowed shift equal to 6."""
         in_bed, in_sam, output = bed_sam_extension
 
         monkeypatch.setattr(
