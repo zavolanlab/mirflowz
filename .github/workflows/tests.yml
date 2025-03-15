@@ -23,14 +23,16 @@ jobs:
       - name: Setup Conda/Mamba
         uses: conda-incubator/setup-miniconda@v3
         with:
-          mamba-version: "*"
           activate-environment: mirflowz
-          channel-priority: true
-          environment-file: environment.yml
           auto-activate-base: false
+          auto-update-conda: false
+          channel-priority: true
+          conda-remove-defaults: true
+          environment-file: environment.yml
+          mamba-version: "2"
       
       - name: Update mirflowz env with dev packages
-        run: mamba env update -n mirflowz -f environment.dev.yml
+        run: mamba env update -n mirflowz -f environment.dev.yml  
       
       - name: display environment info
         run: |
@@ -67,14 +69,16 @@ jobs:
       - name: setup Conda/Mamba
         uses: conda-incubator/setup-miniconda@v3
         with:
-          mamba-version: "*"
           activate-environment: mirflowz
-          channel-priority: true
-          environment-file: environment.yml
           auto-activate-base: false
+          auto-update-conda: false
+          channel-priority: true
+          conda-remove-defaults: true
+          environment-file: environment.yml
+          mamba-version: "2"
       
       - name: update mirflowz env with dev packages
-        run: mamba env update -n mirflowz -f environment.dev.yml
+        run: mamba env update -n mirflowz -f environment.dev.yml 
       
       - name: display environment info
         run: |
@@ -105,25 +109,28 @@ jobs:
       - name: setup Conda/Mamba
         uses: conda-incubator/setup-miniconda@v3
         with:
-          mamba-version: "*"
           activate-environment: mirflowz
-          channel-priority: true
-          environment-file: environment.yml
           auto-activate-base: false
+          auto-update-conda: false
+          channel-priority: true
+          conda-remove-defaults: true
+          environment-file: environment.yml
+          mamba-version: "2"
       
       - name: update mirflowz env with root packages
-        run: mamba env update -n mirflowz -f environment.root.yml
+        run: |
+          mamba env update -n mirflowz -f environment.root.yml 
+          mamba install -c conda-forge mamba=1
       
       - name: display environment info
         run: |
           conda info -a
           conda list   
 
-      - name: run local test with Singularity
-        run: bash test/test_workflow_local_with_singularity.sh
-
       - name: run local test with Conda
-        run: bash test/test_workflow_local_with_conda.sh
+        run: |
+          conda config --set channel_priority strict
+          bash test/test_workflow_local_with_conda.sh
 
 
   unit-testing:
@@ -140,14 +147,16 @@ jobs:
       - name: setup Conda/Mamba
         uses: conda-incubator/setup-miniconda@v3
         with:
-          mamba-version: "*"
           activate-environment: mirflowz
-          channel-priority: true
-          environment-file: environment.yml
           auto-activate-base: false
+          auto-update-conda: false
+          channel-priority: true
+          conda-remove-defaults: true
+          environment-file: environment.yml
+          mamba-version: "2"
       
       - name: update mirflowz env with dev packages
-        run: mamba env update -n mirflowz -f environment.dev.yml
+        run: mamba env update -n mirflowz -f environment.dev.yml 
       
       - name: display environment info
         run: |

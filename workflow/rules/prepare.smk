@@ -80,7 +80,7 @@ rule trim_genome_seq_ids:
     log:
         LOCAL_LOG / "genome_process.log",
     container:
-        "docker://ubuntu:lunar-20221207"
+        "docker://ubuntu:noble-20250127"
     shell:
         "(zcat {input.genome} | {input.script} > {output.genome}) &> {log}"
 
@@ -124,7 +124,7 @@ rule trim_transcriptome_seq_ids:
     log:
         LOCAL_LOG / "trim_transcriptome.log",
     container:
-        "docker://ubuntu:lunar-20221207"
+        "docker://ubuntu:noble-20250127"
     shell:
         "(cat {input.fasta} | {input.script} > {output.fasta}) &> {log}"
 
@@ -197,7 +197,7 @@ rule get_exons_gtf:
     log:
         LOCAL_LOG / "get_exons_gtf.log",
     container:
-        "docker://ubuntu:lunar-20221207"
+        "docker://ubuntu:noble-20250127"
     shell:
         "(bash \
         {input.script} \
@@ -326,7 +326,7 @@ rule extract_chr_len:
     log:
         LOCAL_LOG / "extract_chr_len.log",
     container:
-        "docker://ubuntu:lunar-20221207"
+        "docker://ubuntu:noble-20250127"
     shell:
         "(cut -f1,2 {input.genome} > {output.chrsize}) &> {log}"
 
