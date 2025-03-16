@@ -389,11 +389,12 @@ that each read contributes to each count `1/N` where `N` is the number of
 genomic loci it aligns to and a large `N` makes the contribution negligible.
 
 A final filter is made to further increase the classification accuracy and
-reduce the amount of multimappers. Given that isomiRs are known to present more
+reduce the amount of multimappers. Given that isomiRs are known to contain more
 InDels than mismatches when compared to the canonical sequence they come from,
 when addressing the multiple genomic locations a read has been mapped to, the
 alignments with most InDels are kept. Note that some multimappers might still
-be present if the number of InDels is the same across alignments.
+be present if the number of InDels is the same across alignments and that they
+will have equal edit distance.
 
 ### Quantify module
 
