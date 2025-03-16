@@ -1232,9 +1232,8 @@ Classify and add the intersecting (iso)miR to each alignment as a tag
 with a [**custom script**][custom-script-iso-tag].
 
 > In this step, the mature miRNA annotated regions are used instead of the
-> extended ones. Each alignment gets an extra tag (`YW:Z`) with either the
-> (iso)miR(s) it is considered to really intersect with or an empty string
-> otherwise. The format of the intersecting mature miRNA species is
+> extended ones. Each alignment gets an extra tag (`YW:Z`) with the (iso)miR(s)
+> it is considered to really intersect with using the format:
 > `miRNA_name|5p-shift|3p-shift|CIGAR|MD`, where `5p-shift` and `3p-shift` are
 > the difference between the miRNA start and end coordinates and the
 > alignment's ones respectively.
@@ -1721,7 +1720,7 @@ different library subsets if provided with
 [custom-script-filter-mm]: scripts/filter_multimappers.py
 [custom-script-get-lines]: scripts/get_lines_w_pattern.sh
 [custom-script-gtf-bed]: scripts/gtf_exons_bed.1.1.2.R
-[custom-script-iso-tag]: scripts/iso_name_tagging.py
+[custom-script-iso-tag]: scripts/annotate_sam_with_bed_features.py
 [custom-script-map-chr]: scripts/map_chromosomes.pl
 [custom-script-merge-tab]: scripts/merge_tables.R
 [custom-script-mir-ext]: scripts/mirna_extension.py
