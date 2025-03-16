@@ -35,7 +35,6 @@ feature is found, the alignment is skipped.
 
 Examples
 --------
-
 Example 1: No tag added due to shift mismatch
     BED record:
         19	.	miRNA	44377	44398	.	+	.	ID=MIMAT0002849;Alias=MIMAT0002849;Name=hsa-miR-524-5p;Derives_from=MI0003160	19	44376	44398	13-1_1	1	+	22
