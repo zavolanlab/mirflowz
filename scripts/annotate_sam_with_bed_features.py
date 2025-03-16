@@ -2,7 +2,7 @@
 
 # pylint: disable=line-too-long
 
-"""Annotate SAM alignments with their intersecting feature(s). 
+"""Annotate SAM alignments with their intersecting feature(s).
 
 Add a custom tag ("YW") to each alignment in the SAM file if an intersecting
 feature is found in the BED file. The BED file must be the result of a
@@ -33,7 +33,6 @@ If an alignment has multiple intersecting features, the tag values are
 concatenated using a semicolon as the separator. If no valid intersecting
 feature is found, the alignment is skipped.
 
-
 Examples
 --------
 
@@ -43,7 +42,7 @@ Example 1: No tag added due to shift mismatch
     SAM record:
         13-1_1	0	19	44377	1	11M3I11M	*	0	0	CTACAAAGGGAGGTAGCACTTTCTC	*	HI:i:0	MD:Z:22	NH:i:1	NM:i:3	RG:Z:A1	YZ:Z:0
     Command:
-        iso_name_tagging.py -b BED -s SAM
+        annotate_sam_with_bed_features.py -b BED -s SAM
     Outcome:
         No tag is added because the alignment's 3' end shift exceeds the
         allowed range.
@@ -54,7 +53,7 @@ Example 2: Tag added without coordinate adjustments
     SAM record:
         48-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
     Command:
-        iso_name_tagging.py -b BED -s SAM
+        annotate_sam_with_bed_features.py -b BED -s SAM
     Outcome:
         The tag "hsa-miR-1323|0|0|21M|21|TCAAAACTGAGGGGCATTTTC" is appended
         because the alignment perfectly matches the feature coordinates.
@@ -65,7 +64,7 @@ Example 3: Tag added with coordinate adjustments and allowed shift
     SAM record:
         48-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
     Command:
-        iso_name_tagging.py -b BED -s SAM --extension 6 --shift 7
+        annotate_sam_with_bed_features.py -b BED -s SAM --extension 6 --shift 7
     Outcome:
         After adjusting the feature coordinates, both the 5' and 3' shifts are
         within the allowed range, so the tag
@@ -77,7 +76,7 @@ Example 4: Tag added using a different feature identifier
     SAM record:
         13-1_1	0	19	44377	1	11M3I11M	*	0	0	CTACAAAGGGAGGTAGCACTTTCTC	*	HI:i:0	MD:Z:25	NH:i:1	NM:i:3	RG:Z:A1	YZ:Z:0
     Command:
-        iso_name_tagging.py -b BED -s SAM --extension 6 --shift 7 --id id
+        annotate_sam_with_bed_features.py -b BED -s SAM --extension 6 --shift 7 --id id
     Outcome:
         The feature identifier is taken from the `id` attribute (in
         lowercase), and the tag is constructed accordingly
@@ -192,7 +191,7 @@ def parse_intersect_output(
 
     Read the BED file and create a dictionary mapping each alignment name to
     a list of intersecting features. Each feature is represented as a tuple
-    containing: 
+    containing:
         feature identifier, adjusted feature start and adjusted feature end
 
     The feature identifier is extracted from the attribute column using the
@@ -205,7 +204,7 @@ def parse_intersect_output(
         intersect_file: Path to the intersect BED file.
         ID: Attribute key to extract the feature identifier (default: "name").
         extension: Nucleotides to adjust the feature coordinates (default: 0).
-    
+
     Returns:
         A dictionary mapping alignment names to lists of feature tuples. If
         the BED file is empty, returns None.
