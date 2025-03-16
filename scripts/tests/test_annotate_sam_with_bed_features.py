@@ -1,4 +1,4 @@
-"""Unit tests for module 'iso_name_tagging.py'."""
+"""Unit tests for module 'annotate_sam_with_bed_features.py'."""
 
 import argparse
 from pathlib import Path
@@ -7,7 +7,7 @@ import sys
 import pysam
 import pytest
 
-from ..iso_name_tagging import (
+from ..annotate_sam_with_bed_features import (
     attributes_dictionary,
     get_tags,
     main,
@@ -307,7 +307,7 @@ class TestParseArguments:
                 sys,
                 "argv",
                 [
-                    "iso_name_tagging",
+                    "annotate_sam_with_bed_features",
                     "--sam",
                     str(in_sam),
                 ],
@@ -324,7 +324,7 @@ class TestParseArguments:
                 sys,
                 "argv",
                 [
-                    "iso_name_tagging",
+                    "annotate_sam_with_bed_features",
                     "--bed",
                     str(in_bed),
                 ],
@@ -340,7 +340,7 @@ class TestParseArguments:
             sys,
             "argv",
             [
-                "iso_name_tagging",
+                "annotate_sam_with_bed_features",
                 "--bed",
                 str(in_bed),
                 "--sam",
@@ -358,7 +358,7 @@ class TestParseArguments:
             sys,
             "argv",
             [
-                "iso_name_tagging",
+                "annotate_sam_with_bed_features",
                 "--bed",
                 str(in_bed),
                 "--sam",
@@ -388,7 +388,7 @@ class TestMain:
             sys,
             "argv",
             [
-                "iso_name_tagging",
+                "annotate_sam_with_bed_features",
                 "--bed",
                 str(empty_bed),
                 "--sam",
@@ -413,7 +413,7 @@ class TestMain:
             sys,
             "argv",
             [
-                "iso_name_tagging",
+                "annotate_sam_with_bed_features",
                 "--bed",
                 str(in_bed),
                 "--sam",
@@ -435,7 +435,7 @@ class TestMain:
             sys,
             "argv",
             [
-                "iso_name_tagging",
+                "annotate_sam_with_bed_features",
                 "--bed",
                 str(in_bed),
                 "--sam",
@@ -459,7 +459,7 @@ class TestMain:
             sys,
             "argv",
             [
-                "iso_name_tagging",
+                "annotate_sam_with_bed_features",
                 "--bed",
                 str(in_bed),
                 "--sam",
@@ -485,7 +485,7 @@ class TestMain:
             sys,
             "argv",
             [
-                "iso_name_tagging",
+                "annotate_sam_with_bed_features",
                 "--bed",
                 str(in_bed),
                 "--sam",
