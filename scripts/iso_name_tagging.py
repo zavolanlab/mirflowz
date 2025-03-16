@@ -9,10 +9,12 @@ a tag to alignments in a SAM file using the format
 FEATURE_ID|5'-shift|3'-shift|CIGAR|MD|READ_SEQ.
 
 EXPECTED INPUT FILES
-The BED file must be the output of a bedtools intersect call with `-a` being a
-GFF3 file and `-b` a BAM file. The SAM file must only
-contain alignments with an intersecting feature. If either the BED or the SAM
-file is empty, only the SAM file header is returned.
+- The BED file must be the output of a bedtools intersect call with `-a` being
+  a GFF3 file and `-b` a BAM file.
+- The SAM file must only contain alignments with an intersecting feature.
+
+If either the BED or the SAM file is empty, only the SAM file header is
+returned.
 
 NAME CREATION and TAG ADDITION
 For each alignment, the name of the intersecting feature follows the
@@ -57,9 +59,9 @@ EXAMPLES
     out SAM record:
         48-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0	YW:Z:hsa-miR-1323|0|0|21M|21|TCAAAACTGAGGGGCATTTTC
     explanation:
-        The aligned read and the annotated featrue have the same start and end
+        The aligned read and the annotated feature have the same start and end
         positions. Given that no extension are provided in the script call, no
-        coordinates adjustments are made. And there is no shift on ether end,
+        coordinates adjustments are made. And there is no shift on either end,
         the new tag is added.
 
     Example 3
@@ -313,6 +315,9 @@ def main(args) -> None:
         for alignment in samfile:
             alignment_id = alignment.query_name
             intersecting_feats = intersect_data[alignment_id]
+
+            if len(intersecting_feats) == 0:
+                continue
 
             tags = get_tags(
                 intersecting_feat=intersecting_feats,
