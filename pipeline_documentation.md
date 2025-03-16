@@ -997,14 +997,16 @@ OUT:
 
 #### `filter_by_indels`
 
-Filter multimappers favoring mismatches over InDels with a
+Filter multimappers favoring InDels over mismatches with a
 [**custom script**][custom-script-filter-mm].
 
-> Provided that InDels are more frequent than mismatches only those alignments
-> (of the same read with the same edit distance) with the higher number of
-> InDels are kept. This approach allows the presence of multimappers and/or
-> mismatches after the filtering if several alignments contain the same amount
-> of InDels.
+> Given that InDels are more frequent in miRNAs than mismatches, as
+> demonstrated by [Saunders et al. (2017)][cite_saunders],
+> [Neilsen et al. (2012)][cite_neilsen] and
+> [Schumauch et al. (2024)][cite_schumauch], only those "multimappers" (defined
+> here as alignments of the same read mapping to different genomic loci with
+> the same edit distance) that contain a higher or equal number of InDels
+> compared to mismatches are retained.
 
 - **Input**
   - Alignments file, sorted, filtered (`.sam`); from
@@ -1016,7 +1018,7 @@ Filter multimappers favoring mismatches over InDels with a
 - **Examples**
 
 ```console
-Example 1 | Different amount of InDels
+Example 1 | Different number of InDels
 
 IN:
     1-1	16	19	77595	255	14M1D8M	*	0	0	GCAGGAGAATCACTGATGTCAG	*	MD:Z:14^T2A1C3	NH:i:2	NM:i:3	XA:Z:Q	XI:i:1
@@ -1025,7 +1027,7 @@ OUT:
     1-1	0	19	330456	255	4M1D1M1I3M1D13M	*	0	0	CTGACATCAGTGATTCTCCTGC	*	MD:Z:4^G4^A13	NH:i:1	HI:i:1  NM:i:3	XA:Z:Q	XI:i:0
 
 
-Example 2 | Equal amount of InDels
+Example 2 | Equal number of InDels
 
 IN:
     1-1	0	19	142777	255	15M1I5M	*	0	0	GCTAGGTGGGAGGCTTGAAGC	*	MD:Z:4C0T14	NH:i:3	NM:i:3	XA:Z:Q	XI:i:0
@@ -1716,6 +1718,9 @@ different library subsets if provided with
 
 
 [chr-maps]: <https://github.com/dpryan79/ChromosomeMappings>
+[cite_neilsen]:<https://www.sciencedirect.com/science/article/pii/S0168952512001126>
+[cite_saunders]: <https://pubmed.ncbi.nlm.nih.gov/17360642/>
+[cite_schumauch]: <https://www.biorxiv.org/content/10.1101/2024.03.28.587190v1>
 [custom-script-blocksort]: scripts/blocksort.sh
 [custom-script-filter-mm]: scripts/filter_multimappers.py
 [custom-script-get-lines]: scripts/get_lines_w_pattern.sh
