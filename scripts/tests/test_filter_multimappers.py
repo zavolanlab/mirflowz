@@ -42,24 +42,6 @@ def sam_no_multimappers_file():
 
 
 @pytest.fixture
-def sam_unique_diff_multimappers_files():
-    """Import path to test files with a single multimapper."""
-    in_diff_multi = Path("files/in_diff_multimappers.sam")
-    out_diff_multi = Path("files/diff_multimappers.sam")
-
-    return in_diff_multi, out_diff_multi
-
-
-@pytest.fixture
-def sam_unique_equal_multimapper_files():
-    """Import path to the test file with a single multimapper."""
-    in_sam = Path("files/in_equal_multimappers.sam")
-    out_sam = Path("files/equal_multimappers.sam")
-
-    return in_sam, out_sam
-
-
-@pytest.fixture
 def sam_sec_sup_files():
     """Import path to the test files with secondary and supp. alignments."""
     in_sam = Path("files/in_sec_sup.sam")
@@ -78,8 +60,18 @@ def sam_multimappers_nh_files():
 
 
 @pytest.fixture
-def alns():
-    """Create sample AlignedSegment objects."""
+def aln_dict():
+    """Create a dictionary with sample AlignedSegment objects.
+
+    Dictionary keys have the format: r#_aln_$T
+    Where:
+        - # is the read that alignment belongs to
+        - $ is the number of bases in T
+        - T is the read's sequence transformation for that alignment (M for
+            mismatches, I for insertions and D for Deletions)
+    """
+    aln_dict = dict()
+
     # Alignment with 10 matches
     aln1 = pysam.AlignedSegment()
     aln1.cigartuples = [(0, 10)]
@@ -90,6 +82,8 @@ def alns():
     aln1.reference_start = 63250
     aln1.set_tag("NH", 2)
     aln1.set_tag("HI", 1)
+
+    aln_dict["r1_aln_10M"] = aln1
 
     # Alignment with 3 insertions
     aln2 = pysam.AlignedSegment()
@@ -102,6 +96,8 @@ def alns():
     aln2.set_tag("NH", 2)
     aln2.set_tag("HI", 2)
 
+    aln_dict["r1_aln_3I"] = aln2
+
     # Alignment with 3 deletions
     aln3 = pysam.AlignedSegment()
     aln3.cigartuples = [(0, 10), (2, 3), (0, 5)]
@@ -112,6 +108,8 @@ def alns():
     aln3.reference_start = 142777
     aln3.set_tag("NH", 3)
     aln3.set_tag("HI", 1)
+
+    aln_dict["r2_aln_3D"] = aln3
 
     # Alignments with 1 insertion and 1 deletion
     aln4 = pysam.AlignedSegment()
@@ -134,7 +132,10 @@ def alns():
     aln5.set_tag("NH", 3)
     aln5.set_tag("HI", 2)
 
-    return [aln1, aln2, aln3, aln4, aln5]
+    aln_dict["r2_aln_1I_1D"] = aln4
+    aln_dict["r2_aln_1D_1I"] = aln5
+
+    return aln_dict
 
 
 class TestParseArguments:
@@ -196,67 +197,75 @@ class TestParseArguments:
 class TestCountIndels:
     """Test 'count_indels()' function."""
 
-    def test_no_indels(self, alns):
+    def test_no_indels(self, aln_dict):
         """Test CIGAR string with 10 matches."""
-        assert count_indels(alns[0]) == 0
+        assert count_indels(aln_dict["r1_aln_10M"]) == 0
 
-    def test_three_insertions(self, alns):
+    def test_three_insertions(self, aln_dict):
         """Test CIGAR string with 3 insertions."""
-        assert count_indels(alns[1]) == 3
+        assert count_indels(aln_dict["r1_aln_3I"]) == 3
 
-    def test_three_deletions(self, alns):
+    def test_three_deletions(self, aln_dict):
         """Test CIGAR string with 3 deletions."""
-        assert count_indels(alns[2]) == 3
+        assert count_indels(aln_dict["r2_aln_3D"]) == 3
 
-    def test_one_in_one_del(self, alns):
+    def test_one_in_one_del(self, aln_dict):
         """Test CIGAR string with one insertion and one deletion."""
-        assert count_indels(alns[3]) == 2
+        assert count_indels(aln_dict["r2_aln_1I_1D"]) == 2
 
 
 class TestFindBestAlignments:
     """Test 'find_best_alignments()' function."""
 
-    def test_find_best_alignments_multimappers(self, alns):
+    def test_find_best_alignments_multimappers(self, aln_dict):
         """Test function with multimappers with different indel count."""
-        output = find_best_alignments([alns[0], alns[1]])
+        output = find_best_alignments(
+            [aln_dict["r1_aln_10M"], aln_dict["r1_aln_3I"]]
+        )
 
         assert len(output) == 1
-        assert output[0] == alns[1]
+        assert output[0] == aln_dict["r1_aln_3I"]
 
         assert output[0].get_tag("NH") == 1
         assert output[0].get_tag("HI") == 1
 
-    def test_find_best_alignments_equal_multimappers(self, alns):
+    def test_find_best_alignments_equal_multimappers(self, aln_dict):
         """Test function with multimappers with same indel count."""
-        output = find_best_alignments([alns[3], alns[4]])
+        output = find_best_alignments(
+            [aln_dict["r2_aln_1I_1D"], aln_dict["r2_aln_1D_1I"]]
+        )
 
         assert len(output) == 2
-        assert output[0] == alns[3]
-        assert output[1] == alns[4]
+        assert output[0] == aln_dict["r2_aln_1I_1D"]
+        assert output[1] == aln_dict["r2_aln_1D_1I"]
 
         assert output[0].get_tag("NH") == 2
         assert output[1].get_tag("NH") == 2
         assert output[0].get_tag("HI") == 1
         assert output[1].get_tag("HI") == 2
 
-    def test_find_best_alignments_multimappers_nh(self, alns):
+    def test_find_best_alignments_multimappers_nh(self, aln_dict):
         """Test function with multimappers with different indel count."""
-        output = find_best_alignments([alns[0], alns[1]], True)
+        output = find_best_alignments(
+            [aln_dict["r1_aln_10M"], aln_dict["r1_aln_3I"]], True
+        )
 
         assert len(output) == 1
-        assert output[0] == alns[1]
+        assert output[0] == aln_dict["r1_aln_3I"]
         assert output[0].query_name == "read1_1"
 
         assert output[0].get_tag("NH") == 1
         assert output[0].get_tag("HI") == 1
 
-    def test_find_best_alignments_equal_multimappers_nh(self, alns):
+    def test_find_best_alignments_equal_multimappers_nh(self, aln_dict):
         """Test function with multimappers with same indel count."""
-        output = find_best_alignments([alns[3], alns[4]], True)
+        output = find_best_alignments(
+            [aln_dict["r2_aln_1I_1D"], aln_dict["r2_aln_1D_1I"]], True
+        )
 
         assert len(output) == 2
-        assert output[0] == alns[3]
-        assert output[1] == alns[4]
+        assert output[0] == aln_dict["r2_aln_1I_1D"]
+        assert output[1] == aln_dict["r2_aln_1D_1I"]
 
         assert output[0].query_name == "read2_2"
         assert output[1].query_name == "read2_2"
