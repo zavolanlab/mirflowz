@@ -5,7 +5,10 @@
 """Filter miRNA reads mapped to multiple locations by indel count.
 
 From all the alignments with the same query name and edit distance, keep the
-ones with the higher amount of indels. Supplementary alignments are dismissed.
+ones with the higher amount of indels. Supplementary alignments are dismissed
+as they are part of a chimeric alignment, which is composed of multiple linear
+alignments with minimal overlap.
+
 Additionally, the 'NH' and 'HI' tags are updated to match the new amount of
 alignments and keep their identifier within the new set respectively. If the
 CLI flag `--nh` is set, query names are appended the suffix '_#' were '#' is
@@ -15,17 +18,26 @@ The following assumptions are made:
     - The input SAM file is sorted by query name.
 
 
-EXAMPLES:
-    Example 1
-    IN SAM records:
+Examples
+---------
+Example 1: Different number of InDels 
+    SAM records:
         read-1	16	19	77595	255	14M1D8M	*	0	0	GCAGGAGAATCACTGATGTCAG	*	MD:Z:14^T2A1C3	NH:i:2	NM:i:3	XA:Z:Q	XI:i:1
         read-1	0	19	330456	255	4M1D1M1I3M1D13M	*	0	0	CTGACATCAGTGATTCTCCTGC	*	MD:Z:4^G4^A13	NH:i:2	NM:i:3	XA:Z:Q	XI:i:0
-    command:
+    Alignments:
+        GCAGGAGAATCACT-GATGCTAG
+        |||||||||||||| || || || (1 InDel, 2 mismatches, discarded)
+        GCAGGAGAATCACTTGAAGCCAG
+
+        GTGA-CATCA-GTGATTCTCCTGC
+        |||| | ||| ||||||||||||| (3 InDels, 0 mismatches, retained)
+        GTGAGC-TCAAGTGATTCTCCTGC
+    Command:
         filter_multimappers.py SAM > out_SAM
     OUT SAM record:
         read-1	0	19	330456	255	4M1D1M1I3M1D13M	*	0	0	CTGACATCAGTGATTCTCCTGC	*	MD:Z:4^G4^A13	NH:i:1	HI:i:1	NM:i:3	XA:Z:Q	XI:i:0
 
-    Example 2
+Example 2:
     IN SAM records:
         read-2	0	19	142777	255	21M	*	0	0	GCTAGGTGGGAGGCTTGAAGCT	*	MD:Z:4C0T14A	NH:i:3	NM:i:3	XA:Z:Q	XI:i:0
         read-2	16	19	270081	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14G0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:2
@@ -78,8 +90,8 @@ def parse_arguments():
     parser.add_argument(
         "--nh",
         help=(
-            "If set, the NH tag will be include in the alignment name after"
-            " and underscore. Default: %(default)s."
+            "If set, the NH tag will be included in the alignment name after"
+            " an underscore. Default: %(default)s."
         ),
         action="store_true",
         default=False,
