@@ -60,12 +60,27 @@ Example 2: Equal number of InDels
         GCTTCA-GCCTCCCAAGTAGC
 
     Command:
-        filter_multimappers.py SAM --nh > out_SAM
+        filter_multimappers.py SAM > out_SAM
 
-    OUT SAM record:
+    OUT SAM records:
         read-2_3	0	19	142777	255	5M1D15M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14A0G4	NH:i:3	HI:i:1  NM:i:3	XA:Z:Q	XI:i:0
         read-2_3	0	19	270081	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14G0G4	NH:i:3	HI:i:2  NM:i:3	XA:Z:Q	XI:i:2
         read-2_3	0	19	545543	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14A0G4	NH:i:3	HI:i:3  NM:i:3	XA:Z:Q	XI:i:1
+
+Example 3: Add NH tag as read's name suffix
+    IN SAM record:
+        read-3	0	19	5338	1	15M1I7M	*	0	0	TCAAAACTGAGGGGCTATTTTCT	*	HI:i:1	NH:i:1	NM:i:1	MD:Z:22	RG:Z:A1	YZ:Z:0
+
+    Alignments:
+       TCAAAACTGAGGGGCTATTTTCT 
+       ||||||||||||||| ||||||| (1 Indel, 0 mismatches, retained)
+       TCAAAACTGAGGGGC-ATTTTCT 
+
+    Command:
+        filter_multimappers.py SAM --nh > out_SAM
+
+    OUT SAM record:
+        read-3_1	0	19	5338	1	15M1I7M	*	0	0	TCAAAACTGAGGGGCTATTTTCT	*	HI:i:1	NH:i:1	NM:i:1	MD:Z:22	RG:Z:A1	YZ:Z:0
 """  # noqa: E501
 # pylint: enable=line-too-long
 
