@@ -20,7 +20,7 @@ The following assumptions are made:
 
 Examples
 ---------
-Example 1: Different number of InDels 
+Example 1: Different number of InDels
     IN SAM records:
         read-1	0	19	77595	255	8M1D14M	*	0	0	CTGACATCAGTGATTCTCCTGC	*	MD:Z:3G1T2^A14	NH:i:2	NM:i:3	XA:Z:Q	XI:i:1
         read-1	0	19	330456	255	4M1D1M1I3M1D13M	*	0	0	CTGACATCAGTGATTCTCCTGC	*	MD:Z:4^G4^A13	NH:i:2	NM:i:3	XA:Z:Q	XI:i:0
@@ -72,9 +72,9 @@ Example 3: Add NH tag as read's name suffix
         read-3	0	19	5338	1	15M1I7M	*	0	0	TCAAAACTGAGGGGCTATTTTCT	*	HI:i:1	NH:i:1	NM:i:1	MD:Z:22	RG:Z:A1	YZ:Z:0
 
     Alignments:
-       TCAAAACTGAGGGGCTATTTTCT 
+       TCAAAACTGAGGGGCTATTTTCT
        ||||||||||||||| ||||||| (1 Indel, 0 mismatches, retained)
-       TCAAAACTGAGGGGC-ATTTTCT 
+       TCAAAACTGAGGGGC-ATTTTCT
 
     Command:
         filter_multimappers.py SAM --nh > out_SAM
