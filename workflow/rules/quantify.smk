@@ -1,4 +1,4 @@
-t###############################################################################
+###############################################################################
 # (c) 2020 Paula Iborra, Zavolan Lab, Biozentrum, University of Basel
 # (@) paula.iborradetoledo@unibas.ch / paula.iborra@alumni.esci.upf.edu
 #
