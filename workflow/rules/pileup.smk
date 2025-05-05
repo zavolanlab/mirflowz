@@ -112,7 +112,7 @@ rule compress_reference_genome:
     log:
         LOCAL_LOG / "compress_reference_genome.log",
     container:
-        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
     shell:
