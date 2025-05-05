@@ -22,19 +22,19 @@ snakemake \
     --snakefile="../workflow/Snakefile" \
     --cores 4  \
     --configfile="config.yaml" \
-    --use-singularity \
-    --singularity-args "--bind ${PWD}/../" \
+    --use-apptainer \
+    --apptainer-args "--bind ${PWD}/../" \
     --printshellcmds \
     --rerun-incomplete \
     --no-hooks \
     --verbose
 
-# Snakemake report
-snakemake \
-    --snakefile="../workflow/Snakefile" \
-    --configfile="config.yaml" \
-    --report="snakemake_report.html"
-
+## Snakemake report
+#snakemake \
+#    --snakefile="../workflow/Snakefile" \
+#    --configfile="config.yaml" \
+#    --report="snakemake_report.html"
+#
 # Check md5 sum of some output files
 find results/ -type f -name \*\.gz -exec gunzip '{}' \;
 find results/ -type f -name \*\.zip -exec sh -c 'unzip -o {} -d $(dirname {})' \;

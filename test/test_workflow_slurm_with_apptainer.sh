@@ -38,8 +38,8 @@ snakemake \
         --open-mode=append" \
     --jobscript="../jobscript.sh" \
     --jobs=20 \
-    --use-singularity \
-    --singularity-args="--bind ${PWD}/../" \
+    --use-apptainer \
+    --apptainer-args="--bind ${PWD}/../" \
     --printshellcmds \
     --rerun-incomplete \
     --no-hooks \
