@@ -1,6 +1,6 @@
 name: mirflowz
 dependencies:
-  - graphviz
+  - graphviz=7.1.0
   - python>=3.11
   - bioconda::snakemake>=8
-  - pulp
+  - pulp=2.7.0
