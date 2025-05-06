@@ -43,9 +43,9 @@ cd mirflowz
 For improved reproducibility and reusability of the workflow, as well as an
 easy means to run it on a high performance computing (HPC) cluster managed,
 e.g., by [Slurm][slurm], all steps of the workflow run inside isolated
-environments ([Singularity][singularity] containers or [Conda][conda]
+environments ([Apptainer][apptainer] containers or [Conda][conda]
 environments). As a consequence, running this workflow has only a few
-individual dependencies. These are managed by the package manager Conda, which 
+individual dependencies. These are managed by the package manager Conda, which
 needs to be installed on your system before proceeding.
 
 If you do not already have Conda installed globally on your system,
@@ -71,21 +71,7 @@ HPC cluster.
 conda config --set channel_priority strict
 ```
 
-If you plan to run _MIRFLOWZ_ via Singularity and do not already
-have it installed globally on your system, you must further update the Conda
-environment using the `environment.root.yml` with the command below.
-Mind that you must have the environment activated to update it.
-
-```bash
-conda env update -f environment.root.yml
-```
-
-> Note that you will need to have root permissions on your system to be able
-> to install Singularity. If you want to run _MIRFLOWZ_ on an HPC cluster
-> (recommended in almost all cases), ask your systems administrator about
-> Singularity.
-
-If you would like to contribute to _MIRFLOWZ_ development, you may find it 
+If you would like to contribute to _MIRFLOWZ_ development, you may find it
 useful to further update your environment with the development dependencies:
 
 ```bash
@@ -102,10 +88,10 @@ the instructions in this section to make sure the workflow is ready to use.
 Execute one of the following commands to run the test workflow on your local
 machine:
 
-- Test workflow on local machine with **Singularity**:
+- Test workflow on local machine with **Apptainer**:
 
 ```bash
-bash test/test_workflow_local_with_singularity.sh
+bash test/test_workflow_local_with_apptainer.sh
 ```
 
 - Test workflow on local machine with **Conda**:
@@ -114,15 +100,15 @@ bash test/test_workflow_local_with_singularity.sh
 bash test/test_workflow_local_with_conda.sh
 ```
 
-#### Run test workflow on a cluster via SLURM
+#### Run test workflow on a cluster via Slurm
 
 Execute one of the following commands to run the test workflow on a
-slurm-managed high-performance computing (HPC) cluster:
+Slurm-managed high-performance computing (HPC) cluster:
 
-- Test workflow with **Singularity**:
+- Test workflow with **Apptainer**:
 
 ```bash
-bash test/test_workflow_slurm_with_singularity.sh
+bash test/test_workflow_slurm_with_apptainer.sh
 ```
 
 
@@ -135,7 +121,7 @@ bash test/test_workflow_slurm_with_conda.sh
 #### Rule graph
 
 Execute the following command to generate a rule graph image for the workflow.
-The output will be found in the `images/` directory in the repository root. 
+The output will be found in the `images/` directory in the repository root.
 
 ```bash
 bash test/test_rule_graph.sh
@@ -158,22 +144,22 @@ bash test/test_cleanup.sh
 Now that your virtual environment is set up and the workflow is deployed and
 tested, you can go ahead and run the workflow on your samples.
 
-### Preparing inputs 
+### Preparing inputs
 
-It is suggested to have all the input files for a given run (or hard links 
-pointing to them) inside a dedicated directory, for instance under the 
+It is suggested to have all the input files for a given run (or hard links
+pointing to them) inside a dedicated directory, for instance under the
 _MIRFLOWZ_ root directory. This way, it is easier to keep the data together,
-set up Singularity access to them and reproduce analyses.  
+set up Apptainer access to them and reproduce analyses.
 
 #### 1. Prepare a sample table
 
-Refer to `test/test_files/sample_table.tsv` to know what this file 
-must look like, or use it as a template. 
+Refer to `test/test_files/sample_table.tsv` to know what this file
+must look like, or use it as a template.
 
 ```bash
 touch path/to/your/sample/table.tsv
 ```
-> Fill the sample table according to the following requirements:  
+> Fill the sample table according to the following requirements:
 >
 > - `sample`. Arbitrary name for the miRNA sequencing library.
 > - `sample_file`. Path to the miRNA sequencing library file. The path must be
@@ -184,7 +170,7 @@ touch path/to/your/sample/table.tsv
 
 #### 2. Prepare genome resources
 
-There are 4 files you must provide: 
+There are 4 files you must provide:
 
 1. A **`gzip`ped FASTA** file containing **reference sequences**, typically the
    genome of the source/organism from which the library was extracted.
@@ -209,9 +195,8 @@ There are 4 files you must provide:
    reference names** used in the miRNA annotation file (column 1; "UCSC style")
    and in the gene annotations and reference sequence files (column 2; "Ensembl
    style"). Values in column 1 are expected to be unique, no header is
-   expected, and any additional columns will be ignored. [This
-   resource][chrMap] provides such files for various organisms, and in the
-   expected format.
+   expected, and any additional columns will be ignored. [This resource][chrMap]
+   provides such files for various organisms, and in the expected format.
 
 5. **OPTIONAL**: A **BED6** file with regions for which to produce
    [ASCII-style pileups][ascii-pileups]. If not provided, no pileups are
@@ -233,29 +218,43 @@ cp  config/config_template.yaml  path/to/config.yaml
 
 Open the new copy in your editor of choice and adjust the configuration
 parameters to your liking. The template explains what each of the
-parameters mean and how you can meaningfully adjust them. 
+parameters mean and how you can meaningfully adjust them.
 
 ### Running the workflow
 
 With all the required files in place, you can now run the workflow locally
-via Singularity with the following command:  
+via Apptainer with the following command:
 
 ```bash
 snakemake \
     --snakefile="path/to/Snakefile" \
     --cores 4  \
     --configfile="path/to/config.yaml" \
-    --use-singularity \
-    --singularity-args "--bind ${PWD}/../" \
+    --use-apptainer \
+    --apptainer-args "--bind ${PWD}/../" \
     --printshellcmds \
     --rerun-incomplete \
     --verbose
 ```
 
-> **NOTE:** Depending on your working directory, you do not need to use the 
+Likewise, you can run the workflow locally via Conda with the following
+command:
+
+```bash
+snakemake \
+    --snakefile="path/to/Snakefile" \
+    --cores 4  \
+    --configfile="path/to/config.yaml" \
+    --use-conda \
+    --printshellcmds \
+    --rerun-incomplete \
+    --verbose
+```
+
+> **NOTE:** Depending on your working directory, you do not need to use the
 > parameters `--snakefile` and `--configfile`. For instance, if the `Snakefile`
 > is in the same directory or the `workflow/` directory is beneath the current
-> working directory, there's no need for the `--snakefile` directory. Refer to 
+> working directory, there's no need for the `--snakefile` directory. Refer to
 > the [Snakemake documentation][snakemakeDocu] for more information.
 
 After successful execution of the workflow, results and logs will be found in
@@ -323,7 +322,7 @@ snakemake \
 ```
 
 > **NOTE:** The report creation must be done after running the workflow in
-> order to have the runtime statistics and the results. 
+> order to have the runtime statistics and the results.
 
 ## Workflow description
 
@@ -382,7 +381,7 @@ into genomic ones and alignments are combined into a single file. Duplicate
 alignments resulting from the partially redundant mapping strategy are
 discarded and only the best alignments for each read are retained (_i.e._ the
 ones with the smallest edit distance). In addition, and due to the alignment's
-aggregation, a second filtering according to the new NH is performed. 
+aggregation, a second filtering according to the new NH is performed.
 If a read has been aligned beyond a specified threshold, it is removed due to
 (1) performance reasons as the file size can rapidly increase, and (2) the fact
 that each read contributes to each count `1/N` where `N` is the number of
@@ -460,11 +459,12 @@ For questions or suggestions regarding the code, please use the
 
 &copy; 2023 [Zavolab, Biozentrum, University of Basel][zavolab]
 
+[apptainer]: <https://apptainer.org/docs/user/main/index.html>
 [ascii-pileups]: <https://git.scicore.unibas.ch/zavolan_group/tools/ascii-alignment-pileup>
 [bed-format]: <https://gist.github.com/deliaBlue/19ad3740c95937378bd9281bd9d1bc72>
 [chrMap]: <https://github.com/dpryan79/ChromosomeMappings>
-[conda]: <https://docs.conda.io/projects/conda/en/latest/index.html>
 [cluster execution]: <https://snakemake.readthedocs.io/en/stable/executing/cluster.html>
+[conda]: <https://docs.conda.io/projects/conda/en/latest/index.html>
 [email]: <zavolab-biozentrum@unibas.ch>
 [ensembl]: <https://ensembl.org/>
 [issue-tracker]: <https://github.com/zavolanlab/mirflowz/issues>
@@ -472,7 +472,6 @@ For questions or suggestions regarding the code, please use the
 [miniconda-installation]: <https://docs.conda.io/en/latest/miniconda.html>
 [mirbase]: <https://mirbase.org/>
 [rule-graph]: images/rule_graph.svg
-[singularity]: <https://apptainer.org/admin-docs/3.8/index.html>
 [slurm]: <https://slurm.schedmd.com/documentation.html>
 [snakemake]: <https://snakemake.readthedocs.io/en/stable/>
 [snakemakeDocu]: <https://snakemake.readthedocs.io/en/stable/executing/cli.html>
