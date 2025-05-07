@@ -22,6 +22,5 @@ snakemake \
     --configfile="config.yaml" \
     --rulegraph \
     --dryrun \
-    --quiet \
-| grep -v "Building" \
+    --quiet="all" \
 | dot -Tsvg > "../images/rule_graph.svg"
