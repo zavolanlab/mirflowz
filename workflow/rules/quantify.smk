@@ -353,7 +353,7 @@ rule quantify_mirna:
     log:
         LOCAL_LOG / "quantify_mirna_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
+        "docker://quay.io/biocontainers/pysam:0.23.0--py39hdd5828d_0"
     conda:
         ENV_DIR / "pysam.yaml"
     shell:
@@ -384,7 +384,7 @@ rule quantify_primir:
     log:
         LOCAL_LOG / "quantify_primir_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
+        "docker://quay.io/biocontainers/pysam:0.23.0--py39hdd5828d_0"
     conda:
         ENV_DIR / "pysam.yaml"
     shell:
