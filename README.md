@@ -72,10 +72,10 @@ conda config --set channel_priority strict
 ```
 
 If you would like to contribute to _MIRFLOWZ_ development, you may find it
-useful to further update your environment with the development dependencies:
+useful to create your environment with the development dependencies:
 
 ```bash
-conda env update -f environment.dev.yml
+conda env create -f environment.dev.yml
 ```
 
 ### Testing your installation
