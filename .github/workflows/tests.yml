@@ -28,11 +28,8 @@ jobs:
           auto-update-conda: true
           channel-priority: strict
           conda-remove-defaults: true
-          environment-file: environment.yml
+          environment-file: environment.dev.yml
           miniforge-version: latest
-
-      - name: Update MIRFLOWZ environment with dev packages
-        run: mamba env update -n mirflowz -f environment.dev.yml
 
       - name: Display Conda and environment info
         run: |
@@ -74,11 +71,8 @@ jobs:
           auto-update-conda: true
           channel-priority: strict
           conda-remove-defaults: true
-          environment-file: environment.yml
+          environment-file: environment.dev.yml
           miniforge-version: latest
-
-      - name: Update MIRFLOWZ environment with dev packages
-        run: mamba env update -n mirflowz -f environment.dev.yml
 
       - name: Display Conda and environment info
         run: |
@@ -180,11 +174,8 @@ jobs:
           auto-update-conda: true
           channel-priority: strict
           conda-remove-defaults: true
-          environment-file: environment.yml
+          environment-file: environment.dev.yml
           miniforge-version: latest
-
-      - name: Update MIRFLOWZ environment with dev packages
-        run: mamba env update -n mirflowz -f environment.dev.yml
 
       - name: Display Conda and environment info
         run: |
