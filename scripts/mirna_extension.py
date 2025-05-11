@@ -257,11 +257,13 @@ class MirnaExtension:
             if not isinstance(self.db_out, gffutils.FeatureDB):
                 _file.write("")
             elif feature_type is None:
-                for feature in self.db_out.all_features():  # type: ignore
+                for feature in self.db_out.all_features(  # type: ignore
+                    order_by="start"
+                ):
                     _file.write(str(feature) + "\n")
             else:
                 for feature in self.db_out.features_of_type(  # type: ignore
-                    feature_type
+                    feature_type, order_by="start"
                 ):
                     _file.write(str(feature) + "\n")
 
