@@ -115,7 +115,7 @@ rule fastq_quality_filter:
     log:
         LOCAL_LOG / "fastq_quality_filter_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h87f3376_10"
+        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h503566f_13"
     conda:
         ENV_DIR / "fastx_toolkit.yaml"
     shell:
@@ -143,7 +143,7 @@ rule fastq_to_fasta:
     log:
         LOCAL_LOG / "fastq_to_fasta_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h87f3376_10"
+        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h503566f_13"
     conda:
         ENV_DIR / "fastx_toolkit.yaml"
     shell:
@@ -168,7 +168,7 @@ rule format_fasta:
     log:
         LOCAL_LOG / "format_fasta_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h87f3376_10"
+        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h503566f_13"
     conda:
         ENV_DIR / "fastx_toolkit.yaml"
     shell:
@@ -227,7 +227,7 @@ rule collapse_identical_reads:
     log:
         LOCAL_LOG / "collapse_identical_reads_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h87f3376_10"
+        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h503566f_13"
     conda:
         ENV_DIR / "fastx_toolkit.yaml"
     shell:
