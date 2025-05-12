@@ -3,7 +3,6 @@
 
 import argparse
 from pathlib import Path
-from sqlite3 import InterfaceError
 from typing import Optional
 
 import gffutils  # type: ignore
@@ -41,7 +40,7 @@ class MirnaExtension:
             )
         except gffutils.exceptions.EmptyInputError:
             pass
-        except InterfaceError as err:
+        except AttributeError as err:
             raise AnnotationException(
                 "\n\n"
                 "Illegal coordinate: The provided GFF3 miRNA annotation file"
