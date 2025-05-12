@@ -258,12 +258,12 @@ class MirnaExtension:
                 _file.write("")
             elif feature_type is None:
                 for feature in self.db_out.all_features(  # type: ignore
-                    order_by="start"
+                    order_by=("featuretype", "strand", "start")
                 ):
                     _file.write(str(feature) + "\n")
             else:
                 for feature in self.db_out.features_of_type(  # type: ignore
-                    feature_type, order_by="start"
+                    feature_type, order_by=("strand", "start")
                 ):
                     _file.write(str(feature) + "\n")
 
