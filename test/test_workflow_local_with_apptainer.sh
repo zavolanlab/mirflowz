@@ -22,7 +22,7 @@ snakemake \
     --snakefile="../workflow/Snakefile" \
     --cores 4  \
     --configfile="config.yaml" \
-    --use-apptainer \
+    --software-deployment-method apptainer \
     --apptainer-args "--bind ${PWD}/../" \
     --printshellcmds \
     --rerun-incomplete \
