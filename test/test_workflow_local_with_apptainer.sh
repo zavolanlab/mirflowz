@@ -29,7 +29,7 @@ snakemake \
     --no-hooks \
     --verbose
 
-## Snakemake report
+# Snakemake report
 snakemake \
     --snakefile="../workflow/Snakefile" \
     --configfile="config.yaml" \
