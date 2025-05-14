@@ -22,7 +22,7 @@ snakemake \
     --snakefile="../workflow/Snakefile" \
     --cores 4  \
     --configfile="config.yaml" \
-    --use-conda \
+    --software-deployment-method conda \
     --printshellcmds \
     --rerun-incomplete \
     --no-hooks \
