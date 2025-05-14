@@ -38,7 +38,7 @@ snakemake \
         --open-mode=append" \
     --jobscript="../jobscript.sh" \
     --jobs=20 \
-    --use-apptainer \
+    --software-deployment-method apptainer \
     --apptainer-args="--bind ${PWD}/../" \
     --printshellcmds \
     --rerun-incomplete \
