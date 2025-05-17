@@ -230,7 +230,7 @@ snakemake \
     --snakefile="path/to/Snakefile" \
     --cores 4  \
     --configfile="path/to/config.yaml" \
-    --use-apptainer \
+    --software-deployment-method apptainer \
     --apptainer-args "--bind ${PWD}/../" \
     --printshellcmds \
     --rerun-incomplete \
@@ -245,7 +245,7 @@ snakemake \
     --snakefile="path/to/Snakefile" \
     --cores 4  \
     --configfile="path/to/config.yaml" \
-    --use-conda \
+    --software-deployment-method conda \
     --printshellcmds \
     --rerun-incomplete \
     --verbose
@@ -298,7 +298,7 @@ snakemake \
     --snakefile="path/to/Snakefile" \
     --cores 4  \
     --configfile="path/to/config.yaml" \
-    --use-conda \
+    --software-deployment-method conda \
     --printshellcmds \
     --rerun-incomplete \
     --no-hooks \
