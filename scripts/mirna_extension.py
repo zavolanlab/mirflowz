@@ -169,6 +169,7 @@ class MirnaExtension:
                 if mir_name[2] != precursor_name[2]:
                     mir_name[2] = precursor_name[2]
                     mir.attributes["Name"][0] = "-".join(mir_name)
+                    mir.attributes["Derives_from"][0] = "_".join(precursor_id)
 
     def process_precursor(
         self, precursor: gffutils.Feature, n: int = 6
