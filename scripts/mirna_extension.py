@@ -121,7 +121,7 @@ class MirnaExtension:
 
         If a precursor has a replica but its number is set in the 'ID'
         attribute, the first instance does not has a suffix and but the other
-        ones do. In addition, the 'Derives_from' attribute is updated to
+        one(s) do. In addition, the 'Derives_from' attribute is updated to
         match the precursor 'ID' attribute.
 
         If a precursor has no other occurrences but the 'NAME' part in the
@@ -306,7 +306,7 @@ where:
 
 If a precursor has a replica but its number is set in the 'ID'
 attribute, the first instance does not has a suffix and but the other
-ones do. In addition, the 'Derives_from' attribute is updated to
+one(s) do. In addition, the 'Derives_from' attribute is updated to
 match the precursor 'ID' attribute.
 
 If a precursor has no other occurrences but the 'NAME' part in the
