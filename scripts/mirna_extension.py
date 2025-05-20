@@ -183,7 +183,7 @@ class MirnaExtension:
         If provided, the elongation will take into account the chromosome size.
 
         In addition, the method `adjust_names` is called to ensure uniqueness
-        in the `Name` and 'ID' attributes for both the precursor and its arms.
+        in the `Name` attribute for both the precursor and its arms.
 
         Args:
             precursor: 'miRNA primary transcript' feature entry
