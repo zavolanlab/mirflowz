@@ -7,7 +7,7 @@ on:
   push:
     branches:
       - '*'
- 
+
 jobs:
 
   static-code-analysis:
@@ -15,26 +15,23 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}
-
     steps:
-      - name: check out repository
+
+      - name: Checkout MIRFLOWZ repository
         uses: actions/checkout@v4
-         
-      - name: Setup Conda/Mamba
+
+      - name: Setup Miniforge with MIRFLOWZ environment
         uses: conda-incubator/setup-miniconda@v3
         with:
           activate-environment: mirflowz
           auto-activate-base: false
-          auto-update-conda: false
-          channel-priority: true
+          auto-update-conda: true
+          channel-priority: strict
           conda-remove-defaults: true
-          environment-file: environment.yml
-          mamba-version: "2"
-      
-      - name: Update mirflowz env with dev packages
-        run: mamba env update -n mirflowz -f environment.dev.yml  
-      
-      - name: display environment info
+          environment-file: environment.dev.yml
+          miniforge-version: latest
+
+      - name: Display Conda and environment info
         run: |
           conda info -a
           conda list
@@ -60,77 +57,102 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}
-  
+
     steps:
-    
-      - name: check out repository
+
+      - name: Checkout MIRFLOWZ repository
         uses: actions/checkout@v4
-         
-      - name: setup Conda/Mamba
+
+      - name: Setup Miniforge with MIRFLOWZ environment
         uses: conda-incubator/setup-miniconda@v3
         with:
           activate-environment: mirflowz
           auto-activate-base: false
-          auto-update-conda: false
-          channel-priority: true
+          auto-update-conda: true
+          channel-priority: strict
           conda-remove-defaults: true
-          environment-file: environment.yml
-          mamba-version: "2"
-      
-      - name: update mirflowz env with dev packages
-        run: mamba env update -n mirflowz -f environment.dev.yml 
-      
-      - name: display environment info
+          environment-file: environment.dev.yml
+          miniforge-version: latest
+
+      - name: Display Conda and environment info
         run: |
           conda info -a
-          conda list   
+          conda list
 
-      - name: run test for snakemake format
+      - name: Run test script for snakemake format
         run: bash test/test_snakefmt.sh
 
-      - name: run test for snakemate lint
-        run: bash test/test_snakemake_lint.sh 
+      - name: Run test script for snakemate lint
+        run: bash test/test_snakemake_lint.sh
 
-      - name: run test for rule graph
+      - name: Run test script for rule graph
         run: bash test/test_rule_graph.sh
 
 
-  snakemake-integration-test:
-    runs-on: ubuntu-20.04
+  snakemake-apptainer-integration-test:
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash -l {0}
-  
     steps:
-    
-      - name: check out repository
+
+      - name: Checkout MIRFLOWZ repository
         uses: actions/checkout@v4
-         
-      - name: setup Conda/Mamba
+
+      - name: Setup Miniforge with MIRFLOWZ environment
         uses: conda-incubator/setup-miniconda@v3
         with:
           activate-environment: mirflowz
           auto-activate-base: false
-          auto-update-conda: false
-          channel-priority: true
+          auto-update-conda: true
+          channel-priority: strict
           conda-remove-defaults: true
           environment-file: environment.yml
-          mamba-version: "2"
-      
-      - name: update mirflowz env with root packages
-        run: |
-          mamba env update -n mirflowz -f environment.root.yml 
-          mamba install -c conda-forge mamba=1
-      
-      - name: display environment info
+          miniforge-version: latest
+
+      - name: Install Apptainer
+        uses: eWaterCycle/setup-apptainer@v2
+        with:
+          apptainer-version: 1.3.6
+
+      - name: Display Conda and environment info
         run: |
           conda info -a
-          conda list   
+          conda list
 
-      - name: run local test with Conda
+      - name: Run Apptainer local test script
+        run: bash test/test_workflow_local_with_apptainer.sh
+
+
+  snakemake-conda-integration-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+
+      - name: Checkout MIRFLOWZ repository
+        uses: actions/checkout@v4
+
+      - name: Setup Miniforge with MIRFLOWZ environment
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: mirflowz
+          auto-activate-base: false
+          auto-update-conda: true
+          channel-priority: strict
+          conda-remove-defaults: true
+          environment-file: environment.yml
+          miniforge-version: latest
+
+      - name: Display Conda and environment info
         run: |
-          conda config --set channel_priority strict
-          bash test/test_workflow_local_with_conda.sh
+          conda info -a
+          conda list
+
+      - name: Run Conda local test script
+        run: bash test/test_workflow_local_with_conda.sh
 
 
   unit-testing:
@@ -140,29 +162,26 @@ jobs:
         shell: bash -l {0}
 
     steps:
-    
-      - name: checkout repository
+
+      - name: Checkout MIRFLOWZ repository
         uses: actions/checkout@v4
-         
-      - name: setup Conda/Mamba
+
+      - name: Setup Miniforge with MIRFLOWZ environment
         uses: conda-incubator/setup-miniconda@v3
         with:
           activate-environment: mirflowz
           auto-activate-base: false
-          auto-update-conda: false
-          channel-priority: true
+          auto-update-conda: true
+          channel-priority: strict
           conda-remove-defaults: true
-          environment-file: environment.yml
-          mamba-version: "2"
-      
-      - name: update mirflowz env with dev packages
-        run: mamba env update -n mirflowz -f environment.dev.yml 
-      
-      - name: display environment info
+          environment-file: environment.dev.yml
+          miniforge-version: latest
+
+      - name: Display Conda and environment info
         run: |
           conda info -a
           conda list
-      
-      - name: run unit tests
+
+      - name: Run unit tests
         working-directory: ./scripts/tests
         run: pytest --import-mode prepend --cov=scripts --cov-branch --cov-report=term-missing

@@ -98,7 +98,7 @@ rule intersect_extended_primir:
     log:
         LOCAL_LOG / "intersect_extended_primir_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/bedtools:2.30.0--h468198e_3"
+        "docker://quay.io/biocontainers/bedtools:2.31.1--h13024bc_3"
     conda:
         ENV_DIR / "bedtools.yaml"
     shell:
@@ -129,7 +129,7 @@ rule filter_sam_by_intersecting_primir:
     log:
         LOCAL_LOG / "filter_sam_by_intersecting_primir_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
     shell:
@@ -156,7 +156,7 @@ rule convert_intersecting_primir_sam_to_bam:
     log:
         LOCAL_LOG / "convert_intersecting_primir_sam_to_bam_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
     shell:
@@ -181,7 +181,7 @@ rule sort_intersecting_primir_bam_by_position:
     log:
         LOCAL_LOG / "sort_intersecting_primir_bam_by_position_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
     shell:
@@ -207,7 +207,7 @@ rule index_intersecting_primir_bam:
     log:
         LOCAL_LOG / "index_intersecting_primir_bam_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
     shell:
@@ -235,7 +235,7 @@ rule intersect_extended_mirna:
     log:
         LOCAL_LOG / "intersect_extended_mirna_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/bedtools:2.30.0--h468198e_3"
+        "docker://quay.io/biocontainers/bedtools:2.31.1--h13024bc_3"
     conda:
         ENV_DIR / "bedtools.yaml"
     shell:
@@ -266,7 +266,7 @@ rule filter_sam_by_intersecting_mirna:
     log:
         LOCAL_LOG / "filter_sam_by_intersecting_mirna_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
     shell:
@@ -296,7 +296,7 @@ rule add_intersecting_mirna_tag:
     log:
         LOCAL_LOG / "add_intersecting_mirna_tag_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
+        "docker://quay.io/biocontainers/pysam:0.23.0--py39hdd5828d_0"
     conda:
         ENV_DIR / "pysam.yaml"
     shell:
@@ -326,7 +326,7 @@ rule sort_intersecting_mirna_by_feat_tag:
     log:
         LOCAL_LOG / "sort_intersecting_mirna_by_feat_tag_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
     shell:
@@ -354,7 +354,7 @@ rule quantify_mirna:
     log:
         LOCAL_LOG / "quantify_mirna_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
+        "docker://quay.io/biocontainers/pysam:0.23.0--py39hdd5828d_0"
     conda:
         ENV_DIR / "pysam.yaml"
     shell:
@@ -385,7 +385,7 @@ rule quantify_primir:
     log:
         LOCAL_LOG / "quantify_primir_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/pysam:0.20.0--py310hff46b53_0"
+        "docker://quay.io/biocontainers/pysam:0.23.0--py39hdd5828d_0"
     conda:
         ENV_DIR / "pysam.yaml"
     shell:
@@ -451,7 +451,7 @@ rule uncollapse_reads:
     log:
         LOCAL_LOG / "uncollapse_reads_{sample}.log",
     container:
-        "docker://perl:5.37.10"
+        "docker://perl:5.40.2"
     conda:
         ENV_DIR / "perl.yaml"
     shell:
@@ -481,7 +481,7 @@ rule convert_uncollpased_reads_sam_to_bam:
     log:
         LOCAL_LOG / "convert_uncollapsed_reads_sam_to_bam_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
     shell:
@@ -507,7 +507,7 @@ rule sort_uncollpased_reads_bam_by_position:
     log:
         LOCAL_LOG / "sort_uncollapsed_reads_bam_by_position_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
     shell:
@@ -533,7 +533,7 @@ rule index_uncollapsed_reads_bam:
     log:
         LOCAL_LOG / "index_uncollapsed_reads_bam_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
     shell:

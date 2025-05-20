@@ -5,7 +5,6 @@ cleanup () {
     rc=$?
     cd $user_dir
     echo "Exit status: $rc"
-    rm -rf .snakemake
 }
 trap cleanup EXIT
 
@@ -17,13 +16,30 @@ user_dir=$PWD
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 cd $script_dir
 
+# Create directories defined as in the configuration files
+mkdir -p logs/cluster
+mkdir -p logs/local
+mkdir -p results
+
 # Run test
 snakemake \
     --snakefile="../workflow/Snakefile" \
-    --cores 4  \
+    --cores=256 \
     --configfile="config.yaml" \
-    --use-singularity \
-    --singularity-args "--bind ${PWD}/../" \
+    --cluster-config="cluster.json" \
+    --cluster "sbatch \
+        --cpus-per-task={cluster.threads} \
+        --mem={cluster.mem} \
+        --qos={cluster.queue} \
+        --time={cluster.time} \
+        --export=JOB_NAME={rule} \
+        -o {params.cluster_log} \
+        -p scicore \
+        --open-mode=append" \
+    --jobscript="../jobscript.sh" \
+    --jobs=20 \
+    --software-deployment-method apptainer \
+    --apptainer-args="--bind ${PWD}/../" \
     --printshellcmds \
     --rerun-incomplete \
     --no-hooks \

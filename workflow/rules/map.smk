@@ -115,7 +115,7 @@ rule fastq_quality_filter:
     log:
         LOCAL_LOG / "fastq_quality_filter_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h87f3376_10"
+        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h503566f_13"
     conda:
         ENV_DIR / "fastx_toolkit.yaml"
     shell:
@@ -143,7 +143,7 @@ rule fastq_to_fasta:
     log:
         LOCAL_LOG / "fastq_to_fasta_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h87f3376_10"
+        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h503566f_13"
     conda:
         ENV_DIR / "fastx_toolkit.yaml"
     shell:
@@ -168,7 +168,7 @@ rule format_fasta:
     log:
         LOCAL_LOG / "format_fasta_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h87f3376_10"
+        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h503566f_13"
     conda:
         ENV_DIR / "fastx_toolkit.yaml"
     shell:
@@ -197,7 +197,7 @@ rule remove_adapters:
     resources:
         threads=8,
     container:
-        "docker://quay.io/biocontainers/cutadapt:4.3--py310h1425a21_0"
+        "docker://quay.io/biocontainers/cutadapt:5.0--py39hbcbf7aa_0"
     conda:
         ENV_DIR / "cutadapt.yaml"
     shell:
@@ -227,7 +227,7 @@ rule collapse_identical_reads:
     log:
         LOCAL_LOG / "collapse_identical_reads_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h87f3376_10"
+        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h503566f_13"
     conda:
         ENV_DIR / "fastx_toolkit.yaml"
     shell:
@@ -322,7 +322,7 @@ rule filter_fasta_for_oligomap:
     log:
         LOCAL_LOG / "filter_fasta_for_oligomap_{sample}.log",
     container:
-        "docker://python:3.9.16"
+        "docker://python:3.11.12"
     conda:
         ENV_DIR / "python.yaml"
     shell:
@@ -414,7 +414,7 @@ rule convert_genome_to_sam_oligomap:
         time=1,
         queue=1,
     container:
-        "docker://python:3.9.16"
+        "docker://python:3.11.12"
     conda:
         ENV_DIR / "python.yaml"
     shell:
@@ -502,7 +502,7 @@ rule convert_transcriptome_to_sam_oligomap:
     log:
         LOCAL_LOG / "oligomap_transcriptome_to_sam_{sample}.log",
     container:
-        "docker://python:3.9.16"
+        "docker://python:3.11.12"
     conda:
         ENV_DIR / "python.yaml"
     shell:
@@ -571,7 +571,7 @@ rule filter_genome_by_nh:
     log:
         LOCAL_LOG / "filter_genome_by_nh_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
+        "docker://quay.io/biocontainers/pysam:0.23.0--py39hdd5828d_0"
     conda:
         ENV_DIR / "pysam.yaml"
     shell:
@@ -599,7 +599,7 @@ rule filter_transcriptome_by_nh:
     log:
         LOCAL_LOG / "filter_transcriptome_by_nh_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
+        "docker://quay.io/biocontainers/pysam:0.23.0--py39hdd5828d_0"
     conda:
         ENV_DIR / "pysam.yaml"
     shell:
@@ -625,7 +625,7 @@ rule remove_header_genome_mappings:
     log:
         LOCAL_LOG / "remove_header_genome_mappings_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
     shell:
@@ -647,7 +647,7 @@ rule remove_header_transcriptome_mappings:
     log:
         LOCAL_LOG / "remove_header_transcriptome_mappings_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
     shell:
@@ -671,7 +671,7 @@ rule transcriptome_to_genome_maps:
     log:
         LOCAL_LOG / "transcriptome_to_genome_maps_{sample}.log",
     container:
-        "docker://perl:5.37.10"
+        "docker://perl:5.40.2"
     conda:
         ENV_DIR / "perl.yaml"
     shell:
@@ -739,7 +739,7 @@ rule sort_maps_by_id:
     log:
         LOCAL_LOG / "sort_maps_by_id_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
     shell:
@@ -765,7 +765,7 @@ rule remove_inferiors:
         mem=15,
         threads=4,
     container:
-        "docker://perl:5.37.10"
+        "docker://perl:5.40.2"
     conda:
         ENV_DIR / "perl.yaml"
     shell:
@@ -796,7 +796,7 @@ rule filter_by_indels:
         mem=15,
         threads=4,
     container:
-        "docker://quay.io/biocontainers/pysam:0.15.2--py38h7be0bb8_11"
+        "docker://quay.io/biocontainers/pysam:0.23.0--py39hdd5828d_0"
     conda:
         ENV_DIR / "pysam.yaml"
     shell:
@@ -822,7 +822,7 @@ rule convert_all_alns_sam_to_bam:
     log:
         LOCAL_LOG / "convert_all_alns_sam_to_bam_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
     shell:
@@ -844,7 +844,7 @@ rule sort_all_alns_bam_by_position:
     log:
         LOCAL_LOG / "sort_all_alns_bam_by_position_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
     shell:
@@ -866,7 +866,7 @@ rule index_all_alns_bam:
     log:
         LOCAL_LOG / "index_all_alns_bam_{sample}.log",
     container:
-        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
     shell:

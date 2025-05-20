@@ -1,17 +1,17 @@
 name: mirflowz
-channels:
-  - conda-forge
-  - bioconda
-dependencies: 
-  - black>=24.1.1
-  - coverage>=7.3.2
-  - flake8>=6.1.0
+dependencies:
+  - bioconda::gffutils>=0.13
+  - bioconda::snakefmt>=0.11
+  - bioconda::snakemake>=8
+  - black>=24.1
+  - coverage>=7.8
+  - flake8>=7.2
   - flake8-docstrings>=1.7.0
-  - gffutils>=0.12
-  - mypy>=1.6.1
-  - pylint>=3.0.1
-  - pysam>=0.22.0
-  - pytest>=7.4.2
-  - pytest-cov
-  - snakefmt
-  - snakemake=7.24.0
+  - graphviz
+  - mypy>=1.15
+  - pulp
+  - pylint>=3.3.7
+  - pysam>=0.23
+  - pytest>=8.3.5
+  - pytest-cov>=6.1.1
+  - python>=3.12
