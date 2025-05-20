@@ -213,7 +213,7 @@ def get_cigar_md(
         else:
             idx = bars_line.index(" ")
             cigarStr = f"{idx}M{indelerr}{bars_line.count('|') - idx}M"
-            matchingString = f"MD:Z:{idx}^{ref_seq[idx]}{seq_len - idx -1}"
+            matchingString = f"MD:Z:{idx}^{ref_seq[idx]}{seq_len - idx - 1}"
 
         return cigarStr, matchingString
 

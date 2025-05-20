@@ -3,5 +3,5 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - cutadapt=4.3
+  - cutadapt=5.0
 ...

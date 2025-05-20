@@ -15,12 +15,12 @@ samples: path/to/samples_table.tsv
 genome_file: path/to/gzipped/ensembl/genome.fa.gz
 gtf_file: path/to/gzipped/ensembl/gene_annotations.gtf.gz
 mirna_file: path/to/unzipped/mirbase/mirna_annotations.gff3
-bed_file: path/to/pileups/genomic_regions.bed
+bed_file: path/to/pileups/pileup_regions.bed
 
 # Tab-separated mappings table between UCSC (column 1)
-# and Ensembl (coulm 2) chromosome names 
+# and Ensembl (column 2) chromosome names 
 # Available at: https://github.com/dpryan79/ChromosomeMappings
-map_chr_file: path/to/ucsc_ensembl_mappings.tsv
+map_chr_file: path/to/ucsc_to_ensembl.tsv
 
 
 ###############################

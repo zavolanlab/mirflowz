@@ -1,6 +1,7 @@
 ---
 channels:
+  - conda-forge
   - bioconda
 dependencies:
-  - fastx_toolkit=0.0.14
+  - fastx_toolkit=0.0.14=h503566f_13
 ...

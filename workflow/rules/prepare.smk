@@ -250,7 +250,7 @@ rule create_genome_header:
     log:
         LOCAL_LOG / "create_genome_header.log",
     container:
-        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
     shell:
@@ -276,7 +276,7 @@ rule map_chr_names:
     log:
         LOCAL_LOG / "map_chr_names.log",
     container:
-        "docker://perl:5.37.10"
+        "docker://perl:5.40.2"
     conda:
         ENV_DIR / "perl.yaml"
     shell:
@@ -304,7 +304,7 @@ rule create_index_genome_fasta:
     log:
         LOCAL_LOG / "create_index_genome_fasta.log",
     container:
-        "docker://quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2"
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
     shell:
@@ -357,7 +357,7 @@ rule extend_mirs_annotations:
     log:
         LOCAL_LOG / "extend_mirs_annotations.log",
     container:
-        "docker://quay.io/biocontainers/gffutils:0.11.1--pyh7cba7a3_0"
+        "docker://quay.io/biocontainers/gffutils:0.13--pyh7cba7a3_0"
     conda:
         ENV_DIR / "gffutils.yaml"
     shell:
