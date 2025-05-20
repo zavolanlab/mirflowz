@@ -98,7 +98,7 @@ class MirnaExtension:
     def adjust_names(
         self, precursor: gffutils.Feature, matures: list[gffutils.Feature]
     ) -> None:
-        """Adjust miRNAs 'Name' attribute.
+        """Adjust miRNAs attributes.
 
         This method adjusts the miRNAs 'Name' attribute to account for the
         different genomic locations the miRNA sequence is annotated on and
@@ -110,18 +110,25 @@ class MirnaExtension:
         name already has an infix/suffix, it is replaced by the precursor one.
 
         Precursor names have the format:
-            'SPECIES-mir-NAME-#'
+            'SPECIES-mir-NAME%-#'
         Mature miRNA names present one of the following formats depending on
         whether the arm is specified or not:
-            - 'SPECIES-miR-NAME-#-ARM'
-            - 'SPECIES-miR-NAME-#'
-        where # is the integer indicating the replica the miRNAs are.
+            - 'SPECIES-miR-NAME%-#-ARM'
+            - 'SPECIES-miR-NAME%-#'
+        where:
+            - % is a character denoting closely related mature sequences
+            - # is the integer indicating identical mature sequences
 
         If a precursor has a replica but its number is set in the 'ID'
         attribute, the first instance does not has a suffix and but the other
-        one do.
+        ones do. In addition, the 'Derives_from' attribute is updated to
+        match the precursor 'ID' attribute.
 
-        If a precursor has no other occurrences, no modifications are made.
+        If a precursor has no other occurrences but the 'NAME' part in the
+        precursor and mature miRNAs 'Name' attributes do not match, the mature
+        'NAME' is replaced by the precursor one.
+
+        The 'Alias' attribute is always left unchanged.
 
         Args:
             precursor: 'miRNA primary transcript' feature entry
@@ -154,6 +161,14 @@ class MirnaExtension:
                     mir_name.append(replica)
 
                 mir.attributes["Name"][0] = "-".join(mir_name)
+                mir.attributes["Derives_from"][0] = "_".join(precursor_id)
+        else:
+            for mir in matures:
+                mir_name = mir.attributes["Name"][0].split("-")
+
+                if mir_name[2] != precursor_name[2]:
+                    mir_name[2] = precursor_name[2]
+                    mir.attributes["Name"][0] = "-".join(mir_name)
 
     def process_precursor(
         self, precursor: gffutils.Feature, n: int = 6
@@ -167,7 +182,7 @@ class MirnaExtension:
         If provided, the elongation will take into account the chromosome size.
 
         In addition, the method `adjust_names` is called to ensure uniqueness
-        in the `Name` attribute for both the precursor and its arms.
+        in the `Name` and 'ID' attributes for both the precursor and its arms.
 
         Args:
             precursor: 'miRNA primary transcript' feature entry
@@ -271,24 +286,35 @@ def parse_arguments():
     """Parse command-line arguments."""
     description = """Extend miRNA annotated regions and ensure name uniqueness.
 
-Adjust the miRNAs 'Name' attribute to account for the different genomic
-locations the miRNA sequence is annotated on and ensure their uniqueness.
+Adjust the miRNAs 'Name' and 'ID' attributes to account for the different
+genomic locations the miRNA sequence is annotated on and ensure their
+uniqueness.
 In precursors, the suffix indicating its replica number, is taken either from
 the 'Name' or the 'ID' attribute. Mature miRNAs take this number as an
 infix/suffix to construct its name. If the annotated name already has an
 infix/suffix, it is replaced by the precursor one.
 
 Precursor names have the format:
-    'SPECIES-mir-NAME-#'
-Mature miRNA names present one of the following formats depending on whether
-the arm is specified or not:
-    - 'SPECIES-miR-NAME-#-ARM'
-    - 'SPECIES-miR-NAME-#'
-where # is the integer indicating the replica the miRNAs are.
+    'SPECIES-mir-NAME%-#'
+Mature miRNA names present one of the following formats depending on
+whether the arm is specified or not:
+    - 'SPECIES-miR-NAME%-#-ARM'
+    - 'SPECIES-miR-NAME%-#'
+where:
+    - % is a character denoting closely related mature sequences
+    - # is the integer indicating identical mature sequences
 
-If a precursor has a replica but its number is set in the 'ID' attribute, the
-first instance does not has a suffix and but the other one do.
-If a precursor has no other occurrences, no modifications are made.
+If a precursor has a replica but its number is set in the 'ID'
+attribute, the first instance does not has a suffix and but the other
+ones do. In addition, the 'Derives_from' attribute is updated to
+match the precursor 'ID' attribute.
+
+If a precursor has no other occurrences but the 'NAME' part in the
+precursor and mature miRNAs 'Name' attributes do not match, the mature
+'NAME' is replaced by the precursor one.
+
+Note that the 'Alias' attribute is always left unchanged so repeated values
+may still be present.
 
 Extend mature miRNA start and end coordinates in a GFF3 file by the indicated
 number of nucleotides without exceeding chromosome boundaries. If the
@@ -307,7 +333,7 @@ The following assumptions are made:
 - The input GFF3 file contains miRNA annotations for a single species.
 - The input GFF3 file contains features of type "miRNA_primary_transcript"
   (referred to as "precursors") and "miRNA" (referred to as "mature miRNAs").
-- The input GFF3 file contains a Name attribute for each precursor.
+- The input GFF3 file contains a 'Name' and 'ID' attribute for each precursor.
 - Each precursor contains one or more mature miRNAs.
 - Each mature miRNA is a child of exactly one precursor and is completely
   within the boundaries of the precursor.
@@ -320,7 +346,7 @@ The following assumptions are made:
         "-v",
         "--version",
         action="version",
-        version="%(prog)s 1.1.0",
+        version="%(prog)s 1.2.0",
         help="show program's version number and exit",
     )
     parser.add_argument(
