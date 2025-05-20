@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# pylint: disable=line-too-long
+
 """Quantify miRNAs and corresponding isomiRs.
 
 Read the input SAM file, calculate the contribution sum of the intersecting
@@ -9,7 +11,7 @@ is done, and how the output can look like. The final section contain examples
 covering the main modes.
 
 EXPECTED INPUT
-The SAM file must contain only the alignments that interesct with canonical
+The SAM file must contain only the alignments that intersect with canonical
 miRNAs and/or isomiRs. For each alignment, the intersecting feature name(s)
 must be stored in a tag. If the tag determined by the CLI argument `--tag` is
 empty, the alignment is ignored. In addition, the SAM file must be sorted by
@@ -20,14 +22,15 @@ can also contain the alignment NH vale (see 'READ NAME FORMAT' section)
 
 FEATURE NAME FORMAT
 The name of the intersecting feature(s) has to follow the format:
-feat_name|5p-shift|3p-shift|CIGAR|MD.
-For isomirs, the whole name is used. For canonical miRNAs, the `feat_name`.
+FEAT_NAME|5p-SHIFT|3p-SHIFT|CIGAR|MD|READ_SEQ.
+For isomiRs, the whole name is used. For canonical miRNAs, the `feat_name`.
 A feature is classified as canonical if the 5p and 3p shifts are both 0 and the
 CIGAR and MD strings are the same. If there are different features names
-separated by a semi-colon, they are treated as a unique isomir name. For
-example, the feature name 'feat_name_1|0|0|23M|23' would represent a canonical
-miRNA and the feature names 'feat_name_2|0|0|22M|0A0A2T17' and
-'feat_name_3|0|0|22M|22;feat_name_4|1|0|23M|17A3T0C0' would represent isomiRs.
+separated by a semi-colon, they are treated as a unique isomiR name. For
+example, the feature name 'feat_name_1|0|0|23M|23|read_seq' would represent
+a canonical miRNA and the feature names 'feat_name_2|0|0|22M|0A0A2T17|read_seq'
+and 'feat_name_3|0|0|22M|22|read_seq;feat_name_4|1|0|23M|17A3T0C0|read_seq'
+would represent isomiRs.
 
 READ NAME FORMAT
 The read name must have one of the following formats:
@@ -41,7 +44,7 @@ set if NH is in the name.
 
 COUNT TABULATION
 The count for each feature is the sum of all the intersecting alignment's
-contribution. The appropiate contribution is the ratio between the number of
+contribution. The appropriate contribution is the ratio between the number of
 reads and the alignment's NH. The CLI flags `--collapsed` and `--nh` determine
 if these values are taken from the alignment's name. If `--collapsed` is not
 set, the number of reads is considered to be 1. If `--nh` is not set, the NH
@@ -62,16 +65,16 @@ name and its partial count. Three extra columns can be added by using the CLI
 flags `--count`, `--len` and `--read-ids`. If `--count` is set, the output
 table will contain the number of best alignments for each feature. If `--len`
 is set, the output table will contain the read's length. If both `--count` and
-`--len` are set, the count will always be followed by the read's lenght. If
+`--len` are set, the count will always be followed by the read's length. If
 `--read-ids` is set, a semicolon-separated list of all alignment IDs that
 overlap with the feature will always be in the last column.
 
 EXAMPLES
     Example 1
-    input: SAM with intersecting feature names in stored in the tag XN
+    input: SAM with intersecting feature names in the tag XN
     command: mirna_quantification.py SAM --tag XN
     output: hsa-miR-516b-5p	3.0
-            hsa-miR-517-5p|-1|0|23M|22T	0.6000000000000001
+            hsa-miR-517-5p|-1|0|23M|22T|ACCTCTAGATGGAAGCACTGTCG	0.6000000000000001
 
     Example 2
     input: SAM meeting the minimal characteristics
@@ -82,39 +85,40 @@ EXAMPLES
     Example 3
     input: SAM meeting the minimal characteristics
     command: mirna_quantification.py SAM --mir-list isomir
-    output: hsa-miR-512-3p|0|1|23M|22C	1.6666666666666665
-            hsa-miR-517-5p|-1|0|23M|22T	0.6000000000000001
+    output: hsa-miR-512-3p|0|1|23M|22C|AAGTGCTGTCATAGCTGAGGTAA	1.6666666666666665
+            hsa-miR-517-5p|-1|0|23M|22T|ACCTCTAGATGGAAGCACTGTCG	0.6000000000000001
 
     Example 4
     input: SAM with read names following the format NAME-COUNT_NH
     command: mirna_quantification.py SAM --collpased --nh
     output: hsa-miR-516b-5p	3.0
-            hsa-miR-517-5p|-1|0|23M|22T	0.6000000000000001
+            hsa-miR-517-5p|-1|0|23M|22T|ACCTCTAGATGGAAGCACTGTCG	0.6000000000000001
 
     Example 5
     input: SAM with read names following the format NAME-COUNT
     command: mirna_quantification.py SAM --collapsed
     output: hsa-miR-516b-5p	3.0
-            hsa-miR-517-5p|-1|0|23M|22T	0.6000000000000001
+            hsa-miR-517-5p|-1|0|23M|22T|ACCTCTAGATGGAAGCACTGTCG	0.6000000000000001
 
     Example 6
     input: SAM with read names following the format NAME_NH
     command: mirna_quantification.py SAM --nh
     output: hsa-miR-516b-5p	3.0
-            hsa-miR-517-5p|-1|0|23M|22T	0.6000000000000001
+            hsa-miR-517-5p|-1|0|23M|22T|ACCTCTAGATGGAAGCACTGTCG	0.6000000000000001
 
     Example 7
     input: SAM with read names following the format NAME_NH
     command: mirna_quantification.py SAM --read-ids --nh --mir-list mirna
     output: hsa-miR-498-5p	4.333333333333333   270396_3
-            hsa-miR-1323    12.0    673650_2;673650_2
+            hsa-miR-1323    12.0    673650_2;906983_4
 
     Example 8
     input: SAM meeting the minimal characteristics
     command: mirna_quantification.py SAM --count --len --mir-list isomir
-    output: hsa-miR-512-3p|0|1|23M|22C0	4.333333333333333  6 23
-            hsa-miR-512-3p|0|1|23M|3T18C0 12.0  8 19
-"""
+    output: hsa-miR-512-3p|0|1|23M|22C0|AAGTGCTGTCATAGCTGAGGTAA	4.333333333333333  6 23
+            hsa-miR-512-3p|0|1|23M|3T18C0|AAGGGCTGTCATAGCTGAGGTAA 12.0  8 19
+"""  # noqa: E501
+# pylint: enable=line-too-long
 
 import argparse
 from pathlib import Path
@@ -183,12 +187,12 @@ def parse_arguments():
         "--collapsed",
         help=(
             "Indicate that the SAM file has the reads collapsed by sequence."
-            "In that case, the SAM query names are expected to follow the "
-            "format NAME-COUNT where NAME is an aribitrary unique name and "
-            "COUNT is  is the number of identical reads that were collapsed "
-            "i.e my_query_name-13. The required naming format is produced, "
-            "e.g., by the 'fastx_collapser' tool of the "
-            "FASTX-Toolkit: http://hannonlab.cshl.edu/fastx_toolkit/"
+            " In that case, the SAM query names are expected to follow the"
+            " format NAME-COUNT where NAME is an aribitrary unique name and"
+            " COUNT is  is the number of identical reads that were collapsed"
+            " i.e my_query_name-13. The required naming format is produced,"
+            " e.g., by the 'fastx_collapser' tool of the"
+            " FASTX-Toolkit: http://hannonlab.cshl.edu/fastx_toolkit/"
             " Default: %(default)s."
         ),
         action="store_true",
@@ -227,8 +231,9 @@ def parse_arguments():
     parser.add_argument(
         "--read-ids",
         help=(
-            "If set, the read IDs that belong to each miRNA are included in "
-            "the output table separated by a semi-colon. Default: %(default)s."
+            "If set, the read IDs that belong to each miRNA are included in"
+            " the output table separated by a semi-colon."
+            " Default: %(default)s."
         ),
         action="store_true",
         default=False,
@@ -291,15 +296,13 @@ def collapsed_contribution(aln: pysam.AlignedSegment) -> float:
         if coll := re.search(r"\d+$", name):
             collapsed = float(coll.group())
 
-    except AttributeError:
-        sys.stdout.write(
-            f"Invalid query name: '{aln.query_name}'.\n"
-            + "Option --collapsed specified but query name does"
-            + " not include the number of collapsed sequences.\n"
-            + "Check SAM file consistency and CLI options"
-            + " --collapsed and --nh.\n"
-        )
-        raise
+    except AttributeError as atterr:
+        raise AttributeError(
+            f'Invalid query name: "{aln.query_name}".\n'
+            f"Option --collapsed specified but query name does not include"
+            f" the number of collapsed sequences.\nCheck SAM file consistency"
+            f" and CLI options --collapsed and --nh."
+        ) from atterr
 
     try:
         nh_value = float(aln.get_tag("NH"))
@@ -332,15 +335,12 @@ def nh_contribution(aln: pysam.AlignedSegment) -> float:
 
         return 1 / nh_val
 
-    except AttributeError:
-        sys.stdout.write(
-            f"Invalid query name: '{aln.query_name}'.\n"
-            + "Option --nh specified but query name does"
-            + " not include NH.\n"
-            + "Check SAM file consistency and CLI options"
-            + " --collapsed and --nh.\n"
-        )
-        raise
+    except AttributeError as atterr:
+        raise AttributeError(
+            f'Invalid query name: "{aln.query_name}".\n'
+            f"Option --nh specified but query name does not include NH.\n"
+            f"Check SAM file consistency and CLI options --collapsed and --nh."
+        ) from atterr
 
 
 def contribution(aln: pysam.AlignedSegment) -> float:
@@ -374,7 +374,8 @@ def get_name(pre_name: str) -> list[str]:
 
     Args:
         pre_name:
-            string with the format feat_name|5p-shift|3p-shift|CIGAR|MD
+            string with the format
+            FEAT_NAME|5p-SHIFT|3p-SHIFT|CIGAR|MD|READ_SEQ
 
     Returns:
         list with the species name to be found in the final table and its type
@@ -400,11 +401,11 @@ def write_output(
             mirna.write("")
 
 
-def main(arguments) -> None:
+def main(args) -> None:
     """Quantify miRNAs and corresponding isomiRs."""
-    outdir = Path(arguments.outdir)
+    outdir = Path(args.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
-    outfile = outdir / f"mirna_counts_{arguments.lib}"
+    outfile = outdir / f"mirna_counts_{args.lib}"
 
     contribution_type = {
         (True, True): collapsed_nh_contribution,
@@ -413,12 +414,12 @@ def main(arguments) -> None:
         (False, False): contribution,
     }
 
-    get_contribution = contribution_type[arguments.collapsed, arguments.nh]
+    get_contribution = contribution_type[args.collapsed, args.nh]
 
-    with pysam.AlignmentFile(arguments.samfile, "r") as samfile:
+    with pysam.AlignmentFile(args.samfile, "r") as samfile:
         try:
             alignment = next(samfile)
-            current_species = alignment.get_tag(arguments.tag)
+            current_species = alignment.get_tag(args.tag)
             if current_species:
                 read_ID = [str(alignment.query_name)]
                 count = get_contribution(alignment)
@@ -428,7 +429,7 @@ def main(arguments) -> None:
             write_output(
                 name="",
                 species=[],
-                mir_list=arguments.mir_list,
+                mir_list=args.mir_list,
                 mirna_out=outfile,
             )
 
@@ -436,14 +437,14 @@ def main(arguments) -> None:
 
         for alignment in samfile:
             if current_species == "":
-                current_species = alignment.get_tag(arguments.tag)
+                current_species = alignment.get_tag(args.tag)
                 count = get_contribution(alignment)
                 alns_count = 1
                 read_ID = [str(alignment.query_name)]
 
                 continue
 
-            if current_species == alignment.get_tag(arguments.tag):
+            if current_species == alignment.get_tag(args.tag):
                 count += get_contribution(alignment)
                 alns_count += 1
                 read_ID.append(str(alignment.query_name))
@@ -452,21 +453,21 @@ def main(arguments) -> None:
                 name = get_name(str(current_species))
                 species = [name[1], str(count)]
 
-                if arguments.count:
+                if args.count:
                     species.append(str(alns_count))
-                if arguments.len:
+                if args.len:
                     species.append(str(alignment.query_alignment_length))
-                if arguments.read_ids:
+                if args.read_ids:
                     species.append(";".join(read_ID))
 
                 write_output(
                     name=name[0],
                     species=species,
-                    mir_list=arguments.mir_list,
+                    mir_list=args.mir_list,
                     mirna_out=outfile,
                 )
 
-                current_species = alignment.get_tag(arguments.tag)
+                current_species = alignment.get_tag(args.tag)
                 count = get_contribution(alignment)
                 alns_count = 1
                 read_ID = [str(alignment.query_name)]
@@ -474,21 +475,21 @@ def main(arguments) -> None:
         name = get_name(str(current_species))
         species = [name[1], str(count)]
 
-        if arguments.count:
+        if args.count:
             species.append(str(alns_count))
-        if arguments.len:
+        if args.len:
             species.append(str(alignment.query_alignment_length))
-        if arguments.read_ids:
+        if args.read_ids:
             species.append(";".join(read_ID))
 
         write_output(
             name=name[0],
             species=species,
-            mir_list=arguments.mir_list,
+            mir_list=args.mir_list,
             mirna_out=outfile,
         )
 
 
 if __name__ == "__main__":
-    args = parse_arguments().parse_args()  # pragma: no cover
-    main(args)  # pragma: no cover
+    arguments = parse_arguments().parse_args()  # pragma: no cover
+    main(arguments)  # pragma: no cover

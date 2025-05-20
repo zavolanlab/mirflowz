@@ -95,7 +95,7 @@ def read_len_sam_file():
 def uncollapsed_sam_file():
     """Import path to uncollapsed test files."""
     sam_file = Path("files/in_aln_tag.sam")
-    out_table = Path("files/uncollpased_iso_mirna_quantification")
+    out_table = Path("files/uncollapsed_iso_mirna_quantification")
 
     return sam_file, out_table
 
@@ -176,7 +176,7 @@ class TestParseArguments:
             sys,
             "argv",
             [
-                "mirna__quantification",
+                "mirna_quantification",
                 str(in_sam),
                 "--lib",
                 "test_lib",
@@ -261,17 +261,32 @@ class TestGetName:
     def test_canonical(self):
         """Test canonical miRNA name."""
         name = ["mirna", "hsa-miR-1323"]
-        assert get_name("hsa-miR-1323|0|0|22M|22") == name
+        assert (
+            get_name("hsa-miR-1323|0|0|22M|22|TCAAAACTGAGGGGCATTGGATTCT")
+            == name
+        )
 
     def test_iso_0_shift(self):
         """Test isoform with 0 shift."""
-        name = ["isomir", "hsa-miR-1323|0|0|18M3I4M|22"]
-        assert get_name("hsa-miR-1323|0|0|18M3I4M|22") == name
+        name = [
+            "isomir",
+            "hsa-miR-1323|0|0|18M3I4M|22|TCAAAACTGAGGGGCATTGGATTCT",
+        ]
+        assert (
+            get_name("hsa-miR-1323|0|0|18M3I4M|22|TCAAAACTGAGGGGCATTGGATTCT")
+            == name
+        )
 
     def test_iso(self):
         """Test isoform with shift."""
-        name = ["isomir", "hsa-miR-1323|2|0|18M3I4M|22"]
-        assert get_name("hsa-miR-1323|2|0|18M3I4M|22") == name
+        name = [
+            "isomir",
+            "hsa-miR-1323|2|0|18M3I4M|22|TCAAAACTGAGGGGCATTGGATTCT",
+        ]
+        assert (
+            get_name("hsa-miR-1323|2|0|18M3I4M|22|TCAAAACTGAGGGGCATTGGATTCT")
+            == name
+        )
 
 
 class TestMain:
