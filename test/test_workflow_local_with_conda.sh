@@ -22,17 +22,17 @@ snakemake \
     --snakefile="../workflow/Snakefile" \
     --cores 4  \
     --configfile="config.yaml" \
-    --use-conda \
+    --software-deployment-method conda \
     --printshellcmds \
     --rerun-incomplete \
     --no-hooks \
     --verbose
 
 # Snakemake report
-#snakemake \
-#    --snakefile="../workflow/Snakefile" \
-#    --configfile="config.yaml" \
-#    --report="snakemake_report.html"
+snakemake \
+    --snakefile="../workflow/Snakefile" \
+    --configfile="config.yaml" \
+    --report="snakemake_report.html"
 
 # Check md5 sum of some output files
 find results/ -type f -name \*\.gz -exec gunzip '{}' \;

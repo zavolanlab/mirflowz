@@ -38,7 +38,7 @@ snakemake \
         --open-mode=append" \
     --jobscript="../jobscript.sh" \
     --jobs=20 \
-    --use-conda \
+    --software-deployment-method conda \
     --printshellcmds \
     --rerun-incomplete \
     --no-hooks \

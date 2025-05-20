@@ -1,6 +1,4 @@
 ---
-channels:
-  - bioconda
 dependencies:
-  - segemehl=0.3.4
+  - bioconda/label/cf201901::segemehl
 ...
