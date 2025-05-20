@@ -997,14 +997,16 @@ OUT:
 
 #### `filter_by_indels`
 
-Filter multimappers favoring mismatches over InDels with a
+Filter multimappers favoring InDels over mismatches with a
 [**custom script**][custom-script-filter-mm].
 
-> Under the assumption that InDels are less frequent than mismatches only
-> those alignments (of the same read with the same edit distance) with the
-> lowest number of InDels are kept. This approach allows the presence of
-> multimappers and/or InDels after the filtering if the alignments contain the
-> same proportion of mismatches vs. InDels.
+> Given that InDels are more frequent in miRNAs than mismatches, as
+> demonstrated by [Saunders et al. (2017)][cite_saunders],
+> [Neilsen et al. (2012)][cite_neilsen] and
+> [Schumauch et al. (2024)][cite_schumauch], only those "multimappers" (defined
+> here as alignments of the same read mapping to different genomic loci with
+> the same edit distance) that contain a higher or equal number of InDels
+> compared to mismatches are retained.
 
 - **Input**
   - Alignments file, sorted, filtered (`.sam`); from
@@ -1016,25 +1018,49 @@ Filter multimappers favoring mismatches over InDels with a
 - **Examples**
 
 ```console
-Example 1 | Different proportion of mismatches vs. InDels
+Example 1 | Different number of InDels
 
 IN:
-    1-1	16	19	77595	255	14M1D8M	*	0	0	GCAGGAGAATCACTGATGTCAG	*	MD:Z:14^T2A1C3	NH:i:2	NM:i:3	XA:Z:Q	XI:i:1
+    1-1	0	19	77595	255	8M1D14M	*	0	0	CTGACATCAGTGATTCTCCTGC	*	MD:Z:3G1T2^A14	NH:i:2	NM:i:3	XA:Z:Q	XI:i:1
     1-1	0	19	330456	255	4M1D1M1I3M1D13M	*	0	0	CTGACATCAGTGATTCTCCTGC	*	MD:Z:4^G4^A13	NH:i:2	NM:i:3	XA:Z:Q	XI:i:0
+
+Alignments:
+    CTGACATC-AGTGATTCTCCTGC
+    ||| | || |||||||||||||| (1 InDel, 2 mismatches, discarded)
+    CTGGCTTCAAGTGATTCTCCTGC
+
+    CTGA-CATCA-GTGATTCTCCTGC
+    |||| | ||| ||||||||||||| (3 InDels, 0 mismatches, retained)
+    CTGAGC-TCAAGTGATTCTCCTGC
+
 OUT:
-    1-1	16	19	77595	255	14M1D8M	*	0	0	GCAGGAGAATCACTGATGTCAG	*	MD:Z:14^T2A1C3	NM:i:3	XA:Z:Q	XI:i:1	NH:i:1	HI:i:1
+    1-1	0	19	330456	255	4M1D1M1I3M1D13M	*	0	0	CTGACATCAGTGATTCTCCTGC	*	MD:Z:4^G4^A13	NH:i:1	HI:i:1  NM:i:3	XA:Z:Q	XI:i:0
 
 
-Example 2 | Equal proportion of mismatches vs. InDels
+Example 2 | Equal number of InDels
 
 IN:
-    1-1	0	19	142777	255	15M1I5M	*	0	0	GCTAGGTGGGAGGCTTGAAGC	*	MD:Z:4C0T14	NH:i:3	NM:i:3	XA:Z:Q	XI:i:0
-    1-1	16	19	270081	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14G0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:2
-    1-1	16	19	545543	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14A0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:1
+    1-1	0	19	142777	255	5M1I15M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14A0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:0
+    1-1	0	19	270081	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14G0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:2
+    1-1	0	19	545543	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14A0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:1
+
+Alignments:
+    GCTTCAAGCCTCCCACCTAGC
+    ||||| |||||||||  |||| (1 Indel, 2 mismatches, retained)
+    GCTTC-AGCCTCCCAAGTAGC
+
+    GCTTCAAGCCTCCCACCTAGC
+    |||||| ||||||||  |||| (1 Indel, 2 mismatches, retained)
+    GCTTCA-GCCTCCCAGGTAGC
+
+    GCTTCAAGCCTCCCACCTAGC
+    |||||| ||||||||  |||| (1 Indel, 2 mismatches, retained)
+    GCTTCA-GCCTCCCAAGTAGC
+
 OUT:
-    1-1	0	19	142777	255	15M1I5M	*	0	0	GCTAGGTGGGAGGCTTGAAGC	*	MD:Z:4C0T14	NH:i:3	NM:i:3	XA:Z:Q	XI:i:0
-    1-1	16	19	270081	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14G0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:2
-    1-1	16	19	545543	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14A0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:1
+    1-1	0	19	142777	255	5M1D15M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14A0G4	NH:i:3	HI:i:1  NM:i:3	XA:Z:Q	XI:i:0
+    1-1	0	19	270081	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14G0G4	NH:i:3	HI:i:2  NM:i:3	XA:Z:Q	XI:i:2
+    1-1	0	19	545543	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14A0G4	NH:i:3	HI:i:3  NM:i:3	XA:Z:Q	XI:i:1
 ```
 
 
@@ -1232,9 +1258,8 @@ Classify and add the intersecting (iso)miR to each alignment as a tag
 with a [**custom script**][custom-script-iso-tag].
 
 > In this step, the mature miRNA annotated regions are used instead of the
-> extended ones. Each alignment gets an extra tag (`YW:Z`) with either the
-> (iso)miR(s) it is considered to really intersect with or an empty string
-> otherwise. The format of the intersecting mature miRNA species is
+> extended ones. Each alignment gets an extra tag (`YW:Z`) with the (iso)miR(s)
+> it is considered to really intersect with using the format:
 > `miRNA_name|5p-shift|3p-shift|CIGAR|MD`, where `5p-shift` and `3p-shift` are
 > the difference between the miRNA start and end coordinates and the
 > alignment's ones respectively.
@@ -1717,11 +1742,14 @@ different library subsets if provided with
 
 
 [chr-maps]: <https://github.com/dpryan79/ChromosomeMappings>
+[cite_neilsen]:<https://www.sciencedirect.com/science/article/pii/S0168952512001126>
+[cite_saunders]: <https://pubmed.ncbi.nlm.nih.gov/17360642/>
+[cite_schumauch]: <https://www.biorxiv.org/content/10.1101/2024.03.28.587190v1>
 [custom-script-blocksort]: scripts/blocksort.sh
 [custom-script-filter-mm]: scripts/filter_multimappers.py
 [custom-script-get-lines]: scripts/get_lines_w_pattern.sh
 [custom-script-gtf-bed]: scripts/gtf_exons_bed.1.1.2.R
-[custom-script-iso-tag]: scripts/iso_name_tagging.py
+[custom-script-iso-tag]: scripts/annotate_sam_with_bed_features.py
 [custom-script-map-chr]: scripts/map_chromosomes.pl
 [custom-script-merge-tab]: scripts/merge_tables.R
 [custom-script-mir-ext]: scripts/mirna_extension.py
