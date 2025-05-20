@@ -211,6 +211,11 @@ class TestAdjustNames:
         assert precursor.attributes["Name"][0] == "hsa-mir-10401-2"
         assert matures[0].attributes["Name"][0] in out_mir
         assert matures[1].attributes["Name"][0] in out_mir
+        # Assert that each mature's Derives_from attribute is set to the precursor ID
+        assert "Derives_from" in matures[0].attributes
+        assert matures[0].attributes["Derives_from"][0] == "MI0003161"
+        assert "Derives_from" in matures[1].attributes
+        assert matures[1].attributes["Derives_from"][0] == "MI0003161"
         assert matures[0].attributes["Derives_from"][0] == precursor_id
         assert matures[1].attributes["Derives_from"][0] == precursor_id
 
