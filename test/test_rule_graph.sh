@@ -21,7 +21,6 @@ snakemake \
     --snakefile="../workflow/Snakefile" \
     --configfile="config.yaml" \
     --rulegraph \
-    --printshellcmds \
     --dryrun \
-    --verbose \
-    | dot -Tsvg > "../images/rule_graph.svg"
+    --quiet="all" \
+| dot -Tsvg > "../images/rule_graph.svg"

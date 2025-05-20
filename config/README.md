@@ -18,23 +18,8 @@ conda config --set channel_priority strict
 
 For a faster creation of the environment (and Conda environments in general),
 you can also install [Mamba][mamba] on top of Conda. In that case, replace
-`conda` with `mamba` in the commands above (particularly in 
+`conda` with `mamba` in the commands above (particularly in
 `conda env create`).
-
-## Running _MIRFLOWZ_ with Singularity
-
-If you want to run _MIRFLOWZ_ via Singularity and do not already
-have it installed globally on your system, you must further update the Conda
-environment with:
-
-```bash
-conda env update -f environment.root.yml
-```
-
-> Mind that you must have the environment activated and root permissions on
-> your system to install Singularity. If you want to run _MIRFLOWZ_ on an HPC
-> cluster (recommended in almost all cases), ask your system administrator
-> about Singularity.
 
 # Run the workflow on your own samples
 
@@ -59,7 +44,7 @@ table must look like or use it as a template.
 touch samples.tsv
 ```
 
-> Fill the sample table according to the following requirements:  
+> Fill the sample table according to the following requirements:
 >
 > - `sample`. Arbitrary name for the miRNA sequencing library.
 > - `sample_file`. Path to the miRNA sequencing library file. The path must be
@@ -70,7 +55,7 @@ touch samples.tsv
 
 ## 2. Prepare the genome resources
 
-There are 4 files you must provide: 
+There are 4 files you must provide:
 
 1. A **`gzip`ped FASTA** file containing **reference sequences**, typically the
    genome of the source/organism from which the library was extracted.
