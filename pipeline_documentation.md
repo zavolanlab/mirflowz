@@ -370,21 +370,36 @@ by feature with a [**custom script**][custom-script-mir-ext].
 
 > Adjust miRNAs' 'Name' attribute to account for the different genomic
 > locations the miRNA sequence is annotated on and ensure their uniqueness.
-> The name format is `SPECIES-mir-NAME-#` for pri-miRs, and
-> `SPECIES-miR-NAME-#-ARM` or `SPECIES-miR-NAME-#` for mature miRNA with both
-> or just one arm respectively, where `#` is the replica integer. If a pri-miR
-> has a replica but its number is set in the 'ID' attribute, the first instance
-> does not has a suffix but the other one(s) do. In addition, the
-> 'Derives_from' attribute is updated to match the precursor 'ID' attribute.
-> If a precursor has no other occurrences, but its `NAME` portion of the
-> 'Name' attribute is different from the `NAME` of its corresponding mature
-> miRNA(s), then the mature miRNA(s) `NAME` is updated to match the precursor
-> one. On the other hand, mature miRNA regions are extended on both sides to
-> account for isomiR species with shifted start and/or end positions without
-> exceeding chromosome(s) boundaries. If required, pri-miR loci are also
-> extended to accommodate the new miRNA coordinates. In addition, pri-miR names
-> are modified to record the final positions by appending `_-y` and `_+x` to
-> them, where `y` is the 5' shift and `x` the 3' shift.
+> Updates the attributes of precursor and mature miRNA entries to ensure
+> consistent naming based on their sequence variant and/or replica information.
+> For precursors:
+>    - A suffix indicating the replica number is taken from either the 'Name'
+>      or 'ID' attribute.
+>    - Format: 'SPECIES-mir-NUMBER%-#' (Name) and 'ALIAS_#' (ID)
+>      where '%' indicates a sequence variant (optional, character),
+>      and '#' is the replica number (optional).
+>
+> For mature miRNAs:
+>    - The replica number is added or replaced as an infix/suffix in the name.
+>    - Formats:
+>        - 'SPECIES-miR-NUMBER%-#-ARM'
+>        - 'SPECIES-miR-NUMBER%-#'
+>        - 'SPECIES-miR-NUMBER%-ARM'
+> Cases:
+>    - If a precursor has multiple instances and the replica number is in the
+>      'ID', the first has no suffix; others do.
+>    - The 'Derives_from' attribute of each mature miRNA is updated to match
+>      the precursor 'ID'.
+>    - If a precursor is unique but its 'NUMBER%' differs from its matures, the
+>      mature 'NUMBER%' is updated to match the precursor.
+>
+> The 'Alias' attribute remains unchanged. On the other hand, mature miRNA
+> regions are extended on both sides to account for isomiR species with shifted
+> start and/or end positions without exceeding chromosome(s) boundaries. If
+> required, pri-miR loci are also extended to accommodate the new miRNA
+> coordinates. In addition, pri-miR names are modified to record the final
+> positions by appending `_-y` and `_+x` to them, where `y` is the 5' shift and
+> `x` the 3' shift.
 
 - **Input**
   - miRNA annotations, mapped chromosome name(s) (`.gff3`); from
