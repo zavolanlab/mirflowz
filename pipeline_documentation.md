@@ -368,30 +368,36 @@ Extract chromosome(s) length from the genome sequence.
 Extend miRNA annotations, ensure feature names uniqueness and split the file
 by feature with a [**custom script**][custom-script-mir-ext].
 
-> Adjust miRNAs' 'Name' attribute to account for the different genomic
-> locations the miRNA sequence is annotated on and ensure their uniqueness.
-> Updates the attributes of precursor and mature miRNA entries to ensure
-> consistent naming based on their sequence variant and/or replica information.
+> This method updates the attributes of precursor and mature miRNA entries to
+> ensure consistent naming based on their paralog or sequence variant status.
+>
 > For precursors:
->    - A suffix indicating the replica number is taken from either the 'Name'
->      or 'ID' attribute.
->    - Format: 'SPECIES-mir-NUMBER%-#' (Name) and 'ALIAS_#' (ID)
->      where '%' indicates a sequence variant (optional, character),
->      and '#' is the replica number (optional).
+>     - A suffix indicates distinct genomic loci (paralogs) that express
+>       identical mature sequences. This is typically extracted from the 'Name'
+>       or 'ID' attribute.
+>     - Format: 'SPECIES-mir-NUMBER[LETTER]-#' (Name) and 'ALIAS_#' (ID)
+>       where:
+>           - 'LETTER' denotes a sequence variant of the mature miRNA
+>             (paralogous variant with similar but not identical sequences),
+>           - '#' indicates the paralog number (replica/locus index), included
+>             when multiple loci express the same or similar miRNAs.
 >
 > For mature miRNAs:
->    - The replica number is added or replaced as an infix/suffix in the name.
->    - Formats:
->        - 'SPECIES-miR-NUMBER%-#-ARM'
->        - 'SPECIES-miR-NUMBER%-#'
->        - 'SPECIES-miR-NUMBER%-ARM'
+>     - The replica number is added or replaced as an infix/suffix in the name.
+>     - Formats:
+>         - 'SPECIES-miR-NUMBER[LETTER]-#-ARM'
+>         - 'SPECIES-miR-NUMBER[LETTER]-#'
+>         - 'SPECIES-miR-NUMBER[LETTER]-ARM'
+>
 > Cases:
->    - If a precursor has multiple instances and the replica number is in the
->      'ID', the first has no suffix; others do.
->    - The 'Derives_from' attribute of each mature miRNA is updated to match
->      the precursor 'ID'.
->    - If a precursor is unique but its 'NUMBER%' differs from its matures, the
->      mature 'NUMBER%' is updated to match the precursor.
+>     - If a precursor has multiple genomic instances (paralogs), the first
+>       occurrence typically lacks a numeric suffix; subsequent ones are
+>       numbered incrementally.
+>     - The 'Derives_from' attribute of each mature miRNA is updated to match
+>       the precursor's 'ID'.
+>     - If a precursor has a different sequence variant designation ('LETTER')
+>       than its associated matures, the mature miRNA names are updated to
+>       match the precursor's designation.
 >
 > The 'Alias' attribute remains unchanged. On the other hand, mature miRNA
 > regions are extended on both sides to account for isomiR species with shifted
