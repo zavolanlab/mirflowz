@@ -354,10 +354,12 @@ accommodate isomiR species with shifted start and/or end positions. If
 necessary, pri-miR loci are extended to adjust to the new miRNA coordinates.
 In addition, to account for the different genomic locations a miRNA sequence
 can be annotated, the name of these sequences are modified to have the format
-`SPECIES-mir-NUMBER%-#` for pri-miRs, and `SPECIES-miR-NUMBER%-#-ARM` or
-`SPECIES-miR-NUMBER%-#` for mature miRNAs with both or just one arm
-respectively, where `#` is the replica number and `%` indicates the sequence
-variant.
+`SPECIES-mir-NUMBER[LETTER]-#` for pri-miRs, and
+`SPECIES-miR-NUMBER[LETTER]-#-ARM` or `SPECIES-miR-NUMBER[LETTER]-#` for mature
+miRNAs with both or just one arm respectively, where `#` is the paralog number
+(replica/locus index), included when multiple loci express the same or similar
+miRNAs, and `LETTER` denotes a sequence variant of the mature miRNA
+(paralogous variant with similar but not identical sequences).
 
 ### Map module
 
