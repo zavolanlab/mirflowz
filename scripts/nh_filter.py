@@ -1,15 +1,9 @@
 #!/usr/bin/env python
+"""Filter alignments in a SAM file by NH tag."""
 
-"""Filter alignments in a SAM file by NH tag.
+import argparse
+from pathlib import Path
 
-This script uses the pysam library to open the input SAM file and iterates
-over each alignment in it. If the NH tag is higher than the provided `max_NH`
-value, the aligned read is removed.
-
-Usage: filter_nh.py [SAM file] [max_NH] [OUTPUT file]
-"""
-
-import sys
 import pysam
 
 if sys.argv[1] in ["--help", "-h", "-help"]:
