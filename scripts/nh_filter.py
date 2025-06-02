@@ -45,31 +45,29 @@ specified in `--max_nh`, the aligned read is removed.
     return parser
 
 
-def main():
-    """Filter alignments by NH tag."""
-    sys.stdout.write(
-        f"Removing reads aligned more than {sys.argv[2]} times... \n"
-    )
+def main(arguments) -> None:
+    """Filter alignments by its NH tag value."""
+    with (
+        pysam.AlignmentFile(arguments.samfile, "r", check_sq=False) as in_sam,
+        pysam.AlignmentFile(arguments.outfile, "w", template=in_sam) as o_sam,
+    ):
+        for alignment in in_sam:
+            try:
+                nh = alignment.get_tag("NH")
 
-    infile = pysam.Samfile(sys.argv[1], "r", check_sq=False)
-    out = pysam.Samfile(sys.argv[3], "w", template=infile)
+            except KeyError as keyerr:
+                raise KeyError(
+                    "Missing NH tag: Some alignments do not have the NH"
+                    " tag. Please, check that all entries have an"
+                    " associated NH tag"
+                ) from keyerr
 
-    keep = True
+            if nh > arguments.max_nh:
+                pass
 
-    for DNAread in infile.fetch():
-        intags = DNAread.tags
-
-        for entry in intags:
-            if "NH" in entry and entry[1] > int(sys.argv[2]):
-                keep = False
-        if keep:
-            out.write(DNAread)
-
-        keep = True
-
-    out.close()
-    sys.stdout.write("DONE!\n")
+            o_sam.write(alignment)
 
 
 if __name__ == "__main__":
-    main()
+    args = parse_arguments().parse_args()  # pragma: no cover
+    main(args)  # pragma: no cover
