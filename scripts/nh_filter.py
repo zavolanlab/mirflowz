@@ -6,14 +6,43 @@ from pathlib import Path
 
 import pysam
 
-if sys.argv[1] in ["--help", "-h", "-help"]:
-    sys.exit(
-        "\nDescription: Checks for NH tag to remove reads that aligned "
-        "more than max_NH value.\nUsage: filter_nh.py [SAM file] [max_NH]"
-        "[OUTPUT file]\n"
+
+def parse_arguments():
+    """Parse command-line arguments."""
+    description = """Filter alignments in a SAM file by its NH tag.
+
+For each alignment, check its NH tag, and if the value is higher than the one
+specified in `--max_nh`, the aligned read is removed.
+"""
+    parser = argparse.ArgumentParser(
+        description=description,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-elif len(sys.argv) < 4 or len(sys.argv) > 4:
-    sys.exit("\n Arguments ERROR. See [nh_filter.py --help]\n")
+    parser.add_argument(
+        "samfile",
+        help="Path to the input SAM file. Rquired!",
+        type=Path,
+    )
+    parser.add_argument(
+        "--outfile",
+        help="Path to the output SAM file. Required!",
+        type=Path,
+    )
+    parser.add_argument(
+        "--max_nh",
+        help="Maximum value the NH tag can have for an alignment to be kept.\
+              Default: %(default)d.",
+        default=100,
+        type=int,
+    )
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version="%(prog)s 1.1.0",
+        help="Show program's version number and exit",
+    )
+    return parser
 
 
 def main():
