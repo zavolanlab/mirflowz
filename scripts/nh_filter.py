@@ -20,17 +20,17 @@ specified in `--max_nh`, the aligned read is removed.
     )
     parser.add_argument(
         "samfile",
-        help="Path to the input SAM file. Rquired!",
+        help="Path to the input SAM file. Required!",
         type=Path,
     )
     parser.add_argument(
-        "--out_file",
+        "--out-file",
         help="Path to the output SAM file. Required!",
         type=Path,
         required=True,
     )
     parser.add_argument(
-        "--max_nh",
+        "--max-nh",
         help="Maximum value the NH tag can have for an alignment to be kept.\
               Default: %(default)d.",
         default=100,
