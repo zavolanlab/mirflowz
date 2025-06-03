@@ -24,9 +24,10 @@ specified in `--max_nh`, the aligned read is removed.
         type=Path,
     )
     parser.add_argument(
-        "--outfile",
+        "--out_file",
         help="Path to the output SAM file. Required!",
         type=Path,
+        required=True,
     )
     parser.add_argument(
         "--max_nh",
@@ -49,7 +50,7 @@ def main(arguments) -> None:
     """Filter alignments by its NH tag value."""
     with (
         pysam.AlignmentFile(arguments.samfile, "r", check_sq=False) as in_sam,
-        pysam.AlignmentFile(arguments.outfile, "w", template=in_sam) as o_sam,
+        pysam.AlignmentFile(arguments.out_file, "w", template=in_sam) as o_sam,
     ):
         for alignment in in_sam:
             try:
@@ -63,7 +64,7 @@ def main(arguments) -> None:
                 ) from keyerr
 
             if nh > arguments.max_nh:
-                pass
+                continue
 
             o_sam.write(alignment)
 
