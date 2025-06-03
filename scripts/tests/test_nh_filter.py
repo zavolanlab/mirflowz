@@ -15,9 +15,7 @@ from ..nh_filter import (
 @pytest.fixture
 def empty_file():
     """Import path to empty file."""
-    empty_file = Path("files/header_only.sam")
-
-    return empty_file
+    return Path("files/header_only.sam")
 
 
 @pytest.fixture
@@ -32,23 +30,23 @@ def sam_file():
 @pytest.fixture
 def nh_missing_sam_file():
     """Import path to test files with alignments missing the NH tag."""
-    sam_file = Path("files/in_aln_tag_missing_nh.sam")
-
-    return sam_file
+    return Path("files/in_aln_tag_missing_nh.sam")
 
 
 class TestParseArguments:
     """Test 'parse_arguments()' function."""
 
-    def test_no_in_sam(self, monkeypatch):
+    def test_no_in_sam(self, monkeypatch, empty_file):
         """Call without the positional argument."""
+        sam_file = empty_file
+
         with pytest.raises(SystemExit) as sysex:
             monkeypatch.setattr(
                 sys,
                 "argv",
                 [
                     "nh_filter",
-                    "--out_file",
+                    "--out-file",
                     str(sam_file),
                 ],
             )
@@ -81,9 +79,9 @@ class TestParseArguments:
             [
                 "nh_filter",
                 str(sam_file),
-                "--out_file",
+                "--out-file",
                 str(sam_file),
-                "--max_nh",
+                "--max-nh",
                 "100",
             ],
         )
@@ -105,7 +103,7 @@ class TestMain:
             [
                 "nh_filter",
                 str(empty_file),
-                "--out_file",
+                "--out-file",
                 str(output),
             ],
         )
@@ -128,9 +126,9 @@ class TestMain:
             [
                 "nh_filter",
                 str(in_sam),
-                "--out_file",
+                "--out-file",
                 str(output),
-                "--max_nh",
+                "--max-nh",
                 "2",
             ],
         )
@@ -141,10 +139,11 @@ class TestMain:
             assert out_file.read() == expected.read()
 
     def test_main_nh_missing_sam_file(
-        self, monkeypatch, nh_missing_sam_file
+        self, monkeypatch, nh_missing_sam_file, tmp_path
     ):
         """Test main function with some missing NH tag in SAM file."""
         infile = nh_missing_sam_file
+        output = tmp_path / "output.sam"
 
         monkeypatch.setattr(
             sys,
@@ -152,10 +151,23 @@ class TestMain:
             [
                 "nh_filter",
                 str(infile),
-                "--out_file",
-                str(infile),
+                "--out-file",
+                str(output),
             ],
         )
         args = parse_arguments().parse_args()
         with pytest.raises(KeyError, match=r".* associated NH .*"):
+            main(args)
+
+    def test_main_with_nonexistent_input_file(self, tmp_path):
+        """Test main with a non-existent input SAM file."""
+        non_existent_file = tmp_path / "does_not_exist.sam"
+        out_file = tmp_path / "output.sam"
+
+        args = [
+            str(non_existent_file),
+            "--out-file", str(out_file),
+            "--max-nh", "100",
+        ]
+        with pytest.raises(Exception):
             main(args)
