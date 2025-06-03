@@ -31,8 +31,10 @@ specified in `--max_nh`, the aligned read is removed.
     )
     parser.add_argument(
         "--max-nh",
-        help="Maximum value the NH tag can have for an alignment to be kept.\
-              Default: %(default)d.",
+        help=(
+            "Maximum value the NH tag can have for an alignment to be kept. "
+            "Default: %(default)d."
+        ),
         default=100,
         type=int,
     )
