@@ -1,52 +1,76 @@
 #!/usr/bin/env python
+"""Filter alignments in a SAM file by NH tag."""
 
-"""Filter alignments in a SAM file by NH tag.
+import argparse
+from pathlib import Path
 
-This script uses the pysam library to open the input SAM file and iterates
-over each alignment in it. If the NH tag is higher than the provided `max_NH`
-value, the aligned read is removed.
-
-Usage: filter_nh.py [SAM file] [max_NH] [OUTPUT file]
-"""
-
-import sys
 import pysam
 
-if sys.argv[1] in ["--help", "-h", "-help"]:
-    sys.exit(
-        "\nDescription: Checks for NH tag to remove reads that aligned "
-        "more than max_NH value.\nUsage: filter_nh.py [SAM file] [max_NH]"
-        "[OUTPUT file]\n"
+
+def parse_arguments():
+    """Parse command-line arguments."""
+    description = """Filter alignments in a SAM file by its NH tag.
+
+For each alignment, check its NH tag, and if the value is higher than the one
+specified in `--max_nh`, the aligned read is removed.
+"""
+    parser = argparse.ArgumentParser(
+        description=description,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-elif len(sys.argv) < 4 or len(sys.argv) > 4:
-    sys.exit("\n Arguments ERROR. See [nh_filter.py --help]\n")
-
-
-def main():
-    """Filter alignments by NH tag."""
-    sys.stdout.write(
-        f"Removing reads aligned more than {sys.argv[2]} times... \n"
+    parser.add_argument(
+        "samfile",
+        help="Path to the input SAM file. Required!",
+        type=Path,
     )
+    parser.add_argument(
+        "--out-file",
+        help="Path to the output SAM file. Required!",
+        type=Path,
+        required=True,
+    )
+    parser.add_argument(
+        "--max-nh",
+        help=(
+            "Maximum value the NH tag can have for an alignment to be kept. "
+            "Default: %(default)d."
+        ),
+        default=100,
+        type=int,
+    )
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version="%(prog)s 1.1.0",
+        help="Show program's version number and exit",
+    )
+    return parser
 
-    infile = pysam.Samfile(sys.argv[1], "r", check_sq=False)
-    out = pysam.Samfile(sys.argv[3], "w", template=infile)
 
-    keep = True
+def main(arguments) -> None:
+    """Filter alignments by its NH tag value."""
+    with (
+        pysam.AlignmentFile(arguments.samfile, "r", check_sq=False) as in_sam,
+        pysam.AlignmentFile(arguments.out_file, "w", template=in_sam) as o_sam,
+    ):
+        for alignment in in_sam:
+            try:
+                nh = alignment.get_tag("NH")
 
-    for DNAread in infile.fetch():
-        intags = DNAread.tags
+            except KeyError as keyerr:
+                raise KeyError(
+                    "Missing NH tag: Some alignments do not have the NH"
+                    " tag. Please, check that all entries have an"
+                    " associated NH tag"
+                ) from keyerr
 
-        for entry in intags:
-            if "NH" in entry and entry[1] > int(sys.argv[2]):
-                keep = False
-        if keep:
-            out.write(DNAread)
+            if nh > arguments.max_nh:
+                continue
 
-        keep = True
-
-    out.close()
-    sys.stdout.write("DONE!\n")
+            o_sam.write(alignment)
 
 
 if __name__ == "__main__":
-    main()
+    args = parse_arguments().parse_args()  # pragma: no cover
+    main(args)  # pragma: no cover
