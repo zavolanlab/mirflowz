@@ -578,7 +578,7 @@ rule filter_genome_by_nh:
         "(python {input.script} \
         {input.gmaps} \
         --max_nh {params.nh} \
-        --outfile {output.gmaps} \
+        --out_file {output.gmaps} \
         ) &> {log}"
 
 
@@ -606,7 +606,7 @@ rule filter_transcriptome_by_nh:
         "(python {input.script} \
         {input.tmaps} \
         --max_nh {params.nh} \
-        --outfile {output.tmaps} \
+        --out_file {output.tmaps} \
         ) &> {log}"
 
 
