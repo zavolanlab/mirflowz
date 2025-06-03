@@ -159,4 +159,3 @@ class TestMain:
         args = parse_arguments().parse_args()
         with pytest.raises(KeyError, match=r".* associated NH .*"):
             main(args)
-
