@@ -159,15 +159,21 @@ class TestMain:
         with pytest.raises(KeyError, match=r".* associated NH .*"):
             main(args)
 
-    def test_main_with_nonexistent_input_file(self, tmp_path):
+    def test_main_with_nonexistent_input_file(self, monkeypatch, tmp_path):
         """Test main with a non-existent input SAM file."""
         non_existent_file = tmp_path / "does_not_exist.sam"
-        out_file = tmp_path / "output.sam"
+        output = tmp_path / "output.sam"
 
-        args = [
-            str(non_existent_file),
-            "--out-file", str(out_file),
-            "--max-nh", "100",
-        ]
-        with pytest.raises(Exception):
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            [
+                "nh_filter",
+                str(non_existent_file),
+                "--out-file",
+                str(output),
+            ],
+        )
+        args = parse_arguments().parse_args()
+        with pytest.raises(FileNotFoundError, match=r".* No such file .*"):
             main(args)
