@@ -6,22 +6,22 @@
 
 Build new names for the intersecting features from a BED file and add them as a
 tag to alignments in a SAM file using the format
-FEATURE_ID|5p-shift|3p-shift|CIGAR|MD. If either the BED or the SAM file is
-empty, only the SAM file header is returned.
+FEATURE_ID|5p-shift|3p-shift|CIGAR|MD|READ_SEQ. If either the BED or the SAM
+file is empty, only the SAM file header is returned.
 
 EXPECTED INPUT FILES
-The BED file must be the output a bedtools intersect call with -a being a GFF3
-file and -b a BAM file. If the GFF3 used in the bedtools intersect call has the
-features start and end coordinates extended, the number of additional
+The BED file must be the output a bedtools intersect call with `-a` being a
+GFF3 file and `-b` a BAM file. If the GFF3 used in the bedtools intersect call
+has the features start and end coordinates extended, the number of additional
 nucleotides can be specified using the CLI option `--extension`. The SAM file
-must contian only the reads that have an intersecting feature.
+must contain only the reads that have an intersecting feature.
 
 NAME CREATION and TAG ADDITION
-For each alignment, the name of the the intersecting feature will follow the
-format FEATURE_ID|5p-shift|3p-shift|CIGAR|MD. The CLI option `--id` specifies
-the feature identifier to be used as FEATURE_ID from within the attributes
-column in the BED file. The 5p-shift and the 3-p shift values are the
-difference between the feature start and end coordinates and the alignment
+For each alignment, the name of the intersecting feature will follow the
+format FEATURE_ID|5p-shift|3p-shift|CIGAR|MD|READ_SEQ. The CLI option `--id`
+specifies the feature identifier to be used as FEATURE_ID from within the
+attributes column in the BED file. The 5p-shift and the 3-p shift values are
+the difference between the feature start and end coordinates and the alignment
 start and end coordinates. If `--extension` is provided, the feature start
 position are adjusted by adding the given value and subtracting it from the
 end position. If both, the 5p-shift and the 3p-shift, are within the range
@@ -98,7 +98,7 @@ def parse_arguments():
         "-v",
         "--version",
         action="version",
-        version="%(prog)s 1.0.0",
+        version="%(prog)s 1.1.0",
         help="Show program's version number and exit",
     )
     parser.add_argument(
@@ -227,12 +227,12 @@ def get_tags(
     Given an alignment and a list containing the feature name, start position,
     and end position, create a list of strings to be added as a new tag to that
     alignment. The string has the format:
-    feature-id|5p-shift|3p-shift|CIGAR|MD. The 5p-shift and 3p-shift are
-    calculated as a difference between the feature start/end position and the
-    alignment start/end position. If the start and end position of the
-    alignment differs at most by the extension argument value to the feature
-    start and end positions respectively, the name will be add to the final
-    list.
+        feature-id|5p-shift|3p-shift|CIGAR|MD|READ_SEQ
+    The 5p-shift and 3p-shift are calculated as a difference between the
+    feature start/end position and the alignment start/end position. If the
+    start and end position of the alignment differs at most by the extension
+    argument value to the feature start and end positions respectively,
+    the name will be add to the final list.
 
     Args:
         intersecting_mirna:
@@ -244,13 +244,13 @@ def get_tags(
             can differ from the feature to count it as an intersecting feature
 
     Returns:
-        tags:
-            set of strings containing the new tag
+        tags: set of strings containing the new tag
     """
     cigar = alignment.cigarstring
+    seq = alignment.query_sequence
     md = alignment.get_tag("MD")
-    limit = extension + 1
 
+    limit = extension + 1
     tags = []
 
     for miRNA_name, miRNA_start, miRNA_end in intersecting_mirna:
@@ -258,7 +258,9 @@ def get_tags(
         shift_3p = alignment.reference_end - miRNA_end
 
         if -limit < shift_5p < limit and -limit < shift_3p < limit:
-            tags.append(f"{miRNA_name}|{shift_5p}|{shift_3p}|{cigar}|{md}")
+            tags.append(
+                f"{miRNA_name}|{shift_5p}|{shift_3p}|{cigar}|{md}|{seq}"
+            )
 
     return set(tags)
 
