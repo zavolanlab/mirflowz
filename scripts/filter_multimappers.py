@@ -150,7 +150,7 @@ def count_indels(aln: pysam.libcalignedsegment.AlignedSegment) -> int:
 def find_best_alignments(
     alns: List[pysam.AlignedSegment], nh: bool = False
 ) -> List[pysam.AlignedSegment]:
-    """Find alignments with less indels.
+    """Find alignments with more indels.
 
     Using the function `count_indels` each alignment is assigned with its
     number of indels. Then, only those alignments with the higher amount of
