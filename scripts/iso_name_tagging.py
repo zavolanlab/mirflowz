@@ -4,78 +4,168 @@
 
 """Add intersecting feature(s) into a SAM file as a tag.
 
-Build new names for the intersecting features from a BED file and add them as a
-tag to alignments in a SAM file using the format
-FEATURE_ID|5p-shift|3p-shift|CIGAR|MD|READ_SEQ. If either the BED or the SAM
-file is empty, only the SAM file header is returned.
+Build new names for the intersecting features from an INTERSECT file and add
+them as a tag to alignments in a SAM file using the format
+FEATURE_ID|5p-shift|3p-shift|CIGAR|MD|READ_SEQ. If either the INTERSECT or the
+SAM file is empty, only the SAM file header is returned.
 
 EXPECTED INPUT FILES
-The BED file must be the output a bedtools intersect call with `-a` being a
-GFF3 file and `-b` a BAM file. If the GFF3 used in the bedtools intersect call
-has the features start and end coordinates extended, the number of additional
-nucleotides can be specified using the CLI option `--extension`. The SAM file
-must contain only the reads that have an intersecting feature.
+The INTERSECT file must be the output a bedtools intersect call with `-a` being
+a GFF3 file and `-b` a BAM file. If the GFF3 used in the bedtools intersect
+call has the features start and end coordinates extended, the number of
+additional nucleotides can be specified using the CLI option `--extension`.
+The SAM file must contain only the reads that have an intersecting feature.
 
 NAME CREATION and TAG ADDITION
 For each alignment, the name of the intersecting feature will follow the
 format FEATURE_ID|5p-shift|3p-shift|CIGAR|MD|READ_SEQ. The CLI option `--id`
 specifies the feature identifier to be used as FEATURE_ID from within the
-attributes column in the BED file. The 5p-shift and the 3-p shift values are
-the difference between the feature start and end coordinates and the alignment
-start and end coordinates. If `--extension` is provided, the feature start
-position are adjusted by adding the given value and subtracting it from the
-end position. If both, the 5p-shift and the 3p-shift, are within the range
+attributes column in the INTERSECT file. The 5p-shift and the 3-p shift values
+are the difference between the feature start and end coordinates and the
+alignment start and end coordinates. If `--extension` is provided, the feature
+start position are adjusted by adding the given value and subtracting it from
+the end position. If both, the 5p-shift and the 3p-shift, are within the range
 +/- extension + 1 the feature name is added to the alignment as the new tag
 "YW". Multiple intersecting feature names are separated by a semi-colon.
 
-EXAMPLES
-    Example 1
-    in BED record:
-        19	.	miRNA	44377	44398	.	+	.	ID=MIMAT0002849;Alias=MIMAT0002849;Name=hsa-miR-524-5p;Derives_from=MI0003160	19	44376	44398	13-1_1	1	+	22
-    in SAM record:
-        13-1_1	0	19	44377	1	11M3I11M	*	0	0	CTACAAAGGGAGGTAGCACTTTCTC	*	HI:i:0	MD:Z:22	NH:i:1	NM:i:3	RG:Z:A1	YZ:Z:0
-    command:
-        iso_name_tagging.py -b BED -s SAM
-    new name:
-        hsa-miR-524-5p|0|0|11M3I11M|22
-    out SAM record:
-        13-1_1	0	19	44377	1	11M3I11M	*	0	0	CTACAAAGGGAGGTAGCACTTTCTC	*	HI:i:0	MD:Z:22	NH:i:1	NM:i:3	RG:Z:A1	YZ:Z:0	YW:Z:hsa-miR-524-5p|0|0|11M3I11M|22
 
-    Example 2
-    in BED record:
-        19	.	miRNA	5338	5359	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	48-1_1	255	+	21
-    in SAM record:
-        48-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
-    command:
-        iso_name_tagging.py -b BED -s SAM
-    new name:
-        ""
-    out SAM record:
-        48-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0	YW:Z:
+Examples
+--------
+Example 1: Feature intersects alignment; coordinates adjustment and shift allowed
+    use case:
+        Prior to checking if the feature is intersecting the alignment, its
+        coordinates are adjusted by the value specified in `--extension`. In
+        addition, the same value is used to specify the +/- shift allowed
+        between the feature and the read alignment start and end coordinates.
 
-    Example 3
-    in BED record:
-        19	.	miRNA	5332	5365	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	48-1_1	255	+	21
-    in SAM record:
-        48-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
     command:
-        iso_name_tagging.py -b BED -s SAM --extension 6
-    new name:
-        hsa-miR-1323|0|-1|21M|21
-    out SAM record:
-        48-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0	YW:Z:hsa-miR-1323|0|-1|21M|21
+        iso_name_tagging.py -b INTERSECT -s SAM --extension 5
 
-    Example 4
-    in BED record:
-        19	.	miRNA	44377	44398	.	+	.	ID=MIMAT0002849;Alias=MIMAT0002849;Name=hsa-miR-524-5p;Derives_from=MI0003160	19	44376	44398	13-1_1	1	+	22
+    in INTERSECT record:
+        19	.	miRNA	5332	5365	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	read_1	255	+	21
+
     in SAM record:
-        13-1_1	0	19	44377	1	11M3I11M	*	0	0	CTACAAAGGGAGGTAGCACTTTCTC	*	HI:i:0	MD:Z:22	NH:i:1	NM:i:3	RG:Z:A1	YZ:Z:0
-    command:
-        iso_name_tagging.py -b BED -s SAM --id id
-    new name:
-        MIMAT0002849|0|0|11M3I11M|22
+        read_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
+
+    intersection before coordinates adjustment visualization:
+
+        ---|===============================|--- (feature)
+        ---------|===================|--------- (read)
+
+    intersection after coordinates adjustment visualization:
+
+        --------|=====================|-------- (feature)
+        ---------|===================|--------- (read)
+
     out SAM record:
-        13-1_1	0	19	44377	1	11M3I11M	*	0	0	CTACAAAGGGAGGTAGCACTTTCTC	*	HI:i:0	MD:Z:22	NH:i:1	NM:i:3	RG:Z:A1	YZ:Z:0	YW:Z:MIMAT0002849|0|0|11M3I11M|22
+        read_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0  YW:Z:hsa-miR-1323|1|-1|21M|21|TCAAAACTGAGGGGCATTTTC
+
+    description:
+        The feature start and end coordinates after the adjustment are 5337
+        and 5360 respectively.
+        The read alignment starts at position 5338. As the read has length 21,
+        its end position is 5359.
+        The feature intersects the read alignment with an overhang within the
+        specified shift range (+/- 5) so it is added as a new tag in the output
+        SAM record.
+
+
+Example 2: Feature intersects alignment; no coordinates adjustment or shift allowed
+    use case:
+        The feature and read alignment coordinates must perfectly match.
+
+    command:
+        iso_name_tagging.py -b INTERSECT -s SAM
+
+    in INTERSECT record:
+        19	.	miRNA	5338	5359	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	read_2	255	+	21
+
+    in SAM record:
+        read_2	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
+
+    intersection visualization:
+
+        ---------|===================|--------- (feature)
+        ---------|===================|--------- (read)
+
+    out SAM record:
+        read_2	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0  YW:Z:hsa-miR-1323|0|0|21M|21|TCAAAACTGAGGGGCATTTTC
+
+    description:
+        The feature start and end coordinates are 5338 and 5359 respectively.
+        The read alignment starts at position 5338. As the read has length 21,
+        its end position is 5359.
+        The feature perfectly intersects the read alignment so it is added as
+        a new tag in the output SAM record.
+
+
+Example 3: Non-intersecting feature; shift filter not passed
+    use case:
+        Prior to checking if the feature is intersecting the alignment, its
+        coordinates are adjusted by the value specified in `--extension`. In
+        addition, the same value is used to specify the +/- shift allowed
+        between the feature and the read alignment start and end coordinates.
+
+    command:
+        iso_name_tagging.py -b INTERSECT -s SAM --extension 1
+
+    in INTERSECT record:
+        19	.	miRNA	5332	5365	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	read_3	255	+	21
+
+    in SAM record:
+        read_3	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
+
+    intersection before coordinates adjustment visualization:
+
+        ---|===============================|--- (feature)
+        ---------|===================|--------- (read)
+
+    intersection after coordinates adjustment visualization:
+
+        ----|=============================|---- (feature)
+        ---------|===================|--------- (read)
+
+    out SAM record:
+        read_3	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0  YW:Z:
+
+    description:
+        The feature start and end coordinates after the adjustment are 5333
+        and 5364 respectively.
+        The read alignment starts at position 5338. As the read has length 21,
+        its end position is 5359.
+        There is a 5-nucleotide overhang on both ends. Thus, the feature is
+        not considered to intersect the read alignment and the tag is an empty
+        string.
+
+
+Example 4: Feature intersects alignment; using feature's "Alias"
+    use case:
+        The feature and read alignment coordinates must perfectly match.
+
+    command:
+        iso_name_tagging.py -b INTERSECT -s SAM --id alias
+
+    in INTERSECT record:
+        19	.	miRNA	5338	5359	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	read_4	255	+	21
+
+    in SAM record:
+        read_4	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
+
+    intersection visualization:
+
+        ---------|===================|--------- (feature)
+        ---------|===================|--------- (read)
+
+    out SAM record:
+        read_4	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0  YW:Z:MIMAT0005795|0|0|21M|21|TCAAAACTGAGGGGCATTTTC
+
+    description:
+        The feature start and end coordinates are 5338 and 5359 respectively.
+        The read alignment starts at position 5338. As the read has length 21,
+        its end position is 5359.
+        The feature perfectly intersects the read alignment so it is added as
+        a new tag in the output SAM record. In this case, instead of using the
+        feature `Name` (default), the `Alias` is used.
 """  # noqa: E501
 # pylint: enable=line-too-long
 
@@ -105,7 +195,7 @@ def parse_arguments():
         "-b",
         "--bed",
         help=(
-            "Path to the BED file. This file must be the output of "
+            "Path to the INTERSECT file. This file must be the output of "
             " a bedtools intersect call with -a being a GFF3 file and"
             " -b a BAM file."
         ),
@@ -143,7 +233,7 @@ def parse_arguments():
 
 
 def attributes_dictionary(attr: str) -> Dict[str, str]:
-    """Create attributes dicctionary."""
+    """Create attributes dictionary."""
     pairs = attr.split(";")
 
     if len(pairs[0].split("=")) == 2:
@@ -161,17 +251,17 @@ def parse_intersect_output(
 ) -> Optional[Dict[Optional[str], list]]:
     """Parse intersect BED file.
 
-    Given a BED file generated by intersecting a GFF file (-a) with a BAM file
-    (-b) using bedtools intersect, create a dictionary where the alignment
-    names are the keys. The values are lists containing the feature name,
-    start position, and end position. The id argument specifies the feature
-    name to use, and the extension argument adjusts the feature coordinates by
-    adding the given value and subtracts it from the end position. If the BED
-    file is empty, `None` is returned.
+    Given an INTERSECT file generated by intersecting a GFF file (-a) with a
+    BAM file (-b) using bedtools intersect, create a dictionary where the
+    alignment names are the keys. The values are lists containing the feature
+    name, start position, and end position. The id argument specifies the
+    feature name to use, and the extension argument adjusts the feature
+    coordinates by adding the given value and subtracts it from the end
+    position. If the INTERSECT file is empty, `None` is returned.
 
     Args:
         intersect_file:
-            Path to the intersect BED file.
+            Path to the INTERSECT file.
         id:
             ID used to identify the feature. Defaults to "name".
         extension:
