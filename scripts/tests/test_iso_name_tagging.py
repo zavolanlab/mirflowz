@@ -20,7 +20,7 @@ def empty_files():
 
 @pytest.fixture
 def intersect_sam():
-    """Import path to BED and SAM files."""
+    """Import path to INTERSECT and SAM files."""
     intersect_file = Path("files/in_intersection_mirna.bed")
     sam_file = Path("files/in_alignments_mirna.sam")
     output_file = Path("files/mirna_tag.sam")
@@ -30,7 +30,7 @@ def intersect_sam():
 
 @pytest.fixture
 def intersect_sam_extension():
-    """Import path to BED and SAM files with miRNA extension."""
+    """Import path to INTERSECT and SAM files with miRNA extension."""
     intersect_file = Path("files/in_intersection_extended_mirna.bed")
     sam_file = Path("files/in_alignments_mirna.sam")
     output_file = Path("files/mirna_tag_extension.sam")
@@ -40,7 +40,7 @@ def intersect_sam_extension():
 
 @pytest.fixture
 def intersect_sam_id():
-    """Import path to BED and SAM files with miRNA IDs in the output."""
+    """Import path to INTERSECT and SAM files with miRNA IDs in the output."""
     intersect_file = Path("files/in_intersection_mirna.bed")
     sam_file = Path("files/in_alignments_mirna.sam")
     output_file = Path("files/mirna_tag_id.sam")
