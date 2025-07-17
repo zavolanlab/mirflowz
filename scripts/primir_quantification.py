@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 
-"""Tabulate bedtools intersect output BED file.
+"""Tabulate bedtools intersect output file.
 
-Read the input BED file, calculate the sum of the intersecting contributions
-for each feature and print the result in tab-delimited format. The name of the
-feature is determined by the value of the --id argument, which must match one
-of the fields in the attributes column of the original GFF/GTF file used in
-the bedtools intersect command. The appropriate contribution is based on the
---collapsed and the --nh flags. If --collapsed and --nh are set, the
-contribution of each alignment is computed as # of reads/NH. If only
+Read the input INTERSECT file, calculate the sum of the intersecting
+contributions for each feature and print the result in tab-delimited format.
+The name of the feature is determined by the value of the --id argument, which
+must match one of the fields in the attributes column of the original GFF/GTF
+file used in the bedtools intersect command. The appropriate contribution is
+based on the --collapsed and the --nh flags. If --collapsed and --nh are set,
+the contribution of each alignment is computed as # of reads/NH. If only
 --collapsed is set, the contribution is # of reads/1. If only --nh is set,
-the contribution is 1/NH. Otherwise, the contribution is 1. If the BED file is
-empty, no output is produced. The output columns are also determined by the
-flags --read-ids and --feat-extension. If --read-ids is set, a
+the contribution is 1/NH. Otherwise, the contribution is 1. If the INTERSECT
+file is empty, no output is produced. The output columns are also determined by
+the flags --read-ids and --feat-extension. If --read-ids is set, a
 semicolon-separated list of all alignment IDs that overlap with the feature
 will always be in the last column. If --feat-extension is set, two additional
 columns will be added to the output, containing the 5' and 3' end shifts of the
@@ -39,9 +39,9 @@ def parse_arguments():
         help="Show program's version number and exit",
     )
     parser.add_argument(
-        "bedfile",
+        "intersect",
         help=(
-            "Path to the BED file. This file must be the output of "
+            "Path to the INTERSECT file. This file must be the output of "
             "a bedtools intersect call with -a being a BED file and"
             "-b a BAM file."
         ),
@@ -166,8 +166,8 @@ def get_initial_data(name: str, feat_extension: bool) -> list[str]:
 
 
 def main(arguments) -> None:
-    """Tabulate a bedtools intersect BED file."""
-    with open(arguments.bedfile, "r", encoding="utf-8") as bedfile:
+    """Tabulate a bedtools intersect file."""
+    with open(arguments.intersect, "r", encoding="utf-8") as inter_file:
         Fields = namedtuple(
             "Fields",
             (
@@ -192,7 +192,7 @@ def main(arguments) -> None:
         current_name = None
         read_ID = []
 
-        for line in bedfile:
+        for line in inter_file:
             fields = Fields(*line.strip().split("\t"))
 
             name = attributes_dictionary(fields.feat_attributes)[arguments.id]
