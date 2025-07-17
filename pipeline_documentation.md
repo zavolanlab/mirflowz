@@ -93,7 +93,7 @@ on installation and usage please see [here](README.md).
 
 | Name | License | Tag line | More info |
 | --- | --- | --- | --- |
-| **ASCII-style alignment pileups** | [Apache 2.0][license-apache2] | _"Generates ASCII-style pileups of read alignments in one or more BAM files for one or more genomic regions."_ | [code][code-ascii] | 
+| **ASCII-style alignment pileups** | [Apache 2.0][license-apache2] | _"Generates ASCII-style pileups of read alignments in one or more BAM files for one or more genomic regions."_ | [code][code-ascii] |
 | **BEDTools** | [GPLv2][license-gpl2] | _"[...] intersect, merge, count, complement, and shuffle genomic intervals from multiple files in widely-used genomic file formats such as BAM, BED, GFF/GTF, VCF"_ | [code][code-bedtools] / [manual][docs-bedtools] / [publication][pub-bedtools] |
 | **cufflinks** | [BSL-1.0][license-bsl1] | _"[...] assembles transcripts, estimates their abundances, and tests for differential expression and regulation in RNA-Seq samples"_ | [code][code-cufflinks] / [manual][docs-cufflinks] / [publication][pub-cufflinks] |
 | **cutadapt** | [MIT][license-mit] | _"[...] finds and removes adapter sequences, primers, poly-A tails and other types of unwanted sequence from your high-throughput sequencing reads"_ | [code][code-cutadapt] / [manual][docs-cutadapt] / [publication][pub-cutadapt] |
@@ -129,12 +129,12 @@ Visual representation of the workflow. Automatically prepared with
 ##### Requirements
 
 - Tab-separated values (`.tsv`) file
-- First row has to contain parameter names as in 
-[`samples_table.tsv`](test/test_files/samples_table.tsv) 
+- First row has to contain parameter names as in
+[`samples_table.tsv`](test/test_files/samples_table.tsv)
 - First column used as sample identifiers
 
 Parameter name | Description | Data type(s)
- --- | --- | --- 
+ --- | --- | ---
 sample | Arbitrary name for the miRNA sequence library. | `str`
 sample_file | Path to the `gzip`ped miRNA sequencing library file. The path must be relative to the directory where the workflow will be run. | `str`
 adapter | Sequence of the 3'-end adapter used during library preparation. Required for [Cutadapt](#third-party-software-used). Use a value such as `XXXXXXXXXX` if no adapter is present or if no trimming is desired. | `str`
@@ -217,7 +217,7 @@ Trim genome sequence IDs with a [**custom script**][custom-script-trim-id].
 
 #### `extract_transcriptome_seqs`
 
-Create transcriptome from genomic sequence and annotations with 
+Create transcriptome from genomic sequence and annotations with
 [**cufflinks**](#third-party-software-used).
 
 - **Input**
@@ -225,7 +225,7 @@ Create transcriptome from genomic sequence and annotations with
   - Genome sequence, trimmed IDs (`.fa`); from
   [**trim_genome_seq_ids**](#trim_genome_seq_ids)
 - **Output**
-  - Transcriptome sequence (`.fa`); used in 
+  - Transcriptome sequence (`.fa`); used in
   [**trim_transcriptome_seq_ids**](#trim_transcriptome_seq_ids)
 
 
@@ -256,7 +256,7 @@ short read aligner.
   - Transcriptome sequence, trimmed IDs (`.fa`); from
   [**trim_transcriptome_seq_ids**](#trim_transcriptome_seq_ids)
 - **Output**
-  - segemehl transcriptome index (`.idx`); used in 
+  - segemehl transcriptome index (`.idx`); used in
   [**mapping_transcriptome_segemehl**](#mapping_transcriptome_segemehl)
 
 
@@ -272,7 +272,7 @@ short read aligner.
   - Genome sequence, trimmed IDs (`.fa`); from
   [**trim_genome_seq_ids**](#trim_genome_seq_ids)
 - **Output**
-  - segemehl genome index (`.idx`); used in 
+  - segemehl genome index (`.idx`); used in
   [**mapping_genome_segemehl**](#mapping_genome_segemehl)
 
 
@@ -284,7 +284,7 @@ Retrieve exon annotations from genome annotations with a
 - **Input**
   - (**Workflow input**) Genome annotations, `gzip`ed (`.gtf.gz`)
 - **Output**
-  - Exon annotations (`.gtf`); used in 
+  - Exon annotations (`.gtf`); used in
   [**convert_exons_gtf_to_bed**](#convert_exons_gtf_to_bed)
 
 
@@ -302,7 +302,7 @@ Convert exon annotations `.gtf` to `.bed` with a
 
 #### `create_genome_header`
 
-Create SAM header for the genome with 
+Create SAM header for the genome with
 [**SAMtools**](#third-party-software-used).
 
 > Required by [SAMtools](#third-party-software-used) to work with the
@@ -328,7 +328,7 @@ with a [**custom script**][custom-script-map-chr].
   - (**Workflow input**) miRNA annotations (`.gff3`)
   - (**Workflow input**) Tab-separated chromosome name mappings table (`.tsv`)
 - **Output**
-  - miRNA annotations, mapped chromosome name(s) (`.gff3`); used in 
+  - miRNA annotations, mapped chromosome name(s) (`.gff3`); used in
   [**create_per_library_ascii_pileups**](#create_per_library_ascii_pileups),
   [**create_per_run_ascii_pileups**](#create_per_run_ascii_pileups) and/or
   [**create_per_condition_ascii_pileups**](#create_per_condition_ascii_pileups)
@@ -336,7 +336,7 @@ with a [**custom script**][custom-script-map-chr].
 
 #### `create_index_genome_fasta`
 
-Create a FASTA index for the genome with 
+Create a FASTA index for the genome with
 [**SAMtools**](#third-party-software-used).
 
 - **Input**
@@ -370,7 +370,7 @@ by feature with a [**custom script**][custom-script-mir-ext].
 
 > Adjust miRNAs' 'Name' attribute to account for the different genomic
 > locations the miRNA sequence is annotated on and ensure their uniqueness.
-> The name format is `SPECIES-mir-NAME-#` for pri-miRs, and 
+> The name format is `SPECIES-mir-NAME-#` for pri-miRs, and
 > `SPECIES-miR-NAME-#-ARM` or `SPECIES-miR-NAME-#` for mature miRNA with both
 > or just one arm respectively, where `#` is the replica integer. If a pri-miR
 > has a replica but its number is set in the 'ID' attribute, the first instance
@@ -534,7 +534,7 @@ Copy and rename read files.
   (`.fa.gz`/`.fasta.gz` or `.fq.gz`/`.fastq.gz`)
 - **Output**
   - miRNA sequencing library, copied, renamed (`.fa`, `.fastq`); used in
-  [**fastq_quality_filter**](#fastq_quality_filter) and/or 
+  [**fastq_quality_filter**](#fastq_quality_filter) and/or
   [**format_fasta**](#format_fasta)
 
 
@@ -558,7 +558,7 @@ Conduct quality control for reads library with
 
 #### `fastq_to_fasta`
 
-Convert reads file from FASTQ to FASTA with 
+Convert reads file from FASTQ to FASTA with
 [**fastx_toolkit**](#third-party-software-used).
 
 > Sequence identifiers are renamed to numbers.
@@ -576,7 +576,7 @@ Format read's sequences to appear on a single line with
 [**fastx_toolkit**](#third-party-software-used).
 
 - **Input**
-  - miRNA sequencing library (`.fa`); from [**start**](#start) or 
+  - miRNA sequencing library (`.fa`); from [**start**](#start) or
   [**fastq_to_fasta**](#fastq_to_fasta)
 - **Output**
   - miRNA sequencing library, formatted (`.fasta`); used in
@@ -604,7 +604,7 @@ and number of inner `N` bases with [**cutadapt**](#third-party-software-used).
     - `max_n`: Maximum number of inner `N` bases for a processed read to be
     kept (default: 0)
 - **Output**
-  - miRNA sequencing library, filtered, without adapters (`.fasta`); used in 
+  - miRNA sequencing library, filtered, without adapters (`.fasta`); used in
   [**collapse_identical_reads**](#collapse_identical_reads)
 
 
@@ -614,11 +614,11 @@ Collapse and rename identical reads
 [**fastx_toolkit**](#third-party-software-used).
 
 > Sequences are renamed in the format `R-N`, where `R` is the assigned number
-> to the unique entry, and `N` is the amount of identical sequences within the 
+> to the unique entry, and `N` is the amount of identical sequences within the
 > library collapsed in it.
 
 - **Input**
-  - miRNA sequencing library, filtered, without adapters (`.fasta`); from 
+  - miRNA sequencing library, filtered, without adapters (`.fasta`); from
   [**remove_adapters**](#remove_adapters)
 - **Output**
   - miRNA sequencing library, collapsed, renamed (`.fasta`); used in
@@ -629,13 +629,13 @@ Collapse and rename identical reads
 
 #### `map_genome_segemehl`
 
-Align short reads to reference genome with 
+Align short reads to reference genome with
 [**segemehl**](#third-party-software-used).
 
 - **Input**
   - miRNA sequencing library, collapsed, renamed (`.fasta`); from
   [**collapse_identical_reads**](#collapse_identical_reads)
-  - Genome sequence, trimmed IDs (`.fa`); from 
+  - Genome sequence, trimmed IDs (`.fa`); from
   [**trim_genome_seq_ids**](#trim_genome_seq_ids)
   - segemehl genome index (`.idx`); from
   [**generate_segemehl_index_genome**](#generate_segemehl_index_genome)
@@ -646,13 +646,13 @@ Align short reads to reference genome with
 
 #### `map_transcriptome_segemehl`
 
-Align short reads to reference transcriptome with 
+Align short reads to reference transcriptome with
 [**segemehl**](#third-party-software-used).
 
 - **Input**
   - miRNA sequencing library, collapsed, renamed (`.fasta`); from
   [**collapse_identical_reads**](#collapse_identical_reads)
-  - Transcriptome sequence, trimmed IDs (`.fa`); from 
+  - Transcriptome sequence, trimmed IDs (`.fa`); from
   [**trim_transcriptome_seq_ids**](#trim_transcriptome_seq_ids)
   - segemehl transcriptome index (`.idx`); from
   [**generate_segemehl_index_transcriptome**](#generate_segemehl_index_transcriptome)
@@ -677,7 +677,7 @@ Filter reads by length with a [**custom script**][custom-script-validation].
     - `max_length_reads`: Maximum length of processed reads to be mapped with
     [**oligomap**](#third-party-software-used) (default: 30)
 - **Output**
-  - miRNA sequencing library, collapsed, filtered (`.fasta`); used in 
+  - miRNA sequencing library, collapsed, filtered (`.fasta`); used in
   [**map_genome_oligomap**](#map_genome_oligomap) and
   [**map_transcriptome_oligomap**](#map_transcriptome_oligomap)
 
@@ -693,7 +693,7 @@ Align short reads to reference genome with
 - **Input**
   - miRNA sequencing library, collapsed, filtered (`.fasta`); from
   [**filter_fasta_for_oligomap**](#filter_fasta_for_oligomap)
-  - Genome sequence, trimmed IDs (`.fa`); from 
+  - Genome sequence, trimmed IDs (`.fa`); from
   [**trim_genome_seq_ids**](#trim_genome_seq_ids)
 - **Output**
   - Alignments file (`.oligomap`); used in
@@ -747,7 +747,7 @@ Align short reads to reference transcriptome with
 - **Input**
   - miRNA sequencing library, collapsed, filtered (`.fasta`); from
   [**filter_fasta_for_oligomap**](#filter_fasta_for_oligomap)
-  - Transcriptome sequence, trimmed IDs (`.fa`); from 
+  - Transcriptome sequence, trimmed IDs (`.fa`); from
   [**trim_transcriptome_seq_ids**](#trim_transcriptome_seq_ids)
 - **Output**
   - Alignments file (`.oligomap`); used in
@@ -886,7 +886,7 @@ Remove the SAM header of the transcriptome alignments file with
   - Alignments file (`.sam`); from
   [**filter_transcriptome_by_nh**](#filter_transcriptome_by_nh)
 - **Output**
-  - Alignments file, without SAM header (`.sam`); used in 
+  - Alignments file, without SAM header (`.sam`); used in
   [**transcriptome_to_genome_maps**](#transcriptome_to_genome_maps)
 
 
@@ -896,7 +896,7 @@ Convert the alignments' transcriptome coordinates to genomic ones with a
 [**custom script**][custom-script-sam-trx].
 
 - **Input**
-  - Alignments file, without SAM header (`.sam`); from 
+  - Alignments file, without SAM header (`.sam`); from
   [**remove_header_transcriptome_mappings**](#remove_header_transcriptome_mappings)
   - Exon annotations (`.bed`); from
   [**convert_exons_gtf_to_bed**](#convert_exons_gtf_to_bed)
@@ -948,7 +948,7 @@ Remove duplicate and inferior alignments with a
 [**custom script**][custom-script-remove-dup].
 
 > Alignments are considered to be duplicates if having identical entries for
-> the fields `QNAME`, `FLAG`, `RNAME`, `POS` and `CIGAR`. 
+> the fields `QNAME`, `FLAG`, `RNAME`, `POS` and `CIGAR`.
 > Alignments are considered to be inferiors if having the same `QNAME` and
 > a bigger edit distance than the smaller one within the group. The tags `NH`
 > (number of hits) and `HI` (query hit index) are updated accordingly.
@@ -1159,7 +1159,7 @@ Remove alignments that do not intersect with any pri-miR with
 
 - **Input**
   - Alignments file, filtered (`.sam`); from
-  [**filter_by_indels**](#filter_by_indels) 
+  [**filter_by_indels**](#filter_by_indels)
   - pri-miR intersections file (`.bed`); from
   [**intersect_extended_primir**](#intersect_extended_primir)
 - **Output**
@@ -1243,11 +1243,11 @@ Remove alignments that do not intersect with any miRNA with
 
 - **Input**
   - Alignments file, filtered (`.sam`); from
-  [**filter_sam_by_intersecting_primir**](#filter_sam_by_intersecting_primir) 
+  [**filter_sam_by_intersecting_primir**](#filter_sam_by_intersecting_primir)
   - Mature miRNA intersections file (`.bed`); from
   [**intersect_extended_mirna**](#intersect_extended_mirna)
 - **Output**
-  - (**Workflow output**) Alignments file, filtered (`.sam`); used in 
+  - (**Workflow output**) Alignments file, filtered (`.sam`); used in
   [**add_intersecting_mirna_tag**](#add_intersecting_mirna_tag) and
   [**uncollapse_reads**](#uncollapse_reads)
 
@@ -1260,9 +1260,9 @@ with a [**custom script**][custom-script-iso-tag].
 > In this step, the mature miRNA annotated regions are used instead of the
 > extended ones. Each alignment gets an extra tag (`YW:Z`) with the (iso)miR(s)
 > it is considered to really intersect with using the format:
-> `miRNA_name|5p-shift|3p-shift|CIGAR|MD`, where `5p-shift` and `3p-shift` are
-> the difference between the miRNA start and end coordinates and the
-> alignment's ones respectively.
+> `miRNA_name|5p-shift|3p-shift|CIGAR|MD|READ_SEQ`, where `5p-shift` and
+> `3p-shift` are the difference between the miRNA start and end coordinates
+> and the alignment's ones respectively.
 
 - **Input**
   - Alignments file, filtered (`.sam`); from
@@ -1279,45 +1279,143 @@ with a [**custom script**][custom-script-iso-tag].
 - **Examples**
 
 ```console
-Example 1 | Intersecting a canoncial mature miRNA
+Example 1 | Feature intersects alignment | coordinates adjustment and shift allowed
+    use case:
+        Prior to checking if the feature is intersecting the alignment, its
+        coordinates are adjusted by the value specified in `--extension`. In
+        addition, the same value is used to specify the +/- shift allowed
+        between the feature and the read alignment start and end coordinates.
 
-IN miRNA annotations:
-    chr19	.	miRNA	44377	44398	.	+	.	ID=MIMAT0002849;Alias=MIMAT0002849;Name=hsa-miR-524-5p;Derives_from=MI0003160
-IN SAM record:
-    1-1_1	0	19	44377	255	22M	*	0	0	CTACAAAGGGAAGCACTTTCTC	*	MD:Z:22	NH:i:1	NM:i:0
-NEW TAG:
-	YW:Z:hsa-miR-524-5p|0|0|22M|22
+    command:
+        iso_name_tagging.py -b INTERSECT -s SAM --extension 5
+
+    in INTERSECT record:
+        19	.	miRNA	5332	5365	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	read_1	255	+	21
+
+    in SAM record:
+        read_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
+
+    intersection before coordinates adjustment visualization:
+
+        ---|===============================|--- (feature)
+        ---------|===================|--------- (read)
+
+    intersection after coordinates adjustment visualization:
+
+        --------|=====================|-------- (feature)
+        ---------|===================|--------- (read)
+
+    out SAM record:
+        read_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0  YW:Z:hsa-miR-1323|1|-1|21M|21|TCAAAACTGAGGGGCATTTTC
+
+    description:
+        The feature start and end coordinates after the adjustment are 5337
+        and 5360 respectively.
+        The read alignment starts at position 5338. As the read has length 21,
+        its end position is 5359.
+        The feature intersects the read alignment with an overhang within the
+        specified shift range (+/- 5) so it is added as a new tag in the output
+        SAM record.
 
 
-Example 2 | Intersecting an isomiR (no shifts)
+Example 2 | Feature intersects alignment | no coordinates adjustment or shift allowed
+    use case:
+        The feature and read alignment coordinates must perfectly match.
 
-IN miRNA annotations:
-    chr19	.	miRNA	44377	44398	.	+	.	ID=MIMAT0002849;Alias=MIMAT0002849;Name=hsa-miR-524-5p;Derives_from=MI0003160
-IN SAM record:
-    1-1_1	0	19	44377	1	11M3I11M	*	0	0	CTACAAAGGGAGGTAGCACTTTCTC	*	HI:i:0	MD:Z:22	NH:i:1	NM:i:3
-NEW TAG:
-    YW:Z:hsa-miR-524-5p|0|0|11M3I11M|22
+    command:
+        iso_name_tagging.py -b INTERSECT -s SAM
+
+    in INTERSECT record:
+        19	.	miRNA	5338	5359	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	read_2	255	+	21
+
+    in SAM record:
+        read_2	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
+
+    intersection visualization:
+
+        ---------|===================|--------- (feature)
+        ---------|===================|--------- (read)
+
+    out SAM record:
+        read_2	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0  YW:Z:hsa-miR-1323|0|0|21M|21|TCAAAACTGAGGGGCATTTTC
+
+    description:
+        The feature start and end coordinates are 5338 and 5359 respectively.
+        The read alignment starts at position 5338. As the read has length 21,
+        its end position is 5359.
+        The feature perfectly intersects the read alignment so it is added as
+        a new tag in the output SAM record.
 
 
-Example 3 | Intersecting an isomiR (no InDels nor mismatches)
+Example 3 | Non-intersecting feature | shift filter not passed
+    use case:
+        Prior to checking if the feature is intersecting the alignment, its
+        coordinates are adjusted by the value specified in `--extension`. In
+        addition, the same value is used to specify the +/- shift allowed
+        between the feature and the read alignment start and end coordinates.
 
-IN miRNA annotations:
-    chr19	.	miRNA	5338	5359	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786
-IN SAM record:
-    1-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
-NEW TAG:
-    YW:Z:hsa-miR-1323|0|-1|21M|21
+    command:
+        iso_name_tagging.py -b INTERSECT -s SAM --extension 1
+
+    in INTERSECT record:
+        19	.	miRNA	5332	5365	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	read_3	255	+	21
+
+    in SAM record:
+        read_3	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
+
+    intersection before coordinates adjustment visualization:
+
+        ---|===============================|--- (feature)
+        ---------|===================|--------- (read)
+
+    intersection after coordinates adjustment visualization:
+
+        ----|=============================|---- (feature)
+        ---------|===================|--------- (read)
+
+    out SAM record:
+        read_3	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0  YW:Z:
+
+    description:
+        The feature start and end coordinates after the adjustment are 5333
+        and 5364 respectively.
+        The read alignment starts at position 5338. As the read has length 21,
+        its end position is 5359.
+        There is a 5-nucleotide overhang on both ends. Thus, the feature is
+        not considered to intersect the read alignment and the tag is an empty
+        string.
 
 
-Example 4 | Not intersecting an (iso)miR
+Example 4 | Feature intersects alignment | using feature's "Alias"
+    use case:
+        The feature and read alignment coordinates must perfectly match.
 
-IN miRNA annotations:
-    chr19	.	miRNA	5338	5359	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786
-IN SAM record:
-    1-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
-NEW TAG:
-    YW:Z:
+    command:
+        iso_name_tagging.py -b INTERSECT -s SAM --id alias
+
+    in INTERSECT record:
+        19	.	miRNA	5338	5359	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	read_4	255	+	21
+
+    in SAM record:
+        read_4	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
+
+    intersection visualization:
+
+        ---------|===================|--------- (feature)
+        ---------|===================|--------- (read)
+
+    out SAM record:
+        read_4	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0  YW:Z:MIMAT0005795|0|0|21M|21|TCAAAACTGAGGGGCATTTTC
+
+    description:
+        The feature start and end coordinates are 5338 and 5359 respectively.
+        The read alignment starts at position 5338. As the read has length 21,
+        its end position is 5359.
+        The feature perfectly intersects the read alignment so it is added as
+        a new tag in the output SAM record. In this case, instead of using the
+        feature `Name` (default), the `Alias` is used.
 ```
+
 
 #### `sort_intersecting_mirna_by_feat_tag`
 
@@ -1351,7 +1449,7 @@ Tabulate alignments according to its new tag (`YW:Z`) with a
 > between its start and end positions and the aligned read ones, and there
 > are no mismatches nor InDels.
 
-- **Input** 
+- **Input**
   - Alignments file, tagged, sorted (`.sam`); from
   [**sort_intersecting_mirna_by_feat_tag**](#sort_intersecting_mirna_by_feat_tag)
 - **Parameters**
@@ -1369,8 +1467,8 @@ Tabulate alignments according to its new tag (`YW:Z`) with a
 Example 1 | Canonical miRNA and isomiR
 
 IN SAM record:
-    10-4_2	0	19	34627	255	21M	*	0	0	AAAGTGCTTCCTTTTAGAGGG	*	MD:Z:21	NM:i:0	NH:i:2	HI:i:1	YW:Z:hsa-miR-520b-3p|0|0|21M|21
-    10-4_2	0	19	40866	255	21M	*	0	0	AAAGTGCTTCCTTTTAGAGGG	*	MD:Z:21	NM:i:0	NH:i:2	HI:i:2	YW:Z:hsa-miR-520c-3p|0|-1|21M|21
+    10-4_2	0	19	34627	255	21M	*	0	0	AAAGTGCTTCCTTTTAGAGGG	*	MD:Z:21	NM:i:0	NH:i:2	HI:i:1	YW:Z:hsa-miR-520b-3p|0|0|21M|21|AAAGTGCTTCCTTTTAGAGGG
+    10-4_2	0	19	40866	255	21M	*	0	0	AAAGTGCTTCCTTTTAGAGGG	*	MD:Z:21	NM:i:0	NH:i:2	HI:i:2	YW:Z:hsa-miR-520c-3p|0|-1|21M|21|AAAGTGCTTCCTTTTAGAGGG
 
 Data:
     Alignment:
@@ -1380,28 +1478,28 @@ Data:
         Contribution: 4/2 = 2
 
     miRNA species:
-        Tag name: hsa-miR-520b-3p|0|0|21M|21
+        Tag name: hsa-miR-520b-3p|0|0|21M|21|AAAGTGCTTCCTTTTAGAGGG
         Type: Canonical
         Table name: hsa-miR-520b-3p
         Total count: 2
 
-        Tag name: hsa-miR-520c-3p|0|-1|21M|21
+        Tag name: hsa-miR-520c-3p|0|-1|21M|21|AAAGTGCTTCCTTTTAGAGGG
         Type: isomiR
-        Table name: hsa-miR-520c-3p|0|-1|21M|21
+        Table name: hsa-miR-520c-3p|0|-1|21M|21|AAAGTGCTTCCTTTTAGAGGG
         Total count: 2
 
 OUT table:
-    ID	                        lib_name
-    hsa-miR-520b-3p         	2
-    hsa-miR-520c-3p|0|-1|21M|21	2
+    ID	                                                lib_name
+    hsa-miR-520b-3p         	                        2
+    hsa-miR-520c-3p|0|-1|21M|21|AAAGTGCTTCCTTTTAGAGGG	2
 
 
 Example 2 | Different isomiRs
 
 IN SAM record:
-    599-1_3	0	19	27804	255	20M	*	0	0	AAAGTGCTTCCTTTTAGAGG	*	MD:Z:20	NM:i:0	NH:i:3	HI:i:1	YW:Z:hsa-miR-526b-3p|1|-1|20M|20
-    599-1_3	0	19	34627	255	20M	*	0	0	AAAGTGCTTCCTTTTAGAGG	*	MD:Z:20	NM:i:0	NH:i:3	HI:i:2	YW:Z:hsa-miR-520b-3p|0|-1|20M|20
-    599-1_3	0	19	40866	255	20M	*	0	0	AAAGTGCTTCCTTTTAGAGG	*	MD:Z:20	NM:i:0	NH:i:3	HI:i:3	YW:Z:hsa-miR-520c-3p|0|-2|20M|20
+    599-1_3	0	19	27804	255	20M	*	0	0	AAAGTGCTTCCTTTTAGAGG	*	MD:Z:20	NM:i:0	NH:i:3	HI:i:1	YW:Z:hsa-miR-526b-3p|1|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
+    599-1_3	0	19	34627	255	20M	*	0	0	AAAGTGCTTCCTTTTAGAGG	*	MD:Z:20	NM:i:0	NH:i:3	HI:i:2	YW:Z:hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
+    599-1_3	0	19	40866	255	20M	*	0	0	AAAGTGCTTCCTTTTAGAGG	*	MD:Z:20	NM:i:0	NH:i:3	HI:i:3	YW:Z:hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG
 
 Data:
     Alignment:
@@ -1411,26 +1509,26 @@ Data:
         Contribution: 1/3 = 0.33
 
     miRNA species:
-        Tag name: hsa-miR-526b-3p|1|-1|20M|20
+        Tag name: hsa-miR-526b-3p|1|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
         Type: isomiR
-        Table name: hsa-miR-526b-3p|1|-1|20M|20
+        Table name: hsa-miR-526b-3p|1|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
         Total count: 0.33
 
-        Tag name: hsa-miR-520b-3p|0|-1|20M|20 
+        Tag name: hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
         Type: isomiR
-        Table name: hsa-miR-520b-3p|0|-1|20M|20
+        Table name: hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
         Total count: 0.33
 
-        Tag name: hsa-miR-520c-3p|0|-2|20M|20
+        Tag name: hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG
         Type: isomiR
-        Table name: hsa-miR-520c-3p|0|-2|20M|20 
+        Table name: hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG
         Total count: 0.33
-                      
-OUT table:            
-    ID	                        lib_name
-    hsa-miR-520b-3p|0|-1|20M|20	0.33
-    hsa-miR-520c-3p|0|-2|20M|20	0.33
-    hsa-miR-526b-3p|1|-1|20M|20	0.33
+
+OUT table:
+    ID	                                                lib_name
+    hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG 	0.33
+    hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG 	0.33
+    hsa-miR-526b-3p|1|-1|20M|20|AAAGTGCTTCCTTTTAGAGG 	0.33
 ```
 
 
@@ -1484,7 +1582,7 @@ Alignments:
     Number of mapped genomic loci: 4
     Contribution: 1/4 = 0.25
 
-OUT table:            
+OUT table:
     ID	                lib_name
     hsa-mir-526b_-0_+0	2.723
 
@@ -1501,7 +1599,7 @@ Alignment:
     Number of mapped genomic loci: 2
     Contribution: 4/2 = 2
 
-OUT table:            
+OUT table:
     ID	                lib_name
     hsa-mir-520c_-0_+0	2
     hsa-mir-520b_-5_+6	2
@@ -1532,9 +1630,9 @@ Merge all the tables from the different libraries into a single one with a
 ```console
 IN library 1
     ID                              lib_1
-    hsa-miR-524-5p          	    1	 
-    hsa-miR-524-5p|0|0|22M|9G12	    1    
-    hsa-miR-524-5p|0|0|22M|9G9C2	1    
+    hsa-miR-524-5p          	    1
+    hsa-miR-524-5p|0|0|22M|9G12	    1
+    hsa-miR-524-5p|0|0|22M|9G9C2	1
 
 IN library 2
     ID                              lib_2
@@ -1649,7 +1747,7 @@ Create an empty BED file if the user has not provided one.
 #### `compress_reference_genome`
 
 Compress the processed genome with trimmed IDs using `bgzip` with
-[**SAMtools**](#third-party-software-used). 
+[**SAMtools**](#third-party-software-used).
 
 > Required to perform the ASCII-style alignment pileups.
 
@@ -1690,7 +1788,7 @@ libraries with [**ASCII-style alignment pileups**](#third-party-software-used).
 #### `create_per_run_ascii_pileups`
 
 Create ASCII-style pileups for all the desired annotated regions for the whole
-run with [**ASCII-style alignment pileups**](#third-party-software-used). 
+run with [**ASCII-style alignment pileups**](#third-party-software-used).
 
 > If no BED file is provided, the pileups' output directory will only contain
 > an empty file.

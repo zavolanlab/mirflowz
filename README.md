@@ -422,7 +422,7 @@ InDel or a mismatch on its sequence when compared to the canonical miRNA it
 maps and intersects with.
 
 _MIRFLOWZ_ employs an unambiguous notation to classify isomiRs using the
-format `miRNA_name|5p-shift|3p-shift|CIGAR|MD`, where `5p-shift` and
+format `miRNA_name|5p-shift|3p-shift|CIGAR|MD|READ_SEQ`, where `5p-shift` and
 `3p-shift` represent the differences between the annotated mature miRNA
 start and end positions and those of the read alignment, respectively.
 
