@@ -15,68 +15,107 @@ from Bio import SeqIO, SeqRecord
 #   Company: Zavolan Group, Biozentrum, University of Basel     #
 # ------------------------------------------------------------- #
 
-# ARGUMENTS #
+def parse_and_validate_arguments():
+    """Parse and validate command-line arguments."""
+    description = """Process FASTA files.
 
-parser = ArgumentParser(
-    description=__doc__, formatter_class=RawDescriptionHelpFormatter
-)
-parser.add_argument(
-    "-v",
-    "--version",
-    action="version",
-    version="%(prog)s 1.0",
-    help="Show program's version number and exit",
-)
-parser.add_argument(
-    "--trim",
-    help=(
-        "Character's used to trim the ID. Remove anything that follows the "
-        "character's. Write \\ infront of '.' and '-' "
-        '(i.e trim="$\\.\\-|_").  Default: first white space'
-    ),
-    type=str,
-    nargs="?",
-    default="",
-)
-parser.add_argument(
-    "--idlist",
-    help="Generate text file with the sequences IDs. One ID per line.",
-)
-parser.add_argument(
-    "-f",
-    "--filter",
-    help=(
-        "Input ID list. Filter IDs and sequences from FASTA file with the "
-        "mode selected. Filter file must contain ONE ID per line"
-    ),
-)
-parser.add_argument(
-    "-m",
-    "--mode",
-    help=(
-        "Type of filtering fasta file: keep (k) or discard (d) IDs contained "
-        "in the ID list file."
-    ),
-    choices=("k", "d"),
-)
-parser.add_argument(
-    "-r",
-    "--remove",
-    help="Remove sequences from FASTA file longer than specified length.",
-    type=int,
-)
-parser.add_argument(
-    "-i", "--input", required=True, help="Input FASTA file", type=str
-)
-parser.add_argument("-o", "--output", help="Output FASTA file")
+Process both uncompressed and 'gzip'-compressed FASTA files by trimming,
+filtering, and validating sequence records based on user-defined criteria.
 
-args = parser.parse_args()
+Sequence IDs are trimmed at the first occurrence of any specified characters
+in '--trim' to standardize naming conventions. If not character string is
+provided, the first white space is used.
 
-if args.filter and not args.mode:
-    sys.exit(
-        "ERROR! Mode argument required when using filter option. "
-        "(--mode, -m). See --help option."
+To filter the FASTA file by sequence IDs, a text file, with one (trimmed) ID
+per line, has to be passed to `--filter'. Wheather to keep ('--mode k') or
+discard ('--mode d') the sequences with those IDs must be specified.
+
+Sequences exceeding a given length threshold ('--remove') are excluded.
+
+If a path is provided to '--idlist', the resulting sequence IDs are written
+one per line in a separate text file.
+"""
+    parser = argparse.ArgumentParser(
+        description=description,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
+    parser.add_argument(
+        "infile",
+        help="Path to the input FASTA file",
+        type=Path,
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="Path to the output FASTA file",
+        type=Path,
+        required=True,
+    )
+    parser.add_argument(
+        "--trim",
+        help=(
+            "Character(s) used to trim the ID. Remove anything that follows "
+            "the character(s). Default: first white space"
+        ),
+        type=str,
+        nargs="?",
+        default="",
+    )
+    parser.add_argument(
+        "--idlist",
+        help=(
+            "Path to the text file with the final sequences IDs. "
+            "One ID per line."
+        ),
+        type=Path,
+    )
+    parser.add_argument(
+        "-f",
+        "--filter",
+        help=(
+            "Path to the input ID list. Filter FASTA IDs from inpuft ile with "
+            "the selected mode. Filter file must contain ONE ID per line."
+        ),
+        type=Path,
+    )
+    parser.add_argument(
+        "-m",
+        "--mode",
+        help=(
+            "Type of ID filtering for fasta file: keep (k) or discard (d) IDs "
+            "contained in the ID list file."
+        ),
+        choices=("k", "d"),
+    )
+    parser.add_argument(
+        "-r",
+        "--remove",
+        help="Remove sequences from FASTA file longer than specified length.",
+        type=int,
+    )
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version="%(prog)s 1.1.0",
+        help="Show program's version number and exit",
+    )
+
+    args = parser.parse_args()
+
+    if args.filter and not args.mode:
+        parser.error(
+            "Mode argument ('--mode', '-m' is required when using the filter"
+            " argument ('--filter', '-f'). See '--help' for more information."
+        )
+
+    if args.mode and not args.filter:
+        parser.error(
+            "Filter argument ('--filter', '-f' is required when using the mode"
+            " argument ('--mode', '-m'). See '--help' for more information."
+        )
+
+    return args
 
 
 # PARSE FASTA FILE #
