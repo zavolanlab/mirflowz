@@ -138,6 +138,18 @@ def open_fasta(in_file: Path) -> TextIO:
     return in_file.open("rt", encoding="utf-8")
 
 
+def write_id_file(out_file: Path, id_list: List[str]) -> None:
+    """Write the final sequence IDs, one per line.
+
+    Args:
+        out_file: Path to the file where to write the IDs.
+        id_list: FASTA IDs to be written.
+    """
+    with open(out_file, "w", encoding="utf-8") as id_file:
+        for seq_id in id_list:
+            id_file.write(seq_id + "\n")
+
+
 with f:
     record = []
     nrec = -1
@@ -223,24 +235,3 @@ if args.output:
                 for x in range(0, nrec + 1):
                     output.write(f">{record[x].id}\n{record[x].seq}")
     sys.stdout.write("DONE\n")
-
-
-# OUTPUT LIST IDs #
-
-idlist = []
-
-if args.idlist:
-    sys.stdout.write("Creating IDs list from FASTA file...")
-
-    with (
-        open(args.idlist, "w", encoding="utf-8") as id_list,
-        open(args.output, "r", encoding="utf-8") as fasta,
-    ):
-        for line in fasta:
-            if line.startswith(">"):
-                idlist.append(line[1:])
-
-        idlist.sort()
-        id_list.write("".join(idlist))
-        id_list.close()
-        sys.stdout.write("DONE\n")
