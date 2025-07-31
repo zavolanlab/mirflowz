@@ -224,11 +224,11 @@ def main(arguments) -> None:
                 ):
                     continue
 
-            if arguments.remove and len(record.seq) > arguments.remove:
+            if arguments.remove and len(str(record.seq)) > arguments.remove:
                 continue
 
             SeqIO.write(record, out_handle, "fasta")
-            out_id_lst.append(record.id)
+            out_id_lst.append(str(record.id))
 
     if arguments.idlist:
         write_id_file(out_file=arguments.idlist, id_list=out_id_lst)
