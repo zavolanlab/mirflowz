@@ -118,18 +118,6 @@ one per line in a separate text file.
     return args
 
 
-# PARSE FASTA FILE #
-@dataclass
-class Seq:
-    """Class to store sequence attributes."""
-
-    def __init__(self):
-        """Class initialization."""
-        self.id = ""
-        self.seq = ""
-        self.features = ""
-
-
 if args.input.endswith(".gz"):
     f = gzip.open(args.input, "rt")
 else:
