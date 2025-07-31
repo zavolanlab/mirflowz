@@ -130,7 +130,7 @@ def open_fasta(in_file: Path) -> TextIO:
         valid_extension.index(suffix)
     except ValueError as exc:
         raise ValueError(
-            f'The provided input file has not a valid extension: "{suffix}".\n'
+            f"The provided input file has not a valid extension: '{suffix}'.\n"
             "For an uncompressed FASTA file, the valid extensions are '.fa'"
             " and '.fasta'. For a compressed FASTA file, '.gz'."
         ) from exc
