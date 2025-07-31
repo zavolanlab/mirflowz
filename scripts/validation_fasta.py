@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 """Filter FASTA files."""
-import sys
-import re
+
+import argparse
 import gzip
-from argparse import ArgumentParser, RawDescriptionHelpFormatter
-from dataclasses import dataclass
+from pathlib import Path
+import re
+from typing import List, Pattern, TextIO
+
+from Bio import SeqIO, SeqRecord
 
 # ------------------------------------------------------------- #
 #   Created: Mar 5, 2019                                        #
