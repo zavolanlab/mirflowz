@@ -118,10 +118,24 @@ one per line in a separate text file.
     return args
 
 
-if args.input.endswith(".gz"):
-    f = gzip.open(args.input, "rt")
-else:
-    f = open(args.input, encoding="utf-8")
+def open_fasta(in_file: Path) -> TextIO:
+    """Open a FASTA or FASTA.GZ for text‐mode reading."""
+    valid_extension = [".gz", ".fa", ".fasta"]
+    suffix = in_file.suffix
+
+    try:
+        valid_extension.index(suffix)
+    except ValueError as exc:
+        raise ValueError(
+            f'The provided input file has not a valid extension: "{suffix}".\n'
+            "For an uncompressed FASTA file, the valid extensions are '.fa'"
+            " and '.fasta'. For a compressed FASTA file, '.gz'."
+        ) from exc
+
+    if suffix == ".gz":
+        return gzip.open(in_file, "rt")
+
+    return in_file.open("rt", encoding="utf-8")
 
 
 with f:
