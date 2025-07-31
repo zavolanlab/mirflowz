@@ -7,13 +7,16 @@ from pathlib import Path
 import re
 from typing import List, Pattern, TextIO
 
-from Bio import SeqIO, SeqRecord
+from Bio import SeqIO
+from Bio.SeqRecord import SeqRecord
 
 # ------------------------------------------------------------- #
 #   Created: Mar 5, 2019                                        #
-#   Author: Paula Iborra                                        #
+#   Refactored: Jul 31, 2025                                    #
+#   Authors: Paula Iborra and Iris Mestres-Pascual              #
 #   Company: Zavolan Group, Biozentrum, University of Basel     #
 # ------------------------------------------------------------- #
+
 
 def parse_and_validate_arguments():
     """Parse and validate command-line arguments."""
@@ -183,10 +186,12 @@ def trim_id(*, seq_rec: SeqRecord, _pattern: Pattern[str]) -> SeqRecord:
     Returns:
         The same SeqRecord, with .id and .description possibly updated.
     """
+    assert seq_rec.id is not None
+
     pattern_match = _pattern.match(seq_rec.id)
 
     if pattern_match:
-        new_id, rest_id = pattern_match.groups()
+        new_id, _ = pattern_match.groups()
         seq_rec.id = new_id
         seq_rec.description = ""
 
@@ -204,19 +209,18 @@ def main(arguments) -> None:
         with open(arguments.filter, "r", encoding="utf-8") as filt_file:
             filter_set = {line.strip("\n") for line in filt_file}
 
-    with open_fasta(arguments.infile) as in_handle, \
-         open(arguments.output, "w", encoding="utf-8") as out_handle:
+    with open_fasta(arguments.infile) as in_handle, open(
+        arguments.output, "w", encoding="utf-8"
+    ) as out_handle:
         for record in SeqIO.parse(in_handle, "fasta"):
 
-            if trim_pattern:
-                record = trim_id(_pattern=trim_pattern, seq_rec=record)
+            record = trim_id(_pattern=trim_pattern, seq_rec=record)
 
             if filter_set:
                 is_in_list = record.id in filter_set
 
-                if (
-                    (arguments.mode == "k" and not is_in_list) or
-                    (arguments.mode == "d" and is_in_list)
+                if (arguments.mode == "k" and not is_in_list) or (
+                    arguments.mode == "d" and is_in_list
                 ):
                     continue
 
@@ -231,5 +235,5 @@ def main(arguments) -> None:
 
 
 if __name__ == "__main__":
-    args = parse_and_validate_arguments()  # pragma:no cover
-    main(args)  # pragma: no cover
+    validated_args = parse_and_validate_arguments()  # pragma:no cover
+    main(validated_args)  # pragma: no cover
