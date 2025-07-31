@@ -193,55 +193,43 @@ def trim_id(*, seq_rec: SeqRecord, _pattern: Pattern[str]) -> SeqRecord:
     return seq_rec
 
 
-# ID FILTER LIST #
-id_filter = []
-if args.filter:
-    sys.stdout.write("Filtering FASTA file...")
+def main(arguments) -> None:
+    """Filter and process a FASTA file."""
+    filter_set = None
+    out_id_lst: List[str] = []
 
-    with open(args.filter, encoding="utf-8") as filter_file:
-        id_filter = [line.rstrip("\n") for line in filter_file]
+    trim_pattern = compile_trim_pattern(arguments.trim)
 
-    sys.stdout.write("DONE\n")
+    if arguments.filter:
+        with open(arguments.filter, "r", encoding="utf-8") as filt_file:
+            filter_set = {line.strip("\n") for line in filt_file}
+
+    with open_fasta(arguments.infile) as in_handle, \
+         open(arguments.output, "w", encoding="utf-8") as out_handle:
+        for record in SeqIO.parse(in_handle, "fasta"):
+
+            if trim_pattern:
+                record = trim_id(_pattern=trim_pattern, seq_rec=record)
+
+            if filter_set:
+                is_in_list = record.id in filter_set
+
+                if (
+                    (arguments.mode == "k" and not is_in_list) or
+                    (arguments.mode == "d" and is_in_list)
+                ):
+                    continue
+
+            if arguments.remove and len(record.seq) > arguments.remove:
+                continue
+
+            SeqIO.write(record, out_handle, "fasta")
+            out_id_lst.append(record.id)
+
+    if arguments.idlist:
+        write_id_file(out_file=arguments.idlist, id_list=out_id_lst)
 
 
-# OUTPUT FASTA FILE #
-
-if args.output:
-    sys.stdout.write("Writing FASTA file...")
-
-    with open(args.output, "w", encoding="utf-8") as output:
-        if args.filter and args.mode == "k":
-            if args.remove:
-                for x in range(0, nrec + 1):
-                    if (
-                        record[x].id in id_filter
-                        and len(record[x].seq) - 1 <= args.remove
-                    ):
-                        output.write(f">{record[x].id}\n{record[x].seq}")
-            else:
-                for x in range(0, nrec + 1):
-                    if record[x].id in id_filter:
-                        output.write(f">{record[x].id}\n{record[x].seq}")
-
-        elif args.filter and args.mode == "d":
-            if args.remove:
-                for x in range(0, nrec + 1):
-                    if (
-                        record[x].id not in id_filter
-                        and len(record[x].seq) - 1 <= args.remove
-                    ):
-                        output.write(f">{record[x].id}\n{record[x].seq}")
-            else:
-                for x in range(0, nrec + 1):
-                    if record[x].id not in id_filter:
-                        output.write(f">{record[x].id}\n{record[x].seq}")
-
-        else:
-            if args.remove:
-                for x in range(0, nrec + 1):
-                    if len(record[x].seq) - 1 <= args.remove:
-                        output.write(f">{record[x].id}\n{record[x].seq}")
-            else:
-                for x in range(0, nrec + 1):
-                    output.write(f">{record[x].id}\n{record[x].seq}")
-    sys.stdout.write("DONE\n")
+if __name__ == "__main__":
+    args = parse_and_validate_arguments()  # pragma:no cover
+    main(args)  # pragma: no cover
