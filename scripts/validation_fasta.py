@@ -150,38 +150,48 @@ def write_id_file(out_file: Path, id_list: List[str]) -> None:
             id_file.write(seq_id + "\n")
 
 
-with f:
-    record = []
-    nrec = -1
-    inseq = 0
+def compile_trim_pattern(trim_str: str) -> Pattern[str]:
+    """Get a compiled regex pattern to trim at character first occurrence.
 
-    sys.stdout.write("Parsing FASTA file...")
+    If "trim_str" is empty, white space is used as the default delimiter.
 
-    for line in f:
-        if re.match(r"^>", line):
-            nrec += 1
-            record.append(Seq())
+    Args:
+        trim_str: Characters used to determine where trimming occurs.
 
-            # define id of the record
-            if not args.trim:
-                mobj = re.match(r"^>(\S*)(.*)", line)
-            else:
-                mobj = re.match(f"^>([^{args.trim}]*)(.*)", line)
+    Returns:
+        A compiled regex pattern that captures (1) everything up to the first
+        match and (2) the rest of the string.
+    """
+    if not trim_str:
+        new_trim_str = r"\s"
 
-            # add id and features
-            if mobj:
-                record[nrec].id = mobj.group(1)
-                record[nrec].features = mobj.group(2)
-            inseq = 0
-        else:
-            if inseq == 0:
-                inseq = 1
-                record[nrec].seq = line
-            else:
-                cstring = record[nrec].seq + line
-                record[nrec].seq = cstring
+    else:
+        new_trim_str = re.escape(trim_str)
 
-    sys.stdout.write("DONE\n")
+    return re.compile(rf"^([^{new_trim_str}]*)(.*)$")
+
+
+def trim_id(*, seq_rec: SeqRecord, _pattern: Pattern[str]) -> SeqRecord:
+    """Trim a FASTA ID using the first-occurrence of any character in _pattern.
+
+    All parameters must be passed by keyword.
+
+    Args:
+        seq_rec: A Bio.SeqRecord.SeqRecord to be trimmed in place.
+        _pattern: (internal) a pre-compiled regex from "get_trim_pattern".
+
+    Returns:
+        The same SeqRecord, with .id and .description possibly updated.
+    """
+    pattern_match = _pattern.match(seq_rec.id)
+
+    if pattern_match:
+        new_id, rest_id = pattern_match.groups()
+        seq_rec.id = new_id
+        seq_rec.description = ""
+
+    return seq_rec
+
 
 # ID FILTER LIST #
 id_filter = []
