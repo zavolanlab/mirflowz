@@ -11,7 +11,7 @@ dependencies:
   - mypy>=1.15
   - pulp
   - pylint>=3.3.7
-  - pysam>=0.23
+  - pysam=0.23.0
   - pytest>=8.3.5
   - pytest-cov>=6.1.1
   - python>=3.12
