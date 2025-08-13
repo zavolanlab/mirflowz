@@ -322,13 +322,13 @@ rule filter_fasta_for_oligomap:
     log:
         LOCAL_LOG / "filter_fasta_for_oligomap_{sample}.log",
     container:
-        "docker://python:3.11.12"
+        "docker://quay.io/biocontainers/biopython:1.70--np112py36_1"
     conda:
-        ENV_DIR / "python.yaml"
+        ENV_DIR / "biopython.yaml"
     shell:
         "(python {input.script} \
+        {input.reads} \
         -r {params.max_length_reads} \
-        -i {input.reads} \
         -o {output.reads} \
         ) &> {log}"
 
