@@ -368,20 +368,44 @@ Extract chromosome(s) length from the genome sequence.
 Extend miRNA annotations, ensure feature names uniqueness and split the file
 by feature with a [**custom script**][custom-script-mir-ext].
 
-> Adjust miRNAs' 'Name' attribute to account for the different genomic
-> locations the miRNA sequence is annotated on and ensure their uniqueness.
-> The name format is `SPECIES-mir-NAME-#` for pri-miRs, and
-> `SPECIES-miR-NAME-#-ARM` or `SPECIES-miR-NAME-#` for mature miRNA with both
-> or just one arm respectively, where `#` is the replica integer. If a pri-miR
-> has a replica but its number is set in the 'ID' attribute, the first instance
-> does not has a suffix but the other one(s) do. If a precursor has no other
-> occurrences, no further modifications are made. On the other hand,
-> mature miRNA regions are extended on both sides to account for isomiR species
-> with shifted start and/or end positions without exceeding chromosome(s)
-> boundaries. If required, pri-miR loci are also extended to accommodate the
-> new miRNA coordinates. In addition, pri-miR names are modified to record the
-> final positions by appending `_-y` and `_+x` to them, where `y` is the 5'
-> shift and `x` the 3' shift.
+> This method updates the attributes of precursor and mature miRNA entries to
+> ensure consistent naming based on their paralog or sequence variant status.
+>
+> For precursors:
+>     - A suffix indicates distinct genomic loci (paralogs) that express
+>       identical mature sequences. This is typically extracted from the 'Name'
+>       or 'ID' attribute.
+>     - Format: 'SPECIES-mir-NUMBER[LETTER]-#' (Name) and 'ALIAS_#' (ID)
+>       where:
+>           - 'LETTER' denotes a sequence variant of the mature miRNA
+>             (paralogous variant with similar but not identical sequences),
+>           - '#' indicates the paralog number (replica/locus index), included
+>             when multiple loci express the same or similar miRNAs.
+>
+> For mature miRNAs:
+>     - The replica number is added or replaced as an infix/suffix in the name.
+>     - Formats:
+>         - 'SPECIES-miR-NUMBER[LETTER]-#-ARM'
+>         - 'SPECIES-miR-NUMBER[LETTER]-#'
+>         - 'SPECIES-miR-NUMBER[LETTER]-ARM'
+>
+> Cases:
+>     - If a precursor has multiple genomic instances (paralogs), the first
+>       occurrence typically lacks a numeric suffix; subsequent ones are
+>       numbered incrementally.
+>     - The 'Derives_from' attribute of each mature miRNA is updated to match
+>       the precursor's 'ID'.
+>     - If a precursor has a different sequence variant designation ('LETTER')
+>       than its associated matures, the mature miRNA names are updated to
+>       match the precursor's designation.
+>
+> The 'Alias' attribute remains unchanged. On the other hand, mature miRNA
+> regions are extended on both sides to account for isomiR species with shifted
+> start and/or end positions without exceeding chromosome(s) boundaries. If
+> required, pri-miR loci are also extended to accommodate the new miRNA
+> coordinates. In addition, pri-miR names are modified to record the final
+> positions by appending `_-y` and `_+x` to them, where `y` is the 5' shift and
+> `x` the 3' shift.
 
 - **Input**
   - miRNA annotations, mapped chromosome name(s) (`.gff3`); from
@@ -446,7 +470,7 @@ OUT:
         19	.	miRNA	1	80	.	+	.	ID=MIMAT0002822;Alias=MIMAT0002822;Name=hsa-miR-512-1-5p;Derives_from=MI0003140
 
 
-Example 4 | Name uniqueness | Replica number in the ID
+Example 4 | Name uniqueness | Replica number in the ID; 'Derives_from' update
 
 IN:
     pri-miR entries:
@@ -464,8 +488,8 @@ OUT:
     mature miRNA entries:
         chr21	.	miRNA	8206563	8206582	.	+	.	ID=MIMAT0041633;Alias=MIMAT0041633;Name=hsa-miR-10401-5p;Derives_from=MI0033425
         chr21	.	miRNA	8206598	8206618	.	+	.	ID=MIMAT0041634;Alias=MIMAT0041634;Name=hsa-miR-10401-3p;Derives_from=MI0033425
-        chr21	.	miRNA	8250772	8250791	.	+	.	ID=MIMAT0041633_1;Alias=MIMAT0041633;Name=hsa-miR-10401-2-5p;Derives_from=MI0033425
-        chr21	.	miRNA	8250807	8250827	.	+	.	ID=MIMAT0041634_1;Alias=MIMAT0041634;Name=hsa-miR-10401-2-3p;Derives_from=MI0033425
+        chr21	.	miRNA	8250772	8250791	.	+	.	ID=MIMAT0041633_1;Alias=MIMAT0041633;Name=hsa-miR-10401-2-5p;Derives_from=MI0033425_2
+        chr21	.	miRNA	8250807	8250827	.	+	.	ID=MIMAT0041634_1;Alias=MIMAT0041634;Name=hsa-miR-10401-2-3p;Derives_from=MI0033425_2
 
 
 Example 5 | Name uniqueness | Replica number in the Name; single mature arm
@@ -506,6 +530,28 @@ OUT:
         chr2	.	miRNA	135665411	135665433	.	+	.	ID=MIMAT0026477;Alias=MIMAT0026477;Name=hsa-miR-128-1-5p;Derives_from=MI0000447
         chr3	.	miRNA	35744527	35744547	.	+	.	ID=MIMAT0000424_1;Alias=MIMAT0000424;Name=hsa-miR-128-2-3p;Derives_from=MI0000727
         chr3	.	miRNA	35744490	35744512	.	+	.	ID=MIMAT0031095;Alias=MIMAT0031095;Name=hsa-miR-128-2-5p;Derives_from=MI0000727
+
+
+Example 7 | Name uniqueness | Different precursor and mature miRNA "NAME" in Name
+
+IN:
+    pri-miR entries:
+        chr19	.	miRNA_primary_transcript	45628	45714	.	+	.	ID=MI0003161;Alias=MI0003161;Name=hsa-mir-517a
+        chr19	.	miRNA_primary_transcript	54436	54502	.	+	.	ID=MI0003165;Alias=MI0003165;Name=hsa-mir-517b
+    mature miRNA entries:
+        chr19	.	miRNA	45642	45663	.	+	.	ID=MIMAT0002851;Alias=MIMAT0002851;Name=hsa-miR-517-5p;Derives_from=MI0003161
+        chr19	.	miRNA	45681	45702	.	+	.	ID=MIMAT0002852;Alias=MIMAT0002852;Name=hsa-miR-517a-3p;Derives_from=MI0003161
+        chr19	.	miRNA	54441	54462	.	+	.	ID=MIMAT0002851_1;Alias=MIMAT0002851;Name=hsa-miR-517-5p;Derives_from=MI0003165
+        chr19	.	miRNA	54478	54499	.	+	.	ID=MIMAT0002857;Alias=MIMAT0002857;Name=hsa-miR-517b-3p;Derives_from=MI0003165
+OUT:
+    pri-miR entries:
+        chr19	.	miRNA_primary_transcript	45628	45714	.	+	.	ID=MI0003161;Alias=MI0003161;Name=hsa-mir-517a
+        chr19	.	miRNA_primary_transcript	54436	54502	.	+	.	ID=MI0003165;Alias=MI0003165;Name=hsa-mir-517b
+    mature miRNA entries:
+        chr19	.	miRNA	45642	45663	.	+	.	ID=MIMAT0002851;Alias=MIMAT0002851;Name=hsa-miR-517a-5p;Derives_from=MI0003161
+        chr19	.	miRNA	45681	45702	.	+	.	ID=MIMAT0002852;Alias=MIMAT0002852;Name=hsa-miR-517a-3p;Derives_from=MI0003161
+        chr19	.	miRNA	54441	54462	.	+	.	ID=MIMAT0002851_1;Alias=MIMAT0002851;Name=hsa-miR-517b-5p;Derives_from=MI0003165
+        chr19	.	miRNA	54478	54499	.	+	.	ID=MIMAT0002857;Alias=MIMAT0002857;Name=hsa-miR-517b-3p;Derives_from=MI0003165
 ```
 
 ### Map workflow
@@ -1514,21 +1560,21 @@ Data:
         Table name: hsa-miR-526b-3p|1|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
         Total count: 0.33
 
-        Tag name: hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
+        Tag name: hsa-miR-520b-3p|0|-1|20M|20
         Type: isomiR
         Table name: hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
         Total count: 0.33
 
         Tag name: hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG
         Type: isomiR
-        Table name: hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG
+        Table name: hsa-miR-520c-3p|0|-2|20M|20
         Total count: 0.33
 
 OUT table:
-    ID	                                                lib_name
-    hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG 	0.33
-    hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG 	0.33
-    hsa-miR-526b-3p|1|-1|20M|20|AAAGTGCTTCCTTTTAGAGG 	0.33
+    ID	                        lib_name
+    hsa-miR-520b-3p|0|-1|20M|20	0.33
+    hsa-miR-520c-3p|0|-2|20M|20	0.33
+    hsa-miR-526b-3p|1|-1|20M|20	0.33
 ```
 
 
