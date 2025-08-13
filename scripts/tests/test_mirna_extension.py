@@ -7,8 +7,12 @@ import sys
 import gffutils  # type: ignore
 import pytest
 
-from ..mirna_extension import (AnnotationException, MirnaExtension, main,
-                               parse_arguments)
+from ..mirna_extension import (
+    AnnotationException,
+    MirnaExtension,
+    main,
+    parse_arguments,
+)
 
 
 @pytest.fixture
@@ -106,8 +110,7 @@ class TestSetDb:
 
         miR_obj = MirnaExtension()
 
-        with pytest.raises(AnnotationException,
-                           match=r".* position 0. .*"):
+        with pytest.raises(AnnotationException, match=r".* position 0. .*"):
             miR_obj.set_db(path=in_file)
 
 
@@ -195,11 +198,12 @@ class TestAdjustNames:
         """Test adjusting names when replica integer is in the ID."""
         in_file, out_file = gff_replicas
         out_mir = ["hsa-miR-10401-2-3p", "hsa-miR-10401-2-5p"]
+        precursor_id = "MI0033425_2"
 
         miR_obj = MirnaExtension()
         miR_obj.set_db(path=in_file)
 
-        precursor = miR_obj.db["MI0033425_2"]
+        precursor = miR_obj.db[precursor_id]
         matures = [miR_obj.db["MIMAT0041633_1"], miR_obj.db["MIMAT0041634_1"]]
 
         miR_obj.adjust_names(precursor=precursor, matures=matures)
@@ -207,6 +211,8 @@ class TestAdjustNames:
         assert precursor.attributes["Name"][0] == "hsa-mir-10401-2"
         assert matures[0].attributes["Name"][0] in out_mir
         assert matures[1].attributes["Name"][0] in out_mir
+        assert matures[0].attributes["Derives_from"][0] == precursor_id
+        assert matures[1].attributes["Derives_from"][0] == precursor_id
 
     def test_adjust_names_name_replica(self, gff_replicas):
         """Test adjusting names when replica integer is in the Name."""
@@ -232,13 +238,14 @@ class TestAdjustNames:
         miR_obj = MirnaExtension()
         miR_obj.set_db(path=in_file)
 
-        precursor = miR_obj.db["MI0005764"]
-        matures = [miR_obj.db["MIMAT0004984_1"]]
+        precursor = miR_obj.db["MI0006363"]
+        matures = [miR_obj.db["MIMAT0005890"]]
 
         miR_obj.adjust_names(precursor=precursor, matures=matures)
 
-        assert precursor.attributes["Name"][0] == "hsa-mir-941-2"
-        assert matures[0].attributes["Name"][0] == "hsa-miR-941-2"
+        assert precursor.attributes["Name"][0] == "hsa-mir-1302-2"
+        assert matures[0].attributes["Name"][0] == "hsa-miR-1302-2"
+        assert matures[0].attributes["Derives_from"][0] == "MI0006363"
 
     def test_adjust_names_replace_replica(self, gff_replicas):
         """Test adjusting names when mature miRs have the replica integer."""
@@ -254,6 +261,23 @@ class TestAdjustNames:
         miR_obj.adjust_names(precursor=precursor, matures=matures)
 
         assert precursor.attributes["Name"][0] == "hsa-mir-16-2"
+        assert matures[0].attributes["Name"][0] in out_mir
+        assert matures[1].attributes["Name"][0] in out_mir
+
+    def test_adjust_names_replace_name(self, gff_replicas):
+        """Test adjusting names when precursor and miR names are different."""
+        in_file, out_file = gff_replicas
+        out_mir = ["hsa-miR-517a-3p", "hsa-miR-517a-5p"]
+
+        miR_obj = MirnaExtension()
+        miR_obj.set_db(path=in_file)
+
+        precursor = miR_obj.db["MI0003161"]
+        matures = [miR_obj.db["MIMAT0002851"], miR_obj.db["MIMAT0002852"]]
+
+        miR_obj.adjust_names(precursor=precursor, matures=matures)
+
+        assert precursor.attributes["Name"][0] == "hsa-mir-517a"
         assert matures[0].attributes["Name"][0] in out_mir
         assert matures[1].attributes["Name"][0] in out_mir
 
