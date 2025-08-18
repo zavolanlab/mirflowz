@@ -123,19 +123,21 @@ one per line in a separate text file.
 
 def open_fasta(in_file: Path) -> TextIO:
     """Open a FASTA or FASTA.GZ for text‐mode reading."""
-    valid_extension = [".gz", ".fa", ".fasta"]
-    suffix = in_file.suffix
+    valid_extensions = [".fa", ".fas", ".fasta"]
+    valid_extensions += [_ + ".gz" for _ in valid_extensions]
+
+    suffix = "".join(in_file.suffixes).lower()
 
     try:
-        valid_extension.index(suffix)
+        valid_extensions.index(suffix)
     except ValueError as exc:
         raise ValueError(
             f"The provided input file has not a valid extension: '{suffix}'.\n"
-            "For an uncompressed FASTA file, the valid extensions are '.fa'"
-            " and '.fasta'. For a compressed FASTA file, '.gz'."
+            "Accepted extensions include:"
+            f"{', '.join(valid_extensions)}."
         ) from exc
 
-    if suffix == ".gz":
+    if suffix.endswith(".gz"):
         return gzip.open(in_file, "rt")
 
     return in_file.open("rt", encoding="utf-8")
