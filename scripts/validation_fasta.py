@@ -167,11 +167,7 @@ def compile_trim_pattern(trim_str: str) -> Pattern[str]:
         A compiled regex pattern that captures (1) everything up to the first
         match and (2) the rest of the string.
     """
-    if not trim_str:
-        new_trim_str = r"\s"
-
-    else:
-        new_trim_str = re.escape(trim_str)
+    new_trim_str = r"\s" if not trim_str else re.escape(trim_str)
 
     return re.compile(rf"^([^{new_trim_str}]*)(.*)$")
 
