@@ -86,7 +86,7 @@ def fasta_trim_dot():
 @pytest.fixture
 def seq_record_dict():
     """Create a dictionary with sample SeqRecord objects."""
-    seq_dict = dict()
+    seq_dict = {}
 
     # Initial SeqRecord
     seq1 = SeqRecord(
@@ -122,6 +122,14 @@ class TestOpenFasta:
     def test_open_fa(self, tmp_path):
         """Open FASTA file wih '.fa' extension."""
         in_fa = tmp_path/"sample.fa"
+        in_fa.write_text(">sample_seq\nACTG\n")
+
+        with open_fasta(in_file=in_fa) as in_f:
+            assert ">sample_seq" in [line.strip() for line in in_f.readlines()]
+
+    def test_open_fas(self, tmp_path):
+        """Open FASTA file wih '.fas' extension."""
+        in_fa = tmp_path/"sample.fas"
         in_fa.write_text(">sample_seq\nACTG\n")
 
         with open_fasta(in_file=in_fa) as in_f:
