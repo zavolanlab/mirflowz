@@ -132,8 +132,8 @@ def open_fasta(in_file: Path) -> TextIO:
         valid_extensions.index(suffix)
     except ValueError as exc:
         raise ValueError(
-            f"The provided input file has not a valid extension: '{suffix}'.\n"
-            "Accepted extensions include:"
+            "The provided input file does not have a valid extension: "
+            f"'{suffix}'.\nAccepted extensions include: "
             f"{', '.join(valid_extensions)}."
         ) from exc
 
@@ -156,12 +156,11 @@ def write_id_file(out_file: Path, id_list: List[str]) -> None:
 
 
 def compile_trim_pattern(trim_str: str) -> Pattern[str]:
-    """Get a compiled regex pattern to trim at character first occurrence.
-
-    If "trim_str" is empty, white space is used as the default delimiter.
+    """Get a compiled regex pattern to trim at a character's first occurrence.
 
     Args:
-        trim_str: Characters used to determine where trimming occurs.
+        trim_str: Characters used to determine where trimming occurs. If empty,
+            white space is used as the default delimiter.
 
     Returns:
         A compiled regex pattern that captures (1) everything up to the first
