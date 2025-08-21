@@ -158,7 +158,7 @@ class TestOpenFasta:
         in_txt = tmp_path/"invalid.txt"
         in_txt.write_text("Lorem Ipsum Dolor Sit Amet")
 
-        with pytest.raises(ValueError, match=r".* not a valid extension: ."):
+        with pytest.raises(ValueError, match=r".* have a valid extension: ."):
             open_fasta(in_file=in_txt)
 
 
