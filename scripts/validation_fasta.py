@@ -1,202 +1,236 @@
 #!/usr/bin/env python
 """Filter FASTA files."""
-import sys
-import re
+
+import argparse
 import gzip
-from argparse import ArgumentParser, RawDescriptionHelpFormatter
-from dataclasses import dataclass
+from pathlib import Path
+import re
+from typing import List, Pattern, TextIO
+
+from Bio import SeqIO
+from Bio.SeqRecord import SeqRecord
 
 # ------------------------------------------------------------- #
 #   Created: Mar 5, 2019                                        #
-#   Author: Paula Iborra                                        #
+#   Refactored: Jul 31, 2025                                    #
+#   Authors: Paula Iborra and Iris Mestres-Pascual              #
 #   Company: Zavolan Group, Biozentrum, University of Basel     #
 # ------------------------------------------------------------- #
 
-# ARGUMENTS #
 
-parser = ArgumentParser(
-    description=__doc__, formatter_class=RawDescriptionHelpFormatter
-)
-parser.add_argument(
-    "-v",
-    "--version",
-    action="version",
-    version="%(prog)s 1.0",
-    help="Show program's version number and exit",
-)
-parser.add_argument(
-    "--trim",
-    help=(
-        "Character's used to trim the ID. Remove anything that follows the "
-        "character's. Write \\ infront of '.' and '-' "
-        '(i.e trim="$\\.\\-|_").  Default: first white space'
-    ),
-    type=str,
-    nargs="?",
-    default="",
-)
-parser.add_argument(
-    "--idlist",
-    help="Generate text file with the sequences IDs. One ID per line.",
-)
-parser.add_argument(
-    "-f",
-    "--filter",
-    help=(
-        "Input ID list. Filter IDs and sequences from FASTA file with the "
-        "mode selected. Filter file must contain ONE ID per line"
-    ),
-)
-parser.add_argument(
-    "-m",
-    "--mode",
-    help=(
-        "Type of filtering fasta file: keep (k) or discard (d) IDs contained "
-        "in the ID list file."
-    ),
-    choices=("k", "d"),
-)
-parser.add_argument(
-    "-r",
-    "--remove",
-    help="Remove sequences from FASTA file longer than specified length.",
-    type=int,
-)
-parser.add_argument(
-    "-i", "--input", required=True, help="Input FASTA file", type=str
-)
-parser.add_argument("-o", "--output", help="Output FASTA file")
+def parse_and_validate_arguments():
+    """Parse and validate command-line arguments."""
+    description = """Process FASTA files.
 
-args = parser.parse_args()
+Process both uncompressed and 'gzip'-compressed FASTA files by trimming,
+filtering, and validating sequence records based on user-defined criteria.
 
-if args.filter and not args.mode:
-    sys.exit(
-        "ERROR! Mode argument required when using filter option. "
-        "(--mode, -m). See --help option."
+Sequence IDs are trimmed at the first occurrence of any specified characters
+in '--trim' to standardize naming conventions. If not character string is
+provided, the first white space is used.
+
+To filter the FASTA file by sequence IDs, a text file, with one (trimmed) ID
+per line, has to be passed to `--filter'. Wheather to keep ('--mode k') or
+discard ('--mode d') the sequences with those IDs must be specified.
+
+Sequences exceeding a given length threshold ('--remove') are excluded.
+
+If a path is provided to '--idlist', the resulting sequence IDs are written
+one per line in a separate text file.
+"""
+    parser = argparse.ArgumentParser(
+        description=description,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "infile",
+        help="Path to the input FASTA file",
+        type=Path,
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="Path to the output FASTA file",
+        type=Path,
+        required=True,
+    )
+    parser.add_argument(
+        "--trim",
+        help=(
+            "Character(s) used to trim the ID. Remove anything that follows "
+            "the character(s). Default: first white space"
+        ),
+        type=str,
+        nargs="?",
+        default="",
+    )
+    parser.add_argument(
+        "--idlist",
+        help=(
+            "Path to the text file with the final sequences IDs. "
+            "One ID per line."
+        ),
+        type=Path,
+    )
+    parser.add_argument(
+        "-f",
+        "--filter",
+        help=(
+            "Path to the input ID list. Filter FASTA IDs from inpuft ile with "
+            "the selected mode. Filter file must contain ONE ID per line."
+        ),
+        type=Path,
+    )
+    parser.add_argument(
+        "-m",
+        "--mode",
+        help=(
+            "Type of ID filtering for fasta file: keep (k) or discard (d) IDs "
+            "contained in the ID list file."
+        ),
+        choices=("k", "d"),
+    )
+    parser.add_argument(
+        "-r",
+        "--remove",
+        help="Remove sequences from FASTA file longer than specified length.",
+        type=int,
+    )
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version="%(prog)s 1.1.0",
+        help="Show program's version number and exit",
     )
 
+    args = parser.parse_args()
 
-# PARSE FASTA FILE #
-@dataclass
-class Seq:
-    """Class to store sequence attributes."""
+    if args.filter and not args.mode:
+        parser.error(
+            "Mode argument ('--mode', '-m' is required when using the filter"
+            " argument ('--filter', '-f'). See '--help' for more information."
+        )
 
-    def __init__(self):
-        """Class initialization."""
-        self.id = ""
-        self.seq = ""
-        self.features = ""
+    if args.mode and not args.filter:
+        parser.error(
+            "Filter argument ('--filter', '-f' is required when using the mode"
+            " argument ('--mode', '-m'). See '--help' for more information."
+        )
 
-
-if args.input.endswith(".gz"):
-    f = gzip.open(args.input, "rt")
-else:
-    f = open(args.input, encoding="utf-8")
+    return args
 
 
-with f:
-    record = []
-    nrec = -1
-    inseq = 0
+def open_fasta(in_file: Path) -> TextIO:
+    """Open a FASTA or FASTA.GZ for text‐mode reading."""
+    valid_extensions = [".fa", ".fas", ".fasta"]
+    valid_extensions += [_ + ".gz" for _ in valid_extensions]
 
-    sys.stdout.write("Parsing FASTA file...")
+    suffix = "".join(in_file.suffixes).lower()
 
-    for line in f:
-        if re.match(r"^>", line):
-            nrec += 1
-            record.append(Seq())
+    try:
+        valid_extensions.index(suffix)
+    except ValueError as exc:
+        raise ValueError(
+            "The provided input file does not have a valid extension: "
+            f"'{suffix}'.\nAccepted extensions include: "
+            f"{', '.join(valid_extensions)}."
+        ) from exc
 
-            # define id of the record
-            if not args.trim:
-                mobj = re.match(r"^>(\S*)(.*)", line)
-            else:
-                mobj = re.match(f"^>([^{args.trim}]*)(.*)", line)
+    if suffix.endswith(".gz"):
+        return gzip.open(in_file, "rt")
 
-            # add id and features
-            if mobj:
-                record[nrec].id = mobj.group(1)
-                record[nrec].features = mobj.group(2)
-            inseq = 0
-        else:
-            if inseq == 0:
-                inseq = 1
-                record[nrec].seq = line
-            else:
-                cstring = record[nrec].seq + line
-                record[nrec].seq = cstring
-
-    sys.stdout.write("DONE\n")
-
-# ID FILTER LIST #
-id_filter = []
-if args.filter:
-    sys.stdout.write("Filtering FASTA file...")
-
-    with open(args.filter, encoding="utf-8") as filter_file:
-        id_filter = [line.rstrip("\n") for line in filter_file]
-
-    sys.stdout.write("DONE\n")
+    return in_file.open("rt", encoding="utf-8")
 
 
-# OUTPUT FASTA FILE #
+def write_id_file(out_file: Path, id_list: List[str]) -> None:
+    """Write the final sequence IDs, one per line.
 
-if args.output:
-    sys.stdout.write("Writing FASTA file...")
-
-    with open(args.output, "w", encoding="utf-8") as output:
-        if args.filter and args.mode == "k":
-            if args.remove:
-                for x in range(0, nrec + 1):
-                    if (
-                        record[x].id in id_filter
-                        and len(record[x].seq) - 1 <= args.remove
-                    ):
-                        output.write(f">{record[x].id}\n{record[x].seq}")
-            else:
-                for x in range(0, nrec + 1):
-                    if record[x].id in id_filter:
-                        output.write(f">{record[x].id}\n{record[x].seq}")
-
-        elif args.filter and args.mode == "d":
-            if args.remove:
-                for x in range(0, nrec + 1):
-                    if (
-                        record[x].id not in id_filter
-                        and len(record[x].seq) - 1 <= args.remove
-                    ):
-                        output.write(f">{record[x].id}\n{record[x].seq}")
-            else:
-                for x in range(0, nrec + 1):
-                    if record[x].id not in id_filter:
-                        output.write(f">{record[x].id}\n{record[x].seq}")
-
-        else:
-            if args.remove:
-                for x in range(0, nrec + 1):
-                    if len(record[x].seq) - 1 <= args.remove:
-                        output.write(f">{record[x].id}\n{record[x].seq}")
-            else:
-                for x in range(0, nrec + 1):
-                    output.write(f">{record[x].id}\n{record[x].seq}")
-    sys.stdout.write("DONE\n")
+    Args:
+        out_file: Path to the file where to write the IDs.
+        id_list: FASTA IDs to be written.
+    """
+    with open(out_file, "w", encoding="utf-8") as id_file:
+        for seq_id in id_list:
+            id_file.write(seq_id + "\n")
 
 
-# OUTPUT LIST IDs #
+def compile_trim_pattern(trim_str: str) -> Pattern[str]:
+    """Get a compiled regex pattern to trim at a character's first occurrence.
 
-idlist = []
+    Args:
+        trim_str: Characters used to determine where trimming occurs. If empty,
+            white space is used as the default delimiter.
 
-if args.idlist:
-    sys.stdout.write("Creating IDs list from FASTA file...")
+    Returns:
+        A compiled regex pattern that captures (1) everything up to the first
+        match and (2) the rest of the string.
+    """
+    new_trim_str = r"\s" if not trim_str else re.escape(trim_str)
 
-    with (
-        open(args.idlist, "w", encoding="utf-8") as id_list,
-        open(args.output, "r", encoding="utf-8") as fasta,
-    ):
-        for line in fasta:
-            if line.startswith(">"):
-                idlist.append(line[1:])
+    return re.compile(rf"^([^{new_trim_str}]*)(.*)$")
 
-        idlist.sort()
-        id_list.write("".join(idlist))
-        id_list.close()
-        sys.stdout.write("DONE\n")
+
+def trim_id(*, seq_rec: SeqRecord, _pattern: Pattern[str]) -> SeqRecord:
+    """Trim a FASTA ID using the first-occurrence of any character in _pattern.
+
+    All parameters must be passed by keyword.
+
+    Args:
+        seq_rec: A Bio.SeqRecord.SeqRecord to be trimmed in place.
+        _pattern: (internal) a pre-compiled regex from "get_trim_pattern".
+
+    Returns:
+        The same SeqRecord, with .id and .description possibly updated.
+    """
+    assert seq_rec.id is not None
+
+    pattern_match = _pattern.match(seq_rec.id)
+
+    if pattern_match:
+        new_id, _ = pattern_match.groups()
+        seq_rec.id = new_id
+        seq_rec.description = ""
+
+    return seq_rec
+
+
+def main(arguments) -> None:
+    """Filter and process a FASTA file."""
+    filter_set = None
+    out_id_lst: List[str] = []
+
+    trim_pattern = compile_trim_pattern(arguments.trim)
+
+    if arguments.filter:
+        with open(arguments.filter, "r", encoding="utf-8") as filt_file:
+            filter_set = {line.strip("\n") for line in filt_file}
+
+    with open_fasta(arguments.infile) as in_handle, open(
+        arguments.output, "w", encoding="utf-8"
+    ) as out_handle:
+        for record in SeqIO.parse(in_handle, "fasta"):
+
+            record = trim_id(_pattern=trim_pattern, seq_rec=record)
+
+            if filter_set:
+                is_in_list = record.id in filter_set
+
+                if (arguments.mode == "k" and not is_in_list) or (
+                    arguments.mode == "d" and is_in_list
+                ):
+                    continue
+
+            if arguments.remove and len(str(record.seq)) > arguments.remove:
+                continue
+
+            SeqIO.write(record, out_handle, "fasta")
+            out_id_lst.append(str(record.id))
+
+    if arguments.idlist:
+        write_id_file(out_file=arguments.idlist, id_list=out_id_lst)
+
+
+if __name__ == "__main__":
+    validated_args = parse_and_validate_arguments()  # pragma:no cover
+    main(validated_args)  # pragma: no cover

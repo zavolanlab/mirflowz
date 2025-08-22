@@ -1,0 +1,8 @@
+>first.sequence This is the first sequence
+AAACCCGGGTTTAAACCCGGGTTT
+>second.sequence This is the second sequence and has more than 25 nt
+AAACCCGGGTTTAAACCCGGGTTTAAACCCGGGTTTAAACCCGGGTTT
+>third.sequence This is the third sequence
+TTTGGGCCCAAATTTGGGCCCAAA
+>fourth.sequence This is the fourth sequence and has more than 25 nt
+TTTGGGCCCAAATTTGGGCCCAAATTTGGGCCCAAATTTGGGCCCAAA
