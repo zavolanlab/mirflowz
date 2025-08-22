@@ -98,62 +98,91 @@ class MirnaExtension:
     def adjust_names(
         self, precursor: gffutils.Feature, matures: list[gffutils.Feature]
     ) -> None:
-        """Adjust miRNAs 'Name' attribute.
+        """Adjust miRNA attributes for uniqueness and consistency.
 
-        This method adjusts the miRNAs 'Name' attribute to account for the
-        different genomic locations the miRNA sequence is annotated on and
-        ensure their uniqueness.
+        This method updates the attributes of precursor and mature miRNA
+        entries to ensure consistent naming based on their paralog or sequence
+        variant status.
 
-        In precursors, the suffix indicating its replica number, is taken
-        either from the 'Name' or the 'ID' attribute. Mature miRNAs take
-        this number as an infix/suffix to construct its name. If the annotated
-        name already has an infix/suffix, it is replaced by the precursor one.
+        For precursors:
+            - A suffix indicates distinct genomic loci (paralogs) that express
+              identical mature sequences. This is typically extracted from the
+              'Name' or 'ID' attribute.
+            - Format: 'SPECIES-mir-NUMBER[LETTER]-#' (Name) and 'ALIAS_#' (ID)
+              where:
+                  - 'LETTER' denotes a sequence variant of the mature miRNA
+                    (paralogous variant with similar but not identical
+                    sequences),
+                  - '#' indicates the paralog number (replica/locus index),
+                    included when multiple loci express the same or similar
+                    miRNAs.
 
-        Precursor names have the format:
-            'SPECIES-mir-NAME-#'
-        Mature miRNA names present one of the following formats depending on
-        whether the arm is specified or not:
-            - 'SPECIES-miR-NAME-#-ARM'
-            - 'SPECIES-miR-NAME-#'
-        where # is the integer indicating the replica the miRNAs are.
+        For mature miRNAs:
+            - The replica number is added or replaced as an infix/suffix in
+              the name.
+            - Formats:
+                - 'SPECIES-miR-NUMBER[LETTER]-#-ARM'
+                - 'SPECIES-miR-NUMBER[LETTER]-#'
+                - 'SPECIES-miR-NUMBER[LETTER]-ARM'
 
-        If a precursor has a replica but its number is set in the 'ID'
-        attribute, the first instance does not has a suffix and but the other
-        one do.
+        Cases:
+            - If a precursor has multiple genomic instances (paralogs), the
+              first occurrence typically lacks a numeric suffix; subsequent
+              ones are numbered incrementally.
+            - The 'Derives_from' attribute of each mature miRNA is updated to
+              match the precursor's 'ID'.
+            - If a precursor has a different sequence variant designation
+              ('LETTER') than its associated matures, the mature miRNA names
+              are updated to match the precursor's designation.
 
-        If a precursor has no other occurrences, no modifications are made.
+        The 'Alias' attribute remains unchanged.
 
         Args:
             precursor: 'miRNA primary transcript' feature entry
-            matures: list with the corresponding 'mature miRNA' feature(s)
+            matures: list of the corresponding 'mature miRNA' feature(s)
                     entry(s)
         """
+        precursor_name_parts = precursor.attributes["Name"][0].split("-")
+        precursor_id_parts = precursor.attributes["ID"][0].split("_")
+
         replica = None
-        precursor_name = precursor.attributes["Name"][0].split("-")
-        precursor_id = precursor.attributes["ID"][0].split("_")
+        if len(precursor_name_parts) == 4:
+            replica = precursor_name_parts[3]
 
-        if len(precursor_name) == 4:
-            replica = precursor_name[-1]
+        elif len(precursor_name_parts) == 3 and len(precursor_id_parts) == 2:
+            replica = precursor_id_parts[1]
+            precursor_name_parts.append(replica)
+            precursor.attributes["Name"][0] = "-".join(precursor_name_parts)
 
-        elif len(precursor_name) == 3 and len(precursor_id) == 2:
-            replica = precursor_id[-1]
-            precursor_name.append(replica)
-            precursor.attributes["Name"][0] = "-".join(precursor_name)
+        for mature in matures:
+            mature_name_parts = mature.attributes["Name"][0].split("-")
+            mature.attributes["Derives_from"][0] = "_".join(precursor_id_parts)
 
-        if replica is not None:
-            for mir in matures:
-                mir_name = mir.attributes["Name"][0].split("-")
+            if replica is not None:
+                # Format: SPECIES-miR-NAME%-#-ARM
+                if len(mature_name_parts) == 5:
+                    mature_name_parts[3] = replica
 
-                if len(mir_name) == 5:
-                    mir_name[3] = replica
+                # Formats:
+                #   - SPECIES-miR-NAME%-#
+                #   - SPECIES-miR-NAME%-ARM
+                elif len(mature_name_parts) == 4:
+                    if mature_name_parts[3].isdigit():
+                        mature_name_parts[3] = replica
+                    else:
+                        mature_name_parts.insert(3, replica)
 
-                elif len(mir_name) == 4 and mir_name[-1] != replica:
-                    mir_name.insert(3, replica)
+                # Format: SPECIES-miR-NAME%
+                elif len(mature_name_parts) == 3:
+                    mature_name_parts.append(replica)
+            else:
+                if (
+                    len(mature_name_parts) >= 3
+                    and mature_name_parts[2] != precursor_name_parts[2]
+                ):
+                    mature_name_parts[2] = precursor_name_parts[2]
 
-                elif len(mir_name) == 3:
-                    mir_name.append(replica)
-
-                mir.attributes["Name"][0] = "-".join(mir_name)
+            mature.attributes["Name"][0] = "-".join(mature_name_parts)
 
     def process_precursor(
         self, precursor: gffutils.Feature, n: int = 6
@@ -271,24 +300,40 @@ def parse_arguments():
     """Parse command-line arguments."""
     description = """Extend miRNA annotated regions and ensure name uniqueness.
 
-Adjust the miRNAs 'Name' attribute to account for the different genomic
-locations the miRNA sequence is annotated on and ensure their uniqueness.
-In precursors, the suffix indicating its replica number, is taken either from
-the 'Name' or the 'ID' attribute. Mature miRNAs take this number as an
-infix/suffix to construct its name. If the annotated name already has an
-infix/suffix, it is replaced by the precursor one.
+This method updates the attributes of precursor and mature miRNA
+entries to ensure consistent naming based on their paralog or sequence
+variant status.
 
-Precursor names have the format:
-    'SPECIES-mir-NAME-#'
-Mature miRNA names present one of the following formats depending on whether
-the arm is specified or not:
-    - 'SPECIES-miR-NAME-#-ARM'
-    - 'SPECIES-miR-NAME-#'
-where # is the integer indicating the replica the miRNAs are.
+For precursors:
+    - A suffix indicates distinct genomic loci (paralogs) that express
+      identical mature sequences. This is typically extracted from the 'Name'
+      or 'ID' attribute.
+    - Format: 'SPECIES-mir-NUMBER[LETTER]-#' (Name) and 'ALIAS_#' (ID)
+      where:
+          - 'LETTER' denotes a sequence variant of the mature miRNA (paralogous
+            variant with similar but not identical sequences),
+          - '#' indicates the paralog number (replica/locus index), included
+            when multiple loci express the same or similar miRNAs.
 
-If a precursor has a replica but its number is set in the 'ID' attribute, the
-first instance does not has a suffix and but the other one do.
-If a precursor has no other occurrences, no modifications are made.
+For mature miRNAs:
+    - The replica number is added or replaced as an infix/suffix in the name.
+    - Formats:
+        - 'SPECIES-miR-NUMBER[LETTER]-#-ARM'
+        - 'SPECIES-miR-NUMBER[LETTER]-#'
+        - 'SPECIES-miR-NUMBER[LETTER]-ARM'
+
+Cases:
+    - If a precursor has multiple genomic instances (paralogs), the first
+      occurrence typically lacks a numeric suffix; subsequent ones are numbered
+      incrementally.
+    - The 'Derives_from' attribute of each mature miRNA is updated to match the
+      precursor's 'ID'.
+    - If a precursor has a different sequence variant designation ('LETTER')
+      than its associated matures, the mature miRNA names are updated to match
+      the precursor's designation.
+
+Note that the 'Alias' attribute remains unchanged so repeated values may still
+be present.
 
 Extend mature miRNA start and end coordinates in a GFF3 file by the indicated
 number of nucleotides without exceeding chromosome boundaries. If the
@@ -307,7 +352,7 @@ The following assumptions are made:
 - The input GFF3 file contains miRNA annotations for a single species.
 - The input GFF3 file contains features of type "miRNA_primary_transcript"
   (referred to as "precursors") and "miRNA" (referred to as "mature miRNAs").
-- The input GFF3 file contains a Name attribute for each precursor.
+- The input GFF3 file contains a 'Name' and 'ID' attribute for each precursor.
 - Each precursor contains one or more mature miRNAs.
 - Each mature miRNA is a child of exactly one precursor and is completely
   within the boundaries of the precursor.
@@ -320,7 +365,7 @@ The following assumptions are made:
         "-v",
         "--version",
         action="version",
-        version="%(prog)s 1.1.0",
+        version="%(prog)s 1.2.0",
         help="show program's version number and exit",
     )
     parser.add_argument(
