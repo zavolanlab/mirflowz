@@ -63,6 +63,68 @@ class MirnaExtension:
                 str(gff_file), dbfn=":memory:", force=True, keep_order=True
             )
 
+    def adjust_names(
+        self,
+        primir: gffutils.feature.Feature,
+        mirna_list: list[gffutils.feature.Feature],
+    ) -> None:
+        """Adjust miRNAs' `Name` attribute.
+
+        This method adjusts the miRNAs' `Name` attribute to account for the
+        different genomic locations the miRNA sequence is anotated on making
+        them unique.
+
+        miRNA primary transcript names have either the format
+        `SPECIES-mir-NAME` or `SPECIES-mir-NAME-#` where `#` is the integer
+        indicating which replicate is it. If there are several entries with
+        the exact same name, the feature `ID` has the format `ID_#`.
+
+        Mature miRNA names present one of the following formats:
+            - `SPECIES-miR-NAME-ARM`
+            - `SPECIES-miR-NAME-#-ARM`
+        Or, if there's a single mature miRNA:
+            - `SPECIES-miR-NAME`
+            - `SPECIES-miR-NAME-#`
+
+        If one pri-miR is considered to have multiple entries, the suffix of
+        either the `Name` or the `ID` is set in its corresponding mature
+        miRNA(s) name. The pri-miR `Name` is also updated if the suffix is
+        found in the `ID`.
+
+        Args:
+            primir:
+                miRNA primary transcript feature entry
+            mirna_list:
+                list with the corresponding mature miRNA feature(s) entry(s)
+        """
+        suffix = None
+        primir_name = primir.attributes["Name"][0].split("-")
+        primir_id = primir.attributes["ID"][0].split("_")
+
+        if len(primir_name) == 4:
+            suffix = primir_name[-1]
+
+        elif len(primir_name) == 3 and len(primir_id) == 2:
+            suffix = primir_id[-1]
+            primir_name.append(suffix)
+
+        if suffix:
+            for mirna in mirna_list:
+                mirna_name = mirna.attributes["Name"][0].split("-")
+
+                if len(mirna_name) == 5:
+                    mirna_name[3] = suffix
+
+                elif len(mirna_name) == 4 and mirna_name[-1] != suffix:
+                    mirna_name.insert(3, suffix)
+
+                elif len(mirna_name) == 3:
+                    mirna_name.append(suffix)
+
+                mirna.attributes["Name"][0] = "-".join(mirna_name)
+
+        primir.attributes["Name"][0] = "-".join(primir_name)
+
     def extend_mirnas(
         self,
         primir_out: Path,
@@ -108,44 +170,48 @@ class MirnaExtension:
                 "miRNA_primary_transcript"
             ):
                 seqid = primary_mirna.seqid
-                start = int(primary_mirna.start)
-                end = int(primary_mirna.end)
+                min_start = primary_mirna.start
+                max_end = primary_mirna.end
 
                 mature_miRNAs = list(
                     self.db.region(
                         seqid=seqid,
-                        start=start,
-                        end=end,
+                        start=min_start,
+                        end=max_end,
+                        strand=primary_mirna.strand,
                         featuretype="miRNA",
                         completely_within=True,
                     )
                 )
 
+                self.adjust_names(primary_mirna, mature_miRNAs)
+
                 if mature_miRNAs:
-                    for mir in mature_miRNAs:
-                        if mir.start - n > 0:
-                            mir.start -= n
+                    for mature_mir in mature_miRNAs:
+                        if mature_mir.start - n > 0:
+                            mature_mir.start -= n
                         else:
-                            mir.start = 0
+                            mature_mir.start = 0
 
-                        if mir.end + n < seq_lengths[seqid]:
-                            mir.end += n
+                        if mature_mir.end + n < seq_lengths[seqid]:
+                            mature_mir.end += n
                         else:
-                            mir.end = seq_lengths[seqid]
+                            mature_mir.end = seq_lengths[seqid]
 
-                        if mir.start < start:
-                            primary_mirna.start = mir.start
+                        min_start = min(min_start, mature_mir.start)
+                        max_end = max(max_end, mature_mir.end)
 
-                        if mir.end > end:
-                            primary_mirna.end = mir.end
+                        mirna.write(str(mature_mir) + "\n")
 
-                        mirna.write(str(mir) + "\n")
+                    start_diff = primary_mirna.start - min_start
+                    end_diff = max_end - primary_mirna.end
 
-                    start_diff = start - primary_mirna.start
-                    end_diff = primary_mirna.end - end
+                    primary_mirna.start = min_start
+                    primary_mirna.end = max_end
+
                     primary_mirna.attributes["Name"][0] += f"_-{start_diff}"
                     primary_mirna.attributes["Name"][0] += f"_+{end_diff}"
-
+            
                 primir.write(str(primary_mirna) + "\n")
 
 

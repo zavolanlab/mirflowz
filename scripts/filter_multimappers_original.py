@@ -146,51 +146,6 @@ def find_best_alignments(
     return best_alignments
 
 
-def find_best_alignments_mod(
-    alns: List[pysam.AlignedSegment], nh: bool = False
-) -> List[pysam.AlignedSegment]:
-    """Find alignments with less indels.
-
-    This function creates a list of tuples with the alignment object and its
-    number of indels. Then, computes the minimum number of indels and returns
-    a list with the alignments that have no more than that minimum number of
-    indels. In addition, it updates the 'NH' and 'HI' tags to match the final
-    number of alignments kept and its identifier respectively. If 'nh' is set
-    to 'True', all query names are modified to include the NH tag after an
-    underscore.
-
-    Args:
-        alignments: alignments with the same query name
-
-    Retrns:
-        best_alignments: alignments with the less indels
-    """
-    if len(alns) == 1:
-        if nh:
-            name = f'{alns[0].query_name}_{alns[0].get_tag("NH")}'
-            alns[0].query_name = name
-
-        return alns
-
-    aln_indels = [(aln, count_indels(aln=aln)) for aln in alns]
-    max_indels = max(aln_indels, key=lambda x: x[1])[1]
-    best_alignments = [
-        aln
-        for i, (aln, indels) in enumerate(aln_indels)
-        if indels == max_indels
-    ]
-
-    for i, best_aln in enumerate(best_alignments):
-        if nh:
-            name = f"{best_aln.query_name}_{len(best_alignments)}"
-            best_aln.query_name = name
-
-        best_aln.set_tag("NH", len(best_alignments))
-        best_aln.set_tag("HI", i + 1)
-
-    return best_alignments
-
-
 def write_output(alns: List[pysam.AlignedSegment]) -> None:
     """Write the output to the standard output (stdout).
 
@@ -220,7 +175,7 @@ def main(arguments) -> None:
                 current_alignments.append(alignment)
 
             else:
-                current_alignments = find_best_alignments_mod(
+                current_alignments = find_best_alignments(
                     current_alignments, arguments.nh
                 )
                 write_output(alns=current_alignments)
@@ -229,7 +184,7 @@ def main(arguments) -> None:
                 current_alignments = [alignment]
 
         if len(current_alignments) > 0:
-            current_alignments = find_best_alignments_mod(
+            current_alignments = find_best_alignments(
                 current_alignments, arguments.nh
             )
             write_output(alns=current_alignments)
