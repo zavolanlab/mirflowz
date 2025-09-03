@@ -1,0 +1,13 @@
+feat(scripts): enhance miRNA processing pipeline
+
+Improve core miRNA pipeline scripts with enhanced filtering, quantification,
+and processing capabilities. Add backup of original filter_multimappers.py
+implementation while introducing significant improvements across multiple
+components including name tagging, table merging, and coordinate extension.
+
+- feat: enhance filter_multimappers.py (+47/-2)  
+- feat: add filter_multimappers_original.py backup (+195)
+- refactor: improve iso_name_tagging.py (+64/-62)
+- feat: enhance merge_tables.R (+113/-23)
+- feat: extend mirna_extension.py functionality (+85/-19)
+- refactor: optimize mirna_quantification.py (+68/-71)

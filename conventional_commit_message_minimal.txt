@@ -1,0 +1,6 @@
+feat(scripts): enhance miRNA pipeline processing and quantification
+
+Improve core miRNA processing scripts with enhanced filtering, quantification,
+and coordinate extension capabilities. Preserve original implementations while
+introducing significant functionality improvements across multiple pipeline
+components.

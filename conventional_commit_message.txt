@@ -1,0 +1,14 @@
+feat(scripts): enhance miRNA pipeline processing and quantification
+
+- Enhance filter_multimappers.py with improved filtering logic (+47/-2)
+- Preserve original implementation as filter_multimappers_original.py
+- Refactor iso_name_tagging.py with updated tagging mechanisms (+64/-62)
+- Improve merge_tables.R with enhanced table processing (+113/-23)  
+- Extend mirna_extension.py with additional functionality (+85/-19)
+- Optimize mirna_quantification.py processing logic (+68/-71)
+
+This commit represents a major enhancement to the miRNA processing pipeline,
+improving quantification accuracy and processing capabilities across multiple
+core components while preserving backward compatibility.
+
+Total changes: 572 additions, 177 deletions across 6 files
