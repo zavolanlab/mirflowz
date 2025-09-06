@@ -202,9 +202,9 @@ def write_output(alns: List[pysam.AlignedSegment]) -> None:
         sys.stdout.write(alignment.to_string() + "\n")
 
 
-def main(arguments) -> None:
+def main(args) -> None:
     """Filter multimappers by indels count."""
-    with pysam.AlignmentFile(arguments.infile, "r") as samfile:
+    with pysam.AlignmentFile(args.infile, "r") as samfile:
 
         sys.stdout.write(str(samfile.header))
 
@@ -223,8 +223,8 @@ def main(arguments) -> None:
                 current_alignments.append(alignment)
 
             else:
-                current_alignments = find_best_alignments_mod(
-                    current_alignments, arguments.nh
+                current_alignments = find_best_alignments(
+                    current_alignments, args.nh
                 )
                 write_output(alns=current_alignments)
 
@@ -232,12 +232,12 @@ def main(arguments) -> None:
                 current_alignments = [alignment]
 
         if len(current_alignments) > 0:
-            current_alignments = find_best_alignments_mod(
-                current_alignments, arguments.nh
+            current_alignments = find_best_alignments(
+                current_alignments, args.nh
             )
             write_output(alns=current_alignments)
 
 
 if __name__ == "__main__":
-    args = parse_arguments().parse_args()  # pragma:no cover
-    main(args)  # pragma: no cover
+    arguments = parse_arguments().parse_args()  # pragma:no cover
+    main(arguments)  # pragma: no cover
