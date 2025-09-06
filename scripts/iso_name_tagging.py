@@ -310,7 +310,7 @@ def parse_intersect_output(
 
 
 def get_tags(
-    intersecting_mirna: list, alignment: pysam.AlignedSegment, extend: int
+    intersecting_mirna: list, alignment: pysam.AlignedSegment, extend: int = 0
 ) -> set:
     """Get tag for alignment.
 
