@@ -195,7 +195,7 @@ def parse_arguments():
         "-i",
         "--intersect",
         help=(
-            "Path to the INTERSECT file. This file must be the output of "
+            "Path to the INTERSECT file. This file must be the output of"
             " a bedtools intersect call with -a being a GFF3 file and"
             " -b a BAM file."
         ),
@@ -340,7 +340,7 @@ def get_tags(
     seq = alignment.query_sequence
     md = alignment.get_tag("MD")
 
-    limit = extension + 1
+    limit = extend + 1
     tags = []
 
     for miRNA_name, miRNA_start, miRNA_end in intersecting_mirna:
@@ -358,7 +358,7 @@ def get_tags(
 def main(args) -> None:
     """Add intersecting feature(s) into a SAM file as a tag."""
     intersect_data = parse_intersect_output(
-        arguments.intersect, arguments.id, arguments.extension
+        args.intersect, args.id, args.extension
     )
 
     with pysam.AlignmentFile(args.sam, "r") as samfile:
