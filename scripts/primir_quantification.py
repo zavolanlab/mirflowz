@@ -41,9 +41,9 @@ def parse_arguments():
     parser.add_argument(
         "intersect",
         help=(
-            "Path to the INTERSECT file. This file must be the output of "
-            "a bedtools intersect call with -a being a BED file and"
-            "-b a BAM file."
+            "Path to the INTERSECT file. This file must be the output of"
+            " a bedtools intersect call with -a being a BED file and"
+            " -b a BAM file."
         ),
         type=Path,
     )
@@ -51,9 +51,9 @@ def parse_arguments():
         "--collapsed",
         help=(
             "Indicate that the file used in bedtools intersect has the"
-            "reads collapsed by sequence and alignment. The collapsed name"
-            "must be build by the alignment name followed by a '-' and the"
-            "number of collpased alignments, i.e 1-4. Default %(default)s."
+            " reads collapsed by sequence and alignment. The collapsed name"
+            " must be build by the alignment name followed by a '-' and the"
+            " number of collpased alignments, i.e 1-4. Default %(default)s."
         ),
         action="store_true",
         default=False,
@@ -62,9 +62,9 @@ def parse_arguments():
         "--nh",
         help=(
             "Indicate that the file used in bedtools intersect has the"
-            "NH tag in the read query name. The name must be build by the"
-            "alignment name followed by an underscore and the NH value,"
-            "i.e 1-2_4. Default %(default)s."
+            " NH tag in the read query name. The name must be build by the"
+            " alignment name followed by an underscore and the NH value,"
+            " i.e 1-2_4. Default %(default)s."
         ),
         action="store_true",
         default=False,
@@ -73,7 +73,7 @@ def parse_arguments():
         "--id",
         help=(
             "ID used to identify the feature in the output table."
-            "The ID must be in lowercase. Default: %(default)s."
+            " The ID must be in lowercase. Default: %(default)s."
         ),
         default="name",
         type=str,
@@ -82,7 +82,7 @@ def parse_arguments():
         "--read-ids",
         help=(
             "Include read IDs of the alignments intersecting a feature in"
-            "the output table. Default: %(default)s."
+            " the output table. Default: %(default)s."
         ),
         action="store_true",
         default=False,
@@ -91,9 +91,9 @@ def parse_arguments():
         "--feat-extension",
         help=(
             "If any of the feature's coordinates had been extended, include"
-            "the extension in the output table. It is assumed that the"
-            "extensions are found within the feature id 'name' and separated"
-            "by an underscore. Default: %(default)s."
+            " the extension in the output table. It is assumed that the"
+            " extensions are found within the feature id 'name' and separated"
+            " by an underscore. Default: %(default)s."
         ),
         action="store_true",
         default=False,
@@ -103,7 +103,7 @@ def parse_arguments():
 
 
 def attributes_dictionary(attr: str) -> Dict[str, str]:
-    """Create attributes dicctionary."""
+    """Create attributes dictionary."""
     pairs = attr.split(";")
 
     if len(pairs[0].split("=")) == 2:
@@ -165,9 +165,9 @@ def get_initial_data(name: str, feat_extension: bool) -> list[str]:
     return feat_data
 
 
-def main(arguments) -> None:
+def main(args) -> None:
     """Tabulate a bedtools intersect file."""
-    with open(arguments.intersect, "r", encoding="utf-8") as inter_file:
+    with open(args.intersect, "r", encoding="utf-8") as inter_file:
         Fields = namedtuple(
             "Fields",
             (
@@ -195,14 +195,14 @@ def main(arguments) -> None:
         for line in inter_file:
             fields = Fields(*line.strip().split("\t"))
 
-            name = attributes_dictionary(fields.feat_attributes)[arguments.id]
+            name = attributes_dictionary(fields.feat_attributes)[args.id]
             contribution = get_contribution(
-                fields.read_name, arguments.collapsed, arguments.nh
+                fields.read_name, args.collapsed, args.nh
             )
 
             if current_name is None:
                 current_name = name
-                feat_data = get_initial_data(name, arguments.feat_extension)
+                feat_data = get_initial_data(name, args.feat_extension)
 
             if current_name == name:
                 count += contribution
@@ -211,12 +211,12 @@ def main(arguments) -> None:
             else:
                 feat_data.insert(1, str(count))
 
-                if arguments.read_ids:
+                if args.read_ids:
                     feat_data.append(";".join(sorted(read_ID)))
 
                 sys.stdout.write("\t".join(feat_data) + "\n")
 
-                feat_data = get_initial_data(name, arguments.feat_extension)
+                feat_data = get_initial_data(name, args.feat_extension)
 
                 current_name = name
                 count = contribution
@@ -225,12 +225,12 @@ def main(arguments) -> None:
         if current_name is not None:
             feat_data.insert(1, str(count))
 
-            if arguments.read_ids:
+            if args.read_ids:
                 feat_data.append(";".join(sorted(read_ID)))
 
             sys.stdout.write("\t".join(feat_data) + "\n")
 
 
 if __name__ == "__main__":
-    args = parse_arguments().parse_args()  # pragma: no cover
-    main(args)  # pragma: no cover
+    arguments = parse_arguments().parse_args()  # pragma: no cover
+    main(arguments)  # pragma: no cover
