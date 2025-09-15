@@ -1306,9 +1306,9 @@ with a [**custom script**][custom-script-iso-tag].
 > In this step, the mature miRNA annotated regions are used instead of the
 > extended ones. Each alignment gets an extra tag (`YW:Z`) with the (iso)miR(s)
 > it is considered to really intersect with using the format:
-> `miRNA_name|5p-shift|3p-shift|CIGAR|MD`, where `5p-shift` and `3p-shift` are
-> the difference between the miRNA start and end coordinates and the
-> alignment's ones respectively.
+> `miRNA_name|5p-shift|3p-shift|CIGAR|MD|READ_SEQ`, where `5p-shift` and
+> `3p-shift` are the difference between the miRNA start and end coordinates
+> and the alignment's ones respectively.
 
 - **Input**
   - Alignments file, filtered (`.sam`); from
@@ -1325,44 +1325,141 @@ with a [**custom script**][custom-script-iso-tag].
 - **Examples**
 
 ```console
-Example 1 | Intersecting a canoncial mature miRNA
+Example 1 | Feature intersects alignment | coordinates adjustment and shift allowed
+    use case:
+        Prior to checking if the feature is intersecting the alignment, its
+        coordinates are adjusted by the value specified in `--extension`. In
+        addition, the same value is used to specify the +/- shift allowed
+        between the feature and the read alignment start and end coordinates.
 
-IN miRNA annotations:
-    chr19	.	miRNA	44377	44398	.	+	.	ID=MIMAT0002849;Alias=MIMAT0002849;Name=hsa-miR-524-5p;Derives_from=MI0003160
-IN SAM record:
-    1-1_1	0	19	44377	255	22M	*	0	0	CTACAAAGGGAAGCACTTTCTC	*	MD:Z:22	NH:i:1	NM:i:0
-NEW TAG:
-	YW:Z:hsa-miR-524-5p|0|0|22M|22
+    command:
+        iso_name_tagging.py -b INTERSECT -s SAM --extension 5
+
+    in INTERSECT record:
+        19	.	miRNA	5332	5365	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	read_1	255	+	21
+
+    in SAM record:
+        read_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
+
+    intersection before coordinates adjustment visualization:
+
+        ---|===============================|--- (feature)
+        ---------|===================|--------- (read)
+
+    intersection after coordinates adjustment visualization:
+
+        --------|=====================|-------- (feature)
+        ---------|===================|--------- (read)
+
+    out SAM record:
+        read_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0  YW:Z:hsa-miR-1323|1|-1|21M|21|TCAAAACTGAGGGGCATTTTC
+
+    description:
+        The feature start and end coordinates after the adjustment are 5337
+        and 5360 respectively.
+        The read alignment starts at position 5338. As the read has length 21,
+        its end position is 5359.
+        The feature intersects the read alignment with an overhang within the
+        specified shift range (+/- 5) so it is added as a new tag in the output
+        SAM record.
 
 
-Example 2 | Intersecting an isomiR (no shifts)
+Example 2 | Feature intersects alignment | no coordinates adjustment or shift allowed
+    use case:
+        The feature and read alignment coordinates must perfectly match.
 
-IN miRNA annotations:
-    chr19	.	miRNA	44377	44398	.	+	.	ID=MIMAT0002849;Alias=MIMAT0002849;Name=hsa-miR-524-5p;Derives_from=MI0003160
-IN SAM record:
-    1-1_1	0	19	44377	1	11M3I11M	*	0	0	CTACAAAGGGAGGTAGCACTTTCTC	*	HI:i:0	MD:Z:22	NH:i:1	NM:i:3
-NEW TAG:
-    YW:Z:hsa-miR-524-5p|0|0|11M3I11M|22
+    command:
+        iso_name_tagging.py -b INTERSECT -s SAM
+
+    in INTERSECT record:
+        19	.	miRNA	5338	5359	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	read_2	255	+	21
+
+    in SAM record:
+        read_2	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
+
+    intersection visualization:
+
+        ---------|===================|--------- (feature)
+        ---------|===================|--------- (read)
+
+    out SAM record:
+        read_2	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0  YW:Z:hsa-miR-1323|0|0|21M|21|TCAAAACTGAGGGGCATTTTC
+
+    description:
+        The feature start and end coordinates are 5338 and 5359 respectively.
+        The read alignment starts at position 5338. As the read has length 21,
+        its end position is 5359.
+        The feature perfectly intersects the read alignment so it is added as
+        a new tag in the output SAM record.
 
 
-Example 3 | Intersecting an isomiR (no InDels nor mismatches)
+Example 3 | Non-intersecting feature | shift filter not passed
+    use case:
+        Prior to checking if the feature is intersecting the alignment, its
+        coordinates are adjusted by the value specified in `--extension`. In
+        addition, the same value is used to specify the +/- shift allowed
+        between the feature and the read alignment start and end coordinates.
 
-IN miRNA annotations:
-    chr19	.	miRNA	5338	5359	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786
-IN SAM record:
-    1-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
-NEW TAG:
-    YW:Z:hsa-miR-1323|0|-1|21M|21
+    command:
+        iso_name_tagging.py -b INTERSECT -s SAM --extension 1
+
+    in INTERSECT record:
+        19	.	miRNA	5332	5365	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	read_3	255	+	21
+
+    in SAM record:
+        read_3	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
+
+    intersection before coordinates adjustment visualization:
+
+        ---|===============================|--- (feature)
+        ---------|===================|--------- (read)
+
+    intersection after coordinates adjustment visualization:
+
+        ----|=============================|---- (feature)
+        ---------|===================|--------- (read)
+
+    out SAM record:
+        read_3	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0  YW:Z:
+
+    description:
+        The feature start and end coordinates after the adjustment are 5333
+        and 5364 respectively.
+        The read alignment starts at position 5338. As the read has length 21,
+        its end position is 5359.
+        There is a 5-nucleotide overhang on both ends. Thus, the feature is
+        not considered to intersect the read alignment and the tag is an empty
+        string.
 
 
-Example 4 | Not intersecting an (iso)miR
+Example 4 | Feature intersects alignment | using feature's "Alias"
+    use case:
+        The feature and read alignment coordinates must perfectly match.
 
-IN miRNA annotations:
-    chr19	.	miRNA	5338	5359	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786
-IN SAM record:
-    1-1_1	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
-NEW TAG:
-    YW:Z:
+    command:
+        iso_name_tagging.py -b INTERSECT -s SAM --id alias
+
+    in INTERSECT record:
+        19	.	miRNA	5338	5359	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	read_4	255	+	21
+
+    in SAM record:
+        read_4	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0
+
+    intersection visualization:
+
+        ---------|===================|--------- (feature)
+        ---------|===================|--------- (read)
+
+    out SAM record:
+        read_4	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0  YW:Z:MIMAT0005795|0|0|21M|21|TCAAAACTGAGGGGCATTTTC
+
+    description:
+        The feature start and end coordinates are 5338 and 5359 respectively.
+        The read alignment starts at position 5338. As the read has length 21,
+        its end position is 5359.
+        The feature perfectly intersects the read alignment so it is added as
+        a new tag in the output SAM record. In this case, instead of using the
+        feature `Name` (default), the `Alias` is used.
 ```
 
 #### `sort_intersecting_mirna_by_feat_tag`
@@ -1415,8 +1512,8 @@ Tabulate alignments according to its new tag (`YW:Z`) with a
 Example 1 | Canonical miRNA and isomiR
 
 IN SAM record:
-    10-4_2	0	19	34627	255	21M	*	0	0	AAAGTGCTTCCTTTTAGAGGG	*	MD:Z:21	NM:i:0	NH:i:2	HI:i:1	YW:Z:hsa-miR-520b-3p|0|0|21M|21
-    10-4_2	0	19	40866	255	21M	*	0	0	AAAGTGCTTCCTTTTAGAGGG	*	MD:Z:21	NM:i:0	NH:i:2	HI:i:2	YW:Z:hsa-miR-520c-3p|0|-1|21M|21
+    10-4_2	0	19	34627	255	21M	*	0	0	AAAGTGCTTCCTTTTAGAGGG	*	MD:Z:21	NM:i:0	NH:i:2	HI:i:1	YW:Z:hsa-miR-520b-3p|0|0|21M|21|AAAGTGCTTCCTTTTAGAGGG
+    10-4_2	0	19	40866	255	21M	*	0	0	AAAGTGCTTCCTTTTAGAGGG	*	MD:Z:21	NM:i:0	NH:i:2	HI:i:2	YW:Z:hsa-miR-520c-3p|0|-1|21M|21|AAAGTGCTTCCTTTTAGAGGG
 
 Data:
     Alignment:
@@ -1426,28 +1523,28 @@ Data:
         Contribution: 4/2 = 2
 
     miRNA species:
-        Tag name: hsa-miR-520b-3p|0|0|21M|21
+        Tag name: hsa-miR-520b-3p|0|0|21M|21|AAAGTGCTTCCTTTTAGAGGG
         Type: Canonical
         Table name: hsa-miR-520b-3p
         Total count: 2
 
-        Tag name: hsa-miR-520c-3p|0|-1|21M|21
+        Tag name: hsa-miR-520c-3p|0|-1|21M|21|AAAGTGCTTCCTTTTAGAGGG
         Type: isomiR
-        Table name: hsa-miR-520c-3p|0|-1|21M|21
+        Table name: hsa-miR-520c-3p|0|-1|21M|21|AAAGTGCTTCCTTTTAGAGGG
         Total count: 2
 
 OUT table:
-    ID	                        lib_name
-    hsa-miR-520b-3p         	2
-    hsa-miR-520c-3p|0|-1|21M|21	2
+    ID	                                                lib_name
+    hsa-miR-520b-3p         	                        2
+    hsa-miR-520c-3p|0|-1|21M|21|AAAGTGCTTCCTTTTAGAGGG	2
 
 
 Example 2 | Different isomiRs
 
 IN SAM record:
-    599-1_3	0	19	27804	255	20M	*	0	0	AAAGTGCTTCCTTTTAGAGG	*	MD:Z:20	NM:i:0	NH:i:3	HI:i:1	YW:Z:hsa-miR-526b-3p|1|-1|20M|20
-    599-1_3	0	19	34627	255	20M	*	0	0	AAAGTGCTTCCTTTTAGAGG	*	MD:Z:20	NM:i:0	NH:i:3	HI:i:2	YW:Z:hsa-miR-520b-3p|0|-1|20M|20
-    599-1_3	0	19	40866	255	20M	*	0	0	AAAGTGCTTCCTTTTAGAGG	*	MD:Z:20	NM:i:0	NH:i:3	HI:i:3	YW:Z:hsa-miR-520c-3p|0|-2|20M|20
+    599-1_3	0	19	27804	255	20M	*	0	0	AAAGTGCTTCCTTTTAGAGG	*	MD:Z:20	NM:i:0	NH:i:3	HI:i:1	YW:Z:hsa-miR-526b-3p|1|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
+    599-1_3	0	19	34627	255	20M	*	0	0	AAAGTGCTTCCTTTTAGAGG	*	MD:Z:20	NM:i:0	NH:i:3	HI:i:2	YW:Z:hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
+    599-1_3	0	19	40866	255	20M	*	0	0	AAAGTGCTTCCTTTTAGAGG	*	MD:Z:20	NM:i:0	NH:i:3	HI:i:3	YW:Z:hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG
 
 Data:
     Alignment:
@@ -1457,26 +1554,26 @@ Data:
         Contribution: 1/3 = 0.33
 
     miRNA species:
-        Tag name: hsa-miR-526b-3p|1|-1|20M|20
+        Tag name: hsa-miR-526b-3p|1|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
         Type: isomiR
-        Table name: hsa-miR-526b-3p|1|-1|20M|20
+        Table name: hsa-miR-526b-3p|1|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
         Total count: 0.33
 
-        Tag name: hsa-miR-520b-3p|0|-1|20M|20
+        Tag name: hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
         Type: isomiR
-        Table name: hsa-miR-520b-3p|0|-1|20M|20
+        Table name: hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
         Total count: 0.33
 
-        Tag name: hsa-miR-520c-3p|0|-2|20M|20
+        Tag name: hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG
         Type: isomiR
-        Table name: hsa-miR-520c-3p|0|-2|20M|20
+        Table name: hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG
         Total count: 0.33
 
 OUT table:
-    ID	                        lib_name
-    hsa-miR-520b-3p|0|-1|20M|20	0.33
-    hsa-miR-520c-3p|0|-2|20M|20	0.33
-    hsa-miR-526b-3p|1|-1|20M|20	0.33
+    ID	                                                lib_name
+    hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG	0.33
+    hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG	0.33
+    hsa-miR-526b-3p|1|-1|20M|20|AAAGTGCTTCCTTTTAGAGG	0.33
 ```
 
 

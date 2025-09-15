@@ -191,6 +191,8 @@ rule create_per_run_ascii_pileups:
         cluster_log=CLUSTER_LOG / "pileups_whole_run.log",
         out_dir=PILEUP_DIR / "all",
         prefix="all_samples",
+    resources:
+        mem=16,
     log:
         LOCAL_LOG / "pileups_whole_run.log",
     container:

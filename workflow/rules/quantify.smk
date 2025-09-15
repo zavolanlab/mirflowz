@@ -301,7 +301,7 @@ rule add_intersecting_mirna_tag:
         ENV_DIR / "pysam.yaml"
     shell:
         "(python {input.script} \
-        --bed {input.intersect} \
+        --intersect {input.intersect} \
         --sam {input.alignments} \
         --extension {params.extension} \
         > {output.sam} \

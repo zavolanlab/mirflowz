@@ -150,7 +150,7 @@ def count_indels(aln: pysam.libcalignedsegment.AlignedSegment) -> int:
 def find_best_alignments(
     alns: List[pysam.AlignedSegment], nh: bool = False
 ) -> List[pysam.AlignedSegment]:
-    """Find alignments with less indels.
+    """Find alignments with more indels.
 
     Using the function `count_indels` each alignment is assigned with its
     number of indels. Then, only those alignments with the higher amount of
@@ -202,9 +202,9 @@ def write_output(alns: List[pysam.AlignedSegment]) -> None:
         sys.stdout.write(alignment.to_string() + "\n")
 
 
-def main(arguments) -> None:
+def main(args) -> None:
     """Filter multimappers by indels count."""
-    with pysam.AlignmentFile(arguments.infile, "r") as samfile:
+    with pysam.AlignmentFile(args.infile, "r") as samfile:
 
         sys.stdout.write(str(samfile.header))
 
@@ -224,7 +224,7 @@ def main(arguments) -> None:
 
             else:
                 current_alignments = find_best_alignments(
-                    current_alignments, arguments.nh
+                    current_alignments, args.nh
                 )
                 write_output(alns=current_alignments)
 
@@ -233,11 +233,11 @@ def main(arguments) -> None:
 
         if len(current_alignments) > 0:
             current_alignments = find_best_alignments(
-                current_alignments, arguments.nh
+                current_alignments, args.nh
             )
             write_output(alns=current_alignments)
 
 
 if __name__ == "__main__":
-    args = parse_arguments().parse_args()  # pragma:no cover
-    main(args)  # pragma: no cover
+    arguments = parse_arguments().parse_args()  # pragma:no cover
+    main(arguments)  # pragma: no cover

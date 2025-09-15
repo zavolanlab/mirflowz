@@ -42,6 +42,7 @@ snakemake \
     --apptainer-args="--bind ${PWD}/../" \
     --printshellcmds \
     --rerun-incomplete \
+    --latency-wait 60 \
     --no-hooks \
     --verbose
 
