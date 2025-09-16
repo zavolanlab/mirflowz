@@ -1462,7 +1462,6 @@ Example 4 | Feature intersects alignment | using feature's "Alias"
         feature `Name` (default), the `Alias` is used.
 ```
 
-
 #### `sort_intersecting_mirna_by_feat_tag`
 
 Sort the alignments by the tag containing the classified intersecting (iso)miR
@@ -1560,21 +1559,21 @@ Data:
         Table name: hsa-miR-526b-3p|1|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
         Total count: 0.33
 
-        Tag name: hsa-miR-520b-3p|0|-1|20M|20
+        Tag name: hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
         Type: isomiR
         Table name: hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG
         Total count: 0.33
 
         Tag name: hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG
         Type: isomiR
-        Table name: hsa-miR-520c-3p|0|-2|20M|20
+        Table name: hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG
         Total count: 0.33
 
 OUT table:
-    ID	                        lib_name
-    hsa-miR-520b-3p|0|-1|20M|20	0.33
-    hsa-miR-520c-3p|0|-2|20M|20	0.33
-    hsa-miR-526b-3p|1|-1|20M|20	0.33
+    ID	                                                lib_name
+    hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG	0.33
+    hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG	0.33
+    hsa-miR-526b-3p|1|-1|20M|20|AAAGTGCTTCCTTTTAGAGG	0.33
 ```
 
 
