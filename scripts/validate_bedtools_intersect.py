@@ -22,7 +22,7 @@ Exposes:
 
 
 from pathlib import Path
-from typing import Dict, Literal, Iterator
+from typing import Dict, Literal, Iterator, Union
 
 
 class FileFormatError(BaseException):
@@ -90,15 +90,15 @@ class Record:
         feat_type: str,
         feat_start: int,
         feat_end: int,
-        feat_score: float | Literal["."],
+        feat_score: Union[float, Literal["."]],
         feat_strand: Literal["+", "-"],
-        feat_phase_frame: int | Literal["."],
+        feat_phase_frame: Union[int, Literal["."]],
         feat_attrs: Dict[str, str],
         read_chr: str,
         read_start: int,
         read_end: int,
         read_name: str,
-        read_score: float | Literal["."],
+        read_score: Union[float, Literal["."]],
         read_strand: Literal["+", "-"],
         overlap_len: int,
     ) -> None:
@@ -157,7 +157,7 @@ class Record:
             text=parts[4].strip(), field="feature end (col. 5)"
         )
 
-        feat_score: float | Literal["."] = cls._as_float_or_dot(
+        feat_score: Union[float, Literal["."]] = cls._as_float_or_dot(
             text=parts[5].strip(), field="feature score (col. 6)"
         )
 
@@ -165,7 +165,7 @@ class Record:
             text=parts[6].strip(), field="feature strand (col. 7)"
         )
 
-        feat_phase: int | Literal["."] = cls._as_phase_frame(
+        feat_phase: Union[int, Literal["."]] = cls._as_phase_frame(
             text=parts[7].strip(), field="feature phase/frame (col. 8)"
         )
 
@@ -185,7 +185,7 @@ class Record:
 
         read_name: str = cls._text(parts[12].strip())
 
-        read_score: float | Literal["."] = cls._as_float_or_dot(
+        read_score: Union[float, Literal["."]] = cls._as_float_or_dot(
             text=parts[13].strip(), field="read score (col. 14)"
         )
 
@@ -297,7 +297,7 @@ class Record:
             ) from err
 
     @staticmethod
-    def _as_float_or_dot(text: str, field: str) -> float | Literal["."]:
+    def _as_float_or_dot(text: str, field: str) -> Union[float, Literal["."]]:
         """Parse a field that is either '.' or a float.
 
         Args:
@@ -338,7 +338,7 @@ class Record:
         )
 
     @staticmethod
-    def _as_phase_frame(text: str, field: str) -> Literal["."] | int:
+    def _as_phase_frame(text: str, field: str) -> Union[int, Literal["."]]:
         """Parse a phase/frame field: 0, 1, 2 or '.'.
 
         Args:
