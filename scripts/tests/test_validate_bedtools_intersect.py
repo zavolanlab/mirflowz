@@ -262,7 +262,7 @@ class TestCrossCheck:
 
     def test_cross_check_no_overlap(self):
         """Test with feature and read not overlapping."""
-        with pytest.raises(FileFormatError, match=r"no overlap between .*"):
+        with pytest.raises(FileFormatError, match=r"computed overlap is 0 .*"):
             Record(
                 feat_chr="chr0",
                 feat_source="X_source",
@@ -373,7 +373,7 @@ class TestStaticParsers:
         """Test parsing invalid attributes style."""
         attr_inv = "This is; an invalid; attributes line"
 
-        with pytest.raises(FileFormatError, match=r".* attributes must be .*"):
+        with pytest.raises(FileFormatError, match=r".* must be GFF3 .*"):
             Record._parse_feat_attrs(attr_inv, "field")
 
 
