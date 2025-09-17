@@ -6,7 +6,12 @@ import sys
 
 import pytest
 
-from ..iso_name_tagging import main, parse_arguments
+from ..iso_name_tagging import (
+    main,
+    parse_arguments,
+    parse_intersect_output,
+)
+from ..validate_bedtools_intersect import FileFormatError
 
 
 @pytest.fixture
@@ -21,7 +26,7 @@ def empty_files():
 @pytest.fixture
 def intersect_sam():
     """Import path to INTERSECT and SAM files."""
-    intersect_file = Path("files/in_intersection_mirna.bed")
+    intersect_file = Path("files/in_intersection_mirna.intersect")
     sam_file = Path("files/in_alignments_mirna.sam")
     output_file = Path("files/mirna_tag.sam")
 
@@ -31,7 +36,7 @@ def intersect_sam():
 @pytest.fixture
 def intersect_sam_extension():
     """Import path to INTERSECT and SAM files with miRNA extension."""
-    intersect_file = Path("files/in_intersection_extended_mirna.bed")
+    intersect_file = Path("files/in_intersection_extended_mirna.intersect")
     sam_file = Path("files/in_alignments_mirna.sam")
     output_file = Path("files/mirna_tag_extension.sam")
 
@@ -41,11 +46,20 @@ def intersect_sam_extension():
 @pytest.fixture
 def intersect_sam_id():
     """Import path to INTERSECT and SAM files with miRNA IDs in the output."""
-    intersect_file = Path("files/in_intersection_mirna.bed")
+    intersect_file = Path("files/in_intersection_mirna.intersect")
     sam_file = Path("files/in_alignments_mirna.sam")
     output_file = Path("files/mirna_tag_id.sam")
 
     return intersect_file, sam_file, output_file
+
+
+@pytest.fixture
+def invalid_file():
+    """Import path to test files with an intersect invalid line."""
+    intersect_file = Path("files/invalid_8_lines.intersect")
+    sam_file = Path("files/in_alignments_mirna.sam")
+
+    return intersect_file, sam_file
 
 
 class TestParseArguments:
@@ -251,3 +265,64 @@ class TestMain:
 
         with open(output, "r") as out_file:
             assert captured.out == out_file.read()
+
+    def test_main_invalid_intersect_file(
+        self, monkeypatch, capsys, invalid_file
+    ):
+        """Test main function with an invalid intersect file."""
+        in_intersect, in_sam = invalid_file
+
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            [
+                "iso_name_tagging",
+                "--intersect",
+                str(in_intersect),
+                "--sam",
+                str(in_sam),
+            ],
+        )
+        args = parse_arguments().parse_args()
+
+        with pytest.raises(
+            FileFormatError,
+            match=r"Invalid format in line 3: strand mismatch: .*",
+        ):
+            main(args)
+
+
+class TestParseIntersectOutput:
+    """Test 'parse_intersect_output()' function backed by `parse_all()`."""
+
+    def test_empty_returns_none(self, empty_files):
+        """Test function when an empty intersect file is provided."""
+        empty_intersect, empty_sam = empty_files
+
+        out = parse_intersect_output(intersect_file=empty_intersect)
+
+        assert out is None
+
+    def test_valid_intersect(self, intersect_sam):
+        """Test function when a valid intersect file is provided."""
+        in_intersect, in_sam, out_sam = intersect_sam
+
+        out = parse_intersect_output(intersect_file=in_intersect)
+
+        assert out["13-1_1"] == [("hsa-miR-524-5p", 44377, 44398)]
+
+    def test_valid_intersect_feat_id(self, intersect_sam):
+        """Test function for a valid intersect file using the feat id."""
+        in_intersect, in_sam, out_sam = intersect_sam
+
+        out = parse_intersect_output(intersect_file=in_intersect, feat_id="id")
+
+        assert out["13-1_1"] == [("MIMAT0002849", 44377, 44398)]
+
+    def test_valid_intersect_feat_extension(self, intersect_sam):
+        """Test function for a valid intersect file using a 6bp extension."""
+        in_intersect, in_sam, out_sam = intersect_sam
+
+        out = parse_intersect_output(intersect_file=in_intersect, extension=6)
+
+        assert out["13-1_1"] == [("hsa-miR-524-5p", 44383, 44392)]
