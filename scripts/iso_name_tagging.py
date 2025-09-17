@@ -179,11 +179,24 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 import pysam
 
 if TYPE_CHECKING:
-    from .validate_bedtools_intersect import (FileFormatError, parse_all,
-                                              validate_first_n)
+    from .validate_bedtools_intersect import (
+        FileFormatError,
+        parse_all,
+        validate_first_n,
+    )
 else:
-    from validate_bedtools_intersect import (FileFormatError, parse_all,
-                                             validate_first_n)
+    try:
+        from .validate_bedtools_intersect import (
+            FileFormatError,
+            parse_all,
+            validate_first_n,
+        )
+    except ImportError:  # pragma: no cover
+        from validate_bedtools_intersect import (
+            FileFormatError,
+            parse_all,
+            validate_first_n,
+        )
 
 
 def parse_arguments():
