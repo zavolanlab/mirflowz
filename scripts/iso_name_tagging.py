@@ -174,15 +174,16 @@ import argparse
 from collections import defaultdict
 from pathlib import Path
 import sys
-from typing import Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 import pysam
 
-from .validate_bedtools_intersect import (
-    FileFormatError,
-    validate_first_n,
-    parse_all,
-)
+if TYPE_CHECKING:
+    from .validate_bedtools_intersect import (FileFormatError, parse_all,
+                                              validate_first_n)
+else:
+    from validate_bedtools_intersect import (FileFormatError, parse_all,
+                                             validate_first_n)
 
 
 def parse_arguments():

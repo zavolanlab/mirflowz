@@ -22,7 +22,7 @@ Exposes:
 
 
 from pathlib import Path
-from typing import Dict, Literal, Iterator, Union
+from typing import Dict, Iterator, Literal, Union
 
 
 class FileFormatError(BaseException):
