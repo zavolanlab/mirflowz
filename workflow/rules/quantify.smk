@@ -229,7 +229,7 @@ rule intersect_extended_mirna:
             extension=config["extension"],
         ),
     output:
-        intersect=INTERMEDIATES_DIR / "{sample}" / "intersected_extended_mirna.bed",
+        intersect=INTERMEDIATES_DIR / "{sample}" / "intersected_extended_mirna.intersect",
     params:
         cluster_log=CLUSTER_LOG / "intersect_extended_mirna_{sample}.log",
     log:
@@ -245,7 +245,6 @@ rule intersect_extended_mirna:
         -F 1 \
         -b {input.alignment} \
         -a {input.mirna} \
-        -bed \
         > {output.intersect} \
         ) &> {log}"
 
@@ -258,11 +257,11 @@ rule intersect_extended_mirna:
 rule filter_sam_by_intersecting_mirna:
     input:
         alignments=OUT_DIR / "{sample}" / "alignments_intersecting_primir.sam",
-        intersect=INTERMEDIATES_DIR / "{sample}" / "intersected_extended_mirna.bed",
+        intersect=INTERMEDIATES_DIR / "{sample}" / "intersected_extended_mirna.intersect",
     output:
         sam=OUT_DIR / "{sample}" / "alignments_intersecting_mirna.sam",
     params:
-        cluster_log=CLUSTER_LOG / "filter_sam_by__intersecting_mirna_{sample}.log",
+        cluster_log=CLUSTER_LOG / "filter_sam_by_intersecting_mirna_{sample}.log",
     log:
         LOCAL_LOG / "filter_sam_by_intersecting_mirna_{sample}.log",
     container:
@@ -272,7 +271,7 @@ rule filter_sam_by_intersecting_mirna:
     shell:
         "((samtools view \
         -H {input.alignments}; \
-        awk 'NR==FNR {{bed[$13]=1; next}} $1 in bed' \
+        awk 'NR==FNR {{intersect[$13]=1; next}} $1 in intersect' \
         {input.intersect} {input.alignments} \
         ) > {output.sam} \
         ) &> {log}"
@@ -286,7 +285,7 @@ rule filter_sam_by_intersecting_mirna:
 rule add_intersecting_mirna_tag:
     input:
         alignments=OUT_DIR / "{sample}" / "alignments_intersecting_mirna.sam",
-        intersect=INTERMEDIATES_DIR / "{sample}" / "intersected_extended_mirna.bed",
+        intersect=INTERMEDIATES_DIR / "{sample}" / "intersected_extended_mirna.intersect",
         script=SCRIPTS_DIR / "iso_name_tagging.py",
     output:
         sam=INTERMEDIATES_DIR / "{sample}" / "alignments_intersecting_mirna_tag.sam",
