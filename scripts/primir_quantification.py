@@ -22,10 +22,29 @@ extra columns will be added.
 """
 
 import argparse
-from collections import namedtuple
 from pathlib import Path
 import sys
-from typing import Dict
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .validate_bedtools_intersect import (
+        FileFormatError,
+        parse_all,
+        validate_first_n,
+    )
+else:
+    try:
+        from .validate_bedtools_intersect import (
+            FileFormatError,
+            parse_all,
+            validate_first_n,
+        )
+    except ImportError:  # pragma: no cover
+        from validate_bedtools_intersect import (
+            FileFormatError,
+            parse_all,
+            validate_first_n,
+        )
 
 
 def parse_arguments():
@@ -35,7 +54,7 @@ def parse_arguments():
         "-v",
         "--version",
         action="version",
-        version="%(prog)s 1.0",
+        version="%(prog)s 1.1.0",
         help="Show program's version number and exit",
     )
     parser.add_argument(
@@ -102,20 +121,6 @@ def parse_arguments():
     return parser
 
 
-def attributes_dictionary(attr: str) -> Dict[str, str]:
-    """Create attributes dictionary."""
-    pairs = attr.split(";")
-
-    if len(pairs[0].split("=")) == 2:
-        attr_dict = {p.split("=")[0].lower(): p.split("=")[1] for p in pairs}
-    else:
-        attr_dict = {
-            p.split('"')[0].strip().lower(): p.split('"')[1] for p in pairs
-        }
-
-    return attr_dict
-
-
 def get_contribution(
     query_id: str, collapsed: bool = False, nh: bool = False
 ) -> float:
@@ -167,68 +172,51 @@ def get_initial_data(name: str, feat_extension: bool) -> list[str]:
 
 def main(args) -> None:
     """Tabulate a bedtools intersect file."""
-    with open(args.intersect, "r", encoding="utf-8") as inter_file:
-        Fields = namedtuple(
-            "Fields",
-            (
-                "feat_chr",
-                "source",
-                "feat_type",
-                "feat_start",
-                "feat_end",
-                "feat_score",
-                "strand",
-                "phase",
-                "feat_attributes",
-                "read_chr",
-                "read_start",
-                "read_end",
-                "read_name",
-                "read_score",
-                "read_strand",
-            ),
+    try:
+        validate_first_n(intersect_file=args.intersect, n=10)
+    except FileFormatError as err:
+        raise err
+
+    count = 0.0
+    current_name = None
+    read_id = []
+
+    for _, rec in parse_all(intersect_file=args.intersect):
+
+        name = rec.feat_attrs[args.id]
+        contribution = get_contribution(
+            rec.read_name, args.collapsed, args.nh
         )
-        count = 0.0
-        current_name = None
-        read_ID = []
 
-        for line in inter_file:
-            fields = Fields(*line.strip().split("\t"))
+        if current_name is None:
+            current_name = name
+            feat_data = get_initial_data(name, args.feat_extension)
 
-            name = attributes_dictionary(fields.feat_attributes)[args.id]
-            contribution = get_contribution(
-                fields.read_name, args.collapsed, args.nh
-            )
+        if current_name == name:
+            count += contribution
+            read_id.append(rec.read_name)
 
-            if current_name is None:
-                current_name = name
-                feat_data = get_initial_data(name, args.feat_extension)
-
-            if current_name == name:
-                count += contribution
-                read_ID.append(fields.read_name)
-
-            else:
-                feat_data.insert(1, str(count))
-
-                if args.read_ids:
-                    feat_data.append(";".join(sorted(read_ID)))
-
-                sys.stdout.write("\t".join(feat_data) + "\n")
-
-                feat_data = get_initial_data(name, args.feat_extension)
-
-                current_name = name
-                count = contribution
-                read_ID = [fields.read_name]
-
-        if current_name is not None:
+        else:
             feat_data.insert(1, str(count))
 
             if args.read_ids:
-                feat_data.append(";".join(sorted(read_ID)))
+                feat_data.append(";".join(sorted(read_id)))
 
             sys.stdout.write("\t".join(feat_data) + "\n")
+
+            feat_data = get_initial_data(name, args.feat_extension)
+
+            current_name = name
+            count = contribution
+            read_id = [rec.read_name]
+
+    if current_name is not None:
+        feat_data.insert(1, str(count))
+
+        if args.read_ids:
+            feat_data.append(";".join(sorted(read_id)))
+
+        sys.stdout.write("\t".join(feat_data) + "\n")
 
 
 if __name__ == "__main__":
