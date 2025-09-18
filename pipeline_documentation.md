@@ -1190,7 +1190,7 @@ Intersect the aligned reads with the extended pri-miR annotations with
   - pri-miR extended annotations (`.gff3`); from
   [**extend_mirs_annotations**](#extend_mirs_annotations)
 - **Output**
-  - pri-miR intersections file (`.bed`); used in
+  - pri-miR intersections file (`.intersect`); used in
   [**filter_sam_by_intersecting_primir**](#filter_sam_by_intersecting_primir)
   and [**quantify_primir**](#quantify_primir)
 
@@ -1206,7 +1206,7 @@ Remove alignments that do not intersect with any pri-miR with
 - **Input**
   - Alignments file, filtered (`.sam`); from
   [**filter_by_indels**](#filter_by_indels)
-  - pri-miR intersections file (`.bed`); from
+  - pri-miR intersections file (`.intersect`); from
   [**intersect_extended_primir**](#intersect_extended_primir)
 - **Output**
   - (**Workflow output**) Alignments file, filtered (`.sam`); used in
@@ -1275,7 +1275,7 @@ Intersect the aligned reads with the extended miRNA annotations with
   - Mature miRNA extended annotations (`.gff3`); from
   [**extend_mirs_annotations**](#extend_mirs_annotations)
 - **Output**
-  - Mature miRNA intersections file (`.bed`); used in
+  - Mature miRNA intersections file (`.intersect`); used in
   [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
   and [**add_intersecting_mirna_tag**](#add_intersecting_mirna_tag)
 
@@ -1290,7 +1290,7 @@ Remove alignments that do not intersect with any miRNA with
 - **Input**
   - Alignments file, filtered (`.sam`); from
   [**filter_sam_by_intersecting_primir**](#filter_sam_by_intersecting_primir)
-  - Mature miRNA intersections file (`.bed`); from
+  - Mature miRNA intersections file (`.intersect`); from
   [**intersect_extended_mirna**](#intersect_extended_mirna)
 - **Output**
   - (**Workflow output**) Alignments file, filtered (`.sam`); used in
@@ -1313,7 +1313,7 @@ with a [**custom script**][custom-script-iso-tag].
 - **Input**
   - Alignments file, filtered (`.sam`); from
   [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
-  - Mature miRNA intersections file (`.bed`); from
+  - Mature miRNA intersections file (`.intersect`); from
   [**intersect_extended_mirna**](#intersect_extended_mirna)
 - **Parameters**
   - **config_template.yaml**
@@ -1590,7 +1590,7 @@ Tabulate alignments according to its intersecting pri-miR with a
 > name format set in [**mirna_extension**](#mirna_extension).
 
 - **Input**
-  - pri-miR intersections file (`.bed`); from
+  - pri-miR intersections file (`.intersect`); from
   [**intersect_extended_primir**](#intersect_extended_primir)
 - **Output**
   - pri-miR counts tab-delimited file; used in
@@ -1600,7 +1600,7 @@ Tabulate alignments according to its intersecting pri-miR with a
 ```console
 Example 1 | One single pri-miR with different alignments
 
-IN BED records:
+IN INTERSECT records:
     19	.	miRNA_primary_transcript	27766	27788	.	+	.	ID=MI0003150;Alias=MI0003150;Name=hsa-mir-526b_-0_+0	19	27765	27788	68-2_1	255	+
     19	.	miRNA_primary_transcript	27766	27787	.	+	.	ID=MI0003150;Alias=MI0003150;Name=hsa-mir-526b_-0_+0	19	27765	27787	316-1_7	1	+
     19	.	miRNA_primary_transcript	27804	27823	.	+	.	ID=MI0003150;Alias=MI0003150;Name=hsa-mir-526b_-0_+0	19	27803	27823	599-1_3	255	+
@@ -1634,7 +1634,7 @@ OUT table:
 
 Example 2 | Different pri-miRs for a single read
 
-IN BED records:
+IN INTERSECT records:
     19	.	miRNA_primary_transcript	40866	40886	.	+	.	ID=MI0003158;Alias=MI0003158;Name=hsa-mir-520c_-0_+0	19	40865	40886	10-4_2	255	+
     19	.	miRNA_primary_transcript	34627	34647	.	+	.	ID=MI0003155;Alias=MI0003155;Name=hsa-mir-520b_-5_+6	19	34626	34647	10-4_2	255	+
 
