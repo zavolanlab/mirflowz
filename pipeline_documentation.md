@@ -1605,15 +1605,15 @@ Example 1 | Contribution when using '--collapsed'
         per alignment.
 
     IN INTERSECT records:
-        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	8-2_1	255	+	21
-        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	24-1_1	255	+	21
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	8-2	255	+	21
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	24-1	255	+	21
 
     alignments:
-        Read ID: 8-2_1
+        Read ID: 8-2
         Number of collapsed reads: 2
         Contribution: 2
 
-        Read ID: 24-1_1
+        Read ID: 24-1
         Number of collapsed reads: 1
         Contribution: 1
 
@@ -1627,15 +1627,15 @@ Example 2 | Contribution when using '--nh'
         The flag '--nh' is used, so contribution equals 1/NH.
 
     IN INTERSECT records:
-        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	8-2_1	255	+	21
-        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	24-1_1	255	+	21
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	8_1	255	+	21
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	24_1	255	+	21
 
     alignments:
-        Read ID: 8-2_1
+        Read ID: 8_1
         Number of mapped genomic loci: 1
         Contribution: 1
 
-        Read ID: 24-1_1
+        Read ID: 24_1
         Number of mapped genomic loci: 1
         Contribution: 1
 
