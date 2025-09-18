@@ -23,4 +23,5 @@ snakemake \
     --rulegraph \
     --dryrun \
     --quiet="all" \
+| sed -n '/^\(strict \)\?digraph /,$p' \
 | dot -Tsvg > "../images/rule_graph.svg"
