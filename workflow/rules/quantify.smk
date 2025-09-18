@@ -92,7 +92,7 @@ rule intersect_extended_primir:
             extension=config["extension"],
         ),
     output:
-        intersect=INTERMEDIATES_DIR / "{sample}" / "intersected_extended_primir.bed",
+        intersect=INTERMEDIATES_DIR / "{sample}" / "intersected_extended_primir.intersect",
     params:
         cluster_log=CLUSTER_LOG / "intersect_extended_primir_{sample}.log",
     log:
@@ -103,12 +103,11 @@ rule intersect_extended_primir:
         ENV_DIR / "bedtools.yaml"
     shell:
         "(bedtools intersect \
-        -wb \
+        -wo \
         -s \
         -F 1 \
         -b {input.alignment} \
         -a {input.primir} \
-        -bed \
         > {output.intersect} \
         ) &> {log}"
 
@@ -121,7 +120,7 @@ rule intersect_extended_primir:
 rule filter_sam_by_intersecting_primir:
     input:
         alignments=INTERMEDIATES_DIR / "{sample}" / "alignments_all.sam",
-        intersect=INTERMEDIATES_DIR / "{sample}" / "intersected_extended_primir.bed",
+        intersect=INTERMEDIATES_DIR / "{sample}" / "intersected_extended_primir.intersect",
     output:
         sam=OUT_DIR / "{sample}" / "alignments_intersecting_primir.sam",
     params:
@@ -135,7 +134,7 @@ rule filter_sam_by_intersecting_primir:
     shell:
         "((samtools view \
         -H {input.alignments}; \
-        awk 'NR==FNR {{bed[$13]=1; next}} $1 in bed' \
+        awk 'NR==FNR {{intersect[$13]=1; next}} $1 in intersect' \
         {input.intersect} {input.alignments} \
         ) > {output.sam} \
         ) &> {log}"
@@ -374,7 +373,7 @@ rule quantify_mirna:
 
 rule quantify_primir:
     input:
-        intersect=INTERMEDIATES_DIR / "{sample}" / "intersected_extended_primir.bed",
+        intersect=INTERMEDIATES_DIR / "{sample}" / "intersected_extended_primir.intersect",
         script=SCRIPTS_DIR / "primir_quantification.py",
     output:
         table=INTERMEDIATES_DIR / "TABLES" / "pri-mir_counts_{sample}",
