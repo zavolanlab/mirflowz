@@ -7,36 +7,40 @@
 For each intersecting feature from an INTERSECT file, calculate the sum of its
 contributions and print the result in tab-delimited format.
 
-The contribution computation is based on the '--collapsed' and '--nh' flags:
-    * If no flag is set, the contribution is 1.
-    * If only '--nh' is set, the contribution is 1/NH.
-    * If only '--collapsed' is set, the contribution is # of reads/1.
-    * If '--collapsed' and '--nh' are set, the contribution of each alignment
-        is computed as # of reads/NH.
-The values for the amount of collapsed reads (#) and the NH value are inferred
-from the sequence name which must follow the format 'read-#_NH'.
+Contribution logic (controlled by `--collapsed` and `--nh`):
+    * No flags: contribution = 1
+    * Only `--nh`: contribution = 1 / NH
+    * Only `--collapsed`: contribution = #reads / 1
+    * Both `--collapsed` and `--nh`: contribution = #reads / NH
+
+The number of collapsed reads (#reads) and the NH value are inferred from the
+read name, which must follow one of these formats:
+    * plain: READ
+    * NH only: READ_NH
+    * collapsed only: READ-#reads
+    * collapsed + NH: READ-#reads_NH
 
 EXPECTED INPUT FILE
-The expected INTERSECT file must be the output of the call 'bedtools intersect
--a GFF33/GTF -b BAM -wo -s'. To ensure the file follows the expected format,
-the first 10 lines are going to be validated.
-If the INTERSECT file is empty, no output is produced.
+The expected INTERSECT file must be the output of:
+    bedtools intersect -wo -s -a GFF3/GTF -b BAM
+The first 10 lines are validated for format. If the INTERSECT file is empty,
+no output is produced.
 
 OUTPUT TABLE FORMAT
-The basic output table has nor header and two columns:
-    * The first one contains the intersecting feature name (determined by the
-        value of the '--id' CLI argument, which must match one of the fields
-        in the attributes column of the original GFF3/GTF file used in the
-        bedtools intersect command.
-    * The feature contribution.
+The basic output table has no header and two columns:
+    1) Feature identifier (taken from the attribute named by `--id`,
+       which must match a key in the attributes column of the original
+       GFF3/GTF features used in the bedtools call)
+    2) Feature contribution (float)
 
-Three additional columns can be added when using the flags '--read-ids' and/or
-'--feat-extension':
-    * '--read-ids' always adds as the last column a semicolon-separated list
-        of all the alignment IDs that overlap with that feature.
-    * '--feat-extension' adds two additional columns holding the 5' and 3' end
-        shifts of the feature if, and only if '--id' is set to "name", and
-        "name" contains these shifts separated by an underscore.
+Optional columns (controlled by flags):
+    * `--read-ids` appends a semicolon-separated list of read IDs that
+      overlap the feature (always added as the last column).
+    * `--feat-extension` appends two columns with 5′ and 3′ extension sizes.
+      These are inferred by splitting the FEATURE-ID value (selected via `--id`)
+      on underscores, assuming the convention: NAME_5EXT_3EXT. If that pattern
+      isn't present in the selected attribute, the extension columns will be 0.
+
 
 Examples
 --------
@@ -197,18 +201,17 @@ def parse_arguments():
         "intersect",
         help=(
             "Path to the INTERSECT file. This file must be the output of"
-            " a bedtools intersect call with -a being a BED file and"
-            " -b a BAM file."
+            " the call 'bedtools intersect -wo -s -a GFF3/GTF -b BAM'."
         ),
         type=Path,
     )
     parser.add_argument(
         "--collapsed",
         help=(
-            "Indicate that the file used in bedtools intersect has the"
-            " reads collapsed by sequence and alignment. The collapsed name"
-            " must be build by the alignment name followed by a '-' and the"
-            " number of collpased alignments, i.e 1-4. Default %(default)s."
+            "Indicate that reads were collapsed by sequence/alignment before "
+            "running bedtools. Read names must be built as READ-#reads (or "
+            "READ-#reads_NH when using --nh). Example: abc123-4 or abc123-4_2."
+            " Default: %(default)s."
         ),
         action="store_true",
         default=False,
@@ -216,10 +219,10 @@ def parse_arguments():
     parser.add_argument(
         "--nh",
         help=(
-            "Indicate that the file used in bedtools intersect has the"
-            " NH tag in the read query name. The name must be build by the"
-            " alignment name followed by an underscore and the NH value,"
-            " i.e 1-2_4. Default %(default)s."
+            "Indicate that the NH tag is encoded in the read name. Read names "
+            "must be built as READ_NH (or READ-#reads_NH when using "
+            "--collapsed). Example: abc13_2 or abc13-4_2. "
+            "Default: %(default)s."
         ),
         action="store_true",
         default=False,
@@ -227,8 +230,9 @@ def parse_arguments():
     parser.add_argument(
         "--id",
         help=(
-            "ID used to identify the feature in the output table."
-            " The ID must be in lowercase. Default: %(default)s."
+            "Attribute key (lowercase) used to identify the feature in the "
+            "ouput table. This key must exist in the attributes column of the "
+            "GFF3/GTF features. Default: %(default)s."
         ),
         default="name",
         type=str,
@@ -236,8 +240,8 @@ def parse_arguments():
     parser.add_argument(
         "--read-ids",
         help=(
-            "Include read IDs of the alignments intersecting a feature in"
-            " the output table. Default: %(default)s."
+            "Append a semicolon-separated list of intersecting read IDs as the"
+            " last output column. Default: %(default)s."
         ),
         action="store_true",
         default=False,
@@ -245,10 +249,9 @@ def parse_arguments():
     parser.add_argument(
         "--feat-extension",
         help=(
-            "If any of the feature's coordinates had been extended, include"
-            " the extension in the output table. It is assumed that the"
-            " extensions are found within the feature id 'name' and separated"
-            " by an underscore. Default: %(default)s."
+            "Append two columns with 5′ and 3′ extension sizes of the feature."
+            " Assumes the selected attribute (`--id`) encodes NAME_5EXT_3EXT. "
+            "If not present, zeros are reported. Default: %(default)s."
         ),
         action="store_true",
         default=False,
@@ -260,7 +263,22 @@ def parse_arguments():
 def get_contribution(
     query_id: str, collapsed: bool = False, nh: bool = False
 ) -> float:
-    """Get contribution of an alignment to the overall count."""
+    """Return the contribution of a single alignment.
+
+    The read name format depends on the flags:
+        * collapsed + nh: READ-#reads_NH
+        * nh only:        READ_NH
+        * collapsed only: READ-#reads
+        * neither:        READ
+
+    Args:
+        query_id: Read/query name from the INTERSECT record.
+        collapsed: If True, parse #reads from the read name.
+        nh: If True, parse NH from the read name.
+
+    Returns:
+        Contribution as (#reads / NH) following the rules above.
+    """
     if collapsed and nh:
         num_reads = int(query_id.split("-")[1].split("_")[0])
         nh_value = int(query_id.split("-")[1].split("_")[1])
@@ -307,7 +325,7 @@ def get_initial_data(name: str, feat_extension: bool) -> list[str]:
 
 
 def main(args) -> None:
-    """Tabulate a bedtools intersect file."""
+    """Tabulate 'bedtools intersect -wo -s' output file."""
     try:
         validate_first_n(intersect_file=args.intersect, n=10)
     except FileFormatError as err:
