@@ -1,25 +1,161 @@
 #!/usr/bin/env python
 
-"""Tabulate bedtools intersect output file.
+# pylint: disable=line-too-long
 
-Read the input INTERSECT file, calculate the sum of the intersecting
-contributions for each feature and print the result in tab-delimited format.
-The name of the feature is determined by the value of the --id argument, which
-must match one of the fields in the attributes column of the original GFF/GTF
-file used in the bedtools intersect command. The appropriate contribution is
-based on the --collapsed and the --nh flags. If --collapsed and --nh are set,
-the contribution of each alignment is computed as # of reads/NH. If only
---collapsed is set, the contribution is # of reads/1. If only --nh is set,
-the contribution is 1/NH. Otherwise, the contribution is 1. If the INTERSECT
-file is empty, no output is produced. The output columns are also determined by
-the flags --read-ids and --feat-extension. If --read-ids is set, a
-semicolon-separated list of all alignment IDs that overlap with the feature
-will always be in the last column. If --feat-extension is set, two additional
-columns will be added to the output, containing the 5' and 3' end shifts of the
-feature (if found in the feature name, separated by an underscore). If
---feat-extension is set but --id is set to something other than "name", no
-extra columns will be added.
-"""
+"""Tabulate 'bedtools intersect -wo -s' output file.
+
+For each intersecting feature from an INTERSECT file, calculate the sum of its
+contributions and print the result in tab-delimited format.
+
+The contribution computation is based on the '--collapsed' and '--nh' flags:
+    * If no flag is set, the contribution is 1.
+    * If only '--nh' is set, the contribution is 1/NH.
+    * If only '--collapsed' is set, the contribution is # of reads/1.
+    * If '--collapsed' and '--nh' are set, the contribution of each alignment
+        is computed as # of reads/NH.
+The values for the amount of collapsed reads (#) and the NH value are inferred
+from the sequence name which must follow the format 'read-#_NH'.
+
+EXPECTED INPUT FILE
+The expected INTERSECT file must be the output of the call 'bedtools intersect
+-a GFF33/GTF -b BAM -wo -s'. To ensure the file follows the expected format,
+the first 10 lines are going to be validated.
+If the INTERSECT file is empty, no output is produced.
+
+OUTPUT TABLE FORMAT
+The basic output table has nor header and two columns:
+    * The first one contains the intersecting feature name (determined by the
+        value of the '--id' CLI argument, which must match one of the fields
+        in the attributes column of the original GFF3/GTF file used in the
+        bedtools intersect command.
+    * The feature contribution.
+
+Three additional columns can be added when using the flags '--read-ids' and/or
+'--feat-extension':
+    * '--read-ids' always adds as the last column a semicolon-separated list
+        of all the alignment IDs that overlap with that feature.
+    * '--feat-extension' adds two additional columns holding the 5' and 3' end
+        shifts of the feature if, and only if '--id' is set to "name", and
+        "name" contains these shifts separated by an underscore.
+
+Examples
+--------
+Example 1: Contribution when using '--collapsed'
+    use case:
+        A single feature with several intersecting reads.
+        The flag '--collapsed' is used, so contribution equals the # of reads
+        per alignment.
+
+    IN INTERSECT records:
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	8-2_1	255	+	21
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	24-1_1	255	+	21
+
+    alignments:
+        Read ID: 8-2_1
+        Number of collapsed reads: 2
+        Contribution: 2
+
+        Read ID: 24-1_1
+        Number of collapsed reads: 1
+        Contribution: 1
+
+    OUT table:
+        hsa-mir-524_-0_+0      3
+
+
+Example 2: Contribution when using '--nh'
+    use case:
+        A single feature with several intersecting reads.
+        The flag '--nh' is used, so contribution equals 1/NH.
+
+    IN INTERSECT records:
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	8-2_1	255	+	21
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	24-1_1	255	+	21
+
+    alignments:
+        Read ID: 8-2_1
+        Number of mapped genomic loci: 1
+        Contribution: 1
+
+        Read ID: 24-1_1
+        Number of mapped genomic loci: 1
+        Contribution: 1
+
+    OUT table:
+        hsa-mir-524_-0_+0      2
+
+
+Example 3: Contribution when using '--collapsed' and '--nh'
+    use case:
+        A single feature with several intersecting reads.
+        The flags '--nh' and '--contribution' is used, so contribution equals
+        # of reads/NH.
+
+    IN INTERSECT records:
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	8-2_1	255	+	21
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	24-1_1	255	+	21
+
+    alignments:
+        Read ID: 8-2_1
+        Number of collapsed reads: 2
+        Number of mapped genomic loci: 1
+        Contribution: 2/1 = 2
+
+        Read ID: 23-1_1
+        Number of collapsed reads: 1
+        Number of mapped genomic loci: 1
+        Contribution: 1/1 = 1
+
+    OUT table:
+        hsa-mir-524_-0_+0      3
+
+Example 4: Column with intersecting reads; using '--read-ids'
+    use case:
+        A single feature with several intersecting reads.
+        Each read contributes with 1.
+        Read IDs intersecting the feature are appended as the last column.
+
+    IN INTERSECT records:
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	8-2_1	255	+	21
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	24-1_1	255	+	21
+
+    alignments:
+        Read ID: 8-2_1
+        Contribution: 1
+
+        Read ID: 24-1_1
+        Contribution: 1
+
+    OUT table:
+        hsa-mir-524_-0_+0      2       8-2_1;24-1_1
+
+Example 5: Columns with feature shifts; using '--feat-extension'
+    use case:
+        A single feature with several intersecting reads.
+        Each read contributes with 1.
+        Feature start and end coordinates shift are appended as the third and
+        fourth column respectively.
+
+    IN INTERSECT records:
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-1_+3	19	44413	44434	8-2_1	255	+	21
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-1_+3	19	44413	44434	24-1_1	255	+	21
+
+    alignments:
+        Read ID: 8-2_1
+        Contribution: 1
+
+        Read ID: 24-1_1
+        Contribution: 1
+
+    feature:
+        Feature name: hsa-mir-524_-1_+3
+        5' shift: -1
+        3' shift: +3
+
+    OUT table:
+        hsa-mir-524_-1_+3      2       -1       +3
+"""  # noqa: E501
+# pylint: enable=line-too-long
 
 import argparse
 from pathlib import Path
@@ -184,9 +320,7 @@ def main(args) -> None:
     for _, rec in parse_all(intersect_file=args.intersect):
 
         name = rec.feat_attrs[args.id]
-        contribution = get_contribution(
-            rec.read_name, args.collapsed, args.nh
-        )
+        contribution = get_contribution(rec.read_name, args.collapsed, args.nh)
 
         if current_name is None:
             current_name = name
