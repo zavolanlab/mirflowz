@@ -18,66 +18,66 @@ def empty_file():
 
 
 @pytest.fixture
-def bed_file():
+def intersect_file():
     """Import path to test files with full content."""
-    in_bed = Path("files/in_intersection.bed")
+    in_intersect = Path("files/in_intersection.intersect")
     out_table = Path("files/primir_quantification")
 
-    return in_bed, out_table
+    return in_intersect, out_table
 
 
 @pytest.fixture
-def bed_no_extension_files():
+def intersect_no_extension_files():
     """Import path to test files with no extension on features names."""
-    in_bed = Path("files/in_intersection_no_extension.bed")
+    in_intersect = Path("files/in_intersection_no_extension.intersect")
     out_table = Path("files/no_extension_primir_quantification")
 
-    return in_bed, out_table
+    return in_intersect, out_table
 
 
 @pytest.fixture
-def bed_extension_id_files():
+def intersect_extension_id_files():
     """Import path to test files with extension and reads id."""
-    in_bed = Path("files/in_intersection.bed")
+    in_intersect = Path("files/in_intersection.intersect")
     out_table = Path("files/extension_id_primir_quantification")
 
-    return in_bed, out_table
+    return in_intersect, out_table
 
 
 @pytest.fixture
-def bed_id_files():
+def intersect_id_files():
     """Import path to test files with reads id."""
-    in_bed = Path("files/in_intersection_no_extension.bed")
+    in_intersect = Path("files/in_intersection_no_extension.intersect")
     out_table = Path("files/id_primir_quantification")
 
-    return in_bed, out_table
+    return in_intersect, out_table
 
 
 @pytest.fixture
-def bed_some_extension_files():
+def intersect_some_extension_files():
     """Import path to test files with some extension."""
-    in_bed = Path("files/in_intersection_some_extension.bed")
+    in_intersect = Path("files/in_intersection_some_extension.intersect")
     out_table = Path("files/some_extension_primir_quantification")
 
-    return in_bed, out_table
+    return in_intersect, out_table
 
 
 @pytest.fixture
-def bed_collapsed_file():
+def intersect_collapsed_file():
     """Import path to test files with full content."""
-    in_bed = Path("files/in_intersection_collapsed.bed")
+    in_intersect = Path("files/in_intersection_collapsed.intersect")
     out_table = Path("files/collapsed_primir_quantification")
 
-    return in_bed, out_table
+    return in_intersect, out_table
 
 
 @pytest.fixture
-def bed_nh_file():
+def intersect_nh_file():
     """Import path to test files with full content."""
-    in_bed = Path("files/in_intersection.bed")
+    in_intersect = Path("files/in_intersection.intersect")
     out_table = Path("files/nh_primir_quantification")
 
-    return in_bed, out_table
+    return in_intersect, out_table
 
 
 class TestParseArguments:
@@ -96,24 +96,24 @@ class TestParseArguments:
             parse_arguments().parse_args()
         assert sysex.value.code == 2
 
-    def test_correct_input(self, monkeypatch, bed_file):
+    def test_correct_input(self, monkeypatch, intersect_file):
         """Call with the correct input file."""
-        in_bed, out_table = bed_file
+        in_intersect, out_table = intersect_file
 
         monkeypatch.setattr(
             sys,
             "argv",
             [
                 "primir_quantification",
-                str(in_bed),
+                str(in_intersect),
             ],
         )
         args = parse_arguments().parse_args()
         assert isinstance(args, argparse.Namespace)
 
-    def test_too_many_input_files(self, monkeypatch, bed_file):
+    def test_too_many_input_files(self, monkeypatch, intersect_file):
         """Call with too many input file."""
-        in_bed, out_table = bed_file
+        in_intersect, out_table = intersect_file
 
         with pytest.raises(SystemExit) as sysex:
             monkeypatch.setattr(
@@ -121,23 +121,23 @@ class TestParseArguments:
                 "argv",
                 [
                     "primir_quantification",
-                    str(in_bed),
-                    str(in_bed),
+                    str(in_intersect),
+                    str(in_intersect),
                 ],
             )
             parse_arguments().parse_args()
         assert sysex.value.code == 2
 
-    def test_all_input(self, monkeypatch, bed_file):
+    def test_all_input(self, monkeypatch, intersect_file):
         """Call with all the options."""
-        in_bed, out_table = bed_file
+        in_intersect, out_table = intersect_file
 
         monkeypatch.setattr(
             sys,
             "argv",
             [
                 "primir_quantification",
-                str(in_bed),
+                str(in_intersect),
                 "--id",
                 "name",
                 "--feat-extension",
@@ -153,8 +153,8 @@ class TestParseArguments:
 class TestMain:
     """Test 'main()' function."""
 
-    def test_main_empty_bed_file(self, monkeypatch, capsys, empty_file):
-        """Test main function with an empty bed file."""
+    def test_main_empty_intersect_file(self, monkeypatch, capsys, empty_file):
+        """Test main function with an empty intersect file."""
         empty_file = empty_file
 
         monkeypatch.setattr(
@@ -173,17 +173,17 @@ class TestMain:
             assert captured.out == out_file.read()
 
     def test_main_no_extension(
-        self, monkeypatch, capsys, bed_no_extension_files
+        self, monkeypatch, capsys, intersect_no_extension_files
     ):
         """Test main function with no extension in features names."""
-        in_bed, expected_out = bed_no_extension_files
+        in_intersect, expected_out = intersect_no_extension_files
 
         monkeypatch.setattr(
             sys,
             "argv",
             [
                 "primir_quantification",
-                str(in_bed),
+                str(in_intersect),
             ],
         )
         args = parse_arguments().parse_args()
@@ -194,17 +194,17 @@ class TestMain:
             assert captured.out == out_file.read()
 
     def test_main_id_extension(
-        self, monkeypatch, capsys, bed_extension_id_files
+        self, monkeypatch, capsys, intersect_extension_id_files
     ):
         """Test main function with extension in feature name and read names."""
-        in_bed, expected_out = bed_extension_id_files
+        in_intersect, expected_out = intersect_extension_id_files
 
         monkeypatch.setattr(
             sys,
             "argv",
             [
                 "primir_quantification",
-                str(in_bed),
+                str(in_intersect),
                 "--feat-extension",
                 "--read-ids",
             ],
@@ -216,16 +216,16 @@ class TestMain:
         with open(expected_out, "r") as out_file:
             assert captured.out == out_file.read()
 
-    def test_main_id(self, monkeypatch, capsys, bed_id_files):
+    def test_main_id(self, monkeypatch, capsys, intersect_id_files):
         """Test main function with read names."""
-        in_bed, expected_out = bed_id_files
+        in_intersect, expected_out = intersect_id_files
 
         monkeypatch.setattr(
             sys,
             "argv",
             [
                 "primir_quantification",
-                str(in_bed),
+                str(in_intersect),
                 "--read-ids",
             ],
         )
@@ -237,17 +237,17 @@ class TestMain:
             assert captured.out == out_file.read()
 
     def test_main_some_extension_file(
-        self, monkeypatch, capsys, bed_some_extension_files
+        self, monkeypatch, capsys, intersect_some_extension_files
     ):
         """Test main function with read names."""
-        in_bed, expected_out = bed_some_extension_files
+        in_intersect, expected_out = intersect_some_extension_files
 
         monkeypatch.setattr(
             sys,
             "argv",
             [
                 "primir_quantification",
-                str(in_bed),
+                str(in_intersect),
                 "--feat-extension",
             ],
         )
@@ -258,16 +258,16 @@ class TestMain:
         with open(expected_out, "r") as out_file:
             assert captured.out == out_file.read()
 
-    def test_main_collpased_nh_file(self, monkeypatch, capsys, bed_file):
+    def test_main_collpased_nh_file(self, monkeypatch, capsys, intersect_file):
         """Test main function with collapsed alignments and nh value."""
-        in_bed, expected_out = bed_file
+        in_intersect, expected_out = intersect_file
 
         monkeypatch.setattr(
             sys,
             "argv",
             [
                 "primir_quantification",
-                str(in_bed),
+                str(in_intersect),
                 "--collapsed",
                 "--nh",
             ],
@@ -280,17 +280,17 @@ class TestMain:
             assert captured.out == out_file.read()
 
     def test_main_collpased_file(
-        self, monkeypatch, capsys, bed_collapsed_file
+        self, monkeypatch, capsys, intersect_collapsed_file
     ):
         """Test main function with collapsed alignments."""
-        in_bed, expected_out = bed_collapsed_file
+        in_intersect, expected_out = intersect_collapsed_file
 
         monkeypatch.setattr(
             sys,
             "argv",
             [
                 "primir_quantification",
-                str(in_bed),
+                str(in_intersect),
                 "--collapsed",
             ],
         )
@@ -301,16 +301,16 @@ class TestMain:
         with open(expected_out, "r") as out_file:
             assert captured.out == out_file.read()
 
-    def test_main_nh_file(self, monkeypatch, capsys, bed_nh_file):
+    def test_main_nh_file(self, monkeypatch, capsys, intersect_nh_file):
         """Test main function with nh value."""
-        in_bed, expected_out = bed_nh_file
+        in_intersect, expected_out = intersect_nh_file
 
         monkeypatch.setattr(
             sys,
             "argv",
             [
                 "primir_quantification",
-                str(in_bed),
+                str(in_intersect),
                 "--nh",
             ],
         )
