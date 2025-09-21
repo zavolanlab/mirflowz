@@ -25,7 +25,7 @@ from pathlib import Path
 from typing import Dict, Iterator, Literal, Union
 
 
-class FileFormatError(BaseException):
+class FileFormatError(Exception):
     """Raised when a line or field does not match the expected format."""
 
 
