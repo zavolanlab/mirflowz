@@ -1,6 +1,7 @@
 """Unit tests for module 'validate_bedtools_intersect.py'."""
 
 from pathlib import Path
+from itertools import islice
 
 import pytest
 
@@ -57,9 +58,7 @@ def make_line(sep: str = "\t", **mods) -> str:
         "read_score": ".",
         "read_strand": "+",
         "overlap_len": "13",
-    }
-
-    base_rec.update(mods)
+    } | mods
 
     sorted_parts = [base_rec[field] for field in Record.FIELDS]
 
@@ -148,7 +147,7 @@ class TestFromLine:
 
         assert rec.overlap_len == 13
 
-    def test_from_line_less_fields(elf):
+    def test_from_line_less_fields(self):
         """Test line with less fields than required."""
         line = make_line()
         invalid_line = "\t".join(line.split("\t")[:-1])
@@ -158,7 +157,7 @@ class TestFromLine:
         ):
             Record.from_line(invalid_line)
 
-    def test_from_line_more_fields(elf):
+    def test_from_line_more_fields(self):
         """Test line with more fields than required."""
         line = make_line()
         invalid_line = line + "\t" + line
@@ -376,6 +375,13 @@ class TestStaticParsers:
         with pytest.raises(FileFormatError, match=r".* must be GFF3 .*"):
             Record._parse_feat_attrs(attr_inv, "field")
 
+    def test_parse_duplicate_keys_feat_attrs(self):
+        """Test parsing attributes with duplicate keys."""
+        attr_dup = 'gene_id "feat1"; gene_id "feat2"; gene_name "feat_gtf"'
+        # Assuming last value wins for duplicate keys
+        exp_attr = {"gene_id": "feat2", "gene_name": "feat_gtf"}
+        assert Record._parse_feat_attrs(attr_dup, "field") == exp_attr
+
 
 class TestComputeOverlap:
     """Test for the '_compute_overlap' static method."""
@@ -449,9 +455,9 @@ class TestParseAll:
 
         it_out = parse_all(long_file)
 
-        for i in range(11):
-            num, rec = next(it_out)
-            assert num == i + 1 and isinstance(rec, Record)
+        nums, recs = zip(*islice(it_out, 11))
+        assert nums == tuple(range(1, 12))
+        assert all(isinstance(r, Record) for r in recs)
 
         with pytest.raises(
             FileFormatError,
