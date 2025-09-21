@@ -281,7 +281,6 @@ def parse_intersect_output(
         miRNA_start = rec.feat_start + extension
         miRNA_end = rec.feat_end - extension
 
-        assert rec.read_name is not None
         intersect_data[rec.read_name].append(
             (miRNA_name, miRNA_start, miRNA_end)
         )
