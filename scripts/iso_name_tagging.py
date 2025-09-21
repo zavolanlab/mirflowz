@@ -234,9 +234,11 @@ def parse_arguments():
         "--extension",
         help=(
             "Number of nucleotides the start and end coordinates of the"
-            " annotated features had been extended. Default: %(default)d."
+            " annotated features had been extended. Its value has to 0 or a"
+            " positive integer. Default: %(default)d."
         ),
         default=0,
+        choices=range(10**6),
         type=int,
     )
     parser.add_argument(
