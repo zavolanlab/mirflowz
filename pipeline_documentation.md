@@ -1646,7 +1646,7 @@ Example 2 | Contribution when using '--nh'
 Example 3 | Contribution when using '--collapsed' and '--nh'
     use case:
         A single feature with several intersecting reads.
-        The flags '--nh' and '--contribution' is used, so contribution equals
+        The flags '--nh' and '--contribution' are used, so contribution equals
         # of reads/NH.
 
     IN INTERSECT records:
