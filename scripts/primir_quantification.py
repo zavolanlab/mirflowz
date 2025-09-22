@@ -92,7 +92,7 @@ Example 2: Contribution when using '--nh'
 Example 3: Contribution when using '--collapsed' and '--nh'
     use case:
         A single feature with several intersecting reads.
-        The flags '--nh' and '--contribution' is used, so contribution equals
+        The flags '--nh' and '--contribution' are used, so contribution equals
         # of reads/NH.
 
     IN INTERSECT records:
@@ -280,15 +280,63 @@ def get_contribution(
         Contribution as (#reads / NH) following the rules above.
     """
     if collapsed and nh:
-        num_reads = int(query_id.split("-")[1].split("_")[0])
-        nh_value = int(query_id.split("-")[1].split("_")[1])
+        try:
+            num_reads = int(query_id.split("-")[1].split("_")[0])
+            nh_value = int(query_id.split("-")[1].split("_")[1])
+
+        except IndexError as err:
+            raise IndexError(
+                f'Malformed read name (no delimiters): "{query_id}".\n'
+                "The flags '--collapsed' and '--nh' had been used and the "
+                "expected read format is READ-#reads_NH."
+            ) from err
+
+        except ValueError as err:
+            raise ValueError(
+                f'Malformed read name (no int values): "{query_id}".\n'
+                "The flags '--collapsed' and '--nh' had been used and the "
+                "expected read format is READ-#reads_NH (str-int_int)."
+            ) from err
 
     elif not collapsed and nh:
+
         num_reads = 1
-        nh_value = int(query_id.split("_")[1])
+
+        try:
+            nh_value = int(query_id.split("_")[1])
+
+        except IndexError as err:
+            raise IndexError(
+                f'Malformed read name (no delimiters): "{query_id}".\n'
+                "The flag '--nh' has been used and the expected read format "
+                "is READ_NH."
+            ) from err
+
+        except ValueError as err:
+            raise ValueError(
+                f'Malformed read name (no int value): "{query_id}".\n'
+                "The flag '--nh' has been used and the expected read format "
+                "is READ_NH (str_int)."
+            ) from err
 
     elif collapsed and not nh:
-        num_reads = int(query_id.split("-")[1])
+        try:
+            num_reads = int(query_id.split("-")[1])
+
+        except IndexError as err:
+            raise IndexError(
+                f'Malformed read name (no delimiters): "{query_id}".\n'
+                "The flag '--collapsed' has been used and the expected read "
+                "format is READ-#reads."
+            ) from err
+
+        except ValueError as err:
+            raise ValueError(
+                f'Malformed read name: "{query_id}".\n'
+                "The flag '--collapsed' has been used and the expected read "
+                "format is READ-#reads (str-int)."
+            ) from err
+
         nh_value = 1
 
     else:

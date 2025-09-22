@@ -373,7 +373,7 @@ class TestMain:
 
         args = parse_arguments().parse_args()
 
-        with pytest.raises(Exception, match=r".* READ-#reads_NH."):
+        with pytest.raises(IndexError, match=r".* READ-#reads_NH."):
             main(args)
 
     def test_main_malformed_read_nh_collapsed_delim(
@@ -404,7 +404,7 @@ class TestMain:
 
         args = parse_arguments().parse_args()
 
-        with pytest.raises(Exception, match=r".* READ-#reads_NH."):
+        with pytest.raises(ValueError, match=r".* \(str-int_int\)."):
             main(args)
 
     def test_main_malformed_read_nh_no_delim(
@@ -434,7 +434,7 @@ class TestMain:
 
         args = parse_arguments().parse_args()
 
-        with pytest.raises(Exception, match=r".* READ_NH."):
+        with pytest.raises(IndexError, match=r".* READ_NH."):
             main(args)
 
     def test_main_malformed_read_nh_delim(
@@ -464,7 +464,7 @@ class TestMain:
 
         args = parse_arguments().parse_args()
 
-        with pytest.raises(Exception, match=r".* READ_NH."):
+        with pytest.raises(ValueError, match=r".* \(str_int\)."):
             main(args)
 
     def test_main_malformed_read_collapsed_no_delim(
@@ -494,7 +494,7 @@ class TestMain:
 
         args = parse_arguments().parse_args()
 
-        with pytest.raises(Exception, match=r".* READ-#reads."):
+        with pytest.raises(IndexError, match=r".* READ-#reads."):
             main(args)
 
     def test_main_malformed_read_collapsed_delim(
@@ -524,6 +524,5 @@ class TestMain:
 
         args = parse_arguments().parse_args()
 
-        with pytest.raises(Exception, match=r".* READ-#reads."):
+        with pytest.raises(ValueError, match=r".* \(str-int\)."):
             main(args)
-
