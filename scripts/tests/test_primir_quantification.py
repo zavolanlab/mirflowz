@@ -7,6 +7,7 @@ import sys
 import pytest
 
 from ..primir_quantification import main, parse_arguments
+from ..validate_bedtools_intersect import FileFormatError
 
 
 @pytest.fixture
@@ -320,3 +321,209 @@ class TestMain:
 
         with open(expected_out, "r") as out_file:
             assert captured.out == out_file.read()
+
+    def test_main_invalid_file_validation(self, monkeypatch, capsys, tmp_path):
+        """Test main function with invalid file."""
+        malformed_content = (
+            "chr1\t.\tmiRNA_primary_transcript\t100\t300\t.\t+\t.\t"
+            "ID=MI0003786;Name=hsa-mir-1323_-0_+0\tchr1\t130\t165\n"
+        )
+        in_file = tmp_path / " malformed.intersect"
+        in_file.write_text(malformed_content)
+
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            [
+                "primir_quantification",
+                str(in_file),
+            ],
+        )
+
+        args = parse_arguments().parse_args()
+
+        with pytest.raises(FileFormatError, match=r".*16 columns, found 12."):
+            main(args)
+
+    def test_main_malformed_read_nh_collapsed_no_delim(
+            self,
+            monkeypatch,
+            capsys,
+            tmp_path
+    ):
+        """Test main function with malformed read names."""
+        malformed_content = (
+            "chr1\t.\tmiRNA_primary_transcript\t100\t300\t.\t+\t.\t"
+            "ID=MI0003786;Name=hsa-mir-1323_-0_+0\tchr1\t130\t165\t"
+            "read:without:delimiter\t255\t+\t35\n"
+        )
+        in_file = tmp_path / " malformed.intersect"
+        in_file.write_text(malformed_content)
+
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            [
+                "primir_quantification",
+                str(in_file),
+                "--collapsed",
+                "--nh"
+            ],
+        )
+
+        args = parse_arguments().parse_args()
+
+        with pytest.raises(Exception, match=r".* READ-#reads_NH."):
+            main(args)
+
+    def test_main_malformed_read_nh_collapsed_delim(
+            self,
+            monkeypatch,
+            capsys,
+            tmp_path
+    ):
+        """Test main function with malformed read names."""
+        malformed_content = (
+            "chr1\t.\tmiRNA_primary_transcript\t100\t300\t.\t+\t.\t"
+            "ID=MI0003786;Name=hsa-mir-1323_-0_+0\tchr1\t130\t165\t"
+            "read-with_delimiter\t255\t+\t35\n"
+        )
+        in_file = tmp_path / " malformed.intersect"
+        in_file.write_text(malformed_content)
+
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            [
+                "primir_quantification",
+                str(in_file),
+                "--collapsed",
+                "--nh"
+            ],
+        )
+
+        args = parse_arguments().parse_args()
+
+        with pytest.raises(Exception, match=r".* READ-#reads_NH."):
+            main(args)
+
+    def test_main_malformed_read_nh_no_delim(
+            self,
+            monkeypatch,
+            capsys,
+            tmp_path
+    ):
+        """Test main function with malformed read names."""
+        malformed_content = (
+            "chr1\t.\tmiRNA_primary_transcript\t100\t300\t.\t+\t.\t"
+            "ID=MI0003786;Name=hsa-mir-1323_-0_+0\tchr1\t130\t165\t"
+            "read:without:delimiter\t255\t+\t35\n"
+        )
+        in_file = tmp_path / " malformed.intersect"
+        in_file.write_text(malformed_content)
+
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            [
+                "primir_quantification",
+                str(in_file),
+                "--nh"
+            ],
+        )
+
+        args = parse_arguments().parse_args()
+
+        with pytest.raises(Exception, match=r".* READ_NH."):
+            main(args)
+
+    def test_main_malformed_read_nh_delim(
+            self,
+            monkeypatch,
+            capsys,
+            tmp_path
+    ):
+        """Test main function with malformed read names."""
+        malformed_content = (
+            "chr1\t.\tmiRNA_primary_transcript\t100\t300\t.\t+\t.\t"
+            "ID=MI0003786;Name=hsa-mir-1323_-0_+0\tchr1\t130\t165\t"
+            "read_delimiter\t255\t+\t35\n"
+        )
+        in_file = tmp_path / " malformed.intersect"
+        in_file.write_text(malformed_content)
+
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            [
+                "primir_quantification",
+                str(in_file),
+                "--nh",
+            ],
+        )
+
+        args = parse_arguments().parse_args()
+
+        with pytest.raises(Exception, match=r".* READ_NH."):
+            main(args)
+
+    def test_main_malformed_read_collapsed_no_delim(
+            self,
+            monkeypatch,
+            capsys,
+            tmp_path
+    ):
+        """Test main function with malformed read names."""
+        malformed_content = (
+            "chr1\t.\tmiRNA_primary_transcript\t100\t300\t.\t+\t.\t"
+            "ID=MI0003786;Name=hsa-mir-1323_-0_+0\tchr1\t130\t165\t"
+            "read_delimiter\t255\t+\t35\n"
+        )
+        in_file = tmp_path / " malformed.intersect"
+        in_file.write_text(malformed_content)
+
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            [
+                "primir_quantification",
+                str(in_file),
+                "--collapsed",
+            ],
+        )
+
+        args = parse_arguments().parse_args()
+
+        with pytest.raises(Exception, match=r".* READ-#reads."):
+            main(args)
+
+    def test_main_malformed_read_collapsed_delim(
+            self,
+            monkeypatch,
+            capsys,
+            tmp_path
+    ):
+        """Test main function with malformed read names."""
+        malformed_content = (
+            "chr1\t.\tmiRNA_primary_transcript\t100\t300\t.\t+\t.\t"
+            "ID=MI0003786;Name=hsa-mir-1323_-0_+0\tchr1\t130\t165\t"
+            "read-delimiter\t255\t+\t35\n"
+        )
+        in_file = tmp_path / " malformed.intersect"
+        in_file.write_text(malformed_content)
+
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            [
+                "primir_quantification",
+                str(in_file),
+                "--collapsed",
+            ],
+        )
+
+        args = parse_arguments().parse_args()
+
+        with pytest.raises(Exception, match=r".* READ-#reads."):
+            main(args)
+
