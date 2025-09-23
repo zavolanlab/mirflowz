@@ -160,7 +160,7 @@ know. You can reach us by [email][contact].
 [git-flow]: <https://nvie.com/posts/a-successful-git-branching-model/>
 [github]: <https://github.com>
 [issue-tracker]: <https://github.com/zavolanlab/mirflowz/issues>
-[pull-request]: pull_request_template.md
+[pull-request]: PULL_REQUEST_TEMPLATE.md
 [py]: <https://www.python.org/>
 [py-flake8]: <https://flake8.pycqa.org>
 [py-mypy]: <http://mypy-lang.org/>
