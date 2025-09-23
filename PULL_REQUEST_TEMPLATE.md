@@ -28,7 +28,7 @@ Changes to workflow input (sample table and/or configs):
     * more fields/properties are required
     * existing ones are dropped entirely
 * minor (add **feat:** in the beginning of the PR title)
-    * optional fields/propertied are added
+    * optional fields/properties are added
     * required ones are made optional
 
 

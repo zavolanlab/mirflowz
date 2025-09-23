@@ -55,7 +55,7 @@ as well as to ensure that the code base is robust and of high quality, we
 would kindly ask you to stick to the following guidelines for code style and
 testing.
 
-- Please use a recent version of [Python 3][py] (3.13.7+)
+- Please use a recent version of [Python 3][py] (3.12.0+)
 - Please try to conform to the used code, docstrings and commenting style
   within a project to maintain consistency
 - Please use [type hints][py-typing] for all function/method signatures
@@ -71,7 +71,7 @@ testing.
 
 ## Commit Messages
 
-In an effort to increase consistency, simply maintenance and enable automated
+In an effort to increase consistency, simplify maintenance and enable automated
 change logs, we would like to kindly ask you to write _semantinc commit
 messages_, as described in the [Conventional Commits
 specification][conv-commits].
@@ -88,20 +88,20 @@ The general structure of _Conventional Commits_ is as follows:
 
 Depending on the changes, please use one of the following **type** prefixes:
 
-|    Type    |                                                                                                       Description                                                                                                       |
-|:----------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| `build`    | The `build` type (formerly known as chore) is used to identify development changes related to the build system (involving scripts, configurations or tools) and package dependencies.                                   |
-| `ci`       | The `ci` type is used to identify development changes relates to the continuous integration and deployment system - involving scripts, configurations or tools.                                                         |
-| `docs`     | The `docs` type is used to identify documentation changes related to the project - whether intended externally for the end users (in case of a library) or internally for the developers.                               |
-| `feat`     | The `feat` type is used to identify production changes related to new backward-compatible abilities or functionality.                                                                                                   |
-| `fix`      | The `fix` type is used to identify production changes related to backward-compatible bug fixes.                                                                                                                         |
-| `perf`     | The `perf` type is used to identify production changes related to backward-compatible performance improvements.                                                                                                         |
-| `refactor` | The `refactor` type is used to identify development changes related to modify the codebase, which neither adds a feature not fixes a bug - such as removing redundant code, simplify the code, renaming variables, etc. |
-| `revert`   | For commits that revert one or more previous commits.                                                                                                                                                                   |
-| `style`    | The `style`type is used to identify development changes related to styling the codebase, regardless of the meaning  such as indentations, semi-colons, quotes, trailing commas and so on.                               |
-| `test`     | The `test` type is used to identify development changes related to tests - such as refactoring existing tests or adding new tests.                                                                                      |
+|    Type    |                                                                                                       Description                                                                                                             |
+|:----------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| `build`    | The `build` type (formerly known as chore) is used to identify development changes related to the build system (involving scripts, configurations or tools) and package dependencies.                                         |
+| `ci`       | The `ci` type is used to identify development changes related to the continuous integration and deployment system - involving scripts, configurations or tools.                                                               |
+| `docs`     | The `docs` type is used to identify documentation changes related to the project - whether intended externally for the end users (in case of a library) or internally for the developers.                                     |
+| `feat`     | The `feat` type is used to identify production changes related to new backward-compatible abilities or functionality.                                                                                                         |
+| `fix`      | The `fix` type is used to identify production changes related to backward-compatible bug fixes.                                                                                                                               |
+| `perf`     | The `perf` type is used to identify production changes related to backward-compatible performance improvements.                                                                                                               |
+| `refactor` | The `refactor` type is used to identify development changes related to modifying the codebase, which neither adds a feature nor fixes a bug - such as removing redundant code, simplifying the code, renaming variables, etc. |
+| `revert`   | For commits that revert one or more previous commits.                                                                                                                                                                         |
+| `style`    | The `style`type is used to identify development changes related to styling the codebase, regardless of the meaning  such as indentations, semi-colons, quotes, trailing commas and so on.                                     |
+| `test`     | The `test` type is used to identify development changes related to tests - such as refactoring existing tests or adding new tests.                                                                                            |
 
-In order ti ensure that the format of your commit message adheres to the
+In order to ensure that the format of your commit message adheres to the
 _Conventional Commits_ specification and the defined type vocabulary, you can
 use the [dedicated linter][conv-commits-lint]. More information about
 _Conventional Commits_ can also be found in this [blog
@@ -140,7 +140,7 @@ smoothly:
 ## Becoming a Co-maintainer
 
 If you are as interested in the project as we are and have contributed some
-code, suggested some features or bug reports and have taken part in
+code, suggested some features or reported bugs and have taken part in
 discussions on where to go with the project, we will very likely to have you
 on board as a co-maintainer. If you are interested in that, please let us
 know. You can reach us by [email][contact].
