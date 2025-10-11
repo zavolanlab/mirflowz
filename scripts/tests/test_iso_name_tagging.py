@@ -53,15 +53,6 @@ def intersect_sam_id():
     return intersect_file, sam_file, output_file
 
 
-@pytest.fixture
-def invalid_file():
-    """Import path to test files with an intersect invalid line."""
-    intersect_file = Path("files/invalid_8_lines.intersect")
-    sam_file = Path("files/in_alignments_mirna.sam")
-
-    return intersect_file, sam_file
-
-
 class TestParseArguments:
     """Test 'parse_arguments()' function."""
 
@@ -266,28 +257,25 @@ class TestMain:
         with open(output, "r") as out_file:
             assert captured.out == out_file.read()
 
-    def test_main_invalid_intersect_file(
-        self, monkeypatch, capsys, invalid_file
-    ):
+    @pytest.mark.parametrize("lines", ["8", "13"])
+    def test_main_invalid_intersect_file(self, monkeypatch, capsys, lines):
         """Test main function with an invalid intersect file."""
-        in_intersect, in_sam = invalid_file
-
         monkeypatch.setattr(
             sys,
             "argv",
             [
                 "iso_name_tagging",
                 "--intersect",
-                str(in_intersect),
+                f"files/invalid_{lines}_lines.intersect",
                 "--sam",
-                str(in_sam),
+                "files/in_alignments_mirna.sam",
             ],
         )
         args = parse_arguments().parse_args()
 
         with pytest.raises(
             FileFormatError,
-            match=r"Invalid format in line 3: strand mismatch: .*",
+            match=r"Invalid format in line .* mismatch.*",
         ):
             main(args)
 
