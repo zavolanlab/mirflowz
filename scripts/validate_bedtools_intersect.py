@@ -21,6 +21,7 @@ Exposes:
 """
 
 
+import re
 from pathlib import Path
 from typing import Dict, Iterator, Literal, Union
 
@@ -83,6 +84,8 @@ class Record:
         "overlap_len",
     ]
 
+    EXPECTED_COLUMNS = len(FIELDS)
+
     def __init__(
         self,
         feat_chr: str,
@@ -142,8 +145,10 @@ class Record:
         """
         parts = line.strip().split(sep)
 
-        if len(parts) != 16:
-            raise FileFormatError(f"expected 16 columns, found {len(parts)}.")
+        if len(parts) != cls.EXPECTED_COLUMNS:
+            raise FileFormatError(
+                f"expected {cls.EXPECTED_COLUMNS} columns, found {len(parts)}."
+            )
 
         feat_chr: str = cls._text(parts[0].strip())
         feat_source: str = cls._text(parts[1].strip())
@@ -380,16 +385,26 @@ class Record:
         Raises:
             FileFormatError: If the string is not one if the supported formats.
         """
-        pairs = text.split(";")
+        attrs: Dict[str, str] = {}
 
-        if len(pairs[0].split("=")) == 2:
-            return {p.split("=")[0].lower(): p.split("=")[1] for p in pairs}
+        gff3_line = re.compile(r"(?:\s*[^=;\s]+\s*=\s*[^;]*\s*(?:;|$))+\s*$")
+        gtf_line = re.compile(r'(?:\s*[^"\s;]+\s+"[^"]*"\s*(?:;|$))+\s*$')
 
-        if len(pairs[0].split('"')) == 3:
-            return {
-                p.split('"')[0].strip().lower(): p.split('"')[1]
-                for p in filter(None, pairs)
-            }
+        if gff3_line.fullmatch(text):
+            gff3_pair = re.compile(r"\s*([^=;\s]+)\s*=\s*([^;]*)\s*(?:;|$)")
+
+            for vals in gff3_pair.finditer(text):
+                attrs[vals.group(1).lower()] = vals.group(2)
+
+            return attrs
+
+        if gtf_line.fullmatch(text):
+            gtf_pair = re.compile(r'\s*([^"\s;]+)\s+"([^"]*)"\s*(?:;|$)')
+
+            for vals in gtf_pair.finditer(text):
+                attrs[vals.group(1).lower()] = vals.group(2)
+
+            return attrs
 
         raise FileFormatError(
             f'{field}: must be GFF3 (key=value;..) or GTF (key "value";...); '
