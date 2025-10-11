@@ -1,27 +1,19 @@
 ## Description
 
-Please include a summary of the change and which issue is fixed.  
-Please also include relevant motivation and context.  
-List any dependencies that are required for this change.  
+<!--
+Please include a summary of the change and which issue is fixed.
+Please also include relevant motivation and context.
+List any dependencies that are required for this change.
+-->
 
 Fixes #(issue)
 
-## Type of Change
-
-Please delete options that are not relevant.
-
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality
-      to not work as expected)
-- [ ] Documentation update
-
-## Conventional Commits Guidelines
+## Conventional Commits
 
 - [ ] I made sure that the PR title follows the
-      https://www.conventionalcommits.org/en/v1.0.0/
+  [Conventional Commits][conv-commits] specification
 
-
+<!--
 Changes to workflow input (sample table and/or configs):
 
 * major (add **BREAKING CHANGE:** in the beginning of the PR title)
@@ -42,7 +34,7 @@ Changes to workflow outputs:
 
 Everything else: patch
 (add any other conventional commit in the beginning of the PR title)
-
+-->
 
 ## Checklist
 
@@ -57,5 +49,9 @@ Everything else: patch
 - [ ] I have updated any sections of the project's documentation that are
       affected by the proposed changes
 
+<!--
 If for some reason you are unable to tick off all boxes, please leave a comment
 explaining the issue you are facing so that we can work on it together.
+-->
+
+[conv-commits]: <https://www.conventionalcommits.org/en/v1.0.0/>
