@@ -63,7 +63,7 @@ testing.
 - Please use [type hints][py-typing] for all function/method signatures
   (exception: tests)
 - Please use the following linters (see configuration files in the repository's
-  root directory, _e.g._ `setup.cfg`, for settings):
+  root directory, _e.g._ `pylint.cfg`, for settings):
   - [`flake8`][py-flake8]
   - [`mypy`][py-mypy] to help with type hints
   - [`pylint`][py-pylint] (use available [configuration][py-pylint-conf])
