@@ -1,32 +1,19 @@
 # Guidelines for contributing
 
-## General Workflow
-
-We are using [Git][git], [GitHub][github] and [Git Flow][git-flow].
-
-> **Note:** If you are a **beginner** and do not have a lot of experience with
-> this sort of workflow, please do not feel overwhelmed. We will guide you
-> through the process until you feel comfortable using it. And do not worry
-> about mistakes either - everybody does them. Often! Our project layout makes
-> it very very hard for anyone to cause irreversible harm, so relax, try things
-> out, take your time and enjoy the work! :)
-
 We would kindly ask you to abide by our [Code of Conduct][coc] in all
 interactions with the community when contributing to this project, regardless
 of the type of contribution. We will not accept any offensive or demeaning
 behavior towards others and will take any necessary steps to ensure that
 everyone is treated with respect and dignity.
 
-## Issue Tracker
+## Submitting Issues
 
-Please, use each project's GitHub [issue tracker][issue-tracker] to:
+Please, use the [issue tracker][issue-tracker] to:
 
 - find issues to work on
 - report bugs
 - propose features
 - discuss future directions
-
-## Submitting Issues
 
 Please, choose a template when submitting an issue: choose the
 [**bug report** template][bug-report] only when reporting bugs; for all other
@@ -42,13 +29,28 @@ information required to reproduce the bug.
 
 Please **do not** use the issue tracker to ask usage questions, installation
 problems etc., unless they appear to be bugs. For these issues, please use
-the [communication channels](#communication) outlined below.
+the [communication channels](#other-communication) outlined below.
 
-## Communication
+## Other Communication
 
-Send us an [email][contact] if you want to reach out to us.
+Send us an [email][contact] if you want to reach out to us regarding sensitive
+matters such as Code of Conduct issues, personal inquiries or collaboration
+requests.
 
-## Code Style and Testing
+For anything else, please use the [GitHub Discussions forum][discussion-forum].
+
+## Contributing Code Changes
+
+We are using [Git][git], [GitHub][github] and [Git Flow][git-flow].
+
+> **Note:** If you are a **beginner** and do not have a lot of experience with
+> this sort of workflow, please do not feel overwhelmed. We will guide you
+> through the process until you feel comfortable using it. And do not worry
+> about mistakes either - everybody does them. Often! Our project layout makes
+> it very very hard for anyone to cause irreversible harm, so relax, try things
+> out, take your time and enjoy the work! :)
+
+### Code Style and Testing
 
 To make it easier for everyone to maintain, read and contribute to the code,
 as well as to ensure that the code base is robust and of high quality, we
@@ -69,7 +71,7 @@ testing.
   - [`pytest`][py-pytest]
   - [`coverage`][py-coverage]
 
-## Commit Messages
+### Commit Messages
 
 In an effort to increase consistency, simplify maintenance and enable automated
 change logs, we would like to kindly ask you to write _semantinc commit
@@ -107,7 +109,7 @@ use the [dedicated linter][conv-commits-lint]. More information about
 _Conventional Commits_ can also be found in this [blog
 post][conv-commits-blog].
 
-## Merging Your Code
+### Merging Your Code
 
 Here is a check list that you can follow to make sure that code merges happen
 smoothly:
@@ -137,22 +139,23 @@ smoothly:
    your changes
 
 
-## Becoming a Co-maintainer
+## Becoming a Co-Maintainer
 
 If you are as interested in the project as we are and have contributed some
 code, suggested some features or reported bugs and have taken part in
-discussions on where to go with the project, we will very likely to have you
-on board as a co-maintainer. If you are interested in that, please let us
+discussions on where to go with the project, we will very likely want to have
+you on board as a co-maintainer. If you are interested in that, please let us
 know. You can reach us by [email][contact].
 
 
 [bug-report]: .github/ISSUE_TEMPLATE/bug_report.md
 [ci-cd]: .github/workflows/tests.yml
 [coc]: CODE_OF_CONDUCT.md
-[contact]: <zavolab-biozentrum@unibas.ch>
+[contact]: <mailto:zavolab-biozentrum@unibas.ch>
 [conv-commits]: <https://www.conventionalcommits.org/en/v1.0.0-beta.2/#specification>
 [conv-commits-blog]: <https://nitayneeman.com/posts/understanding-semantic-commit-messages-using-git-and-angular/>
 [conv-commits-lint]: <https://github.com/conventional-changelog/commitlint>
+[discussion-forum]: <https://github.com/zavolanlab/mirflowz/discussions>
 [docs]: README.md
 [docs-pipeline]: pipeline_documentation.md
 [feat-request]: .github/ISSUE_TEMPLATE/feature_request.md
