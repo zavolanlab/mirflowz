@@ -258,13 +258,13 @@ class TestMain:
             assert captured.out == out_file.read()
 
     @pytest.mark.parametrize(
-        "files",
+        "intersect_file",
         [
-            "files/invalid_8_lines.intersect",
-            "files/invalid_13_lines.intersect",
+            Path("files/invalid_8_lines.intersect"),
+            Path("files/invalid_13_lines.intersect"),
         ],
     )
-    def test_main_invalid_intersect_file(self, monkeypatch, capsys, files):
+    def test_main_invalid_intersect_file(self, monkeypatch, intersect_file):
         """Test main function with an invalid intersect file."""
         monkeypatch.setattr(
             sys,
@@ -272,7 +272,7 @@ class TestMain:
             [
                 "iso_name_tagging",
                 "--intersect",
-                files,
+                str(intersect_file),
                 "--sam",
                 "files/in_alignments_mirna.sam",
             ],
