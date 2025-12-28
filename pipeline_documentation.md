@@ -1190,7 +1190,7 @@ Intersect the aligned reads with the extended pri-miR annotations with
   - pri-miR extended annotations (`.gff3`); from
   [**extend_mirs_annotations**](#extend_mirs_annotations)
 - **Output**
-  - pri-miR intersections file (`.bed`); used in
+  - pri-miR intersections file (`.intersect`); used in
   [**filter_sam_by_intersecting_primir**](#filter_sam_by_intersecting_primir)
   and [**quantify_primir**](#quantify_primir)
 
@@ -1206,7 +1206,7 @@ Remove alignments that do not intersect with any pri-miR with
 - **Input**
   - Alignments file, filtered (`.sam`); from
   [**filter_by_indels**](#filter_by_indels)
-  - pri-miR intersections file (`.bed`); from
+  - pri-miR intersections file (`.intersect`); from
   [**intersect_extended_primir**](#intersect_extended_primir)
 - **Output**
   - (**Workflow output**) Alignments file, filtered (`.sam`); used in
@@ -1275,7 +1275,7 @@ Intersect the aligned reads with the extended miRNA annotations with
   - Mature miRNA extended annotations (`.gff3`); from
   [**extend_mirs_annotations**](#extend_mirs_annotations)
 - **Output**
-  - Mature miRNA intersections file (`.bed`); used in
+  - Mature miRNA intersections file (`.intersect`); used in
   [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
   and [**add_intersecting_mirna_tag**](#add_intersecting_mirna_tag)
 
@@ -1290,7 +1290,7 @@ Remove alignments that do not intersect with any miRNA with
 - **Input**
   - Alignments file, filtered (`.sam`); from
   [**filter_sam_by_intersecting_primir**](#filter_sam_by_intersecting_primir)
-  - Mature miRNA intersections file (`.bed`); from
+  - Mature miRNA intersections file (`.intersect`); from
   [**intersect_extended_mirna**](#intersect_extended_mirna)
 - **Output**
   - (**Workflow output**) Alignments file, filtered (`.sam`); used in
@@ -1313,7 +1313,7 @@ with a [**custom script**][custom-script-iso-tag].
 - **Input**
   - Alignments file, filtered (`.sam`); from
   [**filter_sam_by_intersecting_mirna**](#filter_sam_by_intersecting_mirna)
-  - Mature miRNA intersections file (`.bed`); from
+  - Mature miRNA intersections file (`.intersect`); from
   [**intersect_extended_mirna**](#intersect_extended_mirna)
 - **Parameters**
   - **config_template.yaml**
@@ -1590,7 +1590,7 @@ Tabulate alignments according to its intersecting pri-miR with a
 > name format set in [**mirna_extension**](#mirna_extension).
 
 - **Input**
-  - pri-miR intersections file (`.bed`); from
+  - pri-miR intersections file (`.intersect`); from
   [**intersect_extended_primir**](#intersect_extended_primir)
 - **Output**
   - pri-miR counts tab-delimited file; used in
@@ -1598,56 +1598,120 @@ Tabulate alignments according to its intersecting pri-miR with a
 - **Examples**
 
 ```console
-Example 1 | One single pri-miR with different alignments
+Example 1 | Contribution when using '--collapsed'
+    use case:
+        A single feature with several intersecting reads.
+        The flag '--collapsed' is used, so contribution equals the # of reads
+        per alignment.
 
-IN BED records:
-    19	.	miRNA_primary_transcript	27766	27788	.	+	.	ID=MI0003150;Alias=MI0003150;Name=hsa-mir-526b_-0_+0	19	27765	27788	68-2_1	255	+
-    19	.	miRNA_primary_transcript	27766	27787	.	+	.	ID=MI0003150;Alias=MI0003150;Name=hsa-mir-526b_-0_+0	19	27765	27787	316-1_7	1	+
-    19	.	miRNA_primary_transcript	27804	27823	.	+	.	ID=MI0003150;Alias=MI0003150;Name=hsa-mir-526b_-0_+0	19	27803	27823	599-1_3	255	+
-    19	.	miRNA_primary_transcript	27805	27822	.	+	.	ID=MI0003150;Alias=MI0003150;Name=hsa-mir-526b_-0_+0	19	27804	27822	226-1_4	1	+
+    IN INTERSECT records:
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	8-2	255	+	21
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	24-1	255	+	21
 
-Alignments:
-    Read ID: 68
-    Number of collapsed reads: 2
-    Number of mapped genomic loci: 1
-    Contribution: 2/1 = 2
+    alignments:
+        Read ID: 8-2
+        Number of collapsed reads: 2
+        Contribution: 2
 
-    Read ID: 316
-    Number of collapsed reads: 1
-    Number of mapped genomic loci: 7
-    Contribution: 1/7 = 0.143
+        Read ID: 24-1
+        Number of collapsed reads: 1
+        Contribution: 1
 
-    Read ID: 599
-    Number of collapsed reads: 1
-    Number of mapped genomic loci: 3
-    Contribution: 1/3 = 0.33
-
-    Read ID: 226
-    Number of collapsed reads: 1
-    Number of mapped genomic loci: 4
-    Contribution: 1/4 = 0.25
-
-OUT table:
-    ID	                lib_name
-    hsa-mir-526b_-0_+0	2.723
+    OUT table:
+        hsa-mir-524_-0_+0      3
 
 
-Example 2 | Different pri-miRs for a single read
+Example 2 | Contribution when using '--nh'
+    use case:
+        A single feature with several intersecting reads.
+        The flag '--nh' is used, so contribution equals 1/NH.
 
-IN BED records:
-    19	.	miRNA_primary_transcript	40866	40886	.	+	.	ID=MI0003158;Alias=MI0003158;Name=hsa-mir-520c_-0_+0	19	40865	40886	10-4_2	255	+
-    19	.	miRNA_primary_transcript	34627	34647	.	+	.	ID=MI0003155;Alias=MI0003155;Name=hsa-mir-520b_-5_+6	19	34626	34647	10-4_2	255	+
+    IN INTERSECT records:
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	8_1	255	+	21
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	24_1	255	+	21
 
-Alignment:
-    Read ID: 10
-    Number of collapsed reads: 4
-    Number of mapped genomic loci: 2
-    Contribution: 4/2 = 2
+    alignments:
+        Read ID: 8_1
+        Number of mapped genomic loci: 1
+        Contribution: 1
 
-OUT table:
-    ID	                lib_name
-    hsa-mir-520c_-0_+0	2
-    hsa-mir-520b_-5_+6	2
+        Read ID: 24_1
+        Number of mapped genomic loci: 1
+        Contribution: 1
+
+    OUT table:
+        hsa-mir-524_-0_+0      2
+
+
+Example 3 | Contribution when using '--collapsed' and '--nh'
+    use case:
+        A single feature with several intersecting reads.
+        The flags '--nh' and '--contribution' are used, so contribution equals
+        # of reads/NH.
+
+    IN INTERSECT records:
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	8-2_1	255	+	21
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	24-1_1	255	+	21
+
+    alignments:
+        Read ID: 8-2_1
+        Number of collapsed reads: 2
+        Number of mapped genomic loci: 1
+        Contribution: 2/1 = 2
+
+        Read ID: 23-1_1
+        Number of collapsed reads: 1
+        Number of mapped genomic loci: 1
+        Contribution: 1/1 = 1
+
+    OUT table:
+        hsa-mir-524_-0_+0      3
+
+Example 4 | Column with intersecting reads; using '--read-ids'
+    use case:
+        A single feature with several intersecting reads.
+        Each read contributes with 1.
+        Read IDs intersecting the feature are appended as the last column.
+
+    IN INTERSECT records:
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	8-2_1	255	+	21
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0	19	44413	44434	24-1_1	255	+	21
+
+    alignments:
+        Read ID: 8-2_1
+        Contribution: 1
+
+        Read ID: 24-1_1
+        Contribution: 1
+
+    OUT table:
+        hsa-mir-524_-0_+0      2       8-2_1;24-1_1
+
+Example 5 | Columns with feature shifts; using '--feat-extension'
+    use case:
+        A single feature with several intersecting reads.
+        Each read contributes with 1.
+        Feature start and end coordinates shift are appended as the third and
+        fourth column respectively.
+
+    IN INTERSECT records:
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-1_+3	19	44413	44434	8-2_1	255	+	21
+        19	.	miRNA_primary_transcript	44362	44448	.	+	.	ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-1_+3	19	44413	44434	24-1_1	255	+	21
+
+    alignments:
+        Read ID: 8-2_1
+        Contribution: 1
+
+        Read ID: 24-1_1
+        Contribution: 1
+
+    feature:
+        Feature name: hsa-mir-524_-1_+3
+        5' shift: -1
+        3' shift: +3
+
+    OUT table:
+        hsa-mir-524_-1_+3      2       -1       +3
 ```
 
 
