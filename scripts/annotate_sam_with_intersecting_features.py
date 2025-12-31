@@ -21,7 +21,7 @@ Where:
     - 3p-shift: Difference between the alignment end and the (possibly
       adjusted) feature end
     - CIGAR and MD: The alignment's CIGAR string and MD tag respectively
-    - READ_SEQ: The read sequence from the alignment
+    - READ_SEQ: The read sequence from the alignment as stored in the SAM file
 
 Optional adjustment:
 --extension: Adjust the feature's start and end coordinates by the given value
@@ -130,9 +130,6 @@ Example 3: Non-intersecting feature; shift filter not passed
         ----|=============================|---- (feature)
         ---------|===================|--------- (read)
 
-    out SAM record:
-        read_3	0	19	5338	255	21M	*	0	0	TCAAAACTGAGGGGCATTTTC	*	MD:Z:21	NH:i:1	NM:i:0  YW:Z:
-
     description:
         The feature start and end coordinates after the adjustment are 5333
         and 5364 respectively.
@@ -213,7 +210,7 @@ def parse_arguments():
         "-v",
         "--version",
         action="version",
-        version="%(prog)s 1.2.0",
+        version="%(prog)s 1.2.1",
         help="Show program's version number and exit",
     )
     parser.add_argument(
@@ -286,12 +283,12 @@ def parse_intersect_output(
     intersect_data = defaultdict(list)
 
     for _, rec in parse_all(intersect_file=intersect_file):
-        miRNA_name = rec.feat_attrs[feat_id]
-        miRNA_start = rec.feat_start + extension
-        miRNA_end = rec.feat_end - extension
+        feat_name = rec.feat_attrs[feat_id]
+        feat_start = rec.feat_start + extension
+        feat_end = rec.feat_end - extension
 
         intersect_data[rec.read_name].append(
-            (miRNA_name, miRNA_start, miRNA_end)
+            (feat_name, feat_start, feat_end)
         )
 
     if not intersect_data:
@@ -301,31 +298,42 @@ def parse_intersect_output(
 
 
 def get_tags(
-    intersecting_mirna: list, alignment: pysam.AlignedSegment, extend: int = 0
+    intersecting_feat: list, alignment: pysam.AlignedSegment, extend: int = 0
 ) -> set:
-    """Get tag for alignment.
+    """Construct a custom tag for an alignment based on intersecting features.
 
-    Given an alignment and a list containing the feature name, start position,
-    and end position, create a list of strings to be added as a new tag to that
-    alignment. The string has the format:
+    For each intersecting feature (given as a tuple of identifier, start, and
+    end), compute the 5'-shift and 3'-shift values relative to the alignment.
+
+    Tag format:
         FEATURE-ID|5p-shift|3p-shift|CIGAR|MD|READ_SEQ
-    The 5p-shift and 3p-shift are calculated as a difference between the
-    feature start/end position and the alignment start/end position. If the
-    start and end position of the alignment differs at most by the extension
-    argument value to the feature start and end positions respectively,
-    the name will be add to the final list.
+
+    Only features where both shift values are within +/- 'extend' are included.
+    If multiple features are valid, the resulting tags are collected in a set.
+
+    Coordinate conventions
+    ----------------------
+    - feat_start / feat_end (from INTERSECT annotations) are 1-based, inclusive
+    - pysam exposes alignment.reference_start as 0 based, inclusive and
+      alignment.reference_end as 0-based, exclusive
+
+    To compare these consistently, the feature coordinates are implicitly
+    converted to 0-based half-open:
+        new_feat_start = feat_start - 1
+        new_feat_end = feat_end
+
+    Therefore, the implemented shifts are:
+        shift_5p = alignment.reference_start - (feat_start - 1)
+                 = alignment.reference_start - feat_start + 1
+        shift_3p = alignment.reference_end - feat_end
 
     Args:
-        intersecting_mirna:
-            list with the miRNA species name, start and end positions
-        alignment:
-            alignment to create the tag for
-        extend:
-            value that sets the range in which both shifts have to be in to
-            create a new string for a particular miRNA species
+        intersecting_feat: list of tuples (feature identifier, start and end).
+        alignment: a pysam.AlignedSegment object
+        extend: maximum allowed absolute shift for both ends (default: 0)
 
     Returns:
-        tags: set of strings containing the new tag
+        A set of tag strings constructed from valid intersecting features.
     """
     cigar = alignment.cigarstring
     seq = alignment.query_sequence
@@ -340,20 +348,20 @@ def get_tags(
     limit = extend + 1
     tags = []
 
-    for miRNA_name, miRNA_start, miRNA_end in intersecting_mirna:
-        shift_5p = alignment.reference_start - miRNA_start + 1
-        shift_3p = alignment.reference_end - miRNA_end
+    for feat_name, feat_start, feat_end in intersecting_feat:
+        shift_5p = alignment.reference_start - feat_start + 1
+        shift_3p = alignment.reference_end - feat_end
 
         if -limit < shift_5p < limit and -limit < shift_3p < limit:
             tags.append(
-                f"{miRNA_name}|{shift_5p}|{shift_3p}|{cigar}|{md}|{seq}"
+                f"{feat_name}|{shift_5p}|{shift_3p}|{cigar}|{md}|{seq}"
             )
 
     return set(tags)
 
 
 def main(args) -> None:
-    """Add intersecting feature(s) into a SAM record as a tag."""
+    """Annotate alignments in a SAM file with intersecting feature tags."""
     try:
         validate_first_n(intersect_file=args.intersect, n=10)
     except FileFormatError as err:
@@ -373,10 +381,13 @@ def main(args) -> None:
             alignment_id = alignment.query_name
 
             assert alignment_id is not None
-            intersecting_miRNAs = intersect_data[alignment_id]
+            intersecting_feats = intersect_data[alignment_id]
+
+            if len(intersecting_feats) == 0:
+                continue
 
             tags = get_tags(
-                intersecting_mirna=intersecting_miRNAs,
+                intersecting_feat=intersecting_feats,
                 alignment=alignment,
                 extend=args.extension,
             )
