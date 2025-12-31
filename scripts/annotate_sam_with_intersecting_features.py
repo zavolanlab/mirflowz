@@ -2,33 +2,37 @@
 
 # pylint: disable=line-too-long
 
-"""Add intersecting feature(s) into a SAM file as a tag.
+"""Annotate SAM alignments with their intersecting feature(s).
 
-Build new names for the intersecting features from an INTERSECT file and add
-them as a tag to alignments in a SAM file using the format
-FEATURE_ID|5p-shift|3p-shift|CIGAR|MD|READ_SEQ. If either the INTERSECT or the
-SAM file is empty, only the SAM file header is returned.
+Add a custom tag ("YW") to each alignment in the SAM file if an intersecting
+feature is found in the INTERSECT file. The INTERSECT file must be the result
+of the call 'bedtools intersect -wo -s -a GFF3/GTF -b BAM'. If either the
+INTERSECT or the SAM file is empty, only the SAM file header is returned.
 
-EXPECTED INPUT FILES
-The expected INTERSECT file must be the output of the call 'bedtools intersect
--a GFF3/GTF -b BAM -wo -s'. To ensure the file follows the expected format, the
-first 10 lines are going to be validated. If the GFF3/GTF used in the call  has
-the feature start and end coordinates extended, the number of additional
-nucleotides can be specified using the CLI option `--extension`.
-The SAM file must contain only the reads that have an intersecting feature.
+Each matching feature is used to build a tag with the following format:
 
-NAME CREATION and TAG ADDITION
-For each alignment, the name of the intersecting feature will follow the
-format FEATURE_ID|5p-shift|3p-shift|CIGAR|MD|READ_SEQ. The CLI option `--id`
-specifies the feature identifier to be used as FEATURE_ID from within the
-attributes column in the INTERSECT file. The 5p-shift and the 3-p shift values
-are the difference between the feature start and end coordinates and the
-alignment start and end coordinates. If `--extension` is provided, the feature
-start position are adjusted by adding the given value and subtracting it from
-the end position. If both, the 5p-shift and the 3p-shift, are within the range
-+/- extension + 1 the feature name is added to the alignment as the new tag
-"YW". Multiple intersecting feature names are separated by a semi-colon.
+    FEATURE_ID|5p-shift|3p-shift|CIGAR|MD|READ_SEQ
 
+Where:
+    - FEATURE_ID: Extracted from the specified attribute in the INTERSECT file
+      (default: "name")
+    - 5p-shift: Difference between the (possibly adjusted) feature start and
+      the alignment start
+    - 3p-shift: Difference between the alignment end and the (possibly
+      adjusted) feature end
+    - CIGAR and MD: The alignment's CIGAR string and MD tag respectively
+    - READ_SEQ: The read sequence from the alignment
+
+Optional adjustment:
+--extension: Adjust the feature's start and end coordinates by the given value
+    (start is increased and end decreased). In addition, requires both the 5'
+    and 3' shift values to be within +/- this value to include the feature tag
+    in the alignment
+
+If an alignment has multiple intersecting features, the tag values are
+concatenated using a semicolon as the separator. If there are no intersecting
+features or none of the intersecting features pass the shift filter, the
+alignment is skipped.
 
 Examples
 --------
@@ -40,7 +44,7 @@ Example 1: Feature intersects alignment; coordinates adjustment and shift allowe
         between the feature and the read alignment start and end coordinates.
 
     command:
-        iso_name_tagging.py -i INTERSECT -s SAM --extension 5
+        annotate_sam_with_intersecting_features.py -i INTERSECT -s SAM --extension 5
 
     in INTERSECT record:
         19	.	miRNA	5332	5365	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	read_1	255	+	21
@@ -76,7 +80,7 @@ Example 2: Feature intersects alignment; no coordinates adjustment or shift allo
         The feature and read alignment coordinates must perfectly match.
 
     command:
-        iso_name_tagging.py -i INTERSECT -s SAM
+        annotate_sam_with_intersecting_features.py -i INTERSECT -s SAM
 
     in INTERSECT record:
         19	.	miRNA	5338	5359	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	read_2	255	+	21
@@ -108,7 +112,7 @@ Example 3: Non-intersecting feature; shift filter not passed
         between the feature and the read alignment start and end coordinates.
 
     command:
-        iso_name_tagging.py -i INTERSECT -s SAM --extension 1
+        annotate_sam_with_intersecting_features.py -i INTERSECT -s SAM --extension 1
 
     in INTERSECT record:
         19	.	miRNA	5332	5365	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	read_3	255	+	21
@@ -144,7 +148,7 @@ Example 4: Feature intersects alignment; using feature's "Alias"
         The feature and read alignment coordinates must perfectly match.
 
     command:
-        iso_name_tagging.py -i INTERSECT -s SAM --id alias
+        annotate_sam_with_intersecting_features.py -i INTERSECT -s SAM --id alias
 
     in INTERSECT record:
         19	.	miRNA	5338	5359	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	read_4	255	+	21
@@ -301,7 +305,7 @@ def get_tags(
     Given an alignment and a list containing the feature name, start position,
     and end position, create a list of strings to be added as a new tag to that
     alignment. The string has the format:
-        feature-id|5p-shift|3p-shift|CIGAR|MD|READ_SEQ
+        FEATURE-ID|5p-shift|3p-shift|CIGAR|MD|READ_SEQ
     The 5p-shift and 3p-shift are calculated as a difference between the
     feature start/end position and the alignment start/end position. If the
     start and end position of the alignment differs at most by the extension
