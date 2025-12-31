@@ -139,8 +139,8 @@ Example 3: Non-intersecting feature; shift filter not passed
         The read alignment starts at position 5338. As the read has length 21,
         its end position is 5359.
         There is a 5-nucleotide overhang on both ends. Thus, the feature is
-        not considered to intersect the read alignment and the tag is an empty
-        string.
+        not considered to intersect the read alignment and the alignment is
+        not written in the output file.
 
 
 Example 4: Feature intersects alignment; using feature's "Alias"
@@ -237,9 +237,12 @@ def parse_arguments():
         "-e",
         "--extension",
         help=(
-            "Number of nucleotides the start and end coordinates of the"
-            " annotated features had been extended. Its value has to 0 or a"
-            " positive integer. Default: %(default)d."
+            "Number of nucleotides to adjust the feature coordinates: add to"
+            " the start and subtract from the end. Also, maximum allowed"
+            " difference between the alignment and feature coordinates at"
+            " both ends. The tag is added only if both shifts are within +/-"
+            " this value. Its value has to be either 0 or positive integer."
+            " Default: %(default)d."
         ),
         default=0,
         choices=range(10**6),
@@ -371,6 +374,9 @@ def main(args) -> None:
                 alignment=alignment,
                 extend=args.extension,
             )
+
+            if len(tags) == 0:
+                continue
 
             alignment.set_tag("YW", ";".join(tags))
             sys.stdout.write(alignment.to_string() + "\n")
