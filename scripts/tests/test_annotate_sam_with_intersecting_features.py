@@ -5,10 +5,12 @@ from pathlib import Path
 import sys
 
 import pytest
+import pysam
 
 from ..annotate_sam_with_intersecting_features import (
     main,
     parse_arguments,
+    get_tags,
     parse_intersect_output,
 )
 from ..validate_bedtools_intersect import FileFormatError
@@ -53,6 +55,15 @@ def intersect_sam_id():
     return intersect_file, sam_file, output_file
 
 
+def aln_from_sam_line(sam_line: str) -> pysam.AlignedSegment:
+    """Build an AlignedSegment from a SAM line."""
+    header = pysam.AlignmentHeader.from_dict(
+        {"HD": {"VN": "1.6"}, "SQ": [{"SN": "19", "LN": 1000000}]}
+    )
+
+    return pysam.AlignedSegment.fromstring(sam_line, header)
+
+
 class TestParseArguments:
     """Test 'parse_arguments()' function."""
 
@@ -65,7 +76,7 @@ class TestParseArguments:
                 sys,
                 "argv",
                 [
-                    "iso_name_tagging",
+                    "annotate_sam_with_intersecting_features",
                     "--sam",
                     str(in_sam),
                 ],
@@ -82,7 +93,7 @@ class TestParseArguments:
                 sys,
                 "argv",
                 [
-                    "iso_name_tagging",
+                    "annotate_sam_with_intersecting_features",
                     "--intersect",
                     str(in_intersect),
                 ],
@@ -98,7 +109,7 @@ class TestParseArguments:
             sys,
             "argv",
             [
-                "iso_name_tagging",
+                "annotate_sam_with_intersecting_features",
                 "--intersect",
                 str(in_intersect),
                 "--sam",
@@ -116,7 +127,7 @@ class TestParseArguments:
             sys,
             "argv",
             [
-                "iso_name_tagging",
+                "annotate_sam_with_intersecting_features",
                 "--intersect",
                 str(in_intersect),
                 "--sam",
@@ -144,7 +155,7 @@ class TestMain:
             sys,
             "argv",
             [
-                "iso_name_tagging",
+                "annotate_sam_with_intersecting_features",
                 "--intersect",
                 str(empty_intersect),
                 "--sam",
@@ -169,7 +180,7 @@ class TestMain:
             sys,
             "argv",
             [
-                "iso_name_tagging",
+                "annotate_sam_with_intersecting_features",
                 "--intersect",
                 str(in_intersect),
                 "--sam",
@@ -191,7 +202,7 @@ class TestMain:
             sys,
             "argv",
             [
-                "iso_name_tagging",
+                "annotate_sam_with_intersecting_features",
                 "--intersect",
                 str(in_intersect),
                 "--sam",
@@ -215,7 +226,7 @@ class TestMain:
             sys,
             "argv",
             [
-                "iso_name_tagging",
+                "annotate_sam_with_intersecting_features",
                 "--intersect",
                 str(in_intersect),
                 "--sam",
@@ -241,7 +252,7 @@ class TestMain:
             sys,
             "argv",
             [
-                "iso_name_tagging",
+                "annotate_sam_with_intersecting_features",
                 "--intersect",
                 str(in_intersect),
                 "--sam",
@@ -270,7 +281,7 @@ class TestMain:
             sys,
             "argv",
             [
-                "iso_name_tagging",
+                "annotate_sam_with_intersecting_features",
                 "--intersect",
                 str(intersect_file),
                 "--sam",
@@ -320,3 +331,96 @@ class TestParseIntersectOutput:
         out = parse_intersect_output(intersect_file=in_intersect, extension=6)
 
         assert out["13-1_1"] == [("hsa-miR-524-5p", 44383, 44392)]
+
+
+class TestGetTags:
+    """Test 'get_tags()' function."""
+
+    def test_get_tag_intersect_no_shift(self):
+        """Test function for intersecting feature without shift allowed."""
+        sam = (
+            "read_1\t0\t19\t101\t255\t21M\t*\t0\t0\t"
+            "GAAGGCGCTTCCCTTTGGAGT\t*\tMD:Z:21"
+        )
+        aln = aln_from_sam_line(sam)
+
+        feats = [("mirA", 101, 121)]
+        tags = get_tags(feats, aln)
+
+        assert tags == {"mirA|0|0|21M|21|GAAGGCGCTTCCCTTTGGAGT"}
+
+    def test_get_tag_intersect_shift_1(self):
+        """Test function for intersection feature with 1-base shift allowed."""
+        sam = (
+            "read_1\t0\t19\t101\t255\t21M\t*\t0\t0\t"
+            "GAAGGCGCTTCCCTTTGGAGT\t*\tMD:Z:21"
+        )
+        aln = aln_from_sam_line(sam)
+
+        feats = [("mirB", 100, 122)]
+        tags = get_tags(feats, aln, extend=1)
+
+        assert tags == {"mirB|1|-1|21M|21|GAAGGCGCTTCCCTTTGGAGT"}
+
+    def test_get_tag_no_intersect_no_shift(self):
+        """Test function for non-intersecting feature without shift allowed."""
+        sam = (
+            "read_1\t0\t19\t101\t255\t21M\t*\t0\t0\t"
+            "GAAGGCGCTTCCCTTTGGAGT\t*\tMD:Z:21"
+        )
+        aln = aln_from_sam_line(sam)
+
+        feats = [("mirC", 100, 121)]
+        tags = get_tags(feats, aln)
+
+        assert tags == set()
+
+    def test_get_tag_no_intersect_shift_1(self):
+        """Test function for non-intersecting feat, 1-base shift allowed."""
+        sam = (
+            "read_1\t0\t19\t101\t255\t21M\t*\t0\t0\t"
+            "GAAGGCGCTTCCCTTTGGAGT\t*\tMD:Z:21"
+        )
+        aln = aln_from_sam_line(sam)
+
+        feats = [("mirD", 99, 122)]
+        tags = get_tags(feats, aln, extend=1)
+
+        assert tags == set()
+
+    def test_get_tag_multiple_intersect_shift_1(self):
+        """Test function for multiple intersecting features, 1-base shift."""
+        sam = (
+            "read_1\t0\t19\t101\t255\t21M\t*\t0\t0\t"
+            "GAAGGCGCTTCCCTTTGGAGT\t*\tMD:Z:21"
+        )
+        aln = aln_from_sam_line(sam)
+
+        feats = [
+            ("mirA", 101, 121),
+            ("mirB", 100, 122),
+            ("mirC", 100, 121),
+            ("mirD", 99, 122),
+        ]
+        tags = get_tags(feats, aln, extend=1)
+
+        assert tags == {
+            "mirA|0|0|21M|21|GAAGGCGCTTCCCTTTGGAGT",
+            "mirB|1|-1|21M|21|GAAGGCGCTTCCCTTTGGAGT",
+            "mirC|1|0|21M|21|GAAGGCGCTTCCCTTTGGAGT",
+        }
+
+    def test_get_tag_no_MD(self):
+        """Test function for alignment missing the MD tag."""
+        sam = (
+            "read_1\t0\t19\t101\t255\t21M\t*\t0\t0\t"
+            "GAAGGCGCTTCCCTTTGGAGT\t*"
+        )
+        aln = aln_from_sam_line(sam)
+
+        feats = [("mirA", 101, 121)]
+
+        with pytest.raises(
+            KeyError, match=r'SAM record "read_1" is missing required MD tag'
+        ):
+            get_tags(feats, aln)
