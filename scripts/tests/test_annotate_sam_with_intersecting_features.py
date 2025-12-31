@@ -1,4 +1,4 @@
-"""Unit tests for module 'iso_name_tagging.py'."""
+"""Unit tests for module 'annotate_sam_with_intersecting_features.py'."""
 
 import argparse
 from pathlib import Path
@@ -6,7 +6,7 @@ import sys
 
 import pytest
 
-from ..iso_name_tagging import (
+from ..annotate_sam_with_intersecting_features import (
     main,
     parse_arguments,
     parse_intersect_output,
