@@ -329,7 +329,13 @@ def get_tags(
     """
     cigar = alignment.cigarstring
     seq = alignment.query_sequence
-    md = alignment.get_tag("MD")
+
+    try:
+        md = alignment.get_tag("MD")
+    except KeyError as keyerr:
+        raise KeyError(
+            f'SAM record "{alignment.query_name}" is missing required MD tag'
+        ) from keyerr
 
     limit = extend + 1
     tags = []
@@ -347,7 +353,7 @@ def get_tags(
 
 
 def main(args) -> None:
-    """Add intersecting feature(s) into a SAM file as a tag."""
+    """Add intersecting feature(s) into a SAM record as a tag."""
     try:
         validate_first_n(intersect_file=args.intersect, n=10)
     except FileFormatError as err:
