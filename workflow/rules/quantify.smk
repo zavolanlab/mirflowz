@@ -295,7 +295,7 @@ rule add_intersecting_mirna_tag:
         intersect=INTERMEDIATES_DIR
         / "{sample}"
         / "intersected_extended_mirna.intersect",
-        script=SCRIPTS_DIR / "iso_name_tagging.py",
+        script=SCRIPTS_DIR / "annotate_sam_with_intersecting_features.py",
     output:
         sam=INTERMEDIATES_DIR / "{sample}" / "alignments_intersecting_mirna_tag.sam",
     params:
