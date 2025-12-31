@@ -287,9 +287,7 @@ def parse_intersect_output(
         feat_start = rec.feat_start + extension
         feat_end = rec.feat_end - extension
 
-        intersect_data[rec.read_name].append(
-            (feat_name, feat_start, feat_end)
-        )
+        intersect_data[rec.read_name].append((feat_name, feat_start, feat_end))
 
     if not intersect_data:
         return None
