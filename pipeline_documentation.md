@@ -1333,7 +1333,7 @@ Example 1 | Feature intersects alignment | coordinates adjustment and shift allo
         between the feature and the read alignment start and end coordinates.
 
     command:
-        iso_name_tagging.py -b INTERSECT -s SAM --extension 5
+        annotate_sam_with_intersecting_features.py -b INTERSECT -s SAM --extension 5
 
     in INTERSECT record:
         19	.	miRNA	5332	5365	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	read_1	255	+	21
@@ -1369,7 +1369,7 @@ Example 2 | Feature intersects alignment | no coordinates adjustment or shift al
         The feature and read alignment coordinates must perfectly match.
 
     command:
-        iso_name_tagging.py -b INTERSECT -s SAM
+        annotate_sam_with_intersecting_features.py -b INTERSECT -s SAM
 
     in INTERSECT record:
         19	.	miRNA	5338	5359	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	read_2	255	+	21
@@ -1401,7 +1401,7 @@ Example 3 | Non-intersecting feature | shift filter not passed
         between the feature and the read alignment start and end coordinates.
 
     command:
-        iso_name_tagging.py -b INTERSECT -s SAM --extension 1
+        annotate_sam_with_intersecting_features.py -b INTERSECT -s SAM --extension 1
 
     in INTERSECT record:
         19	.	miRNA	5332	5365	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	read_3	255	+	21
@@ -1428,8 +1428,8 @@ Example 3 | Non-intersecting feature | shift filter not passed
         The read alignment starts at position 5338. As the read has length 21,
         its end position is 5359.
         There is a 5-nucleotide overhang on both ends. Thus, the feature is
-        not considered to intersect the read alignment and the tag is an empty
-        string.
+        not considered to intersect the read alignment and the alignment is
+        not written in the output file.
 
 
 Example 4 | Feature intersects alignment | using feature's "Alias"
@@ -1437,7 +1437,7 @@ Example 4 | Feature intersects alignment | using feature's "Alias"
         The feature and read alignment coordinates must perfectly match.
 
     command:
-        iso_name_tagging.py -b INTERSECT -s SAM --id alias
+        annotate_sam_with_intersecting_features.py -b INTERSECT -s SAM --id alias
 
     in INTERSECT record:
         19	.	miRNA	5338	5359	.	+	.	ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786	19	5337	5358	read_4	255	+	21
