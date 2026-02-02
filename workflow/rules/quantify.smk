@@ -62,9 +62,24 @@ localrules:
 
 rule finish_quantify:
     input:
-        primir_intersect_sam=OUT_DIR / "{sample}" / "alignments_intersecting_primir.sam",
-        mirna_intersect_sam=OUT_DIR / "{sample}" / "alignments_intersecting_mirna.sam",
-        table=OUT_DIR / "TABLES" / "all_{mir}_counts.tab",
+        primir_intersect_sam=expand(
+            OUT_DIR
+            / "{sample}"
+            / "alignments_intersecting_primir.sam",
+            sample=pd.unique(samples_table.index.values),
+        ),
+        mirna_intersect_sam=expand(
+            OUT_DIR
+            / "{sample}"
+            / "alignments_intersecting_mirna.sam",
+            sample=pd.unique(samples_table.index.values),
+        ),
+        table=expand(
+            OUT_DIR
+            / "TABLES"
+            / "all_{mir}_counts.tab",
+            mir=config["mir_list"],
+        ),
         uncollapsed_bam=expand(
             OUT_DIR
             / "{sample}"
@@ -77,6 +92,7 @@ rule finish_quantify:
             / "alignments_intersecting_mirna_uncollapsed_sorted.bam.bai",
             sample=pd.unique(samples_table.index.values),
         ),
+
 
 
 ###############################################################################
@@ -476,7 +492,7 @@ rule uncollapse_reads:
 ###############################################################################
 
 
-rule convert_uncollpased_reads_sam_to_bam:
+rule convert_uncollapsed_reads_sam_to_bam:
     input:
         maps=INTERMEDIATES_DIR
         / "{sample}"
@@ -502,7 +518,7 @@ rule convert_uncollpased_reads_sam_to_bam:
 ###############################################################################
 
 
-rule sort_uncollpased_reads_bam_by_position:
+rule sort_uncollapsed_reads_bam_by_position:
     input:
         maps=INTERMEDIATES_DIR
         / "{sample}"
