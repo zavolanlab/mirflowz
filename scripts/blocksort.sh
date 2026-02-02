@@ -2,7 +2,7 @@
 
 # define function to print usage
 display_usage() {
-    echo "Sort oligomap aligments based on their numerical names."
+    echo "Sort oligomap alignments based on their numerical names."
     echo ""
     echo "Usage: $0 input_file number_of_threads output_file"
     echo ""
@@ -20,7 +20,7 @@ then
 fi
 
 # show usage if user has supplied -h or --help
-if [[ ( $# == "--help") ||  $# == "-h" ]] 
+if [[ ( $# == "--help") ||  $# == "-h" ]]
 then
     display_usage
     exit 0
