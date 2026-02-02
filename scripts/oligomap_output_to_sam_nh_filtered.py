@@ -2,7 +2,7 @@
 
 """Transform oligomap output FASTA file to SAM keeping the best alignments.
 
-Read the input file, pick the best alignment(s) for each read (i.e. all
+Read the input file, pick the best alignment(s) for each read (i.e., all
 of the alignments have either 0 or 1 error). In addition, if the `--nh-filter`
 CLI argument is set, filter the reads with more hits than the number provided.
 The following sections will cover what the input file must be like and how the
@@ -11,24 +11,24 @@ output can look like.
 EXPECTED INPUT
 The FASTA file must be the output of mapping your library with the tool
 oligomap: "https://github.com/zavolanlab/oligomap". Refer to the "Output
-format" seccion in its main README.md for more information.
+format" section in its main README.md for more information.
 In addition, alignments have to be sorted by the read name. An example of how
 an entry would look like in the EXAMPLES section.
 
 OUTPUT FORMAT
 The output consist on the filtered set of alignments from the input file in
-SAM format. Only the best alignments per read (i.e. either all the alignments
+SAM format. Only the best alignments per read (i.e., either all the alignments
 have 0 or 1 error) are written to the standard output. Moreover, if the
-`--nh-filter` CLI argument is given, reads with more htis than the provided
+`--nh-filter` CLI argument is given, reads with more hits than the provided
 value are discarded. If none of the alignments meet the criteria, nothing is
 returned. The fields in the SAM entry are:
 
 field | value
 --------------
 QNAME | Read's name
-FLAG  | Set to 0 if the reference sequence is found in the poisitive strand,
+FLAG  | Set to 0 if the reference sequence is found in the positive strand,
       | and to 16 otherwise.
-RNAME | Refernce sequence name
+RNAME | Reference sequence name
 POS   | Alignment's first position in the reference sequence
 MAPQ  | Value set to 255 (mapping quality not available)
 CIGAR | Alignment's CIGAR string
@@ -65,7 +65,7 @@ EXAMPLES
 
 Paula Iborra. Zavolan Lab.
 Adapted version of Alessandro Crippa script.
-Refactored and documented by Iris Mestres.
+Refactored and documented by Iris Mestres-Pascual.
 """  # noqa: E501
 # pylint: enable=line-too-long
 
@@ -257,9 +257,9 @@ def get_sam_fields(aln: list[str]) -> Fields:
     field | value
     --------------
     QNAME | Read's name
-    FLAG  | Set to 0 if the reference sequence is found in the poisitive
+    FLAG  | Set to 0 if the reference sequence is found in the positive
           | strand, and to 16 otherwise.
-    RNAME | Refernce sequence name
+    RNAME | Reference sequence name
     POS   | Alignment's first position in the reference sequence
     MAPQ  | Value set to 255 (mapping quality not available)
     CIGAR | Alignment's CIGAR string
@@ -316,7 +316,7 @@ def eval_aln(
 
     Given a read's alignment, this function first checks if the dictionary
     storing the read alignments is empty. If it is, the function checks if the
-    read has an entry in the dictionary storing the current minium error and
+    read has an entry in the dictionary storing the current minimum error and
     the NH. If there is not, or the minimum number of errors is higher than
     the alignment under evaluation, the entry for that read in both
     dictionaries is set to the data of the alignment under evaluation.
