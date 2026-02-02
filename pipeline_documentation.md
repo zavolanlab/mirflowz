@@ -1049,7 +1049,7 @@ Filter multimappers favoring InDels over mismatches with a
 > Given that InDels are more frequent in miRNAs than mismatches, as
 > demonstrated by [Saunders et al. (2017)][cite_saunders],
 > [Neilsen et al. (2012)][cite_neilsen] and
-> [Schumauch et al. (2024)][cite_schumauch], only those "multimappers" (defined
+> [Schmauch et al. (2024)][cite_schmauch], only those "multimappers" (defined
 > here as alignments of the same read mapping to different genomic loci with
 > the same edit distance) that contain a higher or equal number of InDels
 > compared to mismatches are retained.
@@ -1951,7 +1951,7 @@ different library subsets if provided with
 [chr-maps]: <https://github.com/dpryan79/ChromosomeMappings>
 [cite_neilsen]:<https://www.sciencedirect.com/science/article/pii/S0168952512001126>
 [cite_saunders]: <https://pubmed.ncbi.nlm.nih.gov/17360642/>
-[cite_schumauch]: <https://www.biorxiv.org/content/10.1101/2024.03.28.587190v1>
+[cite_schmauch]: <https://www.biorxiv.org/content/10.1101/2024.03.28.587190v1>
 [custom-script-blocksort]: scripts/blocksort.sh
 [custom-script-filter-mm]: scripts/filter_multimappers.py
 [custom-script-get-lines]: scripts/get_lines_w_pattern.sh
