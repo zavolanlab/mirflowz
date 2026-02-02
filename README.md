@@ -396,7 +396,7 @@ aligning to different genomic loci with the same edit distance). Given that
 isomiRs are known to contain more InDels than mismatches when compared to the
 canonical sequence they come from, as demonstrated by
 [Saunders et al. (2017)][cite_saunders], [Neilsen et al. (2012)][cite_neilsen]
-and [Schumauch et al. (2024)][cite_schumauch] only those multimappers that
+and [Schmauch et al. (2024)][cite_schmauch] only those multimappers that
 contain a higher or equal number of InDels compared to mismatches are retained.
 Note that some multimappers might still be present if the number of InDels is
 the same across alignments.
@@ -471,7 +471,7 @@ For questions or suggestions regarding the code, please use the
 [chrMap]: <https://github.com/dpryan79/ChromosomeMappings>
 [cite_neilsen]:<https://www.sciencedirect.com/science/article/pii/S0168952512001126>
 [cite_saunders]: <https://pubmed.ncbi.nlm.nih.gov/17360642/>
-[cite_schumauch]: <https://www.biorxiv.org/content/10.1101/2024.03.28.587190v1>
+[cite_schmauch]: <https://www.biorxiv.org/content/10.1101/2024.03.28.587190v1>
 [cluster execution]: <https://snakemake.readthedocs.io/en/stable/executing/cluster.html>
 [conda]: <https://docs.conda.io/projects/conda/en/latest/index.html>
 [email]: <zavolab-biozentrum@unibas.ch>
