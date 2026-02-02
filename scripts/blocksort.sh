@@ -7,7 +7,7 @@ display_usage() {
     echo "Usage: $0 input_file number_of_threads output_file"
     echo ""
     echo "Args:"
-    echo "    input_file: oligomap aligments"
+    echo "    input_file: oligomap alignments"
     echo "    number_of_threads: number of threads to run the sorting with"
     echo "    output_file: path to sorted output file"
 }
