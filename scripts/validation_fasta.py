@@ -22,20 +22,20 @@ def parse_and_validate_arguments():
     """Parse and validate command-line arguments."""
     description = """Process FASTA files.
 
-Process both uncompressed and 'gzip'-compressed FASTA files by trimming,
+Process both uncompressed and `gzip`-compressed FASTA files by trimming,
 filtering, and validating sequence records based on user-defined criteria.
 
 Sequence IDs are trimmed at the first occurrence of any specified characters
-in '--trim' to standardize naming conventions. If not character string is
+in `--trim` to standardize naming conventions. If not character string is
 provided, the first white space is used.
 
 To filter the FASTA file by sequence IDs, a text file, with one (trimmed) ID
-per line, has to be passed to `--filter'. Wheather to keep ('--mode k') or
-discard ('--mode d') the sequences with those IDs must be specified.
+per line, has to be passed to `--filter`. Whether to keep (`--mode k`) or
+discard (`--mode d`) the sequences with those IDs must be specified.
 
-Sequences exceeding a given length threshold ('--remove') are excluded.
+Sequences exceeding a given length threshold (`--remove`) are excluded.
 
-If a path is provided to '--idlist', the resulting sequence IDs are written
+If a path is provided to `--idlist`, the resulting sequence IDs are written
 one per line in a separate text file.
 """
     parser = argparse.ArgumentParser(
@@ -108,14 +108,14 @@ one per line in a separate text file.
 
     if args.filter and not args.mode:
         parser.error(
-            "Mode argument ('--mode', '-m' is required when using the filter"
-            " argument ('--filter', '-f'). See '--help' for more information."
+            "Mode argument (`--mode`, `-m` is required when using the filter"
+            " argument (`--filter`, `-f`). See `--help` for more information."
         )
 
     if args.mode and not args.filter:
         parser.error(
-            "Filter argument ('--filter', '-f' is required when using the mode"
-            " argument ('--mode', '-m'). See '--help' for more information."
+            "Filter argument (`--filter`, `-f` is required when using the mode"
+            " argument (`--mode`, `-m`). See `--help` for more information."
         )
 
     return args
