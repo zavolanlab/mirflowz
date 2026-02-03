@@ -130,7 +130,7 @@ option_list <- list(
             type="character",
             default=NULL,
             help="Prefix to be used in the output file name(s). If not provided
-            the input BAM file(s) name will be used instead,",
+            the input BAM file(s) name will be used instead.",
             metavar="string"
         ),
         make_option(
