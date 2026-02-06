@@ -46,7 +46,7 @@ jobs:
 
       - name: pylint
         working-directory: ./workflow/scripts
-        run: pylint --rcfile=../pylint.cfg ./*.py
+        run: pylint --rcfile=../../pylint.cfg ./*.py
 
       - name: black
         working-directory: ./workflow/scripts
