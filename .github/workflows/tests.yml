@@ -37,19 +37,19 @@ jobs:
           conda list
 
       - name: flake8
-        working-directory: ./scripts
+        working-directory: ./workflow/scripts
         run: flake8
 
       - name: mypy
-        working-directory: ./scripts
+        working-directory: ./workflow/scripts
         run: mypy ./*.py
 
       - name: pylint
-        working-directory: ./scripts
+        working-directory: ./workflow/scripts
         run: pylint --rcfile=../pylint.cfg ./*.py
 
       - name: black
-        working-directory: ./scripts
+        working-directory: ./workflow/scripts
         run: black --check --verbose --line-length=79 ./*.py
 
   snakemake-format-graph-test:
@@ -183,5 +183,5 @@ jobs:
           conda list
 
       - name: Run unit tests
-        working-directory: ./scripts/tests
-        run: pytest --import-mode prepend --cov=scripts --cov-branch --cov-report=term-missing
+        working-directory: ./workflow/scripts/tests
+        run: pytest --import-mode prepend --cov=workflow/scripts --cov-branch --cov-report=term-missing
