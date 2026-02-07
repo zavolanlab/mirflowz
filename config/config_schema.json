@@ -57,7 +57,7 @@
         },
         "scripts_dir":{
             "type": "string",
-            "default": "../workflow/scripts/",
+            "default": "../../workflow/scripts/",
             "description": "Path to the scripts directory."
         },
         "extension":{
@@ -117,7 +117,7 @@
         "lib_dict":{
             "type": "object",
             "additionalProperties":{
-                "type": "array",
+                "type": "array"
             },
             "default": {},
             "description": "Dictionary of arbitrary condition names (keys) and library names to aggregate alignment pileups for (values; MUST correspond to names in samples table)."
