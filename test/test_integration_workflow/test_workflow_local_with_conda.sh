@@ -19,9 +19,9 @@ cd $script_dir
 
 # Run test
 snakemake \
-    --snakefile="../workflow/Snakefile" \
+    --snakefile="../../workflow/Snakefile" \
     --cores 4  \
-    --configfile="config.yaml" \
+    --configfile="../test_files/config.yaml" \
     --software-deployment-method conda \
     --printshellcmds \
     --rerun-incomplete \
@@ -30,8 +30,8 @@ snakemake \
 
 # Snakemake report
 snakemake \
-    --snakefile="../workflow/Snakefile" \
-    --configfile="config.yaml" \
+    --snakefile="../../workflow/Snakefile" \
+    --configfile="../test_files/config.yaml" \
     --report="snakemake_report.html"
 
 # Check md5 sum of some output files
