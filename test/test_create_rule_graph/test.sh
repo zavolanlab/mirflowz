@@ -18,8 +18,8 @@ cd $script_dir
 
 # Run test
 snakemake \
-    --snakefile="../workflow/Snakefile" \
-    --configfile="config.yaml" \
+    --snakefile="../../workflow/Snakefile" \
+    --configfile="../test_files/config.yaml" \
     --rulegraph \
     --quiet="all" \
-| dot -Tsvg > "../images/rule_graph.svg"
+| dot -Tsvg > "../../images/rule_graph.svg"
