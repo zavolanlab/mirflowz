@@ -80,13 +80,16 @@ jobs:
           conda list
 
       - name: Run test script for snakemake format
-        run: bash test/test_snakefmt.sh
+        working-directory: ./test/test_format
+        run: bash test_snakefmt.sh
 
       - name: Run test script for snakemate lint
-        run: bash test/test_snakemake_lint.sh
+        working-directory: ./test/test_format
+        run: bash test_snakemake_lint.sh
 
       - name: Run test script for rule graph
-        run: bash test/test_rule_graph.sh
+        working-directory: ./test/test_create_rule_graph
+        run: bash test.sh
 
 
   snakemake-apptainer-integration-test:
@@ -121,7 +124,8 @@ jobs:
           conda list
 
       - name: Run Apptainer local test script
-        run: bash test/test_workflow_local_with_apptainer.sh
+        working-directory: ./test/test_integration_workflow
+        run: bash test_workflow_local_with_apptainer.sh
 
 
   snakemake-conda-integration-test:
@@ -152,7 +156,8 @@ jobs:
           conda list
 
       - name: Run Conda local test script
-        run: bash test/test_workflow_local_with_conda.sh
+        working-directory: ./test/test_integration_workflow
+        run: bash test_workflow_local_with_conda.sh
 
 
   unit-testing:
