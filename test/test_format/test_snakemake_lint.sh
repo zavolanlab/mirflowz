@@ -1,12 +1,9 @@
 #!/bin/bash
 
-# This script is currently exiting with non-zero status.
-# This is expected behaviour though, as several parameters can't be inferred from the test files.
-
 # Tear down test environment
 cleanup () {
     rc=$?
-    cd $user_dir
+    cd $PWD
     echo "Exit status: $rc"
 }
 trap cleanup EXIT
@@ -15,12 +12,15 @@ trap cleanup EXIT
 set -eo pipefail  # ensures that script exits at first command that exits with non-zero status
 set -u  # ensures that script exits when unset variables are used
 set -x  # facilitates debugging by printing out executed commands
-user_dir=$PWD
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-cd $script_dir
+#
+# Store root and test directories
+ROOT="$(git rev-parse --show-toplevel)"
+TEST="${ROOT}/test"
+
+cd $ROOT
 
 # Run tests
 snakemake \
-    --snakefile="../../workflow/Snakefile" \
-    --configfile="../test_files/config.yaml" \
+    --snakefile="$ROOT/workflow/Snakefile" \
+    --configfile="$TEST/test_files/config.yaml" \
     --lint
