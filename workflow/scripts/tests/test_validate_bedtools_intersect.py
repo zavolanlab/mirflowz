@@ -361,8 +361,8 @@ class TestStaticParsers:
 
         assert Record._parse_feat_attrs(attr_gff, "field") == exp_attr
 
-    def test_parse_gft_feat_attrs(self):
-        """Test parsing feature GFT-style attributes."""
+    def test_parse_gtf_feat_attrs(self):
+        """Test parsing feature GTF-style attributes."""
         attr_gtf = 'gene_id "feature"; gene_name "feat_gtf"'
         exp_attr = {"gene_id": "feature", "gene_name": "feat_gtf"}
 
