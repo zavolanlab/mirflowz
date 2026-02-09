@@ -57,7 +57,7 @@
         },
         "scripts_dir":{
             "type": "string",
-            "default": "../../workflow/scripts/",
+            "default": "workflow/scripts/",
             "description": "Path to the scripts directory."
         },
         "extension":{
