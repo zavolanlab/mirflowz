@@ -172,7 +172,7 @@ class TestMain:
     def test_main_empty_sam_file(
         self, monkeypatch, capsys, empty_files, intersect_sam
     ):
-        """Test main function with an empty sam file."""
+        """Test main function with an empty SAM file."""
         empty_intersect, empty_sam = empty_files
         in_intersect, in_sam, output = intersect_sam
 
