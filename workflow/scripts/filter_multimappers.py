@@ -20,18 +20,18 @@ The following assumptions are made:
 
 Examples
 ---------
-Example 1: Different number of InDels
+Example 1: Different number of indels
     IN SAM records:
         read-1	0	19	77595	255	8M1D14M	*	0	0	CTGACATCAGTGATTCTCCTGC	*	MD:Z:3G1T2^A14	NH:i:2	NM:i:3	XA:Z:Q	XI:i:1
         read-1	0	19	330456	255	4M1D1M1I3M1D13M	*	0	0	CTGACATCAGTGATTCTCCTGC	*	MD:Z:4^G4^A13	NH:i:2	NM:i:3	XA:Z:Q	XI:i:0
 
     Alignments:
         CTGACATC-AGTGATTCTCCTGC
-        ||| | || |||||||||||||| (1 InDel, 2 mismatches, discarded)
+        ||| | || |||||||||||||| (1 indel, 2 mismatches, discarded)
         CTGGCTTCAAGTGATTCTCCTGC
 
         CTGA-CATCA-GTGATTCTCCTGC
-        |||| | ||| ||||||||||||| (3 InDels, 0 mismatches, retained)
+        |||| | ||| ||||||||||||| (3 indels, 0 mismatches, retained)
         CTGAGC-TCAAGTGATTCTCCTGC
 
     Command:
@@ -40,7 +40,7 @@ Example 1: Different number of InDels
     OUT SAM record:
         read-1	0	19	330456	255	4M1D1M1I3M1D13M	*	0	0	CTGACATCAGTGATTCTCCTGC	*	MD:Z:4^G4^A13	NH:i:1	HI:i:1  NM:i:3	XA:Z:Q	XI:i:0
 
-Example 2: Equal number of InDels
+Example 2: Equal number of indels
     IN SAM records:
         read-2	0	19	142777	255	5M1I15M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14A0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:0
         read-2	0	19	270081	255	6M1I14M	*	0	0	GCTTCAAGCCTCCCACCTAGC	*	MD:Z:14G0G4	NH:i:3	NM:i:3	XA:Z:Q	XI:i:2
@@ -160,7 +160,7 @@ def find_best_alignments(
     suffix `_#` were '`#` is the new alignment's NH tag.
 
     Args:
-        alignments: alignments with the same query name
+        alns: alignments with the same query name
 
     Returns:
         best_alignments: alignments with the more indels
@@ -193,10 +193,10 @@ def find_best_alignments(
 
 
 def write_output(alns: List[pysam.AlignedSegment]) -> None:
-    """Write the output to the standard output (stdout).
+    """Write the output to the standard output (STDOUT).
 
     Args:
-        alignments: alignments with the same query name
+        alns: alignments with the same query name
     """
     for alignment in alns:
         sys.stdout.write(alignment.to_string() + "\n")
