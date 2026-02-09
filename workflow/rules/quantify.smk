@@ -1,6 +1,6 @@
 ###############################################################################
 # (c) 2020 Paula Iborra, Zavolan Lab, Biozentrum, University of Basel
-# (@) paula.iborradetoledo@unibas.ch / paula.iborra@alumni.esci.upf.edu
+# (@) zavolab-biozentrum@unibas.ch
 #
 # Pipeline to quantify miRNAs, including isomiRs, from miRNA-seq alignments.
 ###############################################################################
@@ -208,7 +208,7 @@ rule sort_intersecting_primir_bam_by_position:
 
 
 ###############################################################################
-### Create bam index
+### Create BAM index
 ###############################################################################
 
 
@@ -424,7 +424,7 @@ rule quantify_primir:
 
 
 ################################################################################
-#### Merge counting tables for all samples by mature/primary/isomirs forms.
+#### Merge counting tables for all samples by mature/primary/isomiRs forms.
 ################################################################################
 
 
@@ -540,7 +540,7 @@ rule sort_uncollapsed_reads_bam_by_position:
 
 
 ###############################################################################
-### Create bam index
+### Create BAM index
 ###############################################################################
 
 
