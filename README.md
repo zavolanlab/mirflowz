@@ -91,13 +91,13 @@ machine:
 - Test workflow on local machine with **Apptainer**:
 
 ```bash
-bash test/test_workflow_local_with_apptainer.sh
+bash test/test_integration_workflow/test_workflow_local_with_apptainer.sh
 ```
 
 - Test workflow on local machine with **Conda**:
 
 ```bash
-bash test/test_workflow_local_with_conda.sh
+bash test/test_integration_workflow/test_workflow_local_with_conda.sh
 ```
 
 #### Run test workflow on a cluster via Slurm
@@ -108,14 +108,14 @@ Slurm-managed high-performance computing (HPC) cluster:
 - Test workflow with **Apptainer**:
 
 ```bash
-bash test/test_workflow_slurm_with_apptainer.sh
+bash test/test_integration_workflow/test_workflow_slurm_with_apptainer.sh
 ```
 
 
 - Test workflow with **Conda**:
 
 ```bash
-bash test/test_workflow_slurm_with_conda.sh
+bash test/test_integration_workflow/test_workflow_slurm_with_conda.sh
 ```
 
 #### Rule graph
@@ -124,7 +124,7 @@ Execute the following command to generate a rule graph image for the workflow.
 The output will be found in the `images/` directory in the repository root.
 
 ```bash
-bash test/test_rule_graph.sh
+bash test/test_create_rule_graph/test.sh
 ```
 
 You can see the rule graph below in the
