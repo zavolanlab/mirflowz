@@ -260,7 +260,7 @@ class TestMain:
             assert captured.out == out_file.read()
 
     def test_main_collpased_nh_file(self, monkeypatch, capsys, intersect_file):
-        """Test main function with collapsed alignments and nh value."""
+        """Test main function with collapsed alignments and NH value."""
         in_intersect, expected_out = intersect_file
 
         monkeypatch.setattr(
@@ -303,7 +303,7 @@ class TestMain:
             assert captured.out == out_file.read()
 
     def test_main_nh_file(self, monkeypatch, capsys, intersect_nh_file):
-        """Test main function with nh value."""
+        """Test main function with NH value."""
         in_intersect, expected_out = intersect_nh_file
 
         monkeypatch.setattr(

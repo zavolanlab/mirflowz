@@ -341,7 +341,7 @@ class TestMain:
     def test_main_multimappers_nh(
         self, capsys, monkeypatch, sam_multimappers_nh_files
     ):
-        """Test main function with multimappers with nh argument."""
+        """Test main function with multimappers with NH argument."""
         in_sam, out_sam = sam_multimappers_nh_files
 
         monkeypatch.setattr(
