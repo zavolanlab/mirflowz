@@ -37,19 +37,19 @@ jobs:
           conda list
 
       - name: flake8
-        working-directory: ./scripts
+        working-directory: ./workflow/scripts
         run: flake8
 
       - name: mypy
-        working-directory: ./scripts
+        working-directory: ./workflow/scripts
         run: mypy ./*.py
 
       - name: pylint
-        working-directory: ./scripts
-        run: pylint --rcfile=../pylint.cfg ./*.py
+        working-directory: ./workflow/scripts
+        run: pylint --rcfile=../../pylint.cfg ./*.py
 
       - name: black
-        working-directory: ./scripts
+        working-directory: ./workflow/scripts
         run: black --check --verbose --line-length=79 ./*.py
 
   snakemake-format-graph-test:
@@ -80,13 +80,13 @@ jobs:
           conda list
 
       - name: Run test script for snakemake format
-        run: bash test/test_snakefmt.sh
+        run: bash ./test/test_format/test_snakefmt.sh
 
       - name: Run test script for snakemate lint
-        run: bash test/test_snakemake_lint.sh
+        run: bash ./test/test_format/test_snakemake_lint.sh
 
       - name: Run test script for rule graph
-        run: bash test/test_rule_graph.sh
+        run: bash ./test/test_create_rule_graph/test.sh
 
 
   snakemake-apptainer-integration-test:
@@ -121,7 +121,7 @@ jobs:
           conda list
 
       - name: Run Apptainer local test script
-        run: bash test/test_workflow_local_with_apptainer.sh
+        run: bash ./test/test_integration_workflow/test_workflow_local_with_apptainer.sh
 
 
   snakemake-conda-integration-test:
@@ -152,7 +152,7 @@ jobs:
           conda list
 
       - name: Run Conda local test script
-        run: bash test/test_workflow_local_with_conda.sh
+        run: bash ./test/test_integration_workflow/test_workflow_local_with_conda.sh
 
 
   unit-testing:
@@ -183,5 +183,5 @@ jobs:
           conda list
 
       - name: Run unit tests
-        working-directory: ./scripts/tests
-        run: pytest --import-mode prepend --cov=scripts --cov-branch --cov-report=term-missing
+        working-directory: ./workflow/scripts/tests
+        run: pytest --import-mode prepend --cov=workflow/scripts --cov-branch --cov-report=term-missing
