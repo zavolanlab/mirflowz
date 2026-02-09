@@ -93,7 +93,7 @@
         "max_n":{
             "type": "integer",
             "default": 0,
-            "description": "Discard reads containing more than the indicated numebr of N bases."
+            "description": "Discard reads containing more than the indicated number of N bases."
         },
         "max_length_reads":{
             "type": "integer",
@@ -112,7 +112,7 @@
                 "enum": ["isomir", "mirna", "pri-mir"]
             },
             "default": ["isomir", "mirna", "pri-mir"],
-            "description": "miRNA speices to be quantified."
+            "description": "miRNA species to be quantified."
         },
         "lib_dict":{
             "type": "object",
