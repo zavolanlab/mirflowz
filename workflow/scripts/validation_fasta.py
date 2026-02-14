@@ -114,8 +114,9 @@ one per line in a separate text file.
 
     if args.mode and not args.filter:
         parser.error(
-            "Filter argument (`--filter`, `-f`) is required when using the mode"
-            " argument (`--mode`, `-m`). See `--help` for more information."
+            "Filter argument (`--filter`, `-f`) is required when using the"
+            " mode argument (`--mode`, `-m`). See `--help` for more"
+            " information."
         )
 
     return args
