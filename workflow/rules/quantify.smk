@@ -63,21 +63,15 @@ localrules:
 rule finish_quantify:
     input:
         primir_intersect_sam=expand(
-            OUT_DIR
-            / "{sample}"
-            / "alignments_intersecting_primir.sam",
+            OUT_DIR / "{sample}" / "alignments_intersecting_primir.sam",
             sample=pd.unique(samples_table.index.values),
         ),
         mirna_intersect_sam=expand(
-            OUT_DIR
-            / "{sample}"
-            / "alignments_intersecting_mirna.sam",
+            OUT_DIR / "{sample}" / "alignments_intersecting_mirna.sam",
             sample=pd.unique(samples_table.index.values),
         ),
         table=expand(
-            OUT_DIR
-            / "TABLES"
-            / "all_{mir}_counts.tab",
+            OUT_DIR / "TABLES" / "all_{mir}_counts.tab",
             mir=config["mir_list"],
         ),
         uncollapsed_bam=expand(
@@ -92,7 +86,6 @@ rule finish_quantify:
             / "alignments_intersecting_mirna_uncollapsed_sorted.bam.bai",
             sample=pd.unique(samples_table.index.values),
         ),
-
 
 
 ###############################################################################
