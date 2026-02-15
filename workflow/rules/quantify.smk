@@ -1,6 +1,6 @@
 ###############################################################################
 # (c) 2020 Paula Iborra, Zavolan Lab, Biozentrum, University of Basel
-# (@) paula.iborradetoledo@unibas.ch / paula.iborra@alumni.esci.upf.edu
+# (@) zavolab-biozentrum@unibas.ch
 #
 # Pipeline to quantify miRNAs, including isomiRs, from miRNA-seq alignments.
 ###############################################################################
@@ -62,9 +62,18 @@ localrules:
 
 rule finish_quantify:
     input:
-        primir_intersect_sam=OUT_DIR / "{sample}" / "alignments_intersecting_primir.sam",
-        mirna_intersect_sam=OUT_DIR / "{sample}" / "alignments_intersecting_mirna.sam",
-        table=OUT_DIR / "TABLES" / "all_{mir}_counts.tab",
+        primir_intersect_sam=expand(
+            OUT_DIR / "{sample}" / "alignments_intersecting_primir.sam",
+            sample=pd.unique(samples_table.index.values),
+        ),
+        mirna_intersect_sam=expand(
+            OUT_DIR / "{sample}" / "alignments_intersecting_mirna.sam",
+            sample=pd.unique(samples_table.index.values),
+        ),
+        table=expand(
+            OUT_DIR / "TABLES" / "all_{mir}_counts.tab",
+            mir=config["mir_list"],
+        ),
         uncollapsed_bam=expand(
             OUT_DIR
             / "{sample}"
@@ -192,7 +201,7 @@ rule sort_intersecting_primir_bam_by_position:
 
 
 ###############################################################################
-### Create bam index
+### Create BAM index
 ###############################################################################
 
 
@@ -408,7 +417,7 @@ rule quantify_primir:
 
 
 ################################################################################
-#### Merge counting tables for all samples by mature/primary/isomirs forms.
+#### Merge counting tables for all samples by mature/primary/isomiRs forms.
 ################################################################################
 
 
@@ -476,7 +485,7 @@ rule uncollapse_reads:
 ###############################################################################
 
 
-rule convert_uncollpased_reads_sam_to_bam:
+rule convert_uncollapsed_reads_sam_to_bam:
     input:
         maps=INTERMEDIATES_DIR
         / "{sample}"
@@ -502,7 +511,7 @@ rule convert_uncollpased_reads_sam_to_bam:
 ###############################################################################
 
 
-rule sort_uncollpased_reads_bam_by_position:
+rule sort_uncollapsed_reads_bam_by_position:
     input:
         maps=INTERMEDIATES_DIR
         / "{sample}"
@@ -524,7 +533,7 @@ rule sort_uncollpased_reads_bam_by_position:
 
 
 ###############################################################################
-### Create bam index
+### Create BAM index
 ###############################################################################
 
 

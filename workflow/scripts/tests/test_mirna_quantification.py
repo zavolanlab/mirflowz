@@ -112,7 +112,7 @@ def uncollapsed_missing_nh_sam_file():
 @pytest.fixture
 def alns():
     """Create sample AlignedSegment objects."""
-    # Collapsed lignment with NH tag in the name
+    # Collapsed alignment with NH tag in the name
     aln1 = pysam.AlignedSegment()
     aln1.query_name = "read1-2_3"
     aln1.query_sequence = "TAAAGCGCTT"
@@ -264,12 +264,12 @@ class TestGetName:
         assert get_name("hsa-miR-1323|0|0|22M|22") == name
 
     def test_iso_0_shift(self):
-        """Test isoform with 0 shift."""
+        """Test isomiR with 0 shift."""
         name = ["isomir", "hsa-miR-1323|0|0|18M3I4M|22"]
         assert get_name("hsa-miR-1323|0|0|18M3I4M|22") == name
 
     def test_iso(self):
-        """Test isoform with shift."""
+        """Test isomiR with shift."""
         name = ["isomir", "hsa-miR-1323|2|0|18M3I4M|22"]
         assert get_name("hsa-miR-1323|2|0|18M3I4M|22") == name
 
@@ -433,7 +433,7 @@ class TestMain:
             assert out_file.read() == expected.read()
 
     def test_main_seq_len_sam_file(self, monkeypatch, tmp_path, len_sam_file):
-        """Test main function with read lenght in output table."""
+        """Test main function with read length in output table."""
         infile, out_table = len_sam_file
         output = tmp_path / "mirna_counts_lib"
 
@@ -483,7 +483,7 @@ class TestMain:
     def test_main_read_len_sam_file(
         self, monkeypatch, tmp_path, read_len_sam_file
     ):
-        """Test main function with read IDs and feature length im output."""
+        """Test main function with read IDs and feature length in output."""
         infile, out_table = read_len_sam_file
         output = tmp_path / "mirna_counts_lib"
 

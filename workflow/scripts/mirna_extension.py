@@ -32,7 +32,7 @@ class MirnaExtension:
         """Load GFF3 file into `gffutils.FeatureDB`.
 
         Args:
-            gff_file: Path to a GFF3 file.
+            path: Path to a GFF3 file.
         """
         try:
             self.db = gffutils.create_db(

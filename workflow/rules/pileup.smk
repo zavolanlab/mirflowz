@@ -1,6 +1,6 @@
 ###############################################################################
 # (c) 2024 Iris Mestres, Zavolan Lab, Biozentrum, University of Basel
-# (@) iris.mestres@alumn.esci.upf.edu
+# (@) zavolab-biozentrum@unibas.ch
 #
 # Workflow to create ASCII-style pileups of read alignments.
 ###############################################################################

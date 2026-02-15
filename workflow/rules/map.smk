@@ -1,6 +1,6 @@
 ###############################################################################
 # (c) 2020 Paula Iborra, Zavolan Lab, Biozentrum, University of Basel
-# (@) paula.iborradetoledo@unibas.ch / paula.iborra@alumni.esci.upf.edu
+# (@) zavolab-biozentrum@unibas.ch
 #
 # Workflow to map small RNA-seq reads (e.g. from miRNA sequencing libraries).
 ###############################################################################
@@ -70,7 +70,7 @@ localrules:
 rule finish_map:
     input:
         maps=expand(
-            INTERMEDIATES_DIR / "{sample}" / "alignments_all_sorted_{sample}.bam.bai",
+            INTERMEDIATES_DIR / "{sample}" / "alignments_all_sorted_{sample}.bam",
             sample=pd.unique(samples_table.index.values),
         ),
 

@@ -476,7 +476,7 @@ class TestEvalAln:
         assert minerr_nh[aln.read_name] == ["1", 2]
 
     def test_smaller_min_error(self, capsys, aln_fields):
-        """Test evaluation when having a smaller minimumm error."""
+        """Test evaluation when having a smaller minimum error."""
         d = {"read_1": [aln_fields[1], aln_fields[2]]}
         minerr_nh = {"read_1": ["1", 2]}
         aln = aln_fields[0]

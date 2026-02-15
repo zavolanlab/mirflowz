@@ -1,9 +1,10 @@
 ###############################################################################
 # (c) 2020 Paula Iborra, Zavolan Lab, Biozentrum, University of Basel
-# (@) paula.iborradetoledo@unibas.ch / paula.iborra@alumni.esci.upf.edu
+# (@) zavolab-biozentrum@unibas.ch
 #
 # Snakemake workflow to:
-#   - download and prepare the necessary files for smallRNA-seq related workflows.
+#   - download and prepare the necessary files for small RNA-seq related
+#     workflows.
 #   - map small RNA-seq reads (e.g. from miRNA sequencing libraries)
 #   - quantify miRNAs, including isomiRs, from miRNA-seq alignments.
 #
