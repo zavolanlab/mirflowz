@@ -1,0 +1,78 @@
+copyright: '&copy; <a href="https://www.biozentrum.unibas.ch/research/research-groups/research-groups-a-z/overview/unit/research-group-mihaela-zavolan">2026 Zavolab, University of Basel</a>'
+
+site_name: MIRFLOWZ documentation
+site_url: https://zavolanlab.github.io/mirflowz
+site_author: Zavolab <zavolab-biozentrum@unibas.ch>
+
+repo_name: mirflowz
+repo_url: https://github.com/zavolanlab/mirflowz
+edit_uri: edit/dev/docs
+docs_dir: docs
+
+theme:
+  name: material
+  favicon: images/mfz_logo.png
+  icon:
+    repo: fontawesome/brands/github
+  language: en
+  logo: images/mfz_logo.png
+  custom_dir: docs/overrides
+  features:
+    - content.code.copy
+    - navigation.footer
+    - navigation.instant
+    - navigation.top
+    - navigation.tracking
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      options:
+        custom_icons:
+          - docs/overrides/.icons
+  - pymdownx.snippets:
+      auto_append:
+        - docs/includes/references.md
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: ¶
+
+plugins:
+  - search
+
+extra:
+  generator: false
+  social:
+    - icon: github
+      link: https://github.com/zavolanlab
+      name: Zavolab GitHub organization
+    - icon: bluesky
+      link: https://bsky.app/profile/mihaelazavolan.bsky.social
+      name: Mihaela Zavolan Bluesky profile
+    - icon: forum
+      link: https://github.com/zavolanlab/mirflowz/discussions
+      name: ZARP Q&A forum
+    - icon: email
+      link: mailto:zavolab-biozentrum@unibas.ch
+
+nav:
+  - Home: README.md
+  - Installation: guides/installation.md
+  - Usage: guides/usage.md
+  - Output Files: guides/outputs.md
+  - Workflow:
+    - Workflow Overview: workflow/overview.md
+    - Modules:
+          - Prepare: workflow/modules/prepare.md
+          - Map: workflow/modules/map.md
+          - Quantify: workflow/modules/quantify.md
+          - ASCII-style Pileups: workflow/modules/pileups.md
+  - API: api/README.md
