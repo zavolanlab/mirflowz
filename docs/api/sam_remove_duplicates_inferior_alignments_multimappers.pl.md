@@ -49,7 +49,7 @@ Options
   that map more than `--keep-mm` times.
 - <b>`-h`</b> | <b>`--help`</b>: Show this information and die.
 - <b>`-u`</b> | <b>`--usage`</b>: Show this information and die.
-- <b>`--quite`</b>: Shut up!
+- <b>`--quiet`</b>: Shut up!
 
 Requirements
 ------------
