@@ -34,7 +34,7 @@ Arguments
 
 - <b>`--in [FILE|SAM]` (required)</b>: Path to the input SAM file (transcript
   coordinates).
-- <b>`--bed [FILE|BED]` (required)</b>: Path to the input BED file of exons
+- <b>`--exons [FILE|BED]` (required)</b>: Path to the input BED file of exons
   (genomic coordinates).
 - <b>`--out [FILE|SAM]` (required)</b>: Path to the output SAM file (genomic
   coordinates).
