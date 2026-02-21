@@ -120,8 +120,8 @@ numerical names.
   Write to the output the correct miRNA type.
 - [`py.main`](./nh_filter.py.md#function-main): Filter alignments by its NH tag
   value.
-- [`py.parse_arguments`](./nh_filter.py.md#function-parse_arguments): Pars
-  e command-line arguments.
+- [`py.parse_arguments`](./nh_filter.py.md#function-parse_arguments): Parse
+  command-line arguments.
 - [`py.eval_aln`](./oligomap_output_to_sam_nh_filtered.py.md#function-eval_aln):
   Evaluate an alignment to add, discard or write it to the STDOUT.
 - [`py.get_cigar_md`](./oligomap_output_to_sam_nh_filtered.py.md#function-get_cigar_md):
