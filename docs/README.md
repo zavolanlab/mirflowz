@@ -55,7 +55,7 @@ _Iris Mestres-Pascual, Alex Kanitz, & Mihalea Zavolan._
   [_MIRFLOWZ_ Q&A forum][mirflowz_discussions] (requires
   [GitHub registration][github_reg]).
 
-- For feature suggestions and bug reports, please us the
+- For feature suggestions and bug reports, please use the
   [_MIRFLOWZ_ issue tracker][mirflowz_issues] (requires
   [GitHub registration][github_reg]).
 
