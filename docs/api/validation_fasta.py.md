@@ -8,7 +8,7 @@ Process both uncompressed and `gzip`-compressed FASTA files by trimming,
 filtering, and validating sequence records based on user-defined criteria.
 
 Sequence IDs are trimmed at the first occurrence of any specified characters
-in `--trim` to standardize naming conventions. If not character string is
+in `--trim` to standardize naming conventions. If no character string is
 provided, the first white space is used.
 
 To filter the FASTA file by sequence IDs, a text file, with one (trimmed) ID

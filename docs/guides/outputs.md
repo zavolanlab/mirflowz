@@ -4,8 +4,8 @@ In this page you can find an overview of the output files.
 
 ## Expected output files
 
-Upon successful execution of _MIRFLOW_, the tool automatically removes all
-automatically removes all intermediate files generated during the process.
+Upon successful execution of _MIRFLOWZ_, the tool automatically removes all
+intermediate files generated during the process.
 
 The final outputs comprise:
 

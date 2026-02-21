@@ -12,7 +12,7 @@ are removed, otherwise, a log file is created.
 
 The modules [(1)](#prepare-module) process the genome resources,
 [(2)](#map-module) map and [(3)](#quantify-module), and
-[(4)](#ascii-style-alignment-pileups-module) are describe in detail below.
+[(4)](#ascii-style-alignment-pileups-module) are described in detail below.
 
 ## Prepare module
 
@@ -102,7 +102,7 @@ the same across alignments.
 !!! info "isomiRs notation"
 
     A sequence is considered to be an isomiR if it has a shift on either end,
-    an indel and/or a mismtach on its sequence when compared to the canonical
+    an indel and/or a mismatch on its sequence when compared to the canonical
     miRNA it maps and intersects with.
 
     _MIRFLOWZ_ employs an unambiguous notation to classify isomiRs using the
@@ -127,7 +127,7 @@ extended) locus annotated for that miRNA. Specifically, reads contribute with
 `1/n` for each miRNA for which that is the case, where `n` is the total number
 of genomic loci the read aligns to. Under this criterion, the precursor counts
 contain reads that intersect with its mature arm(s), its hairpin sequence
-and/ir the whole precursor itself
+and/or the whole precursor itself
 
 <div align="center">
     <img src=../../images/read_contribution.png>

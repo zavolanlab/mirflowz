@@ -21,7 +21,7 @@ cd my_run
 
 It is suggested to have all the input files for a given run (or hard links
 pointing to them) inside a dedicated directory, for instance under the
-`input_files/` subdirectoy in `my_run/` directory. This way, it is easier to
+`input_files/` subdirectory in `my_run/` directory. This way, it is easier to
 keep the data together, set up Apptainer access to them and reproduce analyses.
 
 Create this directory and traverse into it with:
@@ -82,10 +82,10 @@ There are 4 files you must provide:
    style") and in the gene annotations and reference sequence files (column
    2; "Ensembl style"). Values in column 1 are expected to be unique, no header
    is expected, and any additional columns will be ignored.
-   [This resrouce][chr_map] provides such files for various organisms, and in
+   [This resource][chr_map] provides such files for various organisms, and in
    the expected format.
 
-5. **OPTTIONAL**: A **BED6** file with the regions for which to produce
+5. **OPTIONAL**: A **BED6** file with the regions for which to produce
    [ASCII-style pileups][pileups]. If not provided, no pileups are generated.
    See [here][bed-format] for the expected format.
 

@@ -34,7 +34,7 @@ Arguments
 
 - <b>`--in [FILE|SAM]` (required)</b>: Path to the input SAM file (transcript
   coordinates).
-- <b>`--bed [FILE|BED]` (required)</b>: Path to the input BED file of exons
+- <b>`--exons [FILE|BED]` (required)</b>: Path to the input BED file of exons
   (genomic coordinates).
 - <b>`--out [FILE|SAM]` (required)</b>: Path to the output SAM file (genomic
   coordinates).
@@ -57,7 +57,7 @@ the end of each line in the output file.
   and discarded alignments to `STDOUT`.
 - <b>`-h`</b> | <b>`--help`</b>: Show this information and die.
 - <b>`-u`</b> | <b>`--usage`</b>: Show this information and die.
-- <b>`--quite`</b>: Shut up!
+- <b>`--quiet`</b>: Shut up!
 
 Requirements
 ------------

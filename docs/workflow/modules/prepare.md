@@ -317,7 +317,7 @@ by feature type with a [**custom script**][custom-script-mir-ext].
             19	.	miRNA	6	80	.	+	.	ID=MIMAT0002822;Alias=MIMAT0002822;Name=hsa-miR-512-1-5p;Derives_from=MI0003140
 
 
-    Example 3 | Matrue miRNA exceeding chromosome boundaries extension
+    Example 3 | Mature miRNA exceeding chromosome boundaries extension
 
     IN:
         pri-miR entry:

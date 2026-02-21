@@ -45,7 +45,7 @@ If you use _MIRFLOWZ_ in your work, please kindly cite the following Zenodo
 entry:
 
 **zavolanlab/mirflowz: v0.10.0 (v0.10.0).**
-_Iris Mestres-Pascual, Alex Kanitz, & Mihalea Zavolan._
+_Iris Mestres-Pascual, Alex Kanitz, & Mihaela Zavolan._
 (2025). Zenodo.
 [https://doi.org/10.5281/zenodo.17120595](https://doi.org/10.5281/zenodo.17120595)
 
@@ -55,7 +55,7 @@ _Iris Mestres-Pascual, Alex Kanitz, & Mihalea Zavolan._
   [_MIRFLOWZ_ Q&A forum][mirflowz_discussions] (requires
   [GitHub registration][github_reg]).
 
-- For feature suggestions and bug reports, please us the
+- For feature suggestions and bug reports, please use the
   [_MIRFLOWZ_ issue tracker][mirflowz_issues] (requires
   [GitHub registration][github_reg]).
 
