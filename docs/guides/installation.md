@@ -138,7 +138,7 @@ conda activate mirflowz
 ??? tip "Planning to run _MIRFLOWZ_ via Conda?"
 
     If you plan to run _MIRFLOWZ_ via Conda, we recommend using the following
-    command for a faster environment creation, specially if you will run it
+    command for a faster environment creation, especially if you will run it
     on an HPC cluster.
 
     ```sh
