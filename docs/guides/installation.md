@@ -124,7 +124,7 @@ To set up the environment, execute the call below, but do not forget to replace
 the placeholder `ENVIRONMENT` with the appropriate file from the table above:
 
 ```sh
-conda env create -f ENVIRONEMTN
+conda env create -f ENVIRONMENT
 ```
 
 ### 4. Activate the _MIRFLOWZ_ environment
