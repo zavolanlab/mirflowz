@@ -118,8 +118,8 @@ numerical names.
   Command-line arguments parser.
 - [`py.write_output`](./mirna_quantification.py.md#function-write_output):
   Write to the output the correct miRNA type.
-- [`py.main`](./nh_filter.py.md#function-main): Filter alignments by its NH tag
-  value.
+- [`py.main`](./nh_filter.py.md#function-main): Filter alignments by their NH
+  tag value.
 - [`py.parse_arguments`](./nh_filter.py.md#function-parse_arguments): Parse
   command-line arguments.
 - [`py.eval_aln`](./oligomap_output_to_sam_nh_filtered.py.md#function-eval_aln):
