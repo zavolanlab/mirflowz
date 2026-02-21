@@ -21,7 +21,7 @@ cd my_run
 
 It is suggested to have all the input files for a given run (or hard links
 pointing to them) inside a dedicated directory, for instance under the
-`input_files/` subdirectoy in `my_run/` directory. This way, it is easier to
+`input_files/` subdirectory in `my_run/` directory. This way, it is easier to
 keep the data together, set up Apptainer access to them and reproduce analyses.
 
 Create this directory and traverse into it with:
