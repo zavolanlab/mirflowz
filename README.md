@@ -435,6 +435,12 @@ Finally, to visualize the distribution of read alignments around miRNA
 loci, ASCII-style alignment pileups are optionally generated for user-defined
 regions of interest.
 
+!!! warning "Alignment insertions"
+
+    Whenever an alignment contains an insertion, it is removed from the read
+    sequence. The resulting sequence is counted towards the read with an
+    identical sequence, or displayed on its own depending on whether alignments
+    are collapsed or not.
 
 The schema below is a visual representation of the individual workflow steps
 and how they are related:
