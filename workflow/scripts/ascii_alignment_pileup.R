@@ -29,7 +29,7 @@ against one or more regions specified in a BED file.\n"
 author <- "Author: Alexander Kanitz"
 affiliation <- "Affiliation: Biozentrum, University of Basel"
 email <- "Email: alexander.kanitz@alumni.ethz.ch"
-version <- "1.2.1"
+version <- "1.3.0"
 version_formatted <- paste("Version:", version, sep=" ")
 requirements <- c("optparse", "rtracklayer", "GenomicAlignments", "tools")
 requirements_txt <- paste("Requires:", paste(requirements, collapse=", "), sep=" ")
@@ -134,6 +134,24 @@ option_list <- list(
             metavar="string"
         ),
         make_option(
+          "--sort-by",
+          action="store",
+          type="character",
+          default="counts",
+          help="Specify the sort type (either \"position\" or \"counts\"). 
+          [default \"%default\"]",
+          metavar="string"
+        ),
+        make_option(
+          "--reverse-sort",
+          action="store_true",
+          type="logical",
+          default=FALSE,
+          help="Reverse the sort order (from \"from-left-to-right\" to 
+          \"from-right-to-left\" for sort type \"position\" and from 
+          \"descending\" to \"ascending\" for sort type \"counts\")"
+        ),
+        make_option(
             c("-h", "--help"),
             action="store_true",
             default=FALSE,
@@ -170,6 +188,8 @@ count.min <- cli$options[["minimum-count"]]
 char.pad <- cli$options[["padding-character"]]
 char.indel <- cli$options[["indel-character"]]
 field.name.anno <- cli$options[["annotation-name-field"]]
+sort.by <- cli$options[["sort-by"]]
+rev.sort <- cli$options[["reverse-sort"]]
 verb <- cli$options[["verbose"]]
 #==========================#
 #    PRE-REQUISITES END    #
@@ -263,15 +283,24 @@ for(index in seq_along(bed)) {
     if (as.character(strand(region))[[1]] == "-") {
         df[["seq"]] <- reverse(df[["seq"]])
     }
-    # Sort by position of first nucleotide, count and position of last nucleotide
     if (nrow(df)) {
         last_char <- nchar(df[["seq"]][[1]])
         pos.nuc.first <- regexpr(paste0("[^", char.pad, "\\.]"), df[["seq"]])
         pos.nuc.last <- last_char - regexpr(paste0("[^", char.pad, "\\.]"), unlist(lapply(df[["seq"]], reverse))) + 1
-        df <- df[order(
+        
+        # Sort by pos. of first nucleotide, count and pos. of last nucleotide
+        if ( sort.by == "position" ) {
+          df <- df[order(
             pos.nuc.first, df[["count"]], pos.nuc.last,
-            decreasing=c(FALSE, TRUE, FALSE)
-        ), ]
+            decreasing = c( rev.sort, !rev.sort, rev.sort )
+          ), ]
+        # Sort by count, pos. of first nucleotide, and pos. of last nucleotide
+        } else {
+          df <- df[order(
+            df[["count"]], pos.nuc.first, pos.nuc.last,
+            decreasing = c( !rev.sort, rev.sort, rev.sort )
+          ), ]
+        }
     }
     # Reverse sequence again if on minus strand
     if (as.character(strand(region))[[1]] == "-") {
