@@ -76,4 +76,10 @@ mir_list: ['isomir', 'mirna', 'pri-mir']
 #
 # Leave as an empty dictionary if no pileups are desired.
 lib_dict: {}
+
+# sorting type
+# ASCII-style alignment pileups can be sorted by the first nucleotide's
+# position from left-to-right ('position') or by counts in descending order
+# ('counts')
+sort_by: 'position'
 ...
