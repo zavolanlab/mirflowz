@@ -137,7 +137,7 @@ option_list <- list(
           "--sort-by",
           action="store",
           type="character",
-          default="counts",
+          default="position",
           help="Specify the sort type (either \"position\" or \"counts\"). 
           [default \"%default\"]",
           metavar="string"
@@ -191,6 +191,15 @@ field.name.anno <- cli$options[["annotation-name-field"]]
 sort.by <- cli$options[["sort-by"]]
 rev.sort <- cli$options[["reverse-sort"]]
 verb <- cli$options[["verbose"]]
+
+# Ensure CLI arguments correction
+if ( !sort.by %in% c( "position", "counts" )) {
+  sprintf(
+    "`--mode` must be one of: %s.\nYou provided: %s",
+    "'position', 'counts'",
+    sort.by
+  )
+}
 #==========================#
 #    PRE-REQUISITES END    #
 #==========================#
