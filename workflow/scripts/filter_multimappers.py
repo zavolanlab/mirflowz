@@ -82,6 +82,7 @@ Example 3: Add NH tag as read's name suffix
     OUT SAM record:
         read-3_1	0	19	5338	1	15M1I7M	*	0	0	TCAAAACTGAGGGGCTATTTTCT	*	HI:i:1	NH:i:1	NM:i:1	MD:Z:22	RG:Z:A1	YZ:Z:0
 """  # noqa: E501
+
 # pylint: enable=line-too-long
 
 import argparse
