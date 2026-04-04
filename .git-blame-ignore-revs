@@ -3,3 +3,7 @@
 
 # Format Snakefile with snakefmt
 684d582acdb8af4ae87911dc7eb747411ff30eaa
+6d09e3beccd201881c0811f0d554ac9cf657744e
+
+# Format python scripts with black
+c4275a208778aef34664ce49eaa829f4b17ebef3
