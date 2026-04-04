@@ -159,6 +159,7 @@ Example 5: Columns with feature shifts; using '--feat-extension'
     OUT table:
         hsa-mir-524_-1_+3      2       -1       +3
 """  # noqa: E501
+
 # pylint: enable=line-too-long
 
 import argparse

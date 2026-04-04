@@ -20,7 +20,6 @@ Exposes:
 - parse_all: a streaming generator of '(line_number, Record)' tuples.
 """
 
-
 import re
 from pathlib import Path
 from typing import Dict, Iterator, Literal, Union

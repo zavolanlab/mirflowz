@@ -67,6 +67,7 @@ Paula Iborra. Zavolan Lab.
 Adapted version of Alessandro Crippa script.
 Refactored and documented by Iris Mestres-Pascual.
 """  # noqa: E501
+
 # pylint: enable=line-too-long
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter

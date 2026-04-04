@@ -119,6 +119,7 @@ Example 8
     output: hsa-miR-512-3p|0|1|23M|22C0|AAGTGCTGTCATAGCTGAGGTAA	4.333333333333333  6 23
             hsa-miR-512-3p|0|1|23M|3T18C0|AAGGGCTGTCATAGCTGAGGTAA 12.0  8 19
 """  # noqa: E501
+
 # pylint: enable=line-too-long
 
 import argparse

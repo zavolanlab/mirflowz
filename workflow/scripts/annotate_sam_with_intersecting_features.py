@@ -169,6 +169,7 @@ Example 4: Feature intersects alignment; using feature's "Alias"
         a new tag in the output SAM record. In this case, instead of using the
         feature `Name` (default), the `Alias` is used.
 """  # noqa: E501
+
 # pylint: enable=line-too-long
 
 import argparse
