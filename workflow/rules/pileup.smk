@@ -10,7 +10,6 @@ from snakemake.utils import validate
 
 from pathlib import Path
 
-
 ###############################################################################
 ### Configuration validation
 ###############################################################################
@@ -87,12 +86,12 @@ if config["bed_file"] == "":
     rule create_empty_bed:
         output:
             create_empty_bed_file(config, INTERMEDIATES_DIR),
-        params:
-            cluster_log=CLUSTER_LOG / "create_empty_bed.log",
         log:
             LOCAL_LOG / "create_empty_bed.log",
         container:
             "docker://ubuntu:lunar-20221207"
+        params:
+            cluster_log=CLUSTER_LOG / "create_empty_bed.log",
         shell:
             "(touch {output})"
 
@@ -107,14 +106,14 @@ rule compress_reference_genome:
         genome=INTERMEDIATES_DIR / "genome_processed.fa",
     output:
         genome=INTERMEDIATES_DIR / "genome_processed.fa.bz",
-    params:
-        cluster_log=CLUSTER_LOG / "compress_reference_genome.log",
     log:
         LOCAL_LOG / "compress_reference_genome.log",
-    container:
-        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
+    container:
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
+    params:
+        cluster_log=CLUSTER_LOG / "compress_reference_genome.log",
     shell:
         "(bgzip < {input.genome} > {output.genome}) &> {log}"
 
@@ -138,18 +137,18 @@ rule create_per_library_ascii_pileups:
         script=SCRIPTS_DIR / "ascii_alignment_pileup.R",
     output:
         piles=PILEUP_DIR / "{sample}" / "check_file.txt",
+    log:
+        LOCAL_LOG / "pileups_{sample}.log",
+    conda:
+        ENV_DIR / "r.yaml"
+    container:
+        "docker://zavolab/ascii-alignment-pileup:1.1.1"
     params:
         cluster_log=CLUSTER_LOG / "pileups_{sample}.log",
         out_dir=lambda wildcards: expand(
             PILEUP_DIR / "{sample}", sample=[wildcards.sample]
         ),
         prefix="{sample}",
-    log:
-        LOCAL_LOG / "pileups_{sample}.log",
-    container:
-        "docker://zavolab/ascii-alignment-pileup:1.1.1"
-    conda:
-        ENV_DIR / "r.yaml"
     shell:
         "(touch {output.piles} && Rscript {input.script} \
         --verbose \
@@ -187,18 +186,18 @@ rule create_per_run_ascii_pileups:
         script=SCRIPTS_DIR / "ascii_alignment_pileup.R",
     output:
         piles=PILEUP_DIR / "all/check_file.txt",
+    log:
+        LOCAL_LOG / "pileups_whole_run.log",
+    conda:
+        ENV_DIR / "r.yaml"
+    container:
+        "docker://zavolab/ascii-alignment-pileup:1.1.1"
+    resources:
+        mem=16,
     params:
         cluster_log=CLUSTER_LOG / "pileups_whole_run.log",
         out_dir=PILEUP_DIR / "all",
         prefix="all_samples",
-    resources:
-        mem=16,
-    log:
-        LOCAL_LOG / "pileups_whole_run.log",
-    container:
-        "docker://zavolab/ascii-alignment-pileup:1.1.1"
-    conda:
-        ENV_DIR / "r.yaml"
     shell:
         "(touch {output.piles} && Rscript {input.script} \
         --verbose \
@@ -238,18 +237,18 @@ if config["lib_dict"] != None:
             script=SCRIPTS_DIR / "ascii_alignment_pileup.R",
         output:
             piles=PILEUP_DIR / "{condition}" / "check_file_{condition}.txt",
+        log:
+            LOCAL_LOG / "pileups_condition_{condition}.log",
+        conda:
+            ENV_DIR / "r.yaml"
+        container:
+            "docker://zavolab/ascii-alignment-pileup:1.1.1"
         params:
             cluster_log=CLUSTER_LOG / "pileups_condition_{condition}.log",
             out_dir=lambda wildcards: expand(
                 PILEUP_DIR / "{condition}", condition=wildcards.condition
             ),
             prefix="{condition}",
-        log:
-            LOCAL_LOG / "pileups_condition_{condition}.log",
-        container:
-            "docker://zavolab/ascii-alignment-pileup:1.1.1"
-        conda:
-            ENV_DIR / "r.yaml"
         shell:
             "(touch {output.piles} && Rscript {input.script} \
             --verbose \

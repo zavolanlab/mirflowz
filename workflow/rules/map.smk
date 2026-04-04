@@ -10,7 +10,6 @@ from snakemake.utils import validate
 
 from pathlib import Path
 
-
 ###############################################################################
 ### Configuration validation
 ###############################################################################
@@ -88,12 +87,12 @@ rule start:
         ),
     output:
         reads=INTERMEDIATES_DIR / "{sample}" / "{format}" / "reads.{format}",
-    params:
-        cluster_log=CLUSTER_LOG / "uncompress_zipped_files_{sample}_{format}.log",
     log:
         LOCAL_LOG / "uncompress_zipped_files_{sample}_{format}.log",
     container:
         "docker://ubuntu:noble-20250127"
+    params:
+        cluster_log=CLUSTER_LOG / "uncompress_zipped_files_{sample}_{format}.log",
     shell:
         "(zcat {input.reads} > {output.reads}) &> {log}"
 
@@ -108,16 +107,16 @@ rule fastq_quality_filter:
         reads=INTERMEDIATES_DIR / "{sample}" / "fastq" / "reads.fastq",
     output:
         reads=INTERMEDIATES_DIR / "{sample}" / "fastq" / "filtered_reads.fastq",
+    log:
+        LOCAL_LOG / "fastq_quality_filter_{sample}.log",
+    conda:
+        ENV_DIR / "fastx_toolkit.yaml"
+    container:
+        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h503566f_13"
     params:
         cluster_log=CLUSTER_LOG / "fastq_quality_filter_{sample}.log",
         p=config["p_value"],
         q=config["q_value"],
-    log:
-        LOCAL_LOG / "fastq_quality_filter_{sample}.log",
-    container:
-        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h503566f_13"
-    conda:
-        ENV_DIR / "fastx_toolkit.yaml"
     shell:
         "(fastq_quality_filter \
         -v \
@@ -138,14 +137,14 @@ rule fastq_to_fasta:
         reads=INTERMEDIATES_DIR / "{sample}" / "fastq" / "filtered_reads.fastq",
     output:
         reads=INTERMEDIATES_DIR / "{sample}" / "fastq" / "reads.fa",
-    params:
-        cluster_log=CLUSTER_LOG / "fastq_to_fasta_{sample}.log",
     log:
         LOCAL_LOG / "fastq_to_fasta_{sample}.log",
-    container:
-        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h503566f_13"
     conda:
         ENV_DIR / "fastx_toolkit.yaml"
+    container:
+        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h503566f_13"
+    params:
+        cluster_log=CLUSTER_LOG / "fastq_to_fasta_{sample}.log",
     shell:
         "(fastq_to_fasta -r -n -i {input.reads} > {output.reads}) &> {log}"
 
@@ -163,14 +162,14 @@ rule format_fasta:
         / "reads.fa",
     output:
         reads=INTERMEDIATES_DIR / "{sample}" / "reads_formatted.fasta",
-    params:
-        cluster_log=CLUSTER_LOG / "format_fasta_{sample}.log",
     log:
         LOCAL_LOG / "format_fasta_{sample}.log",
-    container:
-        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h503566f_13"
     conda:
         ENV_DIR / "fastx_toolkit.yaml"
+    container:
+        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h503566f_13"
+    params:
+        cluster_log=CLUSTER_LOG / "format_fasta_{sample}.log",
     shell:
         "(fasta_formatter -w 0 -i {input.reads} > {output.reads}) &> {log}"
 
@@ -185,6 +184,14 @@ rule remove_adapters:
         reads=INTERMEDIATES_DIR / "{sample}" / "reads_formatted.fasta",
     output:
         reads=INTERMEDIATES_DIR / "{sample}" / "reads_trimmed_adapters.fasta",
+    log:
+        LOCAL_LOG / "remove_adapters_{sample}.log",
+    conda:
+        ENV_DIR / "cutadapt.yaml"
+    container:
+        "docker://quay.io/biocontainers/cutadapt:5.0--py39hbcbf7aa_0"
+    resources:
+        threads=8,
     params:
         adapter=lambda wildcards: get_sample("adapter", wildcards.sample).upper(),
         error_rate=config["error_rate"],
@@ -192,14 +199,6 @@ rule remove_adapters:
         overlap=config["overlap"],
         max_n=config["max_n"],
         cluster_log=CLUSTER_LOG / "remove_adapters_{sample}.log",
-    log:
-        LOCAL_LOG / "remove_adapters_{sample}.log",
-    resources:
-        threads=8,
-    container:
-        "docker://quay.io/biocontainers/cutadapt:5.0--py39hbcbf7aa_0"
-    conda:
-        ENV_DIR / "cutadapt.yaml"
     shell:
         "(cutadapt \
         -a {params.adapter} \
@@ -222,14 +221,14 @@ rule collapse_identical_reads:
         reads=INTERMEDIATES_DIR / "{sample}" / "reads_trimmed_adapters.fasta",
     output:
         reads=INTERMEDIATES_DIR / "{sample}" / "reads_collapsed.fasta",
-    params:
-        cluster_log=CLUSTER_LOG / "collapse_identical_reads_{sample}.log",
     log:
         LOCAL_LOG / "collapse_identical_reads_{sample}.log",
-    container:
-        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h503566f_13"
     conda:
         ENV_DIR / "fastx_toolkit.yaml"
+    container:
+        "docker://quay.io/biocontainers/fastx_toolkit:0.0.14--h503566f_13"
+    params:
+        cluster_log=CLUSTER_LOG / "collapse_identical_reads_{sample}.log",
     shell:
         "(fastx_collapser -i {input.reads} > {output.reads}) &> {log}"
 
@@ -246,18 +245,18 @@ rule map_genome_segemehl:
         genome_index_segemehl=INTERMEDIATES_DIR / "segemehl_genome_index.idx",
     output:
         gmap=INTERMEDIATES_DIR / "{sample}" / "segemehl_genome_mappings.sam",
-    params:
-        cluster_log=CLUSTER_LOG / "map_genome_segemehl_{sample}.log",
     log:
         LOCAL_LOG / "map_genome_segemehl_{sample}.log",
+    conda:
+        ENV_DIR / "segemehl.yaml"
+    container:
+        "docker://quay.io/biocontainers/segemehl:0.3.4--hf7d323f_8"
     resources:
         mem=50,
         time=12,
         threads=8,
-    container:
-        "docker://quay.io/biocontainers/segemehl:0.3.4--hf7d323f_8"
-    conda:
-        ENV_DIR / "segemehl.yaml"
+    params:
+        cluster_log=CLUSTER_LOG / "map_genome_segemehl_{sample}.log",
     shell:
         "(segemehl.x \
         -i {input.genome_index_segemehl} \
@@ -282,18 +281,18 @@ rule map_transcriptome_segemehl:
         / "segemehl_transcriptome_index.idx",
     output:
         tmap=INTERMEDIATES_DIR / "{sample}" / "segemehl_transcriptome_mappings.sam",
-    params:
-        cluster_log=CLUSTER_LOG / "map_transcriptome_segemehl_{sample}.log",
     log:
         LOCAL_LOG / "map_transcriptome_segemehl_{sample}.log",
+    conda:
+        ENV_DIR / "segemehl.yaml"
+    container:
+        "docker://quay.io/biocontainers/segemehl:0.3.4--hf7d323f_8"
     resources:
         mem=10,
         time=12,
         threads=8,
-    container:
-        "docker://quay.io/biocontainers/segemehl:0.3.4--hf7d323f_8"
-    conda:
-        ENV_DIR / "segemehl.yaml"
+    params:
+        cluster_log=CLUSTER_LOG / "map_transcriptome_segemehl_{sample}.log",
     shell:
         "(segemehl.x \
         -i {input.transcriptome_index_segemehl} \
@@ -316,15 +315,15 @@ rule filter_fasta_for_oligomap:
         script=SCRIPTS_DIR / "validation_fasta.py",
     output:
         reads=INTERMEDIATES_DIR / "{sample}" / "reads_filtered_for_oligomap.fasta",
+    log:
+        LOCAL_LOG / "filter_fasta_for_oligomap_{sample}.log",
+    conda:
+        ENV_DIR / "biopython.yaml"
+    container:
+        "docker://quay.io/biocontainers/biopython:1.70--np112py36_1"
     params:
         cluster_log=CLUSTER_LOG / "filter_fasta_for_oligomap_{sample}.log",
         max_length_reads=config["max_length_reads"],
-    log:
-        LOCAL_LOG / "filter_fasta_for_oligomap_{sample}.log",
-    container:
-        "docker://quay.io/biocontainers/biopython:1.70--np112py36_1"
-    conda:
-        ENV_DIR / "biopython.yaml"
     shell:
         "(python {input.script} \
         {input.reads} \
@@ -345,18 +344,18 @@ rule map_genome_oligomap:
     output:
         gmap=INTERMEDIATES_DIR / "{sample}" / "oligomap_genome_mappings.oligomap",
         report=INTERMEDIATES_DIR / "{sample}" / "oligomap_genome_report.txt",
-    params:
-        cluster_log=CLUSTER_LOG / "map_genome_oligomap_{sample}.log",
     log:
         LOCAL_LOG / "map_genome_oligomap_{sample}.log",
+    conda:
+        ENV_DIR / "oligomap.yaml"
+    container:
+        "docker://quay.io/biocontainers/oligomap:1.0.1--hdcf5f25_0"
     resources:
         mem=50,
         time=6,
         threads=8,
-    container:
-        "docker://quay.io/biocontainers/oligomap:1.0.1--hdcf5f25_0"
-    conda:
-        ENV_DIR / "oligomap.yaml"
+    params:
+        cluster_log=CLUSTER_LOG / "map_genome_oligomap_{sample}.log",
     shell:
         "(oligomap \
         {input.target} \
@@ -377,15 +376,15 @@ rule sort_genome_oligomap:
         script=SCRIPTS_DIR / "blocksort.sh",
     output:
         sort=INTERMEDIATES_DIR / "{sample}" / "oligomap_genome_sorted.oligomap",
-    params:
-        cluster_log=CLUSTER_LOG / "sort_genome_oligomap_{sample}.log",
     log:
         LOCAL_LOG / "sort_genome_oligomap_{sample}.log",
+    container:
+        "docker://ubuntu:noble-20250127"
     resources:
         threads=8,
         time=6,
-    container:
-        "docker://ubuntu:noble-20250127"
+    params:
+        cluster_log=CLUSTER_LOG / "sort_genome_oligomap_{sample}.log",
     shell:
         "(bash {input.script} \
         {input.tmap} \
@@ -405,18 +404,18 @@ rule convert_genome_to_sam_oligomap:
         script=SCRIPTS_DIR / "oligomap_output_to_sam_nh_filtered.py",
     output:
         gmap=INTERMEDIATES_DIR / "{sample}" / "oligomap_genome_mappings.sam",
-    params:
-        cluster_log=CLUSTER_LOG / "oligomap_genome_to_sam_{sample}.log",
-        nh=config["nh"],
     log:
         LOCAL_LOG / "oligomap_genome_to_sam_{sample}.log",
+    conda:
+        ENV_DIR / "python.yaml"
+    container:
+        "docker://python:3.11.12"
     resources:
         time=1,
         queue=1,
-    container:
-        "docker://python:3.11.12"
-    conda:
-        ENV_DIR / "python.yaml"
+    params:
+        cluster_log=CLUSTER_LOG / "oligomap_genome_to_sam_{sample}.log",
+        nh=config["nh"],
     shell:
         "(python {input.script} \
         {input.sort} \
@@ -436,18 +435,18 @@ rule map_transcriptome_oligomap:
     output:
         tmap=INTERMEDIATES_DIR / "{sample}" / "oligomap_transcriptome_mappings.oligomap",
         report=INTERMEDIATES_DIR / "{sample}" / "oligomap_transcriptome_report.txt",
-    params:
-        cluster_log=CLUSTER_LOG / "map_transcriptome_oligomap_{sample}.log",
     log:
         LOCAL_LOG / "map_transcriptome_oligomap_{sample}.log",
+    conda:
+        ENV_DIR / "oligomap.yaml"
+    container:
+        "docker://quay.io/biocontainers/oligomap:1.0.1--hdcf5f25_0"
     resources:
         mem=10,
         time=6,
         threads=8,
-    container:
-        "docker://quay.io/biocontainers/oligomap:1.0.1--hdcf5f25_0"
-    conda:
-        ENV_DIR / "oligomap.yaml"
+    params:
+        cluster_log=CLUSTER_LOG / "map_transcriptome_oligomap_{sample}.log",
     shell:
         "(oligomap \
         {input.target} \
@@ -469,14 +468,14 @@ rule sort_transcriptome_oligomap:
         script=SCRIPTS_DIR / "blocksort.sh",
     output:
         sort=INTERMEDIATES_DIR / "{sample}" / "oligomap_transcriptome_sorted.oligomap",
-    params:
-        cluster_log=CLUSTER_LOG / "sort_transcriptome_oligomap_{sample}.log",
     log:
         LOCAL_LOG / "sort_transcriptome_oligomap_{sample}.log",
-    resources:
-        threads=8,
     container:
         "docker://ubuntu:noble-20250127"
+    resources:
+        threads=8,
+    params:
+        cluster_log=CLUSTER_LOG / "sort_transcriptome_oligomap_{sample}.log",
     shell:
         "(bash {input.script} \
         {input.tmap} \
@@ -496,15 +495,15 @@ rule convert_transcriptome_to_sam_oligomap:
         script=SCRIPTS_DIR / "oligomap_output_to_sam_nh_filtered.py",
     output:
         tmap=INTERMEDIATES_DIR / "{sample}" / "oligomap_transcriptome_mappings.sam",
+    log:
+        LOCAL_LOG / "oligomap_transcriptome_to_sam_{sample}.log",
+    conda:
+        ENV_DIR / "python.yaml"
+    container:
+        "docker://python:3.11.12"
     params:
         cluster_log=CLUSTER_LOG / "oligomap_transcriptome_to_sam_{sample}.log",
         nh=config["nh"],
-    log:
-        LOCAL_LOG / "oligomap_transcriptome_to_sam_{sample}.log",
-    container:
-        "docker://python:3.11.12"
-    conda:
-        ENV_DIR / "python.yaml"
     shell:
         "(python {input.script} \
         {input.sort} \
@@ -523,12 +522,12 @@ rule merge_genome_maps:
         gmap2=INTERMEDIATES_DIR / "{sample}" / "oligomap_genome_mappings.sam",
     output:
         gmaps=INTERMEDIATES_DIR / "{sample}" / "genome_mappings.sam",
-    params:
-        cluster_log=CLUSTER_LOG / "merge_genome_maps_{sample}.log",
     log:
         LOCAL_LOG / "merge_genome_maps_{sample}.log",
     container:
         "docker://ubuntu:noble-20250127"
+    params:
+        cluster_log=CLUSTER_LOG / "merge_genome_maps_{sample}.log",
     shell:
         "(cat {input.gmap1} {input.gmap2} > {output.gmaps}) &> {log}"
 
@@ -544,12 +543,12 @@ rule merge_transcriptome_maps:
         tmap2=INTERMEDIATES_DIR / "{sample}" / "oligomap_transcriptome_mappings.sam",
     output:
         tmaps=INTERMEDIATES_DIR / "{sample}" / "transcriptome_mappings.sam",
-    params:
-        cluster_log=CLUSTER_LOG / "merge_transcriptome_maps_{sample}.log",
     log:
         LOCAL_LOG / "merge_transcriptome_maps_{sample}.log",
     container:
         "docker://ubuntu:noble-20250127"
+    params:
+        cluster_log=CLUSTER_LOG / "merge_transcriptome_maps_{sample}.log",
     shell:
         "(cat {input.tmap1} {input.tmap2} > {output.tmaps}) &> {log}"
 
@@ -565,15 +564,15 @@ rule filter_genome_by_nh:
         script=SCRIPTS_DIR / "nh_filter.py",
     output:
         gmaps=INTERMEDIATES_DIR / "{sample}" / "genome_mappings_filtered_nh.sam",
+    log:
+        LOCAL_LOG / "filter_genome_by_nh_{sample}.log",
+    conda:
+        ENV_DIR / "pysam.yaml"
+    container:
+        "docker://quay.io/biocontainers/pysam:0.23.0--py39hdd5828d_0"
     params:
         cluster_log=CLUSTER_LOG / "filter_genome_by_nh_{sample}.log",
         nh=config["nh"],
-    log:
-        LOCAL_LOG / "filter_genome_by_nh_{sample}.log",
-    container:
-        "docker://quay.io/biocontainers/pysam:0.23.0--py39hdd5828d_0"
-    conda:
-        ENV_DIR / "pysam.yaml"
     shell:
         "(python {input.script} \
         {input.gmaps} \
@@ -593,15 +592,15 @@ rule filter_transcriptome_by_nh:
         script=SCRIPTS_DIR / "nh_filter.py",
     output:
         tmaps=INTERMEDIATES_DIR / "{sample}" / "transcriptome_mappings_filtered_nh.sam",
+    log:
+        LOCAL_LOG / "filter_transcriptome_by_nh_{sample}.log",
+    conda:
+        ENV_DIR / "pysam.yaml"
+    container:
+        "docker://quay.io/biocontainers/pysam:0.23.0--py39hdd5828d_0"
     params:
         cluster_log=CLUSTER_LOG / "filter_transcriptome_by_nh_{sample}.log",
         nh=config["nh"],
-    log:
-        LOCAL_LOG / "filter_transcriptome_by_nh_{sample}.log",
-    container:
-        "docker://quay.io/biocontainers/pysam:0.23.0--py39hdd5828d_0"
-    conda:
-        ENV_DIR / "pysam.yaml"
     shell:
         "(python {input.script} \
         {input.tmaps} \
@@ -620,14 +619,14 @@ rule remove_header_genome_mappings:
         gmap=INTERMEDIATES_DIR / "{sample}" / "genome_mappings_filtered_nh.sam",
     output:
         gmap=INTERMEDIATES_DIR / "{sample}" / "genome_mappings_no_header.sam",
-    params:
-        cluster_log=CLUSTER_LOG / "remove_header_genome_mappings_{sample}.log",
     log:
         LOCAL_LOG / "remove_header_genome_mappings_{sample}.log",
-    container:
-        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
+    container:
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
+    params:
+        cluster_log=CLUSTER_LOG / "remove_header_genome_mappings_{sample}.log",
     shell:
         "samtools view {input.gmap} > {output.gmap}"
 
@@ -642,14 +641,14 @@ rule remove_header_transcriptome_mappings:
         tmap=INTERMEDIATES_DIR / "{sample}" / "transcriptome_mappings_filtered_nh.sam",
     output:
         tmap=INTERMEDIATES_DIR / "{sample}" / "transcriptome_mappings_no_header.sam",
-    params:
-        cluster_log=CLUSTER_LOG / "remove_header_transcriptome_mappings_{sample}.log",
     log:
         LOCAL_LOG / "remove_header_transcriptome_mappings_{sample}.log",
-    container:
-        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
+    container:
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
+    params:
+        cluster_log=CLUSTER_LOG / "remove_header_transcriptome_mappings_{sample}.log",
     shell:
         "samtools view {input.tmap} > {output.tmap}"
 
@@ -666,14 +665,14 @@ rule transcriptome_to_genome_maps:
         exons=INTERMEDIATES_DIR / "exons.bed",
     output:
         genout=INTERMEDIATES_DIR / "{sample}" / "transcriptome_mappings_to_genome.sam",
-    params:
-        cluster_log=CLUSTER_LOG / "transcriptome_to_genome_maps_{sample}.log",
     log:
         LOCAL_LOG / "transcriptome_to_genome_maps_{sample}.log",
-    container:
-        "docker://perl:5.40.2"
     conda:
         ENV_DIR / "perl.yaml"
+    container:
+        "docker://perl:5.40.2"
+    params:
+        cluster_log=CLUSTER_LOG / "transcriptome_to_genome_maps_{sample}.log",
     shell:
         "(perl {input.script} \
         --in {input.tmap} \
@@ -693,12 +692,12 @@ rule merge_all_maps:
         gmap2=INTERMEDIATES_DIR / "{sample}" / "genome_mappings_no_header.sam",
     output:
         catmaps=INTERMEDIATES_DIR / "{sample}" / "mappings_all_no_header.sam",
-    params:
-        cluster_log=CLUSTER_LOG / "merge_all_mappings_{sample}.log",
     log:
         LOCAL_LOG / "merge_all_mappings_{sample}.log",
     container:
         "docker://ubuntu:noble-20250127"
+    params:
+        cluster_log=CLUSTER_LOG / "merge_all_mappings_{sample}.log",
     shell:
         "(cat {input.gmap1} {input.gmap2} > {output.catmaps}) &> {log}"
 
@@ -714,12 +713,12 @@ rule add_header_all_maps:
         catmaps=INTERMEDIATES_DIR / "{sample}" / "mappings_all_no_header.sam",
     output:
         concatenate=INTERMEDIATES_DIR / "{sample}" / "mappings_all.sam",
-    params:
-        cluster_log=CLUSTER_LOG / "add_header_{sample}.log",
     log:
         LOCAL_LOG / "add_header_{sample}.log",
     container:
         "docker://ubuntu:noble-20250127"
+    params:
+        cluster_log=CLUSTER_LOG / "add_header_{sample}.log",
     shell:
         "(cat {input.header} {input.catmaps} > {output.concatenate}) &> {log}"
 
@@ -734,14 +733,14 @@ rule sort_maps_by_id:
         concatenate=INTERMEDIATES_DIR / "{sample}" / "mappings_all.sam",
     output:
         sort=INTERMEDIATES_DIR / "{sample}" / "mappings_all_sorted_by_id.sam",
-    params:
-        cluster_log=CLUSTER_LOG / "sort_maps_by_id_{sample}.log",
     log:
         LOCAL_LOG / "sort_maps_by_id_{sample}.log",
-    container:
-        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
+    container:
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
+    params:
+        cluster_log=CLUSTER_LOG / "sort_maps_by_id_{sample}.log",
     shell:
         "(samtools sort -n -o {output.sort} {input.concatenate}) &> {log}"
 
@@ -757,17 +756,17 @@ rule remove_inferiors:
         script=SCRIPTS_DIR / "sam_remove_duplicates_inferior_alignments_multimappers.pl",
     output:
         remove_inf=INTERMEDIATES_DIR / "{sample}" / "mappings_all_removed_inferiors.sam",
-    params:
-        cluster_log=CLUSTER_LOG / "remove_inferiors_{sample}.log",
     log:
         LOCAL_LOG / "remove_inferiors_{sample}.log",
+    conda:
+        ENV_DIR / "perl.yaml"
+    container:
+        "docker://perl:5.40.2"
     resources:
         mem=15,
         threads=4,
-    container:
-        "docker://perl:5.40.2"
-    conda:
-        ENV_DIR / "perl.yaml"
+    params:
+        cluster_log=CLUSTER_LOG / "remove_inferiors_{sample}.log",
     shell:
         "(perl {input.script} \
         --print-header \
@@ -788,17 +787,17 @@ rule filter_by_indels:
         script=SCRIPTS_DIR / "filter_multimappers.py",
     output:
         sam=INTERMEDIATES_DIR / "{sample}" / "alignments_all.sam",
-    params:
-        cluster_log=CLUSTER_LOG / "remove_multimappers_{sample}.log",
     log:
         LOCAL_LOG / "remove_multimappers_{sample}.log",
+    conda:
+        ENV_DIR / "pysam.yaml"
+    container:
+        "docker://quay.io/biocontainers/pysam:0.23.0--py39hdd5828d_0"
     resources:
         mem=15,
         threads=4,
-    container:
-        "docker://quay.io/biocontainers/pysam:0.23.0--py39hdd5828d_0"
-    conda:
-        ENV_DIR / "pysam.yaml"
+    params:
+        cluster_log=CLUSTER_LOG / "remove_multimappers_{sample}.log",
     shell:
         "(python {input.script} \
         {input.sam} \
@@ -817,14 +816,14 @@ rule convert_all_alns_sam_to_bam:
         maps=INTERMEDIATES_DIR / "{sample}" / "alignments_all.sam",
     output:
         maps=INTERMEDIATES_DIR / "{sample}" / "alignments_all.bam",
-    params:
-        cluster_log=CLUSTER_LOG / "convert_all_alns_sam_to_bam_{sample}.log",
     log:
         LOCAL_LOG / "convert_all_alns_sam_to_bam_{sample}.log",
-    container:
-        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
+    container:
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
+    params:
+        cluster_log=CLUSTER_LOG / "convert_all_alns_sam_to_bam_{sample}.log",
     shell:
         "(samtools view -b {input.maps} > {output.maps}) &> {log}"
 
@@ -839,14 +838,14 @@ rule sort_all_alns_bam_by_position:
         maps=INTERMEDIATES_DIR / "{sample}" / "alignments_all.bam",
     output:
         maps=INTERMEDIATES_DIR / "{sample}" / "alignments_all_sorted_{sample}.bam",
-    params:
-        cluster_log=CLUSTER_LOG / "sort_all_alns_bam_by_position_{sample}.log",
     log:
         LOCAL_LOG / "sort_all_alns_bam_by_position_{sample}.log",
-    container:
-        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
+    container:
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
+    params:
+        cluster_log=CLUSTER_LOG / "sort_all_alns_bam_by_position_{sample}.log",
     shell:
         "(samtools sort {input.maps} > {output.maps}) &> {log}"
 
@@ -861,13 +860,13 @@ rule index_all_alns_bam:
         maps=INTERMEDIATES_DIR / "{sample}" / "alignments_all_sorted.bam",
     output:
         maps=INTERMEDIATES_DIR / "{sample}" / "alignments_all_sorted.bam.bai",
-    params:
-        cluster_log=CLUSTER_LOG / "index_all_alns_bam_{sample}.log",
     log:
         LOCAL_LOG / "index_all_alns_bam_{sample}.log",
-    container:
-        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
     conda:
         ENV_DIR / "samtools.yaml"
+    container:
+        "docker://quay.io/biocontainers/samtools:1.21--h96c455f_1"
+    params:
+        cluster_log=CLUSTER_LOG / "index_all_alns_bam_{sample}.log",
     shell:
         "(samtools index -b {input.maps} > {output.maps}) &> {log}"
