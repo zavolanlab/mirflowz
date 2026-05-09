@@ -1,0 +1,2230 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="Zavolab <zavolab-biozentrum@unibas.ch>">
+      
+      
+        <link rel="canonical" href="https://zavolanlab.github.io/mirflowz/workflow/modules/quantify/">
+      
+      
+        <link rel="prev" href="../map/">
+      
+      
+        <link rel="next" href="../pileups/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../images/mfz_logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Quantify - MIRFLOWZ documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#quantify-module" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="MIRFLOWZ documentation" class="md-header__button md-logo" aria-label="MIRFLOWZ documentation" data-md-component="logo">
+      
+  <img src="../../../images/mfz_logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            MIRFLOWZ documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Quantify
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/zavolanlab/mirflowz" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    mirflowz
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="MIRFLOWZ documentation" class="md-nav__button md-logo" aria-label="MIRFLOWZ documentation" data-md-component="logo">
+      
+  <img src="../../../images/mfz_logo.png" alt="logo">
+
+    </a>
+    MIRFLOWZ documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/zavolanlab/mirflowz" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    mirflowz
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/outputs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output Files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflow
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modules
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Modules
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prepare/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prepare
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../map/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantify
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantify
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#third-party-software-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Third-party software used
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration file
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quantify-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantify Workflow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quantify Workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#finish_quantify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        finish_quantify
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#intersect_extended_primir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        intersect_extended_primir
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filter_sam_by_intersecting_primir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        filter_sam_by_intersecting_primir
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#convert_intersecting_primir_sam_to_bam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        convert_intersecting_primir_sam_to_bam
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sort_intersecting_primir_bam_by_position" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sort_intersecting_primir_bam_by_position
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#index_intersecting_primir_bam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        index_intersecting_primir_bam
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#intersect_extended_mirna" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        intersect_extended_mirna
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filter_sam_by_intersecting_mirna" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        filter_sam_by_intersecting_mirna
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#add_intersecting_mirna_tag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        add_intersecting_mirna_tag
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sort_intersecting_mirna_by_feat_tag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sort_intersecting_mirna_by_feat_tag
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quantify_mirna" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        quantify_mirna
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quantify_primir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        quantify_primir
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#merge_tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        merge_tables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uncollapse_reads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        uncollapse_reads
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#convert_uncollapsed_reads_sam_to_bam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        convert_uncollapsed_reads_sam_to_bam
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sort_uncollapsed_reads_bam_by_position" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sort_uncollapsed_reads_bam_by_position
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#index_uncollapsed_reads_bam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        index_uncollapsed_reads_bam
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pileups/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ASCII-style Pileups
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#third-party-software-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Third-party software used
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration file
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quantify-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantify Workflow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quantify Workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#finish_quantify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        finish_quantify
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#intersect_extended_primir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        intersect_extended_primir
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filter_sam_by_intersecting_primir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        filter_sam_by_intersecting_primir
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#convert_intersecting_primir_sam_to_bam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        convert_intersecting_primir_sam_to_bam
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sort_intersecting_primir_bam_by_position" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sort_intersecting_primir_bam_by_position
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#index_intersecting_primir_bam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        index_intersecting_primir_bam
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#intersect_extended_mirna" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        intersect_extended_mirna
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filter_sam_by_intersecting_mirna" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        filter_sam_by_intersecting_mirna
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#add_intersecting_mirna_tag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        add_intersecting_mirna_tag
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sort_intersecting_mirna_by_feat_tag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sort_intersecting_mirna_by_feat_tag
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quantify_mirna" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        quantify_mirna
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quantify_primir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        quantify_primir
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#merge_tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        merge_tables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uncollapse_reads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        uncollapse_reads
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#convert_uncollapsed_reads_sam_to_bam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        convert_uncollapsed_reads_sam_to_bam
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sort_uncollapsed_reads_bam_by_position" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sort_uncollapsed_reads_bam_by_position
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#index_uncollapsed_reads_bam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        index_uncollapsed_reads_bam
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="quantify-module">Quantify Module<a class="headerlink" href="#quantify-module" title="Permanent link">¶</a></h1>
+<!-- Change? -->
+
+<p>Welcome to the technical documentation for the quantify module. This page aims
+to be a detailed documentation of each rule within the module by stating its
+inputs, outputs (and how they relate to other rules), configurable parameters,
+and the software used. Moreover, when needed, there will be explanations and
+examples of what that particular rule does.</p>
+<p>The schema below is a visual representation of the individual module steps
+and how they are related.</p>
+<div align="center">
+    <img src=../../../images/quantify.png>
+</div>
+
+<h2 id="third-party-software-used">Third-party software used<a class="headerlink" href="#third-party-software-used" title="Permanent link">¶</a></h2>
+<blockquote>
+<p>Tag lines were taken from the developers' websites (code repository or manual)</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>License</th>
+<th>Tag line</th>
+<th>More info</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>BEDTools</strong></td>
+<td><a href="https://opensource.org/licenses/GPL-2.0">GPLv2</a></td>
+<td><em>"[...] intersect, merge, count, complement, and shuffle genomic intervals from multiple files in widely-used genomic file formats such as BAM, BED, GFF/GTF, VCF"</em></td>
+<td><a href="https://github.com/arq5x/bedtools2">code</a> / <a href="https://bedtools.readthedocs.io/en/latest/">manual</a> / <a href="https://academic.oup.com/bioinformatics/article/26/6/841/244688">publication</a></td>
+</tr>
+<tr>
+<td><strong>FASTX-Toolkit</strong></td>
+<td><a href="https://opensource.org/license/agpl-v3/">AGPL-3.0</a></td>
+<td><em>"[...] collection of command line tools for Short-Reads FASTA/FASTQ files preprocessing"</em></td>
+<td><a href="https://github.com/agordon/fastx_toolkit">code</a> / <a href="http://hannonlab.cshl.edu/fastx_toolkit/commandline.html">manual</a></td>
+</tr>
+<tr>
+<td><strong>SAMtools</strong></td>
+<td><a href="https://opensource.org/licenses/MIT">MIT</a></td>
+<td><em>"[...] suite of programs for interacting with high-throughput sequencing data"</em></td>
+<td><a href="https://github.com/samtools/samtools">code</a> / <a href="http://www.htslib.org/doc/samtools.html">manual</a> / <a href="https://doi.org/10.1093/bioinformatics/btp352">publication</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="configuration-file">Configuration file<a class="headerlink" href="#configuration-file" title="Permanent link">¶</a></h2>
+<p>Some parameters within the workflow can be modified. Refer to the
+<a href="https://github.com/zavolanlab/mirflowz/blob/dev/config/config_template.yaml">configuration template</a> for a detailed explanation of each
+option.</p>
+<h2 id="quantify-workflow">Quantify Workflow<a class="headerlink" href="#quantify-workflow" title="Permanent link">¶</a></h2>
+<h3 id="finish_quantify"><code>finish_quantify</code><a class="headerlink" href="#finish_quantify" title="Permanent link">¶</a></h3>
+<p>Target rule as required by <a href="https://snakemake.readthedocs.io/en/stable/">Snakemake</a>.</p>
+<blockquote>
+<p>Local rule</p>
+</blockquote>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Input</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ul>
+<li>Alignments file, filtered (<code>.sam</code>); from
+<a href="./#filter_sam_by_intersecting_primir"><strong>filter_sam_by_intersecting_primir</strong></a>
+and <a href="./#filter_sam_by_intersecting_mirna"><strong>filter_sam_by_intersecting_mirna</strong></a></li>
+<li>(iso)miR and/or pri-miR counts table (<code>.tab</code>); from
+<a href="./#merge_tables"><strong>merge_tables</strong></a></li>
+<li>Alignments file, uncollapsed, sorted (<code>.bam</code>); from
+<a href="./#sort_uncollapsed_reads_bam_by_position"><strong>sort_uncollapsed_reads_bam_by_position</strong></a></li>
+<li>BAM index file (<code>.bam.bai</code>); from
+<a href="./#index_uncollapsed_reads_bam"><strong>index_uncollapsed_reads_bam</strong></a></li>
+</ul>
+</div>
+</div>
+</div>
+<h3 id="intersect_extended_primir"><code>intersect_extended_primir</code><a class="headerlink" href="#intersect_extended_primir" title="Permanent link">¶</a></h3>
+<p>Intersect the aligned reads with the extended pri-miR annotations with
+<a href="./#third-party-software-used"><strong>BEDTools</strong></a>.</p>
+<blockquote>
+<p>Only those alignments fully intersecting a (possibly extended) pri-miR
+annotated region are kept.</p>
+</blockquote>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Input</label><label for="__tabbed_2_2">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ul>
+<li>Alignments file, sorted (<code>.bam</code>); from
+<a href="../map/#sort_all_alns_bam_by_position"><strong>sort_all_alns_bam_by_position</strong></a></li>
+<li>pri-miR extended annotations (<code>.gff3</code>); from
+<a href="../prepare/#extend_mirs_annotations"><strong>extend_mirs_annotations</strong></a></li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p>pri-miR intersections file (<code>.intersect</code>); used in
+<a href="./#filter_sam_by_intersecting_primir"><strong>filter_sam_by_intersecting_primir</strong></a>
+and <a href="./#quantify_primir"><strong>quantify_primir</strong></a></p>
+</div>
+</div>
+</div>
+<h3 id="filter_sam_by_intersecting_primir"><code>filter_sam_by_intersecting_primir</code><a class="headerlink" href="#filter_sam_by_intersecting_primir" title="Permanent link">¶</a></h3>
+<p>Remove alignments that do not intersect with any pri-miR with
+<a href="./#third-party-software-used"><strong>SAMtools</strong></a>.</p>
+<blockquote>
+<p>Required to only intersect alignments within a (possibly extended) pri-miR
+locus.</p>
+</blockquote>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Input</label><label for="__tabbed_3_2">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ul>
+<li>Alignments file, filtered (<code>.sam</code>); from
+<a href="../map/#filter_by_indels"><strong>filter_by_indels</strong></a></li>
+<li>pri-miR intersections file (<code>.intersect</code>); from
+<a href="./#intersect_extended_primir"><strong>intersect_extended_primir</strong></a></li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p>(<strong>Workflow output</strong>) Alignments file, filtered (<code>.sam</code>); used in
+<a href="./#convert_intersecting_primir_sam_to_bam"><strong>convert_intersecting_primir_sam_to_bam</strong></a>
+and <a href="./#filter_sam_by_intersecting_mirna"><strong>filter_sam_by_intersecting_mirna</strong></a></p>
+</div>
+</div>
+</div>
+<h3 id="convert_intersecting_primir_sam_to_bam"><code>convert_intersecting_primir_sam_to_bam</code><a class="headerlink" href="#convert_intersecting_primir_sam_to_bam" title="Permanent link">¶</a></h3>
+<p>Convert alignments <code>.sam</code> file to <code>.bam</code> with
+<a href="./#third-party-software-used"><strong>SAMtools</strong></a>.</p>
+<blockquote>
+<p>Required by <a href="./#third-party-software-used">BEDTools</a> to intersect alignments
+with miRNA annotations.</p>
+</blockquote>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">Input</label><label for="__tabbed_4_2">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Alignments file, filtered (<code>.sam</code>); from
+<a href="./#filter_sam_by_intersecting_primir"><strong>filter_sam_by_intersecting_primir</strong></a></p>
+</div>
+<div class="tabbed-block">
+<p>Alignments file (<code>.bam</code>); used in
+<a href="./#sort_intersecting_primir_bam_by_position"><strong>sort_intersecting_primir_bam_by_position</strong></a></p>
+</div>
+</div>
+</div>
+<h3 id="sort_intersecting_primir_bam_by_position"><code>sort_intersecting_primir_bam_by_position</code><a class="headerlink" href="#sort_intersecting_primir_bam_by_position" title="Permanent link">¶</a></h3>
+<p>Sort alignments by position with <a href="./#third-party-software-used"><strong>SAMtools</strong></a>.</p>
+<blockquote>
+<p>Required by <a href="./#third-party-software-used">BEDTools</a> to intersect alignments
+with miRNA annotations more efficiently.</p>
+</blockquote>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">Input</label><label for="__tabbed_5_2">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Alignments file (<code>.bam</code>); from
+<a href="./#convert_intersecting_primir_sam_to_bam"><strong>convert_intersecting_primir_sam_to_bam</strong></a></p>
+</div>
+<div class="tabbed-block">
+<p>Alignments file, sorted (<code>.bam</code>); used in
+<a href="./#index_intersecting_primir_bam"><strong>index_intersecting_primir_bam</strong></a> and
+<a href="./#intersect_extended_mirna"><strong>intersect_extended_mirna</strong></a></p>
+</div>
+</div>
+</div>
+<h3 id="index_intersecting_primir_bam"><code>index_intersecting_primir_bam</code><a class="headerlink" href="#index_intersecting_primir_bam" title="Permanent link">¶</a></h3>
+<p>Create index BAM file with <a href="./#third-party-software-used"><strong>SAMtools</strong></a>.</p>
+<blockquote>
+<p>Indexing is required by genome viewers such as IGV to quickly display
+alignments in a genomic region of interest.</p>
+</blockquote>
+<div class="tabbed-set tabbed-alternate" data-tabs="6:2"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">Input</label><label for="__tabbed_6_2">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Alignments file, sorted (<code>.bam</code>); from
+<a href="./#sort_intersecting_primir_bam_by_position"><strong>sort_intersecting_primir_bam_by_position</strong></a></p>
+</div>
+<div class="tabbed-block">
+<p>BAM index file (<code>.bam.bai</code>); used in
+<a href="./#intersect_extended_mirna"><strong>intersect_extended_mirna</strong></a></p>
+</div>
+</div>
+</div>
+<h3 id="intersect_extended_mirna"><code>intersect_extended_mirna</code><a class="headerlink" href="#intersect_extended_mirna" title="Permanent link">¶</a></h3>
+<p>Intersect the aligned reads with the extended miRNA annotations with
+<a href="./#third-party-software-used"><strong>BEDTools</strong></a>.</p>
+<blockquote>
+<p>Only those alignments fully intersecting an extended mature miRNA annotated
+region are kept.</p>
+</blockquote>
+<div class="tabbed-set tabbed-alternate" data-tabs="7:2"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><input id="__tabbed_7_2" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="__tabbed_7_1">Input</label><label for="__tabbed_7_2">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ul>
+<li>Alignments file, sorted (<code>.bam</code>); from
+<a href="./#sort_intersecting_primir_bam_by_position"><strong>sort_intersecting_primir_bam_by_position</strong></a></li>
+<li>Mature miRNA extended annotations (<code>.gff3</code>); from
+<a href="../prepare/#extend_mirs_annotations"><strong>extend_mirs_annotations</strong></a></li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p>Mature miRNA intersections file (<code>.intersect</code>); used in
+<a href="./#filter_sam_by_intersecting_mirna"><strong>filter_sam_by_intersecting_mirna</strong></a>
+and <a href="./#add_intersecting_mirna_tag"><strong>add_intersecting_mirna_tag</strong></a></p>
+</div>
+</div>
+</div>
+<h3 id="filter_sam_by_intersecting_mirna"><code>filter_sam_by_intersecting_mirna</code><a class="headerlink" href="#filter_sam_by_intersecting_mirna" title="Permanent link">¶</a></h3>
+<p>Remove alignments that do not intersect with any miRNA with
+<a href="./#third-party-software-used"><strong>SAMtools</strong></a>.</p>
+<blockquote>
+<p>Required to efficiently classify the alignments.</p>
+</blockquote>
+<div class="tabbed-set tabbed-alternate" data-tabs="8:2"><input checked="checked" id="__tabbed_8_1" name="__tabbed_8" type="radio" /><input id="__tabbed_8_2" name="__tabbed_8" type="radio" /><div class="tabbed-labels"><label for="__tabbed_8_1">Input</label><label for="__tabbed_8_2">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ul>
+<li>Alignments file, filtered (<code>.sam</code>); from
+<a href="./#filter_sam_by_intersecting_primir"><strong>filter_sam_by_intersecting_primir</strong></a></li>
+<li>Mature miRNA intersections file (<code>.intersect</code>); from
+<a href="./#intersect_extended_mirna"><strong>intersect_extended_mirna</strong></a></li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p>(<strong>Workflow output</strong>) Alignments file, filtered (<code>.sam</code>); used in
+<a href="./#add_intersecting_mirna_tag"><strong>add_intersecting_mirna_tag</strong></a> and
+<a href="./#uncollapse_reads"><strong>uncollapse_reads</strong></a></p>
+</div>
+</div>
+</div>
+<h3 id="add_intersecting_mirna_tag"><code>add_intersecting_mirna_tag</code><a class="headerlink" href="#add_intersecting_mirna_tag" title="Permanent link">¶</a></h3>
+<p>Classify and add the intersecting (iso)miR to each alignment as a tag
+with a <a href="https://github.com/zavolanlab/mirflowz/blob/dev/workflow/scripts/annotate_sam_with_bed_features.py"><strong>custom script</strong></a>.</p>
+<blockquote>
+<p>In this step, the mature miRNA annotated regions are used instead of the
+extended ones. Each alignment gets an extra tag (<code>YW:Z</code>) with the (iso)miR(s)
+it is considered to really intersect with using the format:
+<code>miRNA_name|5p-shift|3p-shift|CIGAR|MD|READ_SEQ</code>, where <code>5p-shift</code> and
+<code>3p-shift</code> are the difference between the miRNA start and end coordinates
+and the alignment's ones respectively.</p>
+</blockquote>
+<div class="tabbed-set tabbed-alternate" data-tabs="9:4"><input checked="checked" id="__tabbed_9_1" name="__tabbed_9" type="radio" /><input id="__tabbed_9_2" name="__tabbed_9" type="radio" /><input id="__tabbed_9_3" name="__tabbed_9" type="radio" /><input id="__tabbed_9_4" name="__tabbed_9" type="radio" /><div class="tabbed-labels"><label for="__tabbed_9_1">Input</label><label for="__tabbed_9_2">Parameters</label><label for="__tabbed_9_3">Output</label><label for="__tabbed_9_4">Examples</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ul>
+<li>Alignments file, filtered (<code>.sam</code>); from
+<a href="./#filter_sam_by_intersecting_mirna"><strong>filter_sam_by_intersecting_mirna</strong></a></li>
+<li>Mature miRNA intersections file (<code>.intersect</code>); from
+<a href="./#intersect_extended_mirna"><strong>intersect_extended_mirna</strong></a></li>
+</ul>
+</div>
+<div class="tabbed-block">
+<ul>
+<li><strong>config_template.yaml</strong><ul>
+<li><code>extension</code>: Number of nucleotides by which mature miRNA annotated
+regions are extended (default: 6)</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p>Alignments file, tagged (<code>.sam</code>); used in
+<a href="./#sort_intersecting_mirna_by_feat_tag"><strong>sort_intersecting_mirna_by_feat_tag</strong></a></p>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="go">Example 1 | Feature intersects alignment | coordinates adjustment and shift allowed</span>
+<span class="go">    use case:</span>
+<span class="go">        Prior to checking if the feature is intersecting the alignment, its</span>
+<span class="go">        coordinates are adjusted by the value specified in `--extension`. In</span>
+<span class="go">        addition, the same value is used to specify the +/- shift allowed</span>
+<span class="go">        between the feature and the read alignment start and end coordinates.</span>
+
+<span class="go">    command:</span>
+<span class="go">        annotate_sam_with_intersecting_features.py -b INTERSECT -s SAM --extension 5</span>
+
+<span class="go">    in INTERSECT record:</span>
+<span class="go">        19  .   miRNA   5332    5365    .   +   .   ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786 19  5337    5358    read_1  255 +   21</span>
+
+<span class="go">    in SAM record:</span>
+<span class="go">        read_1  0   19  5338    255 21M *   0   0   TCAAAACTGAGGGGCATTTTC   *   MD:Z:21 NH:i:1  NM:i:0</span>
+
+<span class="go">    intersection before coordinates adjustment visualization:</span>
+
+<span class="go">        ---|===============================|--- (feature)</span>
+<span class="go">        ---------|===================|--------- (read)</span>
+
+<span class="go">    intersection after coordinates adjustment visualization:</span>
+
+<span class="go">        --------|=====================|-------- (feature)</span>
+<span class="go">        ---------|===================|--------- (read)</span>
+
+<span class="go">    out SAM record:</span>
+<span class="go">        read_1  0   19  5338    255 21M *   0   0   TCAAAACTGAGGGGCATTTTC   *   MD:Z:21 NH:i:1  NM:i:0  YW:Z:hsa-miR-1323|1|-1|21M|21|TCAAAACTGAGGGGCATTTTC</span>
+
+<span class="go">    description:</span>
+<span class="go">        The feature start and end coordinates after the adjustment are 5337</span>
+<span class="go">        and 5360 respectively.</span>
+<span class="go">        The read alignment starts at position 5338. As the read has length 21,</span>
+<span class="go">        its end position is 5359.</span>
+<span class="go">        The feature intersects the read alignment with an overhang within the</span>
+<span class="go">        specified shift range (+/- 5) so it is added as a new tag in the output</span>
+<span class="go">        SAM record.</span>
+
+
+<span class="go">Example 2 | Feature intersects alignment | no coordinates adjustment or shift allowed</span>
+<span class="go">    use case:</span>
+<span class="go">        The feature and read alignment coordinates must perfectly match.</span>
+
+<span class="go">    command:</span>
+<span class="go">        annotate_sam_with_intersecting_features.py -b INTERSECT -s SAM</span>
+
+<span class="go">    in INTERSECT record:</span>
+<span class="go">        19  .   miRNA   5338    5359    .   +   .   ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786 19  5337    5358    read_2  255 +   21</span>
+
+<span class="go">    in SAM record:</span>
+<span class="go">        read_2  0   19  5338    255 21M *   0   0   TCAAAACTGAGGGGCATTTTC   *   MD:Z:21 NH:i:1  NM:i:0</span>
+
+<span class="go">    intersection visualization:</span>
+
+<span class="go">        ---------|===================|--------- (feature)</span>
+<span class="go">        ---------|===================|--------- (read)</span>
+
+<span class="go">    out SAM record:</span>
+<span class="go">        read_2  0   19  5338    255 21M *   0   0   TCAAAACTGAGGGGCATTTTC   *   MD:Z:21 NH:i:1  NM:i:0  YW:Z:hsa-miR-1323|0|0|21M|21|TCAAAACTGAGGGGCATTTTC</span>
+
+<span class="go">    description:</span>
+<span class="go">        The feature start and end coordinates are 5338 and 5359 respectively.</span>
+<span class="go">        The read alignment starts at position 5338. As the read has length 21,</span>
+<span class="go">        its end position is 5359.</span>
+<span class="go">        The feature perfectly intersects the read alignment so it is added as</span>
+<span class="go">        a new tag in the output SAM record.</span>
+
+
+<span class="go">Example 3 | Non-intersecting feature | shift filter not passed</span>
+<span class="go">    use case:</span>
+<span class="go">        Prior to checking if the feature is intersecting the alignment, its</span>
+<span class="go">        coordinates are adjusted by the value specified in `--extension`. In</span>
+<span class="go">        addition, the same value is used to specify the +/- shift allowed</span>
+<span class="go">        between the feature and the read alignment start and end coordinates.</span>
+
+<span class="go">    command:</span>
+<span class="go">        annotate_sam_with_intersecting_features.py -b INTERSECT -s SAM --extension 1</span>
+
+<span class="go">    in INTERSECT record:</span>
+<span class="go">        19  .   miRNA   5332    5365    .   +   .   ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786 19  5337    5358    read_3  255 +   21</span>
+
+<span class="go">    in SAM record:</span>
+<span class="go">        read_3  0   19  5338    255 21M *   0   0   TCAAAACTGAGGGGCATTTTC   *   MD:Z:21 NH:i:1  NM:i:0</span>
+
+<span class="go">    intersection before coordinates adjustment visualization:</span>
+
+<span class="go">        ---|===============================|--- (feature)</span>
+<span class="go">        ---------|===================|--------- (read)</span>
+
+<span class="go">    intersection after coordinates adjustment visualization:</span>
+
+<span class="go">        ----|=============================|---- (feature)</span>
+<span class="go">        ---------|===================|--------- (read)</span>
+
+<span class="go">    out SAM record:</span>
+<span class="go">        read_3  0   19  5338    255 21M *   0   0   TCAAAACTGAGGGGCATTTTC   *   MD:Z:21 NH:i:1  NM:i:0  YW:Z:</span>
+
+<span class="go">    description:</span>
+<span class="go">        The feature start and end coordinates after the adjustment are 5333</span>
+<span class="go">        and 5364 respectively.</span>
+<span class="go">        The read alignment starts at position 5338. As the read has length 21,</span>
+<span class="go">        its end position is 5359.</span>
+<span class="go">        There is a 5-nucleotide overhang on both ends. Thus, the feature is</span>
+<span class="go">        not considered to intersect the read alignment and the alignment is</span>
+<span class="go">        not written in the output file.</span>
+
+
+<span class="go">Example 4 | Feature intersects alignment | using feature&#39;s &quot;Alias&quot;</span>
+<span class="go">    use case:</span>
+<span class="go">        The feature and read alignment coordinates must perfectly match.</span>
+
+<span class="go">    command:</span>
+<span class="go">        annotate_sam_with_intersecting_features.py -b INTERSECT -s SAM --id alias</span>
+
+<span class="go">    in INTERSECT record:</span>
+<span class="go">        19  .   miRNA   5338    5359    .   +   .   ID=MIMAT0005795;Alias=MIMAT0005795;Name=hsa-miR-1323;Derives_from=MI0003786 19  5337    5358    read_4  255 +   21</span>
+
+<span class="go">    in SAM record:</span>
+<span class="go">        read_4  0   19  5338    255 21M *   0   0   TCAAAACTGAGGGGCATTTTC   *   MD:Z:21 NH:i:1  NM:i:0</span>
+
+<span class="go">    intersection visualization:</span>
+
+<span class="go">        ---------|===================|--------- (feature)</span>
+<span class="go">        ---------|===================|--------- (read)</span>
+
+<span class="go">    out SAM record:</span>
+<span class="go">        read_4  0   19  5338    255 21M *   0   0   TCAAAACTGAGGGGCATTTTC   *   MD:Z:21 NH:i:1  NM:i:0  YW:Z:MIMAT0005795|0|0|21M|21|TCAAAACTGAGGGGCATTTTC</span>
+
+<span class="go">    description:</span>
+<span class="go">        The feature start and end coordinates are 5338 and 5359 respectively.</span>
+<span class="go">        The read alignment starts at position 5338. As the read has length 21,</span>
+<span class="go">        its end position is 5359.</span>
+<span class="go">        The feature perfectly intersects the read alignment so it is added as</span>
+<span class="go">        a new tag in the output SAM record. In this case, instead of using the</span>
+<span class="go">        feature `Name` (default), the `Alias` is used.</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="sort_intersecting_mirna_by_feat_tag"><code>sort_intersecting_mirna_by_feat_tag</code><a class="headerlink" href="#sort_intersecting_mirna_by_feat_tag" title="Permanent link">¶</a></h3>
+<p>Sort the alignments by the tag containing the classified intersecting (iso)miR
+with <a href="./#third-party-software-used"><strong>SAMtools</strong></a>.</p>
+<blockquote>
+<p>Required for an efficient quantification.</p>
+</blockquote>
+<div class="tabbed-set tabbed-alternate" data-tabs="10:2"><input checked="checked" id="__tabbed_10_1" name="__tabbed_10" type="radio" /><input id="__tabbed_10_2" name="__tabbed_10" type="radio" /><div class="tabbed-labels"><label for="__tabbed_10_1">Input</label><label for="__tabbed_10_2">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Alignments file, tagged (<code>.sam</code>); from
+<a href="./#add_intersecting_mirna_tag"><strong>add_intersecting_mirna_tag</strong></a></p>
+</div>
+<div class="tabbed-block">
+<p>Alignments file, tagged, sorted (<code>.sam</code>); used in
+<a href="./#quantify_mirna"><strong>quantify_mirna</strong></a></p>
+</div>
+</div>
+</div>
+<h3 id="quantify_mirna"><code>quantify_mirna</code><a class="headerlink" href="#quantify_mirna" title="Permanent link">¶</a></h3>
+<p>Tabulate alignments according to its new tag (<code>YW:Z</code>) with a
+<a href="https://github.com/zavolanlab/mirflowz/blob/dev/workflow/scripts/mirna_quantification.py"><strong>custom script</strong></a>.</p>
+<blockquote>
+<p>Each alignment contributes to the miRNA species in its <code>YW:Z</code> tag by <code>R/N</code>,
+where <code>R</code> is the number of collapsed reads in that alignment, and <code>N</code> is the
+number of genomic and/or transcriptomic loci it aligns to. The values of
+both, <code>R</code> and <code>N</code> are inferred from the sequence name which follows the
+format <code>ID-R_N</code>. The resulting table has a row for each mature miRNA species
+(isomiR, canonical miRNA or both) with the name format set in
+<a href="#add_intersecting_mirna_tag"><strong>add_intersecting_mirna_tag</strong></a> unless
+considered a canonical miRNA, which only keeps the annotated mature miRNA
+name. A miRNA species is considered to be canonical if there are no shifts
+between its start and end positions and the aligned read ones, and there
+are no mismatches nor indels.</p>
+</blockquote>
+<div class="tabbed-set tabbed-alternate" data-tabs="11:4"><input checked="checked" id="__tabbed_11_1" name="__tabbed_11" type="radio" /><input id="__tabbed_11_2" name="__tabbed_11" type="radio" /><input id="__tabbed_11_3" name="__tabbed_11" type="radio" /><input id="__tabbed_11_4" name="__tabbed_11" type="radio" /><div class="tabbed-labels"><label for="__tabbed_11_1">Input</label><label for="__tabbed_11_2">Parameters</label><label for="__tabbed_11_3">Output</label><label for="__tabbed_11_4">Examples</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Alignments file, tagged, sorted (<code>.sam</code>); from
+<a href="./#sort_intersecting_mirna_by_feat_tag"><strong>sort_intersecting_mirna_by_feat_tag</strong></a></p>
+</div>
+<div class="tabbed-block">
+<ul>
+<li><strong>samples.tsv</strong><ul>
+<li>Library name; specified in the sample's table column <code>sample</code></li>
+</ul>
+</li>
+<li><strong>config_template.yaml</strong><ul>
+<li><code>mir_list</code>: miRNA features to be quantified (default: isomir, mirna
+pri-miR)</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p>(iso)miR counts tab-delimited file; used in
+<a href="./#merge_tables"><strong>merge_tables</strong></a></p>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="go">Example 1 | Canonical miRNA and isomiR</span>
+
+<span class="go">IN SAM record:</span>
+<span class="go">    10-4_2  0   19  34627   255 21M *   0   0   AAAGTGCTTCCTTTTAGAGGG   *   MD:Z:21 NM:i:0  NH:i:2  HI:i:1  YW:Z:hsa-miR-520b-3p|0|0|21M|21|AAAGTGCTTCCTTTTAGAGGG</span>
+<span class="go">    10-4_2  0   19  40866   255 21M *   0   0   AAAGTGCTTCCTTTTAGAGGG   *   MD:Z:21 NM:i:0  NH:i:2  HI:i:2  YW:Z:hsa-miR-520c-3p|0|-1|21M|21|AAAGTGCTTCCTTTTAGAGGG</span>
+
+<span class="go">Data:</span>
+<span class="go">    Alignment:</span>
+<span class="go">        Read ID: 10</span>
+<span class="go">        Number of collapsed reads: 4</span>
+<span class="go">        Number of mapped genomic loci: 2</span>
+<span class="go">        Contribution: 4/2 = 2</span>
+
+<span class="go">    miRNA species:</span>
+<span class="go">        Tag name: hsa-miR-520b-3p|0|0|21M|21|AAAGTGCTTCCTTTTAGAGGG</span>
+<span class="go">        Type: Canonical</span>
+<span class="go">        Table name: hsa-miR-520b-3p</span>
+<span class="go">        Total count: 2</span>
+
+<span class="go">        Tag name: hsa-miR-520c-3p|0|-1|21M|21|AAAGTGCTTCCTTTTAGAGGG</span>
+<span class="go">        Type: isomiR</span>
+<span class="go">        Table name: hsa-miR-520c-3p|0|-1|21M|21|AAAGTGCTTCCTTTTAGAGGG</span>
+<span class="go">        Total count: 2</span>
+
+<span class="go">OUT table:</span>
+<span class="go">    ID                                                  lib_name</span>
+<span class="go">    hsa-miR-520b-3p                                     2</span>
+<span class="go">    hsa-miR-520c-3p|0|-1|21M|21|AAAGTGCTTCCTTTTAGAGGG   2</span>
+
+
+<span class="go">Example 2 | Different isomiRs</span>
+
+<span class="go">IN SAM record:</span>
+<span class="go">    599-1_3 0   19  27804   255 20M *   0   0   AAAGTGCTTCCTTTTAGAGG    *   MD:Z:20 NM:i:0  NH:i:3  HI:i:1  YW:Z:hsa-miR-526b-3p|1|-1|20M|20|AAAGTGCTTCCTTTTAGAGG</span>
+<span class="go">    599-1_3 0   19  34627   255 20M *   0   0   AAAGTGCTTCCTTTTAGAGG    *   MD:Z:20 NM:i:0  NH:i:3  HI:i:2  YW:Z:hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG</span>
+<span class="go">    599-1_3 0   19  40866   255 20M *   0   0   AAAGTGCTTCCTTTTAGAGG    *   MD:Z:20 NM:i:0  NH:i:3  HI:i:3  YW:Z:hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG</span>
+
+<span class="go">Data:</span>
+<span class="go">    Alignment:</span>
+<span class="go">        Read ID: 599</span>
+<span class="go">        Number of collapsed reads: 1</span>
+<span class="go">        Number of mapped genomic loci: 3</span>
+<span class="go">        Contribution: 1/3 = 0.33</span>
+
+<span class="go">    miRNA species:</span>
+<span class="go">        Tag name: hsa-miR-526b-3p|1|-1|20M|20|AAAGTGCTTCCTTTTAGAGG</span>
+<span class="go">        Type: isomiR</span>
+<span class="go">        Table name: hsa-miR-526b-3p|1|-1|20M|20|AAAGTGCTTCCTTTTAGAGG</span>
+<span class="go">        Total count: 0.33</span>
+
+<span class="go">        Tag name: hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG</span>
+<span class="go">        Type: isomiR</span>
+<span class="go">        Table name: hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG</span>
+<span class="go">        Total count: 0.33</span>
+
+<span class="go">        Tag name: hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG</span>
+<span class="go">        Type: isomiR</span>
+<span class="go">        Table name: hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG</span>
+<span class="go">        Total count: 0.33</span>
+
+<span class="go">OUT table:</span>
+<span class="go">    ID                                                  lib_name</span>
+<span class="go">    hsa-miR-520b-3p|0|-1|20M|20|AAAGTGCTTCCTTTTAGAGG    0.33</span>
+<span class="go">    hsa-miR-520c-3p|0|-2|20M|20|AAAGTGCTTCCTTTTAGAGG    0.33</span>
+<span class="go">    hsa-miR-526b-3p|1|-1|20M|20|AAAGTGCTTCCTTTTAGAGG    0.33</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="quantify_primir"><code>quantify_primir</code><a class="headerlink" href="#quantify_primir" title="Permanent link">¶</a></h3>
+<p>Tabulate alignments according to its intersecting pri-miR with a
+<a href="https://github.com/zavolanlab/mirflowz/blob/dev/workflow/scripts/primir_quantification.py"><strong>custom script</strong></a></p>
+<blockquote>
+<p>Each alignment contributes to the pri-miR it intersects with by <code>R/N</code>, where
+<code>R</code> is the number of collapsed reads in that alignment, and <code>N</code> is the
+number of genomic and/or transcriptomic loci it aligns to. The values of
+both, <code>R</code> and <code>N</code> are inferred from the sequence name which follows the
+format <code>ID-R_N</code>. The resulting table has a row for each pri-miR with the
+name format set in
+<a href="../prepare/#extend_mirs_annotations"><strong>extend_mirs_annotations</strong></a>.</p>
+</blockquote>
+<div class="tabbed-set tabbed-alternate" data-tabs="12:3"><input checked="checked" id="__tabbed_12_1" name="__tabbed_12" type="radio" /><input id="__tabbed_12_2" name="__tabbed_12" type="radio" /><input id="__tabbed_12_3" name="__tabbed_12" type="radio" /><div class="tabbed-labels"><label for="__tabbed_12_1">Input</label><label for="__tabbed_12_2">Output</label><label for="__tabbed_12_3">Examples</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>pri-miR intersections file (<code>.intersect</code>); from
+<a href="./#intersect_extended_primir"><strong>intersect_extended_primir</strong></a></p>
+</div>
+<div class="tabbed-block">
+<p>pri-miR counts tab-delimited file; used in
+<a href="./#merge_tables"><strong>merge_tables</strong></a></p>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="go">Example 1 | Contribution when using &#39;--collapsed&#39;</span>
+<span class="go">    use case:</span>
+<span class="go">        A single feature with several intersecting reads.</span>
+<span class="go">        The flag &#39;--collapsed&#39; is used, so contribution equals the # of reads</span>
+<span class="go">        per alignment.</span>
+
+<span class="go">    IN INTERSECT records:</span>
+<span class="go">        19  .   miRNA_primary_transcript    44362   44448   .   +   .   ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0 19  44413   44434   8-2 255 +   21</span>
+<span class="go">        19  .   miRNA_primary_transcript    44362   44448   .   +   .   ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0 19  44413   44434   24-1    255 +   21</span>
+
+<span class="go">    alignments:</span>
+<span class="go">        Read ID: 8-2</span>
+<span class="go">        Number of collapsed reads: 2</span>
+<span class="go">        Contribution: 2</span>
+
+<span class="go">        Read ID: 24-1</span>
+<span class="go">        Number of collapsed reads: 1</span>
+<span class="go">        Contribution: 1</span>
+
+<span class="go">    OUT table:</span>
+<span class="go">        hsa-mir-524_-0_+0      3</span>
+
+
+<span class="go">Example 2 | Contribution when using &#39;--nh&#39;</span>
+<span class="go">    use case:</span>
+<span class="go">        A single feature with several intersecting reads.</span>
+<span class="go">        The flag &#39;--nh&#39; is used, so contribution equals 1/NH.</span>
+
+<span class="go">    IN INTERSECT records:</span>
+<span class="go">        19  .   miRNA_primary_transcript    44362   44448   .   +   .   ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0 19  44413   44434   8_1 255 +   21</span>
+<span class="go">        19  .   miRNA_primary_transcript    44362   44448   .   +   .   ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0 19  44413   44434   24_1    255 +   21</span>
+
+<span class="go">    alignments:</span>
+<span class="go">        Read ID: 8_1</span>
+<span class="go">        Number of mapped genomic loci: 1</span>
+<span class="go">        Contribution: 1</span>
+
+<span class="go">        Read ID: 24_1</span>
+<span class="go">        Number of mapped genomic loci: 1</span>
+<span class="go">        Contribution: 1</span>
+
+<span class="go">    OUT table:</span>
+<span class="go">        hsa-mir-524_-0_+0      2</span>
+
+
+<span class="go">Example 3 | Contribution when using &#39;--collapsed&#39; and &#39;--nh&#39;</span>
+<span class="go">    use case:</span>
+<span class="go">        A single feature with several intersecting reads.</span>
+<span class="go">        The flags &#39;--nh&#39; and &#39;--contribution&#39; are used, so contribution equals</span>
+<span class="gp">        # </span>of<span class="w"> </span>reads/NH.
+
+<span class="go">    IN INTERSECT records:</span>
+<span class="go">        19  .   miRNA_primary_transcript    44362   44448   .   +   .   ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0 19  44413   44434   8-2_1   255 +   21</span>
+<span class="go">        19  .   miRNA_primary_transcript    44362   44448   .   +   .   ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0 19  44413   44434   24-1_1  255 +   21</span>
+
+<span class="go">    alignments:</span>
+<span class="go">        Read ID: 8-2_1</span>
+<span class="go">        Number of collapsed reads: 2</span>
+<span class="go">        Number of mapped genomic loci: 1</span>
+<span class="go">        Contribution: 2/1 = 2</span>
+
+<span class="go">        Read ID: 23-1_1</span>
+<span class="go">        Number of collapsed reads: 1</span>
+<span class="go">        Number of mapped genomic loci: 1</span>
+<span class="go">        Contribution: 1/1 = 1</span>
+
+<span class="go">    OUT table:</span>
+<span class="go">        hsa-mir-524_-0_+0      3</span>
+
+<span class="go">Example 4 | Column with intersecting reads; using &#39;--read-ids&#39;</span>
+<span class="go">    use case:</span>
+<span class="go">        A single feature with several intersecting reads.</span>
+<span class="go">        Each read contributes with 1.</span>
+<span class="go">        Read IDs intersecting the feature are appended as the last column.</span>
+
+<span class="go">    IN INTERSECT records:</span>
+<span class="go">        19  .   miRNA_primary_transcript    44362   44448   .   +   .   ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0 19  44413   44434   8-2_1   255 +   21</span>
+<span class="go">        19  .   miRNA_primary_transcript    44362   44448   .   +   .   ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-0_+0 19  44413   44434   24-1_1  255 +   21</span>
+
+<span class="go">    alignments:</span>
+<span class="go">        Read ID: 8-2_1</span>
+<span class="go">        Contribution: 1</span>
+
+<span class="go">        Read ID: 24-1_1</span>
+<span class="go">        Contribution: 1</span>
+
+<span class="go">    OUT table:</span>
+<span class="go">        hsa-mir-524_-0_+0      2       8-2_1;24-1_1</span>
+
+<span class="go">Example 5 | Columns with feature shifts; using &#39;--feat-extension&#39;</span>
+<span class="go">    use case:</span>
+<span class="go">        A single feature with several intersecting reads.</span>
+<span class="go">        Each read contributes with 1.</span>
+<span class="go">        Feature start and end coordinates shift are appended as the third and</span>
+<span class="go">        fourth column respectively.</span>
+
+<span class="go">    IN INTERSECT records:</span>
+<span class="go">        19  .   miRNA_primary_transcript    44362   44448   .   +   .   ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-1_+3 19  44413   44434   8-2_1   255 +   21</span>
+<span class="go">        19  .   miRNA_primary_transcript    44362   44448   .   +   .   ID=MI0003160;Alias=MI0003160;Name=hsa-mir-524_-1_+3 19  44413   44434   24-1_1  255 +   21</span>
+
+<span class="go">    alignments:</span>
+<span class="go">        Read ID: 8-2_1</span>
+<span class="go">        Contribution: 1</span>
+
+<span class="go">        Read ID: 24-1_1</span>
+<span class="go">        Contribution: 1</span>
+
+<span class="go">    feature:</span>
+<span class="go">        Feature name: hsa-mir-524_-1_+3</span>
+<span class="go">        5&#39; shift: -1</span>
+<span class="go">        3&#39; shift: +3</span>
+
+<span class="go">    OUT table:</span>
+<span class="go">        hsa-mir-524_-1_+3      2       -1       +3</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="merge_tables"><code>merge_tables</code><a class="headerlink" href="#merge_tables" title="Permanent link">¶</a></h3>
+<p>Merge all the tables from the different libraries into a single one with a
+<a href="https://github.com/zavolanlab/mirflowz/blob/dev/workflow/scripts/merge_tables.R"><strong>custom script</strong></a>.</p>
+<blockquote>
+<p>The final table(s) containing the counting data from all libraries for the
+(iso)miRs and/or pri-miRs have a row per miRNA species and a column per
+sample library. If a miRNA species is not found in a certain library, its
+value is set to <code>NA</code>.</p>
+</blockquote>
+<div class="tabbed-set tabbed-alternate" data-tabs="13:4"><input checked="checked" id="__tabbed_13_1" name="__tabbed_13" type="radio" /><input id="__tabbed_13_2" name="__tabbed_13" type="radio" /><input id="__tabbed_13_3" name="__tabbed_13" type="radio" /><input id="__tabbed_13_4" name="__tabbed_13" type="radio" /><div class="tabbed-labels"><label for="__tabbed_13_1">Input</label><label for="__tabbed_13_2">Parameters</label><label for="__tabbed_13_3">Output</label><label for="__tabbed_13_4">Example</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Counts tab-delimited file; from <a href="./#quantify_mirna"><strong>quantify_mirna</strong></a>
+and/or <a href="./#quantify_primir"><strong>quantify_primir</strong></a></p>
+</div>
+<div class="tabbed-block">
+<ul>
+<li><strong>cluster_schema.json</strong><ul>
+<li><code>mir_list</code>: miRNA features to be quantified (default: isomir, mirna
+pri-mir)</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p>(<strong>Workflow output</strong>) (iso)miR and/or pri-miR counts table (<code>.tab</code>)</p>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="go">IN library 1</span>
+<span class="go">    ID                              lib_1</span>
+<span class="go">    hsa-miR-524-5p                  1</span>
+<span class="go">    hsa-miR-524-5p|0|0|22M|9G12     1</span>
+<span class="go">    hsa-miR-524-5p|0|0|22M|9G9C2    1</span>
+
+<span class="go">IN library 2</span>
+<span class="go">    ID                              lib_2</span>
+<span class="go">    hsa-miR-524-5p                  1</span>
+<span class="go">    hsa-miR-1283                    1</span>
+<span class="go">    hsa-miR-1283|-1|-2|21M|21       1</span>
+
+<span class="go">IN library 3</span>
+<span class="go">    ID                              lib_3</span>
+
+<span class="go">OUT table</span>
+<span class="go">    ID                              lib_1  lib_2  lib_3</span>
+<span class="go">    hsa-miR-524-5p                  1       1       NA</span>
+<span class="go">    hsa-miR-524-5p|0|0|22M|9G12     1       NA      NA</span>
+<span class="go">    hsa-miR-524-5p|0|0|22M|9G9C2    1       NA      NA</span>
+<span class="go">    hsa-miR-1283                    NA      1       NA</span>
+<span class="go">    hsa-miR-1283|-1|-2|21M|21       NA      1       NA</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="uncollapse_reads"><code>uncollapse_reads</code><a class="headerlink" href="#uncollapse_reads" title="Permanent link">¶</a></h3>
+<p>Reverse the collapsing of reads with identical sequences as done with
+<a href="./#third-party-software-used"><strong>FASTX-Toolkit</strong></a> with a
+<a href="https://github.com/zavolanlab/mirflowz/blob/dev/workflow/scripts/sam_uncollapse.pl"><strong>custom script</strong></a>.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="14:2"><input checked="checked" id="__tabbed_14_1" name="__tabbed_14" type="radio" /><input id="__tabbed_14_2" name="__tabbed_14" type="radio" /><div class="tabbed-labels"><label for="__tabbed_14_1">Input</label><label for="__tabbed_14_2">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Alignments file, filtered (<code>.sam</code>); from
+<a href="./#filter_sam_by_intersecting_mirna"><strong>filter_sam_by_intersecting_mirna</strong></a></p>
+</div>
+<div class="tabbed-block">
+<p>Uncollapsed aligned reads (<code>.sam</code>); used in
+<a href="./#convert_uncollapsed_reads_sam_to_bam"><strong>convert_uncollapsed_reads_sam_to_bam</strong></a></p>
+</div>
+</div>
+</div>
+<h3 id="convert_uncollapsed_reads_sam_to_bam"><code>convert_uncollapsed_reads_sam_to_bam</code><a class="headerlink" href="#convert_uncollapsed_reads_sam_to_bam" title="Permanent link">¶</a></h3>
+<p>Convert alignments <code>.sam</code> file to <code>.bam</code> with
+<a href="./#third-party-software-used"><strong>SAMtools</strong></a>.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="15:2"><input checked="checked" id="__tabbed_15_1" name="__tabbed_15" type="radio" /><input id="__tabbed_15_2" name="__tabbed_15" type="radio" /><div class="tabbed-labels"><label for="__tabbed_15_1">Input</label><label for="__tabbed_15_2">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Alignments file, uncollapsed (<code>.sam</code>); from
+<a href="./#filter_sam_by_intersecting_mirna"><strong>filter_sam_by_intersecting_mirna</strong></a></p>
+</div>
+<div class="tabbed-block">
+<p>Alignments file, uncollapsed (<code>.bam</code>); used in
+<a href="./#sort_uncollapsed_reads_bam_by_position"><strong>sort_uncollapsed_reads_bam_by_position</strong></a></p>
+</div>
+</div>
+</div>
+<h3 id="sort_uncollapsed_reads_bam_by_position"><code>sort_uncollapsed_reads_bam_by_position</code><a class="headerlink" href="#sort_uncollapsed_reads_bam_by_position" title="Permanent link">¶</a></h3>
+<p>Sort alignments by position with <a href="./#third-party-software-used"><strong>SAMtools</strong></a>.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="16:2"><input checked="checked" id="__tabbed_16_1" name="__tabbed_16" type="radio" /><input id="__tabbed_16_2" name="__tabbed_16" type="radio" /><div class="tabbed-labels"><label for="__tabbed_16_1">Input</label><label for="__tabbed_16_2">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Alignments file, uncollapsed (<code>.bam</code>); from
+<a href="./#convert_uncollapsed_reads_sam_to_bam"><strong>convert_uncollapsed_reads_sam_to_bam</strong></a></p>
+</div>
+<div class="tabbed-block">
+<p>(<strong>Workflow output</strong>) Alignments file, uncollapsed, sorted (<code>.bam</code>); used in
+<a href="../pileups/#create_per_library_ascii_pileups"><strong>create_per_library_ascii_pileups</strong></a>,
+<a href="../pileups/#create_per_run_ascii_pileups"><strong>create_per_run_ascii_pileups</strong></a> and/or
+<a href="../pileups/#create_per_condition_ascii_pileups"><strong>create_per_condition_ascii_pileups</strong></a></p>
+</div>
+</div>
+</div>
+<h3 id="index_uncollapsed_reads_bam"><code>index_uncollapsed_reads_bam</code><a class="headerlink" href="#index_uncollapsed_reads_bam" title="Permanent link">¶</a></h3>
+<p>Create index BAM file with <a href="./#third-party-software-used"><strong>SAMtools</strong></a>.</p>
+<blockquote>
+<p>Indexing is required by genome viewers such as IGV to quickly display
+alignments in a genomic region of interest.</p>
+</blockquote>
+<div class="tabbed-set tabbed-alternate" data-tabs="17:2"><input checked="checked" id="__tabbed_17_1" name="__tabbed_17" type="radio" /><input id="__tabbed_17_2" name="__tabbed_17" type="radio" /><div class="tabbed-labels"><label for="__tabbed_17_1">Input</label><label for="__tabbed_17_2">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>(<strong>Workflow output</strong>) Alignments file, uncollapsed, sorted (<code>.bam</code>); from
+<a href="./#sort_uncollapsed_reads_bam_by_position"><strong>sort_uncollapsed_reads_bam_by_position</strong></a></p>
+</div>
+<div class="tabbed-block">
+<p>(<strong>Workflow output</strong>) BAM index file (<code>.bam.bai</code>); used in
+<a href="../pileups/#create_per_library_ascii_pileups"><strong>create_per_library_ascii_pileups</strong></a>,
+<a href="../pileups/#create_per_run_ascii_pileups"><strong>create_per_run_ascii_pileups</strong></a> and/or
+<a href="../pileups/#create_per_condition_ascii_pileups"><strong>create_per_condition_ascii_pileups</strong></a></p>
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../map/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Map">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Map
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../pileups/" class="md-footer__link md-footer__link--next" aria-label="Next: ASCII-style Pileups">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                ASCII-style Pileups
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      &copy; <a href="https://www.biozentrum.unibas.ch/research/research-groups/research-groups-a-z/overview/unit/research-group-mihaela-zavolan">2026 Zavolab, University of Basel</a>
+    </div>
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://github.com/zavolanlab" target="_blank" rel="noopener" title="Zavolab GitHub organization" class="md-social__link">
+      <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="42.606205mm"
+   height="41.55431mm"
+   viewBox="0 0 42.606205 41.55431"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
+   sodipodi:docname="white.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.35"
+     inkscape:cx="45.317061"
+     inkscape:cy="-120.08459"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1848"
+     inkscape:window-height="1016"
+     inkscape:window-x="72"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(41.850258,-77.018548)">
+    <path
+       inkscape:connector-curvature="0"
+       id="path15"
+       d="m -236.24064,67.929517 c -0.0469,0.106109 -0.2136,0.136428 -0.36518,0.06477 -0.15435,-0.07028 -0.24116,-0.213596 -0.19155,-0.321083 0.0455,-0.107487 0.21222,-0.137803 0.36656,-0.06615 0.15571,0.07028 0.24391,0.216352 0.19017,0.32246"
+       style="fill:#191714;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277775" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path17"
+       d="m -235.37799,68.891389 c -0.10198,0.0937 -0.30041,0.05099 -0.43546,-0.09784 -0.13918,-0.148828 -0.16536,-0.347266 -0.062,-0.44373 0.10473,-0.0937 0.29765,-0.04961 0.43684,0.09922 0.13918,0.150207 0.16674,0.347266 0.0606,0.442352"
+       style="fill:#191714;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277775" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path19"
+       d="m -234.53739,70.117841 c -0.13091,0.09095 -0.34451,0.0055 -0.4768,-0.183277 -0.13091,-0.190169 -0.13091,-0.416168 0.003,-0.507119 0.13229,-0.09095 0.34313,-0.0097 0.4768,0.177766 0.12954,0.192926 0.12954,0.420304 -0.003,0.51263"
+       style="fill:#191714;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277775" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path21"
+       d="m -233.38673,71.302958 c -0.11713,0.129532 -0.36655,0.09508 -0.54845,-0.08131 -0.18604,-0.170878 -0.23841,-0.414787 -0.12127,-0.544324 0.11851,-0.128157 0.36931,-0.09233 0.55259,0.0813 0.18466,0.172255 0.24116,0.417545 0.11713,0.544328"
+       style="fill:#191714;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277775" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path23"
+       d="m -231.79923,71.991975 c -0.0524,0.166743 -0.29214,0.242533 -0.5333,0.172254 -0.24115,-0.07303 -0.39825,-0.268718 -0.35002,-0.438219 0.051,-0.16674 0.29077,-0.246665 0.53468,-0.170873 0.23978,0.07304 0.39825,0.267338 0.34864,0.436838"
+       style="fill:#191714;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277775" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path25"
+       d="m -230.05601,72.120131 c 0.005,0.175014 -0.19844,0.321085 -0.45199,0.32384 -0.25494,0.0055 -0.46165,-0.136428 -0.4644,-0.308682 0,-0.177768 0.20119,-0.322458 0.45475,-0.326594 0.25356,-0.0055 0.46164,0.136428 0.46164,0.311436"
+       style="fill:#191714;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277775" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path27"
+       d="m -228.43406,71.843147 c 0.0303,0.172254 -0.14607,0.347265 -0.39687,0.394118 -0.24805,0.04548 -0.4768,-0.06063 -0.5085,-0.230132 -0.0303,-0.17639 0.14883,-0.351398 0.3955,-0.396875 0.25218,-0.0441 0.47818,0.05926 0.50987,0.232889"
+       style="fill:#191714;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277775" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path103"
+       d="m -20.547169,77.018548 c -11.76431,0 -21.303089,9.537403 -21.303089,21.303092 0,9.412 6.103331,17.39773 14.568618,20.21444 1.063847,0.19706 1.455208,-0.46164 1.455208,-1.02526 0,-0.50711 -0.0193,-2.18557 -0.02893,-3.96599 -5.926942,1.28847 -7.176823,-2.51354 -7.176823,-2.51354 -0.970138,-2.46256 -2.366091,-3.11713 -2.366091,-3.11713 -1.933388,-1.32153 0.146072,-1.29535 0.146072,-1.29535 2.138715,0.1502 3.265949,2.19522 3.265949,2.19522 1.898939,3.25767 4.982986,2.31648 6.198418,1.77215 0.191544,-1.37666 0.744139,-2.31786 1.353231,-2.84978 -4.732182,-0.53882 -9.706899,-2.36472 -9.706899,-10.528215 0,-2.326128 0.832333,-4.226443 2.195213,-5.717479 -0.220486,-0.537436 -0.949466,-2.703714 0.206706,-5.637555 0,0 1.788693,-0.573264 5.85942,2.182813 1.700499,-0.47129 3.522264,-0.708311 5.333005,-0.71658 1.810745,0.0083 3.63389,0.24529 5.337143,0.71658 4.065215,-2.756077 5.8525278,-2.182813 5.8525278,-2.182813 1.158931,2.933841 0.429948,5.100119 0.208084,5.637555 1.365637,1.491036 2.192459,3.391351 2.192459,5.717479 0,8.182795 -4.9829868,9.983885 -9.7275718,10.511675 0.764812,0.66146 1.445564,1.95819 1.445564,3.94533 0,2.84978 -0.02479,5.14421 -0.02479,5.84563 0,0.56775 0.383093,1.23197 1.463474,1.02251 C -5.3404942,115.71248 0.75594776,107.73088 0.75594776,98.32164 0.75593676,86.555951 -8.7814642,77.018548 -20.547155,77.018548"
+       style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.35277775" />
+  </g>
+</svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://bsky.app/profile/mihaelazavolan.bsky.social" target="_blank" rel="noopener" title="Mihaela Zavolan Bluesky profile" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#3b82f6"><path fill="#3b82f6" d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565C.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479c.815 2.736 3.713 3.66 6.383 3.364c.136-.02.275-.039.415-.056c-.138.022-.276.04-.415.056c-3.912.58-7.387 2.005-2.83 7.078c5.013 5.19 6.87-1.113 7.823-4.308c.953 3.195 2.05 9.271 7.733 4.308c4.267-4.308 1.172-6.498-2.74-7.078a8.741 8.741 0 0 1-.415-.056c.14.017.279.036.415.056c2.67.297 5.568-.628 6.383-3.364c.246-.828.624-5.79.624-6.478c0-.69-.139-1.861-.902-2.206c-.659-.298-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://github.com/zavolanlab/mirflowz/discussions" target="_blank" rel="noopener" title="MIRFLOWZ Q&amp;A forum" class="md-social__link">
+      <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="Layer_1"
+   x="0px"
+   y="0px"
+   viewBox="0 0 120.47 122.88007"
+   xml:space="preserve"
+   sodipodi:docname="forum.svg"
+   width="120.47"
+   height="122.88007"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"><metadata
+     id="metadata13"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:Work></rdf:RDF></metadata><defs
+     id="defs11" /><sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1848"
+     inkscape:window-height="1016"
+     id="namedview9"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:zoom="1.9205718"
+     inkscape:cx="-125.65211"
+     inkscape:cy="99.449625"
+     inkscape:window-x="72"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Layer_1" /><style
+     type="text/css"
+     id="style2">.st0{fill-rule:evenodd;clip-rule:evenodd;}</style><path
+     style="clip-rule:evenodd;fill-rule:evenodd;fill:#ffffff"
+     inkscape:connector-curvature="0"
+     id="path4"
+     d="m 17.2,0 h 62.29 c 4.73,0 9.03,1.93 12.15,5.05 3.12,3.12 5.05,7.42 5.05,12.15 v 38.35 c 0,4.73 -1.93,9.03 -5.05,12.15 -3.12,3.12 -7.42,5.05 -12.15,5.05 H 46.92 L 20.81,95.2 c -1.21,1.04 -3.04,0.9 -4.08,-0.32 -0.51,-0.6 -0.74,-1.34 -0.69,-2.07 L 17.43,72.74 H 17.2 C 12.47,72.74 8.17,70.81 5.05,67.69 1.93,64.58 0,60.28 0,55.55 V 17.2 C 0,12.47 1.93,8.17 5.05,5.05 8.16,1.93 12.46,0 17.2,0 Z m 45.92,29.37 c 4.48,0 8.11,3.63 8.11,8.11 0,4.48 -3.63,8.11 -8.11,8.11 -4.48,0 -8.11,-3.63 -8.11,-8.11 0,-4.48 3.63,-8.11 8.11,-8.11 z m -29.43,0 c 4.48,0 8.11,3.63 8.11,8.11 0,4.48 -3.63,8.11 -8.11,8.11 -4.48,0 -8.11,-3.63 -8.11,-8.11 0,-4.48 3.63,-8.11 8.11,-8.11 z m 73.1,-1.39 c 3.37,0.65 6.39,2.31 8.73,4.65 3.05,3.05 4.95,7.26 4.95,11.9 v 38.35 c 0,4.64 -1.89,8.85 -4.95,11.9 -3.05,3.05 -7.26,4.95 -11.9,4.95 h -0.61 l 1.42,20.44 v 0 c 0.04,0.64 -0.15,1.3 -0.6,1.82 -0.91,1.07 -2.52,1.19 -3.58,0.28 L 74.04,99.07 H 39.49 L 56.5,81.77 h 36.04 c 7.86,0 14.3,-6.43 14.3,-14.3 V 29.11 c -0.01,-0.38 -0.02,-0.76 -0.05,-1.13 z M 79.48,5.8 H 17.2 C 14.07,5.8 11.22,7.08 9.15,9.15 7.08,11.22 5.8,14.06 5.8,17.2 v 38.35 c 0,3.13 1.28,5.98 3.35,8.05 2.07,2.07 4.92,3.35 8.05,3.35 h 3.34 v 0.01 l 0.19,0.01 c 1.59,0.11 2.8,1.49 2.69,3.08 L 22.29,86.31 43.83,67.79 c 0.52,-0.52 1.24,-0.84 2.04,-0.84 h 33.61 c 3.13,0 5.98,-1.28 8.05,-3.35 2.07,-2.07 3.35,-4.92 3.35,-8.05 V 17.2 C 90.88,14.07 89.6,11.22 87.53,9.15 85.46,7.08 82.61,5.8 79.48,5.8 Z"
+     class="st0" /></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="mailto:zavolab-biozentrum@unibas.ch" target="_blank" rel="noopener" title="" class="md-social__link">
+      <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.88 88.86"><title>email</title><path d="M7.05,0H115.83a7.07,7.07,0,0,1,7,7.05V81.81a7,7,0,0,1-1.22,4,2.78,2.78,0,0,1-.66,1,2.62,2.62,0,0,1-.66.46,7,7,0,0,1-4.51,1.65H7.05a7.07,7.07,0,0,1-7-7V7.05A7.07,7.07,0,0,1,7.05,0Zm-.3,78.84L43.53,40.62,6.75,9.54v69.3ZM49.07,45.39,9.77,83.45h103L75.22,45.39l-11,9.21h0a2.7,2.7,0,0,1-3.45,0L49.07,45.39Zm31.6-4.84,35.46,38.6V9.2L80.67,40.55ZM10.21,5.41,62.39,47.7,112.27,5.41Z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["content.code.copy", "navigation.footer", "navigation.instant", "navigation.top", "navigation.tracking"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
