@@ -40,6 +40,25 @@ than `--minimum-count` are filtered out.
     identical sequence, or displayed on its own if the option
     `--do-not-collapse-alignments` is used.
 
+**SORTING**
+
+ASCII-style alignment pileups' final arrangement is controlled by the option
+`--sort-by` and the flag `--reverse-sort`.
+
+By default, pileups are sorted by the alignment counts in descending order. If
+two alignments have the same amount of counts, these are sorted
+from-left-to-right by their first and last nucleotide position.
+
+Use `--sort-by="position"` to arrange the alignments by their first
+nucleotide's position (from-left-to-right). If more than one alignment starts
+at the same location, these are additionally sorted by counts
+(descending order), and by their last nucleotide's position
+(from-left-to-right).
+
+Both sorting types can be reversed by using the flag `--reverse-sort`:
+from "from-left-to-right" to "from-right-to-left" for sort type "position",
+and from "descending" to "ascending" for sort type "counts".
+
 **EXPECTED OUTPUT**
 
 For each BED interval, one TSV is written to `--output-directory`:
@@ -126,9 +145,13 @@ Options
   in alignments. (default: "-")
 - <b>`--prefix=STRING`</b>: Prefix to be used in the output file name(s). If
   not provided the input BAM file(s) name will be used instead.
+- <b>`--sort-by=STRING`</b>: Specify the sort type (either "position" or
+  "counts"). (default = "counts")
+- <b>`--reverse-sort`</b>: Reverse the sort order; from "from-left-to-right" to
+  "from-right-to-left" for sort type "position", and from "descending" to
+  "ascending" for sort type "counts".
 - <b>`-h`</b> | <b>`--help`</b>: Show this information and die.
 - <b>`-v`</b> | <b>`--verbose`</b>: Print log messages to `STDOUT`.
-
 
 Dependencies
 ------------

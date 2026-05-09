@@ -1890,6 +1890,11 @@ libraries with [**ASCII-style alignment pileups**](#third-party-software-used).
   [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
   - Annotated genomic regions (`.bed`); from workflow input files or
   [**create_empty_bed**](#create_empty_bed)
+- **Parameters**
+  - **config_template.yaml**
+    - `sort_by`: ASCII-style alignment pileups can be sorted by the first
+    nucleotide's position from left-to-right ('position') or by counts in
+    descending order ('counts') (default: 'position')
 - **Output**
   - (**Workflow output**) Empty text file (`.txt`)
 
@@ -1913,6 +1918,11 @@ run with [**ASCII-style alignment pileups**](#third-party-software-used).
   [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
   - Annotated genomic regions (`.bed`); from workflow input files or
   [**create_empty_bed**](#create_empty_bed)
+- **Parameters**
+  - **config_template.yaml**
+    - `sort_by`: ASCII-style alignment pileups can be sorted by the first
+    nucleotide's position from left-to-right ('position') or by counts in
+    descending order ('counts') (default: 'position')
 - **Output**
   - (**Workflow output**) Empty text file (`.txt`)
 
@@ -1944,6 +1954,9 @@ different library subsets if provided with
     - `lib_dict`: Dictionary of arbitrary condition names (keys) and library
     names to aggregate alignment pileups for (values; MUST correspond to names
     in samples table) (default: None)
+    - `sort_by`: ASCII-style alignment pileups can be sorted by the first
+    nucleotide's position from left-to-right ('position') or by counts in
+    descending order ('counts') (default: 'position')
 - **Output**
   - Empty text file (`.txt`)
 

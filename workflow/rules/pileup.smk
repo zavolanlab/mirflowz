@@ -149,11 +149,13 @@ rule create_per_library_ascii_pileups:
             PILEUP_DIR / "{sample}", sample=[wildcards.sample]
         ),
         prefix="{sample}",
+        sort=config["sort_by"],
     shell:
         "(touch {output.piles} && Rscript {input.script} \
         --verbose \
         --annotations={input.annotations} \
         --reference={input.reference} \
+        --sort-by={params.sort} \
         --prefix={params.prefix} \
         --output-directory {params.out_dir} \
         {input.regions} \
@@ -198,12 +200,14 @@ rule create_per_run_ascii_pileups:
         cluster_log=CLUSTER_LOG / "pileups_whole_run.log",
         out_dir=PILEUP_DIR / "all",
         prefix="all_samples",
+        sort=config["sort_by"],
     shell:
         "(touch {output.piles} && Rscript {input.script} \
         --verbose \
         --annotations={input.annotations} \
         --reference={input.reference} \
         --prefix={params.prefix} \
+        --sort-by={params.sort} \
         --output-directory {params.out_dir} \
         {input.regions} \
         {input.maps} \
@@ -249,12 +253,14 @@ if config["lib_dict"] != None:
                 PILEUP_DIR / "{condition}", condition=wildcards.condition
             ),
             prefix="{condition}",
+            sort=config["sort_by"],
         shell:
             "(touch {output.piles} && Rscript {input.script} \
             --verbose \
             --annotations={input.annotations} \
             --reference={input.reference} \
             --prefix={params.prefix} \
+            --sort-by={params.sort} \
             --output-directory {params.out_dir} \
             {input.regions} \
             {input.maps} \

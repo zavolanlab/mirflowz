@@ -121,6 +121,11 @@
             },
             "default": {},
             "description": "Dictionary of arbitrary condition names (keys) and library names to aggregate alignment pileups for (values; MUST correspond to names in samples table)."
+        },
+        "sort_by":{
+            "type": "string",
+            "default": "position",
+            "description":"Sort pileups by the first nucleotide's position from left-to-right ('position') or by counts in descending order ('counts')."
         }
     }
 }
