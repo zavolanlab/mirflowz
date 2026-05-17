@@ -174,7 +174,7 @@
                 "generic": { "type": "string" }
             },
             "additionalProperties": false,
-            "default": { "adenine": "green", "cytosine": "orange", "guanine": "light purple", "thymine": "light blue", "gap": "light gray", "generic": "white" },
+            "default": { "adenine": "green", "cytosine": "orange", "guanine": "'light purple'", "thymine": "'light blue'", "gap": "'light gray'", "generic": "white" },
             "description": "Dictionary with the character-to-color mapping."
         }
     }

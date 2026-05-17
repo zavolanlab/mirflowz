@@ -104,7 +104,7 @@ keep_info: true # keep genomic coordinates and feature names on the final file
 # Keys must not be changed!
 color_dict: {
   'adenine': 'green', 'cytosine': 'orange',
-  'guanine': 'light purple', 'thymine': 'light blue',
-  'gap': 'light gray', 'generic': 'white'
+  'guanine': '"light purple"', 'thymine': '"light blue"',
+  'gap': '"light gray"', 'generic': 'white'
 }
 ...
