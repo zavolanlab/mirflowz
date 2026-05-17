@@ -262,7 +262,6 @@ h3 {
     def _parse_input_name(self) -> ParsedPileupName:
         """Extract file-name components, display title, and shift.
 
-
         The input file name must be `LIB.MIRNA.#-shift.tab` where:
             - `LIB` is the library name,
             - `MIRNA` is the mature miRNA the pileup is made for
