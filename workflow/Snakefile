@@ -128,3 +128,4 @@ rule finish:
             ),
             cond=list(config["lib_dict"].keys()),
         ),
+        piles_colored=PILEUP_DIR / "color_coded" / "check_file.txt",
