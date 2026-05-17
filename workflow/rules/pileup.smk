@@ -79,6 +79,7 @@ rule finish_pileup:
             PILEUP_DIR / "mod" / "{sample}" / "check_file.txt",
             sample=pd.unique(samples_table.index.values),
         ),
+        piles_colored=PILEUP_DIR / "color_coded" / "check_file.txt",
 
 
 ###############################################################################
@@ -405,3 +406,59 @@ if config["lib_dict"] != None:
             --overhang {params.overhang} \
             {params.split_arms} {params.canonical} {params.keep_all} \
             ) &> {log}"
+
+
+###############################################################################
+### Color-code ASCII-style pileups
+###############################################################################
+
+
+rule color_code_ascii_pileups:
+    input:
+        piles_lib=expand(
+            PILEUP_DIR / "mod" / "{sample}" / "check_file.txt",
+            sample=pd.unique(samples_table.index.values),
+        ),
+        piles_run=PILEUP_DIR / "mod/all/check_file.txt",
+        piles_design=expand(
+            (
+                PILEUP_DIR / "mod" / "{cond}" / "check_file_{cond}.txt"
+                if config["lib_dict"] != None
+                else []
+            ),
+            cond=list(config["lib_dict"].keys()),
+        ),
+        script=SCRIPTS_DIR / "copper.py",
+    output:
+        piles=PILEUP_DIR / "color_coded" / "check_file.txt",
+    log:
+        LOCAL_LOG / "pileups_color_code.log",
+    conda:
+        ENV_DIR / "python.yaml"
+    container:
+        "docker://python:3.11.12"
+    params:
+        cluster_log=CLUSTER_LOG / "pileups_color_code.log",
+        in_dir=PILEUP_DIR / "mod",
+        out_dir=PILEUP_DIR / "color_coded",
+        keep_info=lambda wc: "--keep_info" if config["keep_info"] else "",
+        adenine=config["color_dict"]["adenine"],
+        cytosine=config["color_dict"]["cytosine"],
+        guanine=config["color_dict"]["guanine"],
+        thymine=config["color_dict"]["thymine"],
+        gap=config["color_dict"]["gap"],
+        generic=config["color_dict"]["generic"],
+        group_id="Group",
+    shell:
+        "(touch {output.piles} && python {input.script} \
+        {params.in_dir} \
+        --outdir {params.out_dir} \
+        --group_id {params.group_id} \
+        -a {params.adenine} \
+        -c {params.cytosine} \
+        -g {params.guanine} \
+        -t {params.thymine} \
+        -G {params.gap} \
+        --generic {params.generic} \
+        {params.keep_info} \
+        ) &> {log}"
