@@ -668,11 +668,11 @@ def main(args):
             )
     # Process a single pileup file
     else:
-        sample = str(args.input).rsplit("/", maxsplit=1)[-1].split(".")[0]
+        sample = str(args.input).rsplit("/", maxsplit=1)[-1].split(".")[0:-1]
 
         color_pileup.input = args.input
         color_pileup.css = args.outdir / "pileup_style.css"
-        color_pileup.html = args.outdir / f"{''.join(sample)}.html"
+        color_pileup.html = args.outdir / f"{'_'.join(sample)}.html"
 
         color_pileup.create_css()
         color_pileup.create_html()
