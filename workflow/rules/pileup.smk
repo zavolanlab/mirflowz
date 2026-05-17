@@ -437,8 +437,6 @@ rule color_code_ascii_pileups:
         ENV_DIR / "python.yaml"
     container:
         "docker://python:3.11.12"
-    resources:
-        time=6,
     params:
         cluster_log=CLUSTER_LOG / "pileups_color_code.log",
         in_dir=PILEUP_DIR / "mod",
