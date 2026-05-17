@@ -175,7 +175,7 @@
             },
             "additionalProperties": false,
             "default": { "adenine": "green", "cytosine": "orange", "guanine": "light purple", "thymine": "light blue", "gap": "light gray", "generic": "white" },
-            "description": "Dictionary with the minimum count for a sequence to be kept for each pileup group; per run, per library, per condition."
+            "description": "Dictionary with the character-to-color mapping."
         }
     }
 }
