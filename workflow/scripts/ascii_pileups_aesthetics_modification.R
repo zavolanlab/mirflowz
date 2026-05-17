@@ -702,9 +702,9 @@ for ( file.pileup in dir.pileups ) {
         out.dir,
         paste0(
           prefix,
-          "_",
+          ".",
           x$counts[1],
-          "_",
+          ".",
           overhang,
           "-shift.tab"
         )
