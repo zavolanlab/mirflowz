@@ -69,9 +69,9 @@ localrules:
 
 rule finish_pileup:
     input:
-        piles_run=PILEUP_DIR / "all/check_file.txt",
+        piles_run=PILEUP_DIR / "raw/all/check_file.txt",
         piles_lib=expand(
-            PILEUP_DIR / "{sample}" / "check_file.txt",
+            PILEUP_DIR / "raw" / "{sample}" / "check_file.txt",
             sample=pd.unique(samples_table.index.values),
         ),
 
@@ -136,17 +136,17 @@ rule create_per_library_ascii_pileups:
         regions=config["bed_file"],
         script=SCRIPTS_DIR / "ascii_alignment_pileup.R",
     output:
-        piles=PILEUP_DIR / "{sample}" / "check_file.txt",
+        piles=PILEUP_DIR / "raw" / "{sample}" / "check_file.txt",
     log:
-        LOCAL_LOG / "pileups_{sample}.log",
+        LOCAL_LOG / "pileups_raw_{sample}.log",
     conda:
         ENV_DIR / "r.yaml"
     container:
         "docker://zavolab/ascii-alignment-pileup:1.1.1"
     params:
-        cluster_log=CLUSTER_LOG / "pileups_{sample}.log",
+        cluster_log=CLUSTER_LOG / "pileups_raw_{sample}.log",
         out_dir=lambda wildcards: expand(
-            PILEUP_DIR / "{sample}", sample=[wildcards.sample]
+            PILEUP_DIR / "raw" / "{sample}", sample=[wildcards.sample]
         ),
         prefix="{sample}",
         sort=config["sort_by"],
@@ -187,9 +187,9 @@ rule create_per_run_ascii_pileups:
         regions=config["bed_file"],
         script=SCRIPTS_DIR / "ascii_alignment_pileup.R",
     output:
-        piles=PILEUP_DIR / "all/check_file.txt",
+        piles=PILEUP_DIR / "raw/all/check_file.txt",
     log:
-        LOCAL_LOG / "pileups_whole_run.log",
+        LOCAL_LOG / "pileups_raw_whole_run.log",
     conda:
         ENV_DIR / "r.yaml"
     container:
@@ -197,8 +197,8 @@ rule create_per_run_ascii_pileups:
     resources:
         mem=16,
     params:
-        cluster_log=CLUSTER_LOG / "pileups_whole_run.log",
-        out_dir=PILEUP_DIR / "all",
+        cluster_log=CLUSTER_LOG / "pileups_raw_whole_run.log",
+        out_dir=PILEUP_DIR / "raw" / "all",
         prefix="all_samples",
         sort=config["sort_by"],
     shell:
@@ -219,7 +219,7 @@ rule create_per_run_ascii_pileups:
 ###############################################################################
 
 if config["lib_dict"] != None:
-    condition = list(config["lib_dict"].keys())
+    cond = list(config["lib_dict"].keys())
 
     rule create_per_condition_ascii_pileups:
         input:
@@ -228,31 +228,31 @@ if config["lib_dict"] != None:
                 OUT_DIR
                 / "{group}"
                 / "alignments_intersecting_mirna_uncollapsed_sorted.bam",
-                group=config["lib_dict"][wildcards.condition],
+                group=config["lib_dict"][wildcards.cond],
             ),
             maps_index=lambda wildcards: expand(
                 OUT_DIR
                 / "{group}"
                 / "alignments_intersecting_mirna_uncollapsed_sorted.bam.bai",
-                group=config["lib_dict"][wildcards.condition],
+                group=config["lib_dict"][wildcards.cond],
             ),
             reference=INTERMEDIATES_DIR / "genome_processed.fa.bz",
             regions=config["bed_file"],
             script=SCRIPTS_DIR / "ascii_alignment_pileup.R",
         output:
-            piles=PILEUP_DIR / "{condition}" / "check_file_{condition}.txt",
+            piles=PILEUP_DIR / "raw" / "{cond}" / "check_file_{cond}.txt",
         log:
-            LOCAL_LOG / "pileups_condition_{condition}.log",
+            LOCAL_LOG / "pileups_raw_condition_{cond}.log",
         conda:
             ENV_DIR / "r.yaml"
         container:
             "docker://zavolab/ascii-alignment-pileup:1.1.1"
         params:
-            cluster_log=CLUSTER_LOG / "pileups_condition_{condition}.log",
+            cluster_log=CLUSTER_LOG / "pileups_raw_condition_{cond}.log",
             out_dir=lambda wildcards: expand(
-                PILEUP_DIR / "{condition}", condition=wildcards.condition
+                PILEUP_DIR / "raw" / "{cond}", condition=wildcards.cond
             ),
-            prefix="{condition}",
+            prefix="{cond}",
             sort=config["sort_by"],
         shell:
             "(touch {output.piles} && Rscript {input.script} \
