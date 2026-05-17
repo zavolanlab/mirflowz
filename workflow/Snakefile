@@ -102,14 +102,27 @@ rule finish:
             / "alignments_intersecting_mirna_uncollapsed_sorted.bam.bai",
             sample=pd.unique(samples_table.index.values),
         ),
-        piles_run=PILEUP_DIR / "raw/all/check_file.txt",
-        piles_lib=expand(
+        piles_raw_run=PILEUP_DIR / "raw/all/check_file.txt",
+        piles_raw_lib=expand(
             PILEUP_DIR / "raw" / "{sample}" / "check_file.txt",
             sample=pd.unique(samples_table.index.values),
         ),
-        piles_design=expand(
+        piles_raw_design=expand(
             (
                 PILEUP_DIR / "raw" / "{cond}" / "check_file_{cond}.txt"
+                if config["lib_dict"] != None
+                else []
+            ),
+            cond=list(config["lib_dict"].keys()),
+        ),
+        piles_mod_run=PILEUP_DIR / "mod/all/check_file.txt",
+        piles_mod_lib=expand(
+            PILEUP_DIR / "mod" / "{sample}" / "check_file.txt",
+            sample=pd.unique(samples_table.index.values),
+        ),
+        piles_mod_design=expand(
+            (
+                PILEUP_DIR / "mod" / "{cond}" / "check_file_{cond}.txt"
                 if config["lib_dict"] != None
                 else []
             ),

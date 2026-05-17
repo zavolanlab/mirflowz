@@ -69,9 +69,14 @@ localrules:
 
 rule finish_pileup:
     input:
-        piles_run=PILEUP_DIR / "raw/all/check_file.txt",
-        piles_lib=expand(
+        piles_raw_run=PILEUP_DIR / "raw/all/check_file.txt",
+        piles_raw_lib=expand(
             PILEUP_DIR / "raw" / "{sample}" / "check_file.txt",
+            sample=pd.unique(samples_table.index.values),
+        ),
+        piles_mod_run=PILEUP_DIR / "mod/all/check_file.txt",
+        piles_mod_lib=expand(
+            PILEUP_DIR / "mod" / "{sample}" / "check_file.txt",
             sample=pd.unique(samples_table.index.values),
         ),
 
@@ -250,7 +255,7 @@ if config["lib_dict"] != None:
         params:
             cluster_log=CLUSTER_LOG / "pileups_raw_condition_{cond}.log",
             out_dir=lambda wildcards: expand(
-                PILEUP_DIR / "raw" / "{cond}", condition=wildcards.cond
+                PILEUP_DIR / "raw" / "{cond}", cond=wildcards.cond
             ),
             prefix="{cond}",
             sort=config["sort_by"],
@@ -264,4 +269,139 @@ if config["lib_dict"] != None:
             --output-directory {params.out_dir} \
             {input.regions} \
             {input.maps} \
+            ) &> {log}"
+
+
+###############################################################################
+### Modify ASCII-style pileups (per library)
+###############################################################################
+
+
+rule modify_per_library_ascii_pileups:
+    input:
+        piles=PILEUP_DIR / "raw" / "{sample}" / "check_file.txt",
+        script=SCRIPTS_DIR / "ascii_pileups_aesthetics_modification.R",
+    output:
+        piles=PILEUP_DIR / "mod" / "{sample}" / "check_file.txt",
+    log:
+        LOCAL_LOG / "pileups_mod_{sample}.log",
+    conda:
+        ENV_DIR / "r.yaml"
+    container:
+        "docker://zavolab/r-tidyverse:3.5.3"
+    params:
+        cluster_log=CLUSTER_LOG / "pileups_mod_{sample}.log",
+        in_dir=lambda wildcards: expand(
+            PILEUP_DIR / "raw" / "{sample}", sample=[wildcards.sample]
+        ),
+        out_dir=lambda wildcards: expand(
+            PILEUP_DIR / "mod" / "{sample}", sample=[wildcards.sample]
+        ),
+        prefix="{sample}",
+        split_arms=lambda wc: "--split-arms" if config["split"] else "",
+        canonical=lambda wc: "--canonical" if config["canonical"] else "",
+        keep_all=lambda wc: "--keep-all" if config["keep_all"] else "",
+        min_count=config["min_count_dict"]["lib"],
+        max_seq=config["max_seq"],
+        overhang=config["extension"],
+    shell:
+        "(touch {output.piles} && Rscript {input.script} \
+        --verbose \
+        --in-dir={params.in_dir} \
+        --prefix={params.prefix} \
+        --out-dir {params.out_dir} \
+        --min-count {params.min_count} \
+        --max-sequences {params.max_seq} \
+        --overhang {params.overhang} \
+        {params.split_arms} {params.canonical} {params.keep_all} \
+        ) &> {log}"
+
+
+###############################################################################
+### Modify ASCII-style pileups (per run)
+###############################################################################
+
+
+rule modify_per_run_ascii_pileups:
+    input:
+        piles=PILEUP_DIR / "raw/all/check_file.txt",
+        script=SCRIPTS_DIR / "ascii_pileups_aesthetics_modification.R",
+    output:
+        piles=PILEUP_DIR / "mod/all/check_file.txt",
+    log:
+        LOCAL_LOG / "pileups_mod_whole_run.log",
+    conda:
+        ENV_DIR / "r.yaml"
+    container:
+        "docker://zavolab/r-tidyverse:3.5.3"
+    resources:
+        mem=16,
+    params:
+        cluster_log=CLUSTER_LOG / "pileups_mod_whole_run.log",
+        in_dir=PILEUP_DIR / "raw" / "all",
+        out_dir=PILEUP_DIR / "mod" / "all",
+        prefix="all-samples",
+        split_arms=lambda wc: "--split-arms" if config["split"] else "",
+        canonical=lambda wc: "--canonical" if config["canonical"] else "",
+        keep_all=lambda wc: "--keep-all" if config["keep_all"] else "",
+        min_count=config["min_count_dict"]["run"],
+        max_seq=config["max_seq"],
+        overhang=config["extension"],
+    shell:
+        "(touch {output.piles} && Rscript {input.script} \
+        --verbose \
+        --in-dir={params.in_dir} \
+        --prefix={params.prefix} \
+        --out-dir {params.out_dir} \
+        --min-count {params.min_count} \
+        --max-sequences {params.max_seq} \
+        --overhang {params.overhang} \
+        {params.split_arms} {params.canonical} {params.keep_all} \
+        ) &> {log}"
+
+
+###############################################################################
+### Modify ASCII-style pileups (per experiment design)
+###############################################################################
+
+if config["lib_dict"] != None:
+    cond = list(config["lib_dict"].keys())
+
+    rule modify_per_condition_ascii_pileups:
+        input:
+            piles=PILEUP_DIR / "raw" / "{cond}" / "check_file_{cond}.txt",
+            script=SCRIPTS_DIR / "ascii_pileups_aesthetics_modification.R",
+        output:
+            piles=PILEUP_DIR / "mod" / "{cond}" / "check_file_{cond}.txt",
+        log:
+            LOCAL_LOG / "pileups_mod_condition_{cond}.log",
+        conda:
+            ENV_DIR / "r.yaml"
+        container:
+            "docker://zavolab/r-tidyverse:3.5.3"
+        params:
+            cluster_log=CLUSTER_LOG / "pileups_mod_condition_{cond}.log",
+            in_dir=lambda wildcards: expand(
+                PILEUP_DIR / "raw" / "{cond}", cond=wildcards.cond
+            ),
+            out_dir=lambda wildcards: expand(
+                PILEUP_DIR / "mod" / "{cond}", cond=wildcards.cond
+            ),
+            prefix="{cond}",
+            split_arms=lambda wc: "--split-arms" if config["split"] else "",
+            canonical=lambda wc: "--canonical" if config["canonical"] else "",
+            keep_all=lambda wc: "--keep-all" if config["keep_all"] else "",
+            min_count=config["min_count_dict"]["condition"],
+            max_seq=config["max_seq"],
+            overhang=config["extension"],
+        shell:
+            "(touch {output.piles} && Rscript {input.script} \
+            --verbose \
+            --in-dir={params.in_dir} \
+            --prefix={params.prefix} \
+            --out-dir {params.out_dir} \
+            --min-count {params.min_count} \
+            --max-sequences {params.max_seq} \
+            --overhang {params.overhang} \
+            {params.split_arms} {params.canonical} {params.keep_all} \
             ) &> {log}"
