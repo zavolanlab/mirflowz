@@ -183,6 +183,23 @@ ACCATGAGGTAGTAGGTTGTATAGTT.....................................................	
 ........................................................TATACAATCTACTGTCTTTCCT.	1
 ```
 
+The generated ASCII-style alignment pileups are further modified and
+color-coded to produce publication-style pileups.
+
+<div align="center">
+    <img src=../../images/colored_pileup.png>
+</div>
+
+??? tip "Wanna customize the color-coded pileups?"
+
+    There are 43 allowed colors. Depending on the color brightness, the text
+    will be black or white.
+
+    <div align="center">
+        <img src=../../images/allowed_colors.png>
+    </div>
+
+
 ??? tip "Wanna see a more technical step by step explanation?"
 
     For a detailed description of this module, with examples and explanations
