@@ -284,10 +284,10 @@ represents a sample library. Each read is counted towards all the annotated
 miRNA species it aligns to, with 1/n, where n is the number of genomic and/or
 transcriptomic loci that read aligns to.
 
-5. **OPTIONAL**. ASCII-style pileups of read alignments produced for individual
-libraries, combinations of libraries and/or all libraries of a given run. The
-exact number and nature of the outputs depends on the workflow
-inputs/parameters. See the
+5. **OPTIONAL**. ASCII-style pileups of read alignments and publication style
+color-coded pileups produced for individual libraries, combinations of
+libraries and/or all libraries of a given run. The exact number and nature of
+the outputs depends on the workflow inputs/parameters. See the
 [pileups section](pipeline_documentation.md/#pileup-workflow) for a detailed
 description.
 
@@ -433,12 +433,19 @@ start and end positions and those of the read alignment, respectively.
 
 Finally, to visualize the distribution of read alignments around miRNA
 loci, ASCII-style alignment pileups are optionally generated for user-defined
-regions of interest.
+regions of interest. These, are modified and color-coded to produce
+publication-style pileups.
 
 > **NOTE:**  Whenever an alignment contains an insertion, it is removed from
 > the read sequence. The resulting sequence is counted towards the read with an
 > identical sequence, or displayed on its own depending on whether alignments
 > are collapsed or not.
+
+The table bellow show the allowed string color names. The text color in each
+cell is the one used in the final representation.
+
+> ![allowed_colors][allowed_colors]
+
 
 The schema below is a visual representation of the individual workflow steps
 and how they are related:
@@ -469,6 +476,7 @@ For questions or suggestions regarding the code, please use the
 
 &copy; 2023 [Zavolab, Biozentrum, University of Basel][zavolab]
 
+[allowed_colors]: images/allowed_colors.png
 [apptainer]: <https://apptainer.org/docs/user/main/index.html>
 [ascii-pileups]: <https://git.scicore.unibas.ch/zavolan_group/tools/ascii-alignment-pileup>
 [bed-format]: <https://gist.github.com/deliaBlue/19ad3740c95937378bd9281bd9d1bc72>
