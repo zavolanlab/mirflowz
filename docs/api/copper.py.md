@@ -4,7 +4,40 @@
 
 COlor-coded PileuP gEneratoR.
 
+Generate color-coded pileups in HTML and their corresponding CSS style file
+either for a whole directory or a single file.
 
+If a directory is provided as input, an HTML file is generated for each
+file with just one CSS file.
+
+For a proper HTML creation, the counts column title must be specified in
+the CLI argument `--counts_id` (see the "Constraints" section for a more
+detailed explanation on the input format)
+
+The final color-coded pileup has a two-line header:
+    - The first line starts with a label used to categorize samples based
+        on experimental context specified in `--group_id`, followed by the
+        sample name.
+    - The second line contains the mature miRNA the pileup is made for,
+        followed by the +/- nucleotide shift allowed at either end of the
+        miRNA sequence.
+
+All the nucleotides outside the canonical sequence use the `--gap`
+background. Therefore, only the positions aligning with the canonical
+sequence are colored.
+
+If the input pileup contains the canonical sequence, the output pileup
+will display it in bold.
+
+
+Constraints:
+- The tabulated file has to follow the format specified [here][pileup-format].
+
+The following assumptions are made:
+- The input file name must be `LIB.MIRNA.#-shift.tab` where `LIB` is the
+    library name, `MIRNA` is the mature miRNA the pileup is made for, and
+    `#` is the maximum allowed shift on both ends of the canonical
+    sequence.
 ---
 
 <a href="https://github.com/zavolanlab/mirflowz/blob/dev/workflow/scripts/copper.py#L426"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
