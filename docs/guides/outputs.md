@@ -29,11 +29,12 @@ The final outputs comprise:
    miRNA species it aligns to, with `1/n`, where `n` is the number of genomic
    and/or transcriptomic loci that read aligns to.
 
-5. **OPTIONAL**. ASCII-style pileups of read alignments produced for individual
-   libraries, combinations of libraries and/or all libraries of a given run.
-   The exact number and nature of the outputs depends on the workflow
-   inputs/parameters. See the [pileups section](../workflow/modules/pileups.md)
-   for a detailed description.
+5. **OPTIONAL**. ASCII-style pileups of read alignments and publication-style
+   color-coded pileups produced for individual libraries, combinations of
+   libraries and/or all libraries of a given run. The exact number and nature
+   of the outputs depends on the workflow inputs/parameters. See the
+   [pileups section](../workflow/modules/pileups.md) for a detailed
+   description.
 
 ??? tip "I want to keep the intermediate files"
 
@@ -60,18 +61,46 @@ The following file structure is expected:
 ```
 test/results/
 ├── pileups
-│   ├── all
+│   ├── color_coded
 │   │   ├── check_file.txt
-│   │   ├── all_samples.hsa-mir-A.min.1.pileup.tab
-│   │   └── all_samples.hsa-mir-B.min.1.pileup.tab
-│   ├── group_A
-│   │   ├── check_file_group_A.txt
-│   │   ├── group_A.hsa-mir-A.min.1.pileup.tab
-│   │   └── group_A.hsa-mir-B.min.1.pileup.tab
-│   └── lib_name
-│       ├── check_file.txt
-│       ├── lib_name.hsa-mir-A.min.1.pileup.tab
-│       └── lib_name.hsa-mir-B.min.1.pileup.tab
+│   │   ├── all
+│   │   │   ├── pileup_style.css
+│   │   │   ├── all-samples_hsa-mir-A_6-shift.html
+│   │   │   └── all-samples_hsa-mir-B_6-shift.html
+│   │   ├── group_A
+│   │   │   ├── pileup_style.css
+│   │   │   ├── group_A_hsa-mir-A_6-shift.html
+│   │   │   └── group_A_hsa-mir-B_6-shift.html
+│   │   └── test_lib
+│   │       ├── pileup_style.css
+│   │       ├── test_lib_hsa-mir-A_6-shift.html
+│   │       └── test_lib_hsa-mir-B_6-shift.html
+│   ├── mod
+│   │   ├── all
+│   │   │   ├── check_file.txt
+│   │   │   ├── all-samples.hsa-mir-A.6-shift.tab
+│   │   │   └── all-samples.hsa-mir-B.6-shift.tab
+│   │   ├── group_A
+│   │   │   ├── check_file_group_A.txt
+│   │   │   ├── group-A.hsa-mir-A.6-shift.tab
+│   │   │   └── group-A.hsa-mir-B.6-shift.tab
+│   │   └── test_lib
+│   │       ├── check_file.txt
+│   │       ├── lib-name.hsa-mir-A.6-shift.tab
+│   │       └── lib-name.hsa-mir-B.min.6-shift.tab
+│   └── raw
+│       ├── all
+│       │   ├── check_file.txt
+│       │   ├── all_samples.hsa-mir-A.min.1.pileup.tab
+│       │   └── all_samples.hsa-mir-B.min.1.pileup.tab
+│       ├── group_A
+│       │   ├── check_file_group_A.txt
+│       │   ├── group_A.hsa-mir-A.min.1.pileup.tab
+│       │   └── group_A.hsa-mir-B.min.1.pileup.tab
+│       └── test_lib
+│           ├── check_file.txt
+│           ├── lib_name.hsa-mir-A.min.1.pileup.tab
+│           └── lib_name.hsa-mir-B.min.1.pileup.tab
 ├── TABLES
 │   ├── all_mirna_counts.tab
 │   └── all_pri-mir_counts.tab
