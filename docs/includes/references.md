@@ -66,6 +66,7 @@
 [oligomap]: <https://github.com/zavolanlab/oligomap>
 [oligomap-out]: <https://github.com/zavolanlab/oligomap#output-format>
 [pileups]: <https://git.scicore.unibas.ch/zavolan_group/tools/ascii-alignment-pileup>
+[pileup-format]: <https://gist.github.com/deliaBlue/a27f78ab9e80c54b9a021e724384c6e6>
 [pub-bedtools]: <https://academic.oup.com/bioinformatics/article/26/6/841/244688>
 [pub-cufflinks]: <https://doi.org/10.1038/nprot.2012.016>
 [pub-cutadapt]: <https://doi.org/10.14806/ej.17.1.200>
