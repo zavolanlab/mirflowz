@@ -197,11 +197,23 @@ text hexadecimal color codes using the provided color scheme.
 
 Background color names used for pileup symbols.
 
+**Attributes:**
+
+ - <b>`adenine`</b>: String for the adenine background color.
+ - <b>`cytosine`</b>: String for the cytosine background color.
+ - <b>`guanine`</b>: String for the guanine background color.
+ - <b>`thymine`</b>: String for the thymine background color.
+ - <b>`gap`</b>: String for the deletions background color.
+ - <b>`generic`</b>: String for the generic symbols background color.
+
 ---
 
 ## <kbd>class</kbd> `ColorValues`
 
 Background and text colors for a pileup symbol.
+
+ - <b>`bg`</b>: Hexadecimal string for background color.
+ - <b>`text`</b>: Hexadecimal string for text color.
 
 ---
 
@@ -209,12 +221,19 @@ Background and text colors for a pileup symbol.
 
 Metadata derived from the pileup input file name.
 
+- <b>`parts`</b>: List of the substrings subtracted from the pileup file name.
+- <b>`title`</b>: miRNA name for which the pileup has been created.
+- <b>`shift`</b>: Number of allowed bases at either end of the reference
+  sequence.
 
 ---
 
 ## <kbd>class</kbd> `RowRender`
 
 Rendered HTML fragment and current sequence length.
+
+- <b>`html`</b>: Row HTML string representation.
+- <b>`seq_len`</b>: Lenght of the sequence representation
 
 ---
 
