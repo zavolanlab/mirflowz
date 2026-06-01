@@ -15,6 +15,7 @@ the CLI argument `--counts_id` (see the "Constraints" section for a more
 detailed explanation on the input format)
 
 The final color-coded pileup has a two-line header:
+
     - The first line starts with a label used to categorize samples based
         on experimental context specified in `--group_id`, followed by the
         sample name.
@@ -34,10 +35,13 @@ Constraints:
 - The tabulated file has to follow the format specified [here][pileup-format].
 
 The following assumptions are made:
+
 - The input file name must be `LIB.MIRNA.#-shift.tab` where `LIB` is the
-    library name, `MIRNA` is the mature miRNA the pileup is made for, and
-    `#` is the maximum allowed shift on both ends of the canonical
-    sequence.
+  library name, `MIRNA` is the mature miRNA the pileup is made for, and
+  `#` is the maximum allowed shift on both ends of the canonical
+  sequence.
+
+
 ---
 
 <a href="https://github.com/zavolanlab/mirflowz/blob/dev/workflow/scripts/copper.py#L426"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
