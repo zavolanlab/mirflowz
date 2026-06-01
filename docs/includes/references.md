@@ -17,7 +17,9 @@
 [code-oligomap]: <https://github.com/zavolanlab/oligomap>
 [code-samtools]: <https://github.com/samtools/samtools>
 [conda]: <https://docs.conda.io/projects/conda/en/latest/index.html>
+[custom-script-ascii-mod]: <https://github.com/zavolanlab/mirflowz/blob/dev/workflow/scripts/ascii_pileup_aesthetics_modification.R>
 [custom-script-blocksort]: <https://github.com/zavolanlab/mirflowz/blob/dev/workflow/scripts/blocksort.sh>
+[custom-script-copper]: <https://github.com/zavolanlab/mirflowz/blob/dev/workflow/scripts/copper.py>
 [custom-script-filter-mm]: <https://github.com/zavolanlab/mirflowz/blob/dev/workflow/scripts/filter_multimappers.py>
 [custom-script-get-lines]: <https://github.com/zavolanlab/mirflowz/blob/dev/workflow/scripts/get_lines_w_pattern.sh>
 [custom-script-gtf-bed]: <https://github.com/zavolanlab/mirflowz/blob/dev/workflow/scripts/gtf_exons_bed.1.1.2.R>
