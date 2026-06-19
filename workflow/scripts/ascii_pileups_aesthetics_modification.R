@@ -3,35 +3,28 @@
 # ------------------------------------------------------------------------------
 # Enhance ASCII-style alignment pileups
 #
-# This script reads ASCII-style alignment pileups from an input directory and
-# applies a series of optional formatting and filtering operations to improve
-# their readability and interpretability.
+# Filter each ASCII-style alignment pileup in the provided input directory
+# retaining those alignments with at least  `--min-count` amount of reads that
+# appear in the first `--max-sequence` lines. If `--canonical` is set, mark the
+# read(s) matching the canonical sequence(s) inferred from the reference row in
+# the output.
 #
-# Main features:
-#   - filter aligned reads by minimum count
-#   - limit the number of displayed sequences
-#   - split precursor pileups into arm-specific pileups
-#   - trim arm-specific pileups to the arm span plus optional overhang
-#   - adjust genomic coordinates after trimming
-#   - mark the canonical read sequence
+# Optionally, if `--split-arms` is set, split the precursor pileup into
+# arm-specific pileup(s) with an allowed overhang of &pm; `--overhang`
+# nucleotides on either side of the mature arm, and the genomic coordinates are
+# adjusted to the final representation.
 #
-# Input:
-#   Tab-separated pileup files with two columns without header:
-#     1. `seq`: alignment string or reference sequence
-#     2. `counts`: feature name, genomic coordinates, or read count
+# If `--keep-all` is set, the ASCII-style alignment pileup is written even if
+# it has no aligned sequences.
 #
-# Output:
-#   Reformatted pileup files written to the output directory.
+# The expected input is a tab-separated pileup files with two columns without
+# header:
+#   1. Alignment string or reference sequence
+#   2. Feature name, genomic coordinates, or read count
 #
 # Expected pileup formats:
 #   1. One arm with precursor
 #   2. Two arms with precursor
-#
-# Notes:
-#   - If `--split-arms` is set, each precursor pileup is split into one file per
-#     mature arm.
-#   - If `--canonical` is set, the read matching the canonical sequence inferred
-#     from the reference row is marked in the output.
 #
 # (c) 2026 Zavolan Lab, Biozentrum, University of Basel
 # ------------------------------------------------------------------------------
