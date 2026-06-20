@@ -132,7 +132,7 @@ option.list <- list(
       action = "store",
       type = "character",
       default = NULL,
-      help = "Prefix to be used in the output file name(s).",
+      help = "Prefix to be used in the output file name(s). Required!",
       metavar = "string"
   ),
   make_option(
@@ -163,6 +163,7 @@ opt.parser <-
       "Usage:",
       script,
       "--in-dir <path/to/input/pileups>",
+      "--prefix=<prefix>"
       "[OPTIONS]\n",
       sep = " "
     ),
@@ -185,9 +186,9 @@ prefix <- opt$`prefix`
 verb <- opt$`verbose`
 
 # Dies if required arguments are missing
-if (is.null( in.dir )) {
+if (is.null( in.dir ) | is.null( prefix )) {
   print_help( opt.parser )
-  stop("[ERROR] Required input directory missing! Aborted.")
+  stop("[ERROR] argument missing! Aborted.")
 }
 
 # Ensure CLI arguments correction
