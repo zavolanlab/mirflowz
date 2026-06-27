@@ -163,7 +163,7 @@ opt.parser <-
       "Usage:",
       script,
       "--in-dir <path/to/input/pileups>",
-      "--prefix=<prefix>"
+      "--prefix=<prefix>",
       "[OPTIONS]\n",
       sep = " "
     ),
