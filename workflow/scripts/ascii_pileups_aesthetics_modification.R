@@ -638,7 +638,7 @@ for ( file.pileup in dir.pileups ) {
                       col.names = c( "seq", "counts" ))
 
   # Store index of the last header line
-  last.header.row <- which(grepl("^.*:", pileup[, 2]))
+  last.header.row <- max(which(grepl("^.*:", pileup[, 2])))
 
   # Skip empty pileups unless `--keep-all` is set
   if ( !keep.all && nrow( pileup ) <= last.header.row ) {
