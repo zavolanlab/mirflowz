@@ -107,25 +107,25 @@ rule finish:
             PILEUP_DIR / "raw" / "{sample}" / "check_file.txt",
             sample=pd.unique(samples_table.index.values),
         ),
-        piles_raw_design=expand(
-            (
-                PILEUP_DIR / "raw" / "{cond}" / "check_file_{cond}.txt"
-                if config["lib_dict"] != None
-                else []
-            ),
-            cond=list(config["lib_dict"].keys()),
+        piles_raw_design=(
+            expand(
+                PILEUP_DIR / "raw" / "{cond}" / "check_file_{cond}.txt",
+                cond=list(config["lib_dict"].keys()),
+            )
+            if config["lib_dict"] != None
+            else []
         ),
         piles_mod_run=PILEUP_DIR / "mod/all/check_file.txt",
         piles_mod_lib=expand(
             PILEUP_DIR / "mod" / "{sample}" / "check_file.txt",
             sample=pd.unique(samples_table.index.values),
         ),
-        piles_mod_design=expand(
-            (
-                PILEUP_DIR / "mod" / "{cond}" / "check_file_{cond}.txt"
-                if config["lib_dict"] != None
-                else []
-            ),
-            cond=list(config["lib_dict"].keys()),
+        piles_mod_design=(
+            expand(
+                PILEUP_DIR / "mod" / "{cond}" / "check_file_{cond}.txt",
+                cond=list(config["lib_dict"].keys()),
+            )
+            if config["lib_dict"] != None
+            else []
         ),
         piles_colored=PILEUP_DIR / "color_coded" / "check_file.txt",
