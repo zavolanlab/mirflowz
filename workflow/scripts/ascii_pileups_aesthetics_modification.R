@@ -52,7 +52,7 @@ script <- sub("--file=", "", basename(commandArgs(trailingOnly = FALSE)[4]))
 description <- "Enhance raw ASCII-style alignment pileups.\n"
 author <- "Author: Iris Mestres-Pascual <zavolab-biozentrum@unibas.ch>"
 maintainer <- "Maintainer: Iris Mestres-Pascual <zavolab-biozentrum@unibas.ch>"
-version <- "Version: 1.0.0 (ABR-2026)"
+version <- "Version: 1.0.0 (APR-2026)"
 requirements <- "Requires: dplyr, optparse"
 msg <- paste(description, author, maintainer, version, requirements, sep = "\n")
 
