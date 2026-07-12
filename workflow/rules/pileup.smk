@@ -420,13 +420,13 @@ rule color_code_ascii_pileups:
             sample=pd.unique(samples_table.index.values),
         ),
         piles_run=PILEUP_DIR / "mod/all/check_file.txt",
-        piles_design=expand(
-            (
-                PILEUP_DIR / "mod" / "{cond}" / "check_file_{cond}.txt"
-                if config["lib_dict"] != None
-                else []
-            ),
-            cond=list(config["lib_dict"].keys()),
+        piles_design=(
+            expand(
+                PILEUP_DIR / "mod" / "{cond}" / "check_file_{cond}.txt",
+                cond=list(config["lib_dict"].keys()),
+            )
+            if config["lib_dict"] != None
+            else []
         ),
         script=SCRIPTS_DIR / "copper.py",
     output:
