@@ -484,7 +484,7 @@ SplitArms <- function(in.pileup, head.lines, overhang) {
 FilterPileup <- function( pileup, min.count, max.seq ) {
 
   # Store last header line index
-  head.lines <- which(grepl("^.*:", pileup[, 2]))
+  head.lines <- max(which(grepl("^.*:", pileup[, 2])))
 
   # Get aligned reads rows
   read.rows <- pileup %>%
