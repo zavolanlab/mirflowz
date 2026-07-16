@@ -433,7 +433,7 @@ start and end positions and those of the read alignment, respectively.
 
 Finally, to visualize the distribution of read alignments around miRNA
 loci, ASCII-style alignment pileups are optionally generated for user-defined
-regions of interest. These, are modified and color-coded to produce
+regions of interest. These are modified and color-coded to produce
 publication-style pileups.
 
 > **NOTE:**  Whenever an alignment contains an insertion, it is removed from
@@ -441,7 +441,7 @@ publication-style pileups.
 > identical sequence, or displayed on its own depending on whether alignments
 > are collapsed or not.
 
-The table bellow show the allowed string color names. The text color in each
+The table below shows the allowed string color names. The text color in each
 cell is the one used in the final representation.
 
 > ![allowed_colors][allowed_colors]
