@@ -41,8 +41,11 @@ Target rule as required by [Snakemake][docs-snakemake].
 === "Input"
 
     (**Workflow output**) Empty text file (`.txt`)
-    [**create_per_library_ascii_pileups**](pileups.md#create_per_library_ascii_pileups)
-    and [**create_per_run_ascii_pileups**](pileups.md#create_per_run_ascii_pileups)
+    [**create_per_library_ascii_pileups**](pileups.md#create_per_library_ascii_pileups),
+    [**create_per_run_ascii_pileups**](pileups.md#create_per_run_ascii_pileups),
+    [**modify_per_library_ascii_pileups**](pileups.md#modify_per_library_ascii_pileups),
+    [**modify_per_run_ascii_pileups**](pileups.md#modify_per_run_ascii_pileups),
+    and [**color_code_ascii_pileups**](pileups.md#color_code_ascii_pileups)
 
 
 ### `create_empty_bed`
@@ -120,6 +123,7 @@ libraries with [**ASCII-style alignment pileups**](pileups.md#third-party-softwa
 
     (**Workflow output**) Empty text file (`.txt`)
 
+
 ### `create_per_run_ascii_pileups`
 
 Create ASCII-style pileups for all the desired annotated regions for the whole
@@ -164,6 +168,13 @@ different library subsets if provided with
 > [configuration file](#configuration-file). Otherwise, this rule will not be
 > executed, and no output will be generated.
 
+=== "Condition"
+
+    - **config_template.yaml**
+        - `lib_dict`: Dictionary of arbitrary condition names (keys) and library
+        names to aggregate alignment pileups for (values; MUST correspond to names
+        in samples table) (default: None)
+
 === "Input"
 
     - Genome sequence, trimmed IDs, `bgzip`ed (`.fa.bz`); from
@@ -190,3 +201,158 @@ different library subsets if provided with
 === "Output"
 
     Empty text file (`.txt`)
+
+
+### `modify_per_library_ascii_pileups`
+
+Modify the generated ASCII-style pileups for all the desired annotated regions
+across libraries with a [**custom script**][custom-script-ascii-mod].
+
+> A directory containing the modified ASCII-style pileups is created for each
+> library. If no ASCII-style alignment pileups were created, the modified
+> pileups' output directories will only contain an empty file.
+
+=== "Input"
+
+    (**Workflow output**) Empty text file (`.txt`); from
+    [**create_per_library_ascii_pileups**](pileups.md#create_per_library_ascii_pileups)
+
+=== "Parameters"
+
+    - **config_template.yaml**
+        - `sort_by`: ASCII-style alignment pileups can be sorted by the first
+          nucleotide's position from left-to-right ('position') or by counts
+          in descending order ('counts') (default: 'position')
+        - `split`: Split precursor pileups into one mature-arm pileup per arm
+          (default: 'true')
+        - `canonical`: Mark the aligned read corresponding to the canonical
+          sequence (default: 'true')
+        - `keep_all`: Write the pileup even if it has no aligned sequences
+          (default: 'true')
+        - `min_count_dict`: Dictionary with the minimum count for a sequence to
+          be kept for each pileup group (default: 'min_count_dict["lib"] = 1')
+        - `max_seq`: Maximum number of top sequences to display (default: 15)
+        - `extension`: Extension of the mature miRNA start and end coordinates
+          in bp (default: 6)
+
+=== "Output"
+
+    (**Workflow output**) Empty text file (`.txt`)
+
+
+### `modify_per_run_ascii_pileups`
+
+Modify the generated ASCII-style pileups for all the desired annotated regions
+for the whole run with a [**custom script**][custom-script-ascii-mod].
+
+> A directory containing the modified ASCII-style pileups is created for the
+> whole run. If no ASCII-style alignment pileups were created, the modified
+> pileups' output directories will only contain an empty file.
+
+=== "Input"
+
+    (**Workflow output**) Empty text file (`.txt`); from
+    [**create_per_run_ascii_pileups**](pileups.md#create_per_run_ascii_pileups)
+
+=== "Parameters"
+
+    - **config_template.yaml**
+        - `sort_by`: ASCII-style alignment pileups can be sorted by the first
+          nucleotide's position from left-to-right ('position') or by counts
+          in descending order ('counts') (default: 'position')
+        - `split`: Split precursor pileups into one mature-arm pileup per arm
+          (default: 'true')
+        - `canonical`: Mark the aligned read corresponding to the canonical
+          sequence (default: 'true')
+        - `keep_all`: Write the pileup even if it has no aligned sequences
+          (default: 'true')
+        - `min_count_dict`: Dictionary with the minimum count for a sequence to
+          be kept for each pileup group (default: 'min_count_dict["run"] = 1')
+        - `max_seq`: Maximum number of top sequences to display (default: 15)
+        - `extension`: Extension of the mature miRNA start and end coordinates
+          in bp (default: 6)
+
+=== "Output"
+
+    (**Workflow output**) Empty text file (`.txt`)
+
+
+### `modify_per_condition_ascii_pileups`
+
+Modify the generated ASCII-style pileups for all the desired annotated regions
+across the different library subsets if provided with a
+[**custom script**][custom-script-ascii-mod].
+
+> **OPTIONAL RULE.** The ASCII-style pileups for each annotated region are
+> modified if, and only if, at least one library subset is specified in the
+> [configuration file](#configuration-file). Otherwise, this rule will not be
+> executed, and no output will be generated.
+
+=== "Condition"
+
+    - **config_template.yaml**
+        - `lib_dict`: Dictionary of arbitrary condition names (keys) and library
+        names to aggregate alignment pileups for (values; MUST correspond to names
+        in samples table) (default: None)
+
+=== "Input"
+
+    (**Workflow output**) Empty text file (`.txt`); from
+    [**create_per_condition_ascii_pileups**](pileups.md#create_per_condition_ascii_pileups)
+
+=== "Parameters"
+
+    - **config_template.yaml**
+        - `sort_by`: ASCII-style alignment pileups can be sorted by the first
+          nucleotide's position from left-to-right ('position') or by counts
+          in descending order ('counts') (default: 'position')
+        - `split`: Split precursor pileups into one mature-arm pileup per arm
+          (default: 'true')
+        - `canonical`: Mark the aligned read corresponding to the canonical
+          sequence (default: 'true')
+        - `keep_all`: Write the pileup even if it has no aligned sequences
+          (default: 'true')
+        - `min_count_dict`: Dictionary with the minimum count for a sequence to
+          be kept for each pileup group (default:
+          'min_count_dict["condition"] = 1')
+        - `max_seq`: Maximum number of top sequences to display (default: 15)
+        - `extension`: Extension of the mature miRNA start and end coordinates
+          in bp (default: 6)
+
+=== "Output"
+
+    (**Workflow output**) Empty text file (`.txt`)
+
+
+### `color_code_ascii_pileups`
+
+Color-code all the modified ASCII-style pileups for all the desired annotated
+regions with a [**custom script**][custom-script-copper].
+
+> A directory containing the color-coded ASCII-style pileups is created. If no
+> ASCII-style alignment pileups were created, the color-coded pileups' output
+> directories will only contain an empty file and their corresponding CSS style
+> file.
+
+===  "Input"
+
+    (**Workflow output**) Empty text file (`.txt`); from
+    [**modify_per_library_ascii_pileups**](pileups.md#create_per_library_ascii_pileups),
+    [**modify_per_run_ascii_pileups**](pileups.md#create_per_run_ascii_pileups), and
+    [**modify_per_condition_ascii_pileups**](pileups.md#create_per_condition_ascii_pileups),
+
+=== "Parameters"
+
+      - **config_template.yaml**
+          - `keep_info`: keep genomic coordinates and feature names on the
+            final file (default: 'true')
+          - `color_dict`: Dictionary with the character-to-color mapping. See
+            available colors in the
+            [module overview](../overview.md#ascii-style-alignment-pileups-module).
+            (default: 'adenine'='green', 'cytosine'='orange',
+            'guanine'='"light purple"', 'thymine'='"light blue"',
+            'gap'='"light gray"', and 'generic'='white')
+
+=== "Output"
+
+    (**Workflow output**) Empty text file (`.txt`)

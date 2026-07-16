@@ -85,6 +85,11 @@ on installation and usage please see [here](README.md).
     - [`create_per_library_ascii_pileups`](#create_per_library_ascii_pileups)
     - [`create_per_run_ascii_pileups`](#create_per_run_ascii_pileups)
     - [`create_per_condition_ascii_pileups`](#create_per_condition_ascii_pileups)
+    - [`modify_per_library_ascii_pileups`](#modify_per_library_ascii_pileups)
+    - [`modify_per_run_ascii_pileups`](#modify_per_run_ascii_pileups)
+    - [`modify_per_condition_ascii_pileups`](#modify_per_condition_ascii_pileups)
+    - [`color_code_ascii_pileups`](#color_code_ascii_pileups)
+
 
 
 ## Third-party software used
@@ -169,8 +174,12 @@ Target rule as required by [Snakemake][docs-snakemake].
   [**index_uncollapsed_reads_bam**](#index_uncollapsed_reads_bam)
   - (**Workflow output**) Empty text file (`.txt`)
   [**create_per_library_ascii_pileups**](#create_per_library_ascii_pileups),
-  [**create_per_run_ascii_pileups**](#create_per_run_ascii_pileups) and/or
-  [**create_per_condition_ascii_pileups**](#create_per_condition_ascii_pileups)
+  [**create_per_run_ascii_pileups**](#create_per_run_ascii_pileups),
+  [**create_per_condition_ascii_pileups**](#create_per_condition_ascii_pileups),
+  [**modify_per_library_ascii_pileups**](#modify_per_library_ascii_pileups),
+  [**modify_per_run_ascii_pileups**](#modify_per_run_ascii_pileups),
+  [**modify_per_condition_ascii_pileups**](#modify_per_condition_ascii_pileups),
+  and/or [**color_code_ascii_pileups**](#color_code_ascii_pileups)
 
 
 ### Prepare workflow
@@ -1830,8 +1839,11 @@ Target rule as required by [Snakemake][docs-snakemake].
 
 - **Input**
   - (**Workflow output**) Empty text file (`.txt`)
-  [**create_per_library_ascii_pileups**](#create_per_library_ascii_pileups) and
-  [**create_per_run_ascii_pileups**](#create_per_run_ascii_pileups)
+  [**create_per_library_ascii_pileups**](#create_per_library_ascii_pileups),
+  [**create_per_run_ascii_pileups**](#create_per_run_ascii_pileups),
+  [**modify_per_library_ascii_pileups**](#modify_per_library_ascii_pileups),
+  [**modify_per_run_ascii_pileups**](#modify_per_run_ascii_pileups), and
+  [**color_code_ascii_pileups**](#color_code_ascii_pileups)
 
 
 #### `create_empty_bed`
@@ -1961,11 +1973,138 @@ different library subsets if provided with
   - Empty text file (`.txt`)
 
 
+#### `modify_per_library_ascii_pileups`
+
+Modify the generated ASCII-style pileups for all the desired annotated regions
+across libraries with a [**custom script**][custom-script-ascii-mod].
+
+> A directory containing the modified ASCII-style pileups is created for each
+> library. If no ASCII-style alignment pileups were created, the modified
+> pileups' output directories will only contain an empty file.
+
+- **Input**
+  - (**Workflow output**) Empty text file (`.txt`); from
+    [**create_per_library_ascii_pileups**](#create_per_library_ascii_pileups)
+- **Parameters**
+  - **config_template.yaml**
+    - `sort_by`: ASCII-style alignment pileups can be sorted by the first
+    nucleotide's position from left-to-right ('position') or by counts in
+    descending order ('counts') (default: 'position')
+    - `split`: Split precursor pileups into one mature-arm pileup per arm
+      (default: 'true')
+    - `canonical`: Mark the aligned read corresponding to the canonical
+      sequence (default: 'true')
+    - `keep_all`: Write the pileup even if it has no aligned sequences
+      (default: 'true')
+    - `min_count_dict`: Dictionary with the minimum count for a sequence to be
+      kept for each pileup group (default: 'min_count_dict["lib"] = 1')
+    - `max_seq`: Maximum number of top sequences to display (default: 15)
+    - `extension`: Extension of the mature miRNA start and end coordinates in
+      bp (default: 6)
+- **Output**
+  - (**Workflow output**) Empty text file (`.txt`)
+
+
+#### `modify_per_run_ascii_pileups`
+
+Modify the generated ASCII-style pileups for all the desired annotated regions
+for the whole run with a [**custom script**][custom-script-ascii-mod].
+
+> A directory containing the modified ASCII-style pileups for the whole run is
+> created. If no ASCII-style alignment pileups were created, the modified
+> pileups' output directory will only contain an empty file.
+
+- **Input**
+  - (**Workflow output**) Empty text file (`.txt`); from
+    [**create_per_run_ascii_pileups**](#create_per_run_ascii_pileups)
+- **Parameters**
+  - **config_template.yaml**
+    - `sort_by`: ASCII-style alignment pileups can be sorted by the first
+    nucleotide's position from left-to-right ('position') or by counts in
+    descending order ('counts') (default: 'position')
+    - `split`: Split precursor pileups into one mature-arm pileup per arm
+      (default: 'true')
+    - `canonical`: Mark the aligned read corresponding to the canonical
+      sequence (default: 'true')
+    - `keep_all`: Write the pileup even if it has no aligned sequences
+      (default: 'true')
+    - `min_count_dict`: Dictionary with the minimum count for a sequence to be
+      kept for each pileup group (default: 'min_count_dict["run"] = 1')
+    - `max_seq`: Maximum number of top sequences to display (default: 15)
+    - `extension`: Extension of the mature miRNA start and end coordinates in
+      bp (default: 6)
+- **Output**
+  - (**Workflow output**) Empty text file (`.txt`)
+
+
+#### `modify_per_condition_ascii_pileups`
+
+Modify the generated ASCII-style pileups for all the desired annotated regions
+across the different library subsets, if provided, with a
+[**custom script**][custom-script-ascii-mod].
+
+> **OPTIONAL RULE.** The ASCII-style pileups modifications are made if, and
+> only if, at least one library subset is specified in the
+> [configuration file](#configuration-file). Otherwise, this rule will not be
+> executed, and no output will be generated.
+
+- **Input**
+  - (**Workflow output**) Empty text file (`.txt`); from
+    [**create_per_condition_ascii_pileups**](#create_per_condition_ascii_pileups)
+- **Parameters**
+  - **config_template.yaml**
+    - `sort_by`: ASCII-style alignment pileups can be sorted by the first
+    nucleotide's position from left-to-right ('position') or by counts in
+    descending order ('counts') (default: 'position')
+    - `split`: Split precursor pileups into one mature-arm pileup per arm
+      (default: 'true')
+    - `canonical`: Mark the aligned read corresponding to the canonical
+      sequence (default: 'true')
+    - `keep_all`: Write the pileup even if it has no aligned sequences
+      (default: 'true')
+    - `min_count_dict`: Dictionary with the minimum count for a sequence to be
+      kept for each pileup group (default: 'min_count_dict["condition"] = 1')
+    - `max_seq`: Maximum number of top sequences to display (default: 15)
+    - `extension`: Extension of the mature miRNA start and end coordinates in
+      bp (default: 6)
+- **Output**
+  - (**Workflow output**) Empty text file (`.txt`)
+
+
+#### `color_code_ascii_pileups`
+
+Color-code all the modified ASCII-style pileups for all the desired annotated
+regions with a [**custom script**][custom-script-copper].
+
+> A directory containing the color-coded ASCII-style pileups is created. If no
+> ASCII-style alignment pileups were created, the color-coded pileups' output
+> directories will only contain an empty file and their corresponding CSS style
+> file.
+
+- **Input**
+  - (**Workflow output**) Empty text file (`.txt`); from
+    [**modify_per_library_ascii_pileups**](#create_per_library_ascii_pileups),
+    [**modify_per_run_ascii_pileups**](#create_per_run_ascii_pileups), and
+    [**modify_per_condition_ascii_pileups**](#create_per_condition_ascii_pileups),
+- **Parameters**
+  - **config_template.yaml**
+    - `keep_info`: keep genomic coordinates and feature names on the final
+      file (default: 'true')
+    - `color_dict`: Dictionary with the character-to-color mapping. See
+      available colors in the main [README][readme_colors]. (default:
+      'adenine'='green', 'cytosine'='orange', 'guanine'='"light purple"',
+      'thymine'='"light blue"', 'gap'='"light gray"', and 'generic'='white')
+- **Output**
+  - (**Workflow output**) Empty text file (`.txt`)
+
+
 [chr-maps]: <https://github.com/dpryan79/ChromosomeMappings>
 [cite_neilsen]:<https://www.sciencedirect.com/science/article/pii/S0168952512001126>
 [cite_saunders]: <https://pubmed.ncbi.nlm.nih.gov/17360642/>
 [cite_schmauch]: <https://www.biorxiv.org/content/10.1101/2024.03.28.587190v1>
+[custom-script-ascii-mod]: workflow/scripts/ascii_pileups_aesthetics_modification.R
 [custom-script-blocksort]: workflow/scripts/blocksort.sh
+[custom-script-copper]: workflow/scripts/copper.py
 [custom-script-filter-mm]: workflow/scripts/filter_multimappers.py
 [custom-script-get-lines]: workflow/scripts/get_lines_w_pattern.sh
 [custom-script-gtf-bed]: workflow/scripts/gtf_exons_bed.1.1.2.R
@@ -2012,5 +2151,6 @@ different library subsets if provided with
 [pub-oligomap]: <https://doi.org/10.1016/j.ymeth.2007.10.002>
 [pub-samtools]: <https://doi.org/10.1093/bioinformatics/btp352>
 [pub-segemehl]: <https://doi.org/10.1371/journal.pcbi.1000502>
+[readme_colors]: README.md
 [rule-graph]: images/rule_graph.svg
 

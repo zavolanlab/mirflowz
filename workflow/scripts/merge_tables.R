@@ -30,7 +30,7 @@ script <- sub("--file=", "", basename(commandArgs(trailingOnly = FALSE)[4]))
 description <- "Merge miRNAs quantification tables.\n"
 author <- "Author: Zavolan Lab <zavolab-biozentrum@unibas.ch>"
 maintainer <- "Maintainer: Iris Mestres <zavolab-biozentrum@unibas.ch>"
-version <- "Version: 1.1.0 (FEB-2024)"
+version <- "Version: 1.1.1 (MAY-2026)"
 requirements <- "Requires: optparse, dplyr"
 msg <- paste(description, author, maintainer, version, requirements, sep = "\n")
 
@@ -54,7 +54,7 @@ option_list <- list(
   ),
   make_option(
     c("--prefix"),
-    action = "store_true",
+    action = "store",
     type = "character",
     default = NULL,
     help = "Prefix for reading input files. Default: NULL.",

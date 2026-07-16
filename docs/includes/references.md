@@ -17,7 +17,9 @@
 [code-oligomap]: <https://github.com/zavolanlab/oligomap>
 [code-samtools]: <https://github.com/samtools/samtools>
 [conda]: <https://docs.conda.io/projects/conda/en/latest/index.html>
+[custom-script-ascii-mod]: <https://github.com/zavolanlab/mirflowz/blob/dev/workflow/scripts/ascii_pileup_aesthetics_modification.R>
 [custom-script-blocksort]: <https://github.com/zavolanlab/mirflowz/blob/dev/workflow/scripts/blocksort.sh>
+[custom-script-copper]: <https://github.com/zavolanlab/mirflowz/blob/dev/workflow/scripts/copper.py>
 [custom-script-filter-mm]: <https://github.com/zavolanlab/mirflowz/blob/dev/workflow/scripts/filter_multimappers.py>
 [custom-script-get-lines]: <https://github.com/zavolanlab/mirflowz/blob/dev/workflow/scripts/get_lines_w_pattern.sh>
 [custom-script-gtf-bed]: <https://github.com/zavolanlab/mirflowz/blob/dev/workflow/scripts/gtf_exons_bed.1.1.2.R>
@@ -64,6 +66,7 @@
 [oligomap]: <https://github.com/zavolanlab/oligomap>
 [oligomap-out]: <https://github.com/zavolanlab/oligomap#output-format>
 [pileups]: <https://git.scicore.unibas.ch/zavolan_group/tools/ascii-alignment-pileup>
+[pileup-format]: <https://gist.github.com/deliaBlue/a27f78ab9e80c54b9a021e724384c6e6>
 [pub-bedtools]: <https://academic.oup.com/bioinformatics/article/26/6/841/244688>
 [pub-cufflinks]: <https://doi.org/10.1038/nprot.2012.016>
 [pub-cutadapt]: <https://doi.org/10.14806/ej.17.1.200>

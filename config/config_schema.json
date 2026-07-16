@@ -125,7 +125,57 @@
         "sort_by":{
             "type": "string",
             "default": "position",
-            "description":"Sort pileups by the first nucleotide's position from left-to-right ('position') or by counts in descending order ('counts')."
+            "description": "Sort pileups by the first nucleotide's position from left-to-right ('position') or by counts in descending order ('counts')."
+        },
+        "min_count_dict":{
+            "type": "object",
+            "properties": {
+                "run": { "type": "integer" },
+                "lib": { "type": "integer" },
+                "condition": { "type": "integer" }
+            },
+            "additionalProperties": false,
+            "default": {"run": 1, "lib": 1, "condition": 1},
+            "description": "Dictionary with the minimum count for a sequence to be kept for each pileup group; per run, per library, per condition."
+        },
+        "split": {
+            "type": "boolean",
+            "default": true,
+            "description": "Split precursor pileups into one mature-arm pileup per arm."
+        },
+        "canonical": {
+            "type": "boolean",
+            "default": true,
+            "description": "Mark the aligned read corresponding to the canonical mature sequence."
+        },
+        "keep_all": {
+            "type": "boolean",
+            "default": true,
+            "description": "Write the pileup even if it as no aligned sequences."
+        },
+        "keep_info": {
+            "type": "boolean",
+            "default": true,
+            "description": "Keep genomic coordinates and feature names on the final display."
+        },
+        "max_seq":{
+            "type": "integer",
+            "default": 15,
+            "description": "Maximum number of top sequences to display."
+        },
+        "color_dict":{
+            "type": "object",
+            "properties": {
+                "adenine": { "type": "string" },
+                "cytosine": { "type": "string" },
+                "guanine": { "type": "string" },
+                "thymine": { "type": "string" },
+                "gap": { "type": "string" },
+                "generic": { "type": "string" }
+            },
+            "additionalProperties": false,
+            "default": { "adenine": "green", "cytosine": "orange", "guanine": "'light purple'", "thymine": "'light blue'", "gap": "'light gray'", "generic": "white" },
+            "description": "Dictionary with the character-to-color mapping."
         }
     }
 }

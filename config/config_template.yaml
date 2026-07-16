@@ -82,4 +82,29 @@ lib_dict: {}
 # position from left-to-right ('position') or by counts in descending order
 # ('counts')
 sort_by: 'position'
+
+# Pileup modifications
+# Dictionary with the minimum count for a sequence to be kept for each pileup
+# group: pileups for the whole run (`run`), pileups for each library (`lib`),
+# and pileups for the conditions specified in `lib_dict`.
+#
+# Keys must not be changed!
+min_count_dict: {'run': 1, 'lib': 1, 'condition': 1}
+split: true # split precursor pileups into one mature-arm pileup per arm
+canonical: true # mark the aligned read corresponding to the canonical sequence
+keep_all: true # write the pileup even if it has no aligned sequences
+max_seq: 15 # maximum number of top sequences to display
+
+
+# Color-coded pileups
+keep_info: true # keep genomic coordinates and feature names on the final file
+# Dictionary with the character-to-color-mapping. See available colors in the
+# main README.
+#
+# Keys must not be changed!
+color_dict: {
+  'adenine': 'green', 'cytosine': 'orange',
+  'guanine': '"light purple"', 'thymine': '"light blue"',
+  'gap': '"light gray"', 'generic': 'white'
+}
 ...

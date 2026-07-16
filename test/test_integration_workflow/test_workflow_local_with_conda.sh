@@ -27,6 +27,7 @@ snakemake \
     --configfile="$TEST/test_files/config.yaml" \
     --software-deployment-method conda \
     --printshellcmds \
+    --show-failed-logs \
     --rerun-incomplete \
     --no-hooks \
     --verbose

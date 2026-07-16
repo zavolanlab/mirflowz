@@ -28,6 +28,7 @@ snakemake \
     --software-deployment-method apptainer \
     --apptainer-args "--bind ${PWD}/" \
     --printshellcmds \
+    --show-failed-logs \
     --rerun-incomplete \
     --no-hooks \
     --verbose
