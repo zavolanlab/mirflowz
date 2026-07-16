@@ -348,7 +348,7 @@ regions with a [**custom script**][custom-script-copper].
             final file (default: 'true')
           - `color_dict`: Dictionary with the character-to-color mapping. See
             available colors in the
-            [module overview](../overview.md#ascii-style-alignmnet-pileups-module).
+            [module overview](../overview.md#ascii-style-alignment-pileups-module).
             (default: 'adenine'='green', 'cytosine'='orange',
             'guanine'='"light purple"', 'thymine'='"light blue"',
             'gap'='"light gray"', and 'generic'='white')

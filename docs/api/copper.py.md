@@ -10,9 +10,9 @@ either for a whole directory or a single file.
 If a directory is provided as input, an HTML file is generated for each
 file with just one CSS file.
 
-For a proper HTML creation, the counts column title must be specified in
-the CLI argument `--counts_id` (see the "Constraints" section for a more
-detailed explanation on the input format)
+For proper HTML creation, the counts column title must be specified in the CLI
+argument `--counts_id` (see the "Constraints" section for a more detailed
+explanation on the input format).
 
 The final color-coded pileup has a two-line header:
 
@@ -270,7 +270,7 @@ Metadata derived from the pileup input file name.
 Rendered HTML fragment and current sequence length.
 
 - <b>`html`</b>: Row HTML string representation.
-- <b>`seq_len`</b>: Lenght of the sequence representation
+- <b>`seq_len`</b>: Length of the sequence representation
 
 ---
 

@@ -76,7 +76,7 @@ Options
   (default: 1).
 - <b>`--max-sequences INT`</b>: Maximum number of top sequences to be
   displayed. It is assumed that the input ASCII-style alignment pileups are
-  alredy sorted in the desired order (default: 30).
+  already sorted in the desired order (default: 30).
 - <b>`--overhang INT`</b>: If `--split-arms` is set, number of extra positions
   to retain on each side of the mature arm span. Reads extending beyond this
   interval are removed. If omitted, only reads fully contained within the
