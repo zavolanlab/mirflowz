@@ -295,7 +295,7 @@ h3 {
 
         html_pileup = f"""
             <div class="line">
-                <div class"line-sequence">
+                <div class="line-sequence">
                     {self.get_char_seq(seq, shift)}
                 <span class="line-data">{vals}<strong>{info}</strong></span>
                 </div>
@@ -318,7 +318,7 @@ h3 {
 
         html_pileup = f"""
             <div class="line">
-                <div class"line-sequence">
+                <div class="line-sequence">
                     {self.get_char_seq(seq, shift)}
                 <span class="line-data">{vals}</span>
                 </div>
@@ -333,7 +333,7 @@ h3 {
         """Render a three-field pileup row."""
         html_pileup = f"""
             <div class="line">
-                <div class"line-sequence"><strong>
+                <div class="line-sequence"><strong>
                     {self.get_char_seq(seq, shift)}
                 <span class="line-data">{vals}  {info}</span>
                 </strong></div>
