@@ -2008,7 +2008,7 @@ across libraries with a [**custom script**][custom-script-ascii-mod].
 #### `modify_per_run_ascii_pileups`
 
 Modify the generated ASCII-style pileups for all the desired annotated regions
-for the whole rune with a [**custom script**][custom-script-ascii-mod].
+for the whole run with a [**custom script**][custom-script-ascii-mod].
 
 > A directory containing the modified ASCII-style pileups for the whole run is
 > created. If no ASCII-style alignment pileups were created, the modified

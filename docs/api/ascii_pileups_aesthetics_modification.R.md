@@ -269,7 +269,7 @@ For each mature arm:
 
 - <b>`in.pileup`</b>: A data frame representing one input pileup. It must
   contain the columns `seq` and `counts`.
-- <b<`overhang`</b>: A non-negative integer specifying the allowed extension
+- <b>`overhang`</b>: A non-negative integer specifying the allowed extension
   beyond the arm span on each side. If `NULL`, it is treated as `0`.
 - <b>`head.lines`</b>: An integer giving the number of header lines in the
   input pileup. Expected values are: `3` if single arm with precursor, or
